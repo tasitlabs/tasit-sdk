@@ -1,6 +1,6 @@
 # TasitSDK
 
-The Tasit SDK is a standardized, open-source set of tools and components for interacting with major classes of already-on-chain dapp smart contracts. The Tasit SDK is intended to be used on mobile devices (iOS and Android) for app written in React Native.
+The Tasit SDK is a standardized, open-source set of tools and components for interacting with major classes of already-on-chain dapp smart contracts. The Tasit SDK is intended to be used on mobile devices (iOS and Android) in React Native apps.
 
 ### Tools for major classes of dapps
 
