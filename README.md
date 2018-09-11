@@ -17,7 +17,7 @@ The Tasit SDK also provides a standalone tool for discovering the current addres
 
 #### Injecting web3
 
-Unlike Coinbase Wallet, Status, Cipher, or Vault, the idea is that the Tasit SDK would be used by many different mobile apps on a user's device. That is, a user wouldn't use every dapp through a single-app browser with web3 injected there. Instead, the Tasit SDK provides tooling for web3 to be injected in each mobile app it is used, each time with a different Ethereum addres. There are more details in the section `Accounts and private keys` below.
+Unlike Coinbase Wallet, Status, Cipher, or Vault, the idea is that the Tasit SDK would be used by many different mobile apps on a user's device. That is, a user wouldn't use every dapp through a single-app browser with web3 injected there. Instead, the Tasit SDK provides tooling for web3 to be injected in each mobile app it is used, each time with a different Ethereum address. There are more details in the section `Accounts and private keys` below.
 
 #### Accounts and private keys
 
