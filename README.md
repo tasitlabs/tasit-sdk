@@ -42,7 +42,7 @@ _This means fewer steps that need to be taken to onboard a new user._
 
 #### Connects with your preferred wallet
 
-Through compatibility with WalletConnect, any app can be authorized to take actions in a way that has only been possible in wallet apps to date. The wallet might be an [Aragon personal DAO](http://blog.aragon.one/enter-the-world-of-personal-daos), the [Gnosis Safe personal edition](https://blog.gnosis.pm/announcing-the-gnosis-safe-beta-personal-edition-19a69a4453e8)﻿﻿, the [Balance wallet](https://twitter.com/ricburton/status/1038772498756714496), [the wallet Alex Van de Sande ends up building](https://www.youtube.com/watch?v=WODqP3DR8rA), Status, etc.
+Through compatibility with WalletConnect, any app can be authorized to take actions in a way that has only been possible in wallet apps to date. The wallet might be an [Aragon personal DAO](http://blog.aragon.one/enter-the-world-of-personal-daos), the [Gnosis Safe personal edition](https://blog.gnosis.pm/announcing-the-gnosis-safe-beta-personal-edition-19a69a4453e8), the [Balance wallet](https://twitter.com/ricburton/status/1038772498756714496), any wallet that may be built to be compatible with [Alex Van de Sande’s universal logins (ERC 1077 and 1078)](https://www.youtube.com/watch?v=WODqP3DR8rA), Status, etc.
 
 _This means a flow that users will be used to which decreases the friction for onboarding people who have used other Ethereum dapps._
 
@@ -85,7 +85,7 @@ We already said this, but it's worth repeating:
 
 We encourage contributions by the community, so please reach out!
 
-[Telegram](https://t.me/tasitlabs)
-[Website](https://tasit.io/)
-[Email](mailto:founders@tasit.io)
-[GitHub issues](https://github.com/tasitlabs/tasitsdk/issues)
+- [Telegram](https://t.me/tasitlabs)
+- [Website](https://tasit.io/)
+- [Email](mailto:founders@tasit.io)
+- [GitHub issues](https://github.com/tasitlabs/tasitsdk/issues)
