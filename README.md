@@ -4,13 +4,37 @@ The Tasit SDK is a JavaScript SDK for making mobile apps for Ethereum dapps usin
 
 We encourage contributions by the community, so please reach out!
 
-### Why?
+### Why (from the user's perspective)?
 
-Today, using a dapp from your phone is painful. Almost no dapps have standalone mobile apps, and I’m not easily able to use the dapp without ETH or with the ETH I have in another wallet. We lose mainstream people from the onboarding funnel because of this. Some dapps can be used inside a single app like Coinbase Wallet or Status that serves as a dapp browser, but this feels like a terribly broken UX for anyone who has been using a mobile phone for a while, and it also feels like broken UX for people who are used to using web-based dapps with MetaMask. The ideal UX would be installing each mobile dapp in a way that feels the same as installing any mobile app, and giving it permission to take actions with my ETH held in a separate wallet.
-
-One major reason most dapps don’t have standalone mobile apps today is because it’s hard for developers to build mobile Ethereum dapps. There isn’t any good tooling for it. Most developers building interesting new mobile apps these days use React Native to automatically support both iOS and Android, but there is little-to-no tooling for Ethereum in the React Native ecosystem. The Tasit SDK provides that tooling.
+Today, using a dapp from your phone is painful. Almost no dapps have standalone mobile apps, and I’m not easily able to use the dapp without ETH or with the ETH I have in another wallet. We lose mainstream people from the onboarding funnel because of this. Some dapps can be used inside a single app like Coinbase Wallet or Status that serves as a dapp browser, but this feels like a terribly broken UX for anyone who has been using a mobile phone for a while, and it also feels like broken UX for people who are used to using web-based dapps with MetaMask. The ideal UX would be installing each mobile dapp in a way that feels the same as installing any mobile app, and giving it permission to take actions with the costs of onboarding subsidized by others or with my ETH held in a separate wallet.
 
 The idea is that the Tasit SDK would be used by many different mobile apps on a user's device. Once the Tasit SDK is around, more dapps will have dedicated mobile apps. This will remove a key barrier to mainstream adoption of Ethereum dapps.
+
+### Why (from a developer / Ethereum enthusiast's perspective)?
+
+The user-facing answer for "Why?" focused on the UX/product, since that's the main thing that mainstream users care about. Here we'll touch on more technical/ideological arguments for why it's important that the Ethereum community creates more mobile dapps.
+
+One major reason most dapps don’t have standalone mobile apps today is because it’s hard for developers to build mobile Ethereum dapps. There isn’t much good tooling for it. Most developers building interesting new mobile apps these days use React Native to automatically support both iOS and Android, but there is little-to-no tooling for Ethereum in the React Native ecosystem. The Tasit SDK provides that tooling.
+
+The web-based front end for most dapps these days are written with React, so using React Native for the native mobile version is a natural fit.
+
+Developers shouldn't need to reinvent the wheel for each new dapp: account and private key generation, linking to another wallet or adding meta-transaction support, etc. Let the Tasit SDK handle that bit and focus on the business logic for your dapp.
+
+#### Proof of decentralization
+
+Tasit will serve as "proof of decentralization" for the dapps we
+support. Vitalik tweeted 'One simple litmus test for
+whether or not a blockchain project is truly decentralized: can a
+third party independently make a client for it, and do everything
+that the "official" client can?'. It's time for major decoupling of "back end" and front end.
+
+#### Right to exit for users
+
+A single company's financial incentives determining how a software
+product works is a bummer for users. See Facebook's newsfeed
+changing to clickbait, or see Twitter users clamoring for simple
+changes to the product like spambot or harassment detection to no
+avail.
 
 ### Getting started
 
@@ -40,7 +64,17 @@ Using the Tasit SDK, you can generate a new Ethereum account and private key. Th
 
 _This means fewer steps that need to be taken to onboard a new user._
 
-#### Connects with your preferred wallet
+#### Supports both Infura and geth light nodes
+
+[Add more info]
+
+#### Supports both meta-transactions and personal DAOs
+
+##### Meta-transactions
+
+[Add more info]
+
+##### Connects with your preferred wallet
 
 Through compatibility with WalletConnect, any app can be authorized to take actions in a way that has only been possible in wallet apps to date. The wallet might be an [Aragon personal DAO](http://blog.aragon.one/enter-the-world-of-personal-daos), the [Gnosis Safe personal edition](https://blog.gnosis.pm/announcing-the-gnosis-safe-beta-personal-edition-19a69a4453e8), the [Balance wallet](https://twitter.com/ricburton/status/1038772498756714496), any wallet that may be built to be compatible with [Alex Van de Sande’s universal logins (ERC 1077 and 1078)](https://www.youtube.com/watch?v=WODqP3DR8rA), Status, etc.
 
