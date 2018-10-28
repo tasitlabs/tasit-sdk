@@ -29,11 +29,14 @@ This app scaffold comes ready to submit for beta testing on iOS with Testflight 
 #### BYO Scaffold
 
 Prefer to scaffold out your own app? That works too.
-In `App.js`, import whichever APIs you need from the Tasit SDK.
+In `App.js` or the appropriate React Native component, import whichever APIs you need from the Tasit SDK.
 
-`import { Accounts } from 'tasit-sdk'`
-
-_TODO: Add more details on using other features_
+```
+import { Account } from 'tasit-sdk'
+const wallet = await Account.create();
+console.log(wallet); // { address: '...', privateKey: '...', publicKey: '...' }
+...
+```
 
 ### Features
 
@@ -99,13 +102,15 @@ The Tasit SDK will work with Ethereum 2.0. We support Ethereum-based dapps to st
 
 _In order for the Tasit SDK to make a difference for current and future users of Ethereum, it will need to support future versions of the EVM._
 
-### Why (from the user's perspective)?
+### Why?
+
+#### Why (from the user's perspective)?
 
 Today, using a dapp from your phone is painful. Almost no dapps have standalone mobile apps, and I’m not easily able to use the dapp without ETH or with the ETH I have in another wallet. We lose mainstream people from the onboarding funnel because of this. Some dapps can be used inside a single app like Coinbase Wallet or Status that serves as a dapp browser, but this feels like a terribly broken UX for anyone who has been using a mobile phone for a while, and it also feels like broken UX for people who are used to using web-based dapps with MetaMask. The ideal UX would be installing each mobile dapp in a way that feels the same as installing any mobile app, and giving it permission to take actions during onboarding with the costs subsidized by others or with my ETH held in a separate wallet.
 
 The idea is that the Tasit SDK would be used by many different mobile apps on a user's device. Once the Tasit SDK is around, more dapps will have dedicated mobile apps. This will remove a key barrier to mainstream adoption of Ethereum dapps.
 
-### Why (from a developer / Ethereum enthusiast's perspective)?
+#### Why (from a developer / Ethereum enthusiast's perspective)?
 
 The user-facing answer for "Why?" focused on the UX/product, since that's the main thing that mainstream users care about. Here we'll touch on more technical/ideological arguments for why it's important that the Ethereum community creates more mobile dapps.
 
@@ -115,17 +120,17 @@ The web-based front end for most dapps these days are written with React, so usi
 
 Developers shouldn't need to reinvent the wheel for each new dapp: account and private key generation, linking to another wallet or adding meta-transaction support, etc. Let the Tasit SDK handle that bit and focus on the business logic for your dapp.
 
-#### Proof of decentralization
+##### Proof of decentralization
 
 Tasit will serve as "proof of decentralization" for the dapps we support. Vitalik tweeted 'One simple litmus test for whether or not a blockchain project is truly decentralized: can a third party independently make a client for it, and do everything that the "official" client can?'. It's time for major decoupling of "back end" and front end.
 
-#### Right to exit for users
+##### Right to exit for users
 
 A single company's financial incentives determining how a software product works is a bummer for users. See Facebook's newsfeed changing to clickbait, or see Twitter users clamoring for simple changes to the product like spambot or harassment detection to no avail.
 
 ### Contact us
 
-We'd love any and all feedback from the community, so please feel free to reach out!
+We love getting feedback from the community, so please feel free to reach out.
 
 - [Telegram](https://t.me/tasitlabs)
 
