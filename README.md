@@ -1,20 +1,24 @@
 # Tasit SDK
 
-<div align="center">
-  <img src="/images/TasitLogoGrayscale.png" width="300" />
+<div align="left">
+  <img src="/images/TasitLogoGrayscale.png" width="200" />
 </div>
+
+### Introduction
 
 The Tasit SDK is a JavaScript SDK for making mobile Ethereum dapps using React Native.
 
-Already convinced you've been looking for something like this? Then continue right on to the [Getting started](#getting-started) section below.
+##### Already convinced you've been looking for something like this?
 
-Still a bit skeptical about mobile dapps? Then you might want to jump ahead to the "why" sections.
+You can continue right on to the [Getting started](#getting-started) section below.
+
+##### A bit skeptical about the need for mobile dapps?
+
+You might want to jump ahead to the "why" sections to start:
 
 - [Why (from the user's perspective)?](#why-from-the-users-perspective)
 
 - [Why (from a developer / Ethereum enthusiast’s perspective)?](#why-from-a-developer--ethereum-enthusiasts-perspective)
-
-We encourage contributions by the community, so please reach out!
 
 ### Getting started
 
