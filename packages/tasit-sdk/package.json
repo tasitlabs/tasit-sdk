@@ -1,0 +1,27 @@
+{
+  "name": "tasit-sdk",
+  "version": "0.0.1",
+  "description": "A JavaScript SDK for making mobile Ethereum dapps using React Native",
+  "keywords": [
+    "ethereum",
+    "dapp",
+    "react",
+    "native"
+  ],
+  "author": "Tasit Labs",
+  "homepage": "https://github.com/tasitlabs/TasitSDK#readme",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tasitlabs/tasitsdk.git"
+  },
+  "scripts": {
+    "test": "echo \"Error: run tests from root\" && exit 1"
+  },
+  "bugs": {
+    "url": "https://github.com/tasitlabs/tasitsdk/issues"
+  },
+  "dependencies": {
+    "tasit-account": "^0.0.1"
+  }
+}

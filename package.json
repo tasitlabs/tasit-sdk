@@ -1,7 +1,30 @@
 {
   "name": "root",
   "private": true,
+  "description": "A monorepo for all npm packages in the Tasit ecosystem",
   "devDependencies": {
-    "lerna": "^3.2.1"
+    "@babel/preset-env": "^7.1.6",
+    "lerna": "^3.4.3",
+    "prettier": "^1.15.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tasitlabs/TasitSDK.git"
+  },
+  "keywords": [
+    "dapp",
+    "ethereum",
+    "react",
+    "native"
+  ],
+  "author": "Tasit Labs",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/tasitlabs/TasitSDK/issues"
+  },
+  "homepage": "https://github.com/tasitlabs/TasitSDK#readme",
+  "engines": {
+    "node": ">=10.13.0",
+    "npm": ">=6.4.1"
   }
 }
