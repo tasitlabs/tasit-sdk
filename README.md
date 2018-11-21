@@ -60,25 +60,27 @@ We realized that different developers have different takes on whether it's accep
 
 Have a strong opinion on whether we should prioritize Infura-style or light-node-style first? Please [reach out](#contact-us)!
 
-#### Supports both meta-transactions and personal DAOs
+#### Onboarding
 
-##### Meta-transactions
+Supports both universal logins and connecting with your mobile Ethereum wallet
 
-The approach with [meta-transactions](https://medium.com/@austin_48503/ethereum-meta-transactions-90ccf0859e84) is that web3.js is only used to sign messages, and then as a developer you can use your preferred centralized or decentralized solution to relay that as an Ethereum tx and pay and/or be rewarded as each solution sees fit.
+##### Universal logins (and therefore meta-transactions)
 
-##### Connects with your preferred wallet
+The approach with [Alex Van de Sande’s universal logins (ERC 1077 and 1078)](https://www.youtube.com/watch?v=WODqP3DR8rA) and [meta-transactions](https://medium.com/@austin_48503/ethereum-meta-transactions-90ccf0859e84) is that the user's account is only used to sign messages, and then as a developer you can use your preferred centralized or decentralized solution to relay that as an Ethereum tx and pay and/or be rewarded as each solution sees fit.
 
-Through compatibility with WalletConnect, any app can be authorized to take actions in a way that has only been possible in wallet apps to date. The wallet might be an [Aragon personal DAO](http://blog.aragon.one/enter-the-world-of-personal-daos), the [Gnosis Safe personal edition](https://blog.gnosis.pm/announcing-the-gnosis-safe-beta-personal-edition-19a69a4453e8), the [Balance wallet](https://twitter.com/ricburton/status/1038772498756714496), any wallet that may be built to be compatible with [Alex Van de Sande’s universal logins (ERC 1077 and 1078)](https://www.youtube.com/watch?v=WODqP3DR8rA), Status, etc.
+##### Connects with your preferred mobile Ethereum wallet
 
-##### Wrapping up meta-transactions and personal DAOs
+Through compatibility with WalletConnect, any app can be authorized to take actions in a way that has only been possible in wallet apps to date. The wallet might be an [Aragon personal DAO](http://blog.aragon.one/enter-the-world-of-personal-daos), the [Gnosis Safe personal edition](https://blog.gnosis.pm/announcing-the-gnosis-safe-beta-personal-edition-19a69a4453e8), the [Balance wallet](https://twitter.com/ricburton/status/1038772498756714496), Status, etc.
+
+##### Wrapping up onboarding
 
 _This means a flow that users will be used to which decreases the friction for onboarding people who have used other Ethereum dapps._
 
 Have a strong opinion on whether we should prioritize meta-transactions-style or personal-DAO-style first? Please [reach out](#contact-us)!
 
-#### Injecting web3.js
+#### Using ethers.js for JSON-RPC requests
 
-The Tasit SDK provides tooling for web3 to be injected in each mobile app it is used in.
+The Tasit SDK provides tooling for ethers.js to be instantiated in each mobile app it is used in.
 
 This is necessary to be able to initiate transactions on the Ethereum blockchain from within the app.
 
@@ -94,7 +96,7 @@ _This also makes the experience for new developers working on a mobile app with 
 
 #### Advanced support for popular ERC standards
 
-Classes of smart contracts we support include [NFTs](http://erc721.org/), [TCRs](https://medium.com/@simondlr/city-walls-bo-taoshi-exploring-the-power-of-token-curated-registries-588f208c17d5), [DAOs](https://blog.aragon.org/bringing-daos-back-aragon-monthly-92756cb65639/), and two-sided marketplaces (like Gitcoin, CryptoCribs, Ethlance, etc.). There’s an ERC-standard-specific JavaScript API wrapping the core web3 API so that the function-names in the Tasit SDK are tailored to that type of dapp. As long as we’ve built the tooling to interact with that class of dapp at least once before, the Tasit SDK can “automagically” support any new dapp of that type.
+Classes of smart contracts we support include [NFTs](http://erc721.org/), [TCRs](https://medium.com/@simondlr/city-walls-bo-taoshi-exploring-the-power-of-token-curated-registries-588f208c17d5), [DAOs](https://blog.aragon.org/bringing-daos-back-aragon-monthly-92756cb65639/), and two-sided marketplaces (like Gitcoin, CryptoCribs, Ethlance, etc.). There’s an ERC-standard-specific JavaScript API wrapping the core ether.js API so that the function-names in the Tasit SDK are tailored to that type of dapp. As long as we’ve built the tooling to interact with that class of dapp at least once before, the Tasit SDK can “automagically” support any new dapp of that type.
 
 _This means there’s a network effect for the Tasit SDK, so once we have a few apps using it, it will be much faster to make new apps with it._
 
@@ -140,10 +142,12 @@ A single company's financial incentives determining how a software product works
 
 We love getting feedback from the community, so please feel free to reach out.
 
-- [Telegram](https://t.me/tasitlabs)
-
 - [Website](https://tasit.io/)
+
+- [Telegram](https://t.me/tasitlabs)
 
 - [Email](mailto:founders@tasit.io)
 
-- [GitHub issues](https://github.com/tasitlabs/tasitsdk/issues)
+- [Feature requests](https://tasit.canny.io/feature-requests)
+
+- [Project Kanban board](https://github.com/orgs/tasitlabs/projects/1)
