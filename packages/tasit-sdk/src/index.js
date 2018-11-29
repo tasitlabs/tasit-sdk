@@ -2,7 +2,7 @@
 
 import { Wallet } from "ethers/wallet";
 
-export const create = async () => {
+const create = async () => {
   try {
     const wallet = Wallet.createRandom();
     return wallet;
@@ -11,8 +11,12 @@ export const create = async () => {
   }
 };
 
-const Account = {
+export const Account = {
   create
 };
 
-export default Account;
+const Tasit = {
+	Account
+};
+
+export default Tasit;

@@ -1,4 +1,4 @@
-import Account from "./index.js";
+import { Account } from "./index.js";
 import { expect, assert } from "chai";
 
 describe("Account", function() {
