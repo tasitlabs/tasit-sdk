@@ -17,7 +17,7 @@
     "url": "git+https://github.com/tasitlabs/tasitsdk.git"
   },
   "scripts": {
-    "build": "npx babel src --out-dir lib --ignore **/*.test.js",
+    "prepublish": "npx babel src --out-dir lib --ignore **/*.test.js",
     "test": "npx mocha src/index.test.js --require @babel/register"
   },
   "bugs": {
