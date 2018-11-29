@@ -1,7 +1,5 @@
 "use strict";
 
-// TODO: Add Babel support
-
 import { Wallet } from "ethers/wallet";
 
 export const create = async () => {
@@ -12,3 +10,9 @@ export const create = async () => {
     throw new Error(`Error creating wallet: ${error.message}`);
   }
 };
+
+const Account = {
+  create
+};
+
+export default Account;
