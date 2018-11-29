@@ -144,6 +144,8 @@ We love getting feedback from the community, so please feel free to reach out.
 
 - [Website](https://tasit.io/)
 
+- [Twitter](https://twitter.com/tasitlabs)
+
 - [Telegram](https://t.me/tasitlabs)
 
 - [Email](mailto:founders@tasit.io)
