@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = exports.create = void 0;
+exports.default = exports.Account = void 0;
 
 require("ethers/dist/shims.js");
 
@@ -19,9 +19,12 @@ const create = async () => {
   }
 };
 
-exports.create = create;
 const Account = {
   create
 };
-var _default = Account;
+exports.Account = Account;
+const Tasit = {
+  Account
+};
+var _default = Tasit;
 exports.default = _default;
