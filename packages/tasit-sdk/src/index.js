@@ -1,6 +1,6 @@
 "use strict";
 
-import "thers/dist/shims.js";
+import "ethers/dist/shims.js";
 import { Wallet } from "ethers/wallet";
 
 export const create = async () => {
