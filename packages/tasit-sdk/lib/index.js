@@ -5,7 +5,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = exports.create = void 0;
 
-require("thers/dist/shims.js");
+require("ethers/dist/shims.js");
 
 var _wallet = require("ethers/wallet");
 
