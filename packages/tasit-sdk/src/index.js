@@ -1,18 +1,18 @@
 "use strict";
 
-import "ethers/dist/shims.js";
-import { Wallet } from "ethers/wallet";
+require("ethers/dist/shims.js");
+let ethers = require("ethers");
 
 const create = async () => {
   try {
-    const wallet = Wallet.createRandom();
+    const wallet = ethers.Wallet.createRandom();
     return wallet;
   } catch (error) {
     throw new Error(`Error creating wallet: ${error.message}`);
   }
 };
 
-export const Account = {
+const Account = {
   create
 };
 
@@ -20,4 +20,4 @@ const Tasit = {
 	Account
 };
 
-export default Tasit;
+module.exports = Tasit

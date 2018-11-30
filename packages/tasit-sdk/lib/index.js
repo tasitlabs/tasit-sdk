@@ -1,18 +1,12 @@
 "use strict";
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = exports.Account = void 0;
-
 require("ethers/dist/shims.js");
 
-var _wallet = require("ethers/wallet");
+let ethers = require("ethers");
 
 const create = async () => {
   try {
-    const wallet = _wallet.Wallet.createRandom();
-
+    const wallet = ethers.Wallet.createRandom();
     return wallet;
   } catch (error) {
     throw new Error(`Error creating wallet: ${error.message}`);
@@ -22,9 +16,9 @@ const create = async () => {
 const Account = {
   create
 };
-exports.Account = Account;
 const Tasit = {
   Account
 };
-var _default = Tasit;
-exports.default = _default;
+module.exports = {
+  Account
+};
