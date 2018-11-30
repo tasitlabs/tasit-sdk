@@ -17,7 +17,7 @@ const Account = {
 };
 
 const Tasit = {
-	Account
+  Account
 };
 
-module.exports = Tasit
+module.exports = Tasit;
