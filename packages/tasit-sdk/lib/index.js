@@ -15,7 +15,6 @@ var _ethers = require("ethers");
 const create = async () => {
   try {
     const wallet = _ethers.ethers.Wallet.createRandom();
-
     return wallet;
   } catch (error) {
     throw new Error(`Error creating wallet: ${error.message}`);
