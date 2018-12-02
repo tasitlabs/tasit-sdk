@@ -2,7 +2,7 @@
   "name": "tasit-sdk",
   "version": "0.0.1",
   "description": "A JavaScript SDK for making mobile Ethereum dapps using React Native",
-  "main": "src/index.js",
+  "main": "lib/index.js",
   "keywords": [
     "ethereum",
     "dapp",

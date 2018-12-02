@@ -1,7 +1,10 @@
 "use strict";
 
-require("ethers/dist/shims.js");
-let ethers = require("ethers");
+import "ethers/dist/shims.js";
+// Note: ethers SHOULD be imported from their main object
+// shims aren't injected with package import
+import { ethers } from "ethers";
+// import { Wallet } from "ethers/Wallet";
 
 const create = async () => {
   try {
@@ -12,7 +15,7 @@ const create = async () => {
   }
 };
 
-const Account = {
+export const Account = {
   create
 };
 
@@ -20,4 +23,4 @@ const Tasit = {
   Account
 };
 
-module.exports = Tasit;
+export default Tasit;
