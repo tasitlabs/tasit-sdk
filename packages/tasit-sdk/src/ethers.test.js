@@ -73,7 +73,10 @@ describe("ethers.js", function() {
     randomWallet = ethers.Wallet.createRandom();
     expect(randomWallet.address).to.have.lengthOf(42);
   });
-
+// Note: We're intentionally not testing the `fromEncryptedJson` or `encrypt` functions
+// from `ethers.js` because we don't plan to expose that functionality in the Tasit SDK.
+// For a detailed explanation of why, see this GitHub issue:
+// https://github.com/tasitlabs/TasitSDK/issues/24#issuecomment-443576993```
   it("should sign a raw transaction", async function() {
     let signedTx = await wallet.sign(rawTx);
 
