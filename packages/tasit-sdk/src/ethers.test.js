@@ -124,7 +124,7 @@ describe("ethers.js", function() {
 
     let signedBinData = await wallet.signMessage(binData);
 
-    expect(signedBinData).to.be.equals(expectedSignedBinData);
+    expect(signedBinData).to.equal(expectedSignedBinData);
   });
 
   it("should resolve ENS name", async function() {
