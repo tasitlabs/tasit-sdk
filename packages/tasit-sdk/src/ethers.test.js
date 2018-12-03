@@ -93,7 +93,7 @@ describe("ethers.js", function() {
     rawTx.nonce = await ropstenProvider.getTransactionCount(wallet.address);
     let signedTx = await wallet.sign(rawTx);
     let sentTx = await ropstenProvider.sendTransaction(signedTx);
-    expect(sentTx).to.be.not.undefined;
+    expect(sentTx).not.to.be.undefined;
 
     await ropstenProvider.waitForTransaction(sentTx.hash);
     let txResponse = await ropstenProvider.getTransaction(sentTx.hash);
