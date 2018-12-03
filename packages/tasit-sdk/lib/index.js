@@ -9,12 +9,13 @@ require("ethers/dist/shims.js");
 
 var _ethers = require("ethers");
 
-// Note: ethers SHOULD be imported from their main Object
-// shims are not injected with package import
+// Note: ethers SHOULD be imported from their main object
+// shims aren't injected with package import
 // import { Wallet } from "ethers/Wallet";
 const create = async () => {
   try {
     const wallet = _ethers.ethers.Wallet.createRandom();
+
     return wallet;
   } catch (error) {
     throw new Error(`Error creating wallet: ${error.message}`);
