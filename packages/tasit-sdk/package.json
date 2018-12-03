@@ -2,6 +2,7 @@
   "name": "tasit-sdk",
   "version": "0.0.1",
   "description": "A JavaScript SDK for making mobile Ethereum dapps using React Native",
+  "main": "lib/index.js",
   "keywords": [
     "ethereum",
     "dapp",
@@ -16,12 +17,22 @@
     "url": "git+https://github.com/tasitlabs/tasitsdk.git"
   },
   "scripts": {
-    "test": "echo \"Error: run tests from root\" && exit 1"
+    "prepublish": "npx babel src --out-dir lib --ignore **/*.test.js",
+    "test": "npx mocha src/index.test.js --require @babel/register"
   },
   "bugs": {
     "url": "https://github.com/tasitlabs/tasitsdk/issues"
   },
   "dependencies": {
-    "tasit-account": "^0.0.1"
+    "@babel/runtime": "^7.1.5",
+    "ethers": "^4.0.15"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.1.5",
+    "@babel/core": "^7.1.6",
+    "@babel/preset-env": "^7.1.6",
+    "@babel/register": "^7.0.0",
+    "chai": "^4.2.0",
+    "mocha": "^5.2.0"
   }
 }

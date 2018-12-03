@@ -22,21 +22,19 @@ You might want to jump ahead to the "why" sections to start:
 
 ### Getting started
 
-You can use the Tasit SDK to create user-friendly mobile iOS and Android apps for a dapp using React Native. Getting started is as simple as running
+You can use the Tasit SDK to create user-friendly mobile iOS and Android apps for a dapp using React Native.
+
+#### Installation
+
+Getting started is as simple as running
 
 `npm install --save tasit-sdk`
 
-#### Scaffolding
+#### Usage
 
-Then just run `npx tasit init` to automatically generate the scaffolding for a mobile dapp project.
+Are you looking to add functionality to a pre-existing app using the Tasit SDK?
 
-Alternatively, for popular ERC standards like ERC-721 for NFTs, you can even run `npx tasit init --nft` to instantly create a standalone mobile dapp for CryptoKitties, Decentraland, etc.
-
-This app scaffold comes ready to submit for beta testing on iOS with Testflight and on Android with Google Play Beta track, so you can focus on the core features of your dapp like you would do on the web.
-
-#### BYO Scaffold
-
-Prefer to scaffold out your own app? That works too.
+Using the Tasit SDK from within your app is simple.
 In `App.js` or the appropriate React Native component, import whichever APIs you need from the Tasit SDK.
 
 ```
@@ -45,6 +43,35 @@ const wallet = await Account.create();
 console.log(wallet); // { address: '...', privateKey: '...', publicKey: '...' }
 ...
 ```
+
+#### Automatic scaffolding using the Tasit CLI
+
+Are you starting a project from scratch? Let the Tasit CLI (installed automatically with the Tasit SDK) scaffold out your project for you.
+
+Just run `npx tasit init` to automatically generate the scaffolding for a mobile dapp project.
+
+Alternatively, for popular ERC standards like ERC-721 for NFTs, you can even run `npx tasit init --nft` to instantly create a standalone mobile dapp for CryptoKitties, Decentraland, etc.
+
+This app scaffold comes ready to submit for beta testing on iOS with Testflight and on Android with Google Play Beta track, so you can focus on the core features of your dapp like you would do on the web.
+
+#### Modular
+
+The Tasit SDK is designed with modularity in mind. Are you only planning on using the Tasit SDK for generating an Ethereum acccount in your app? That works too!
+
+You can install `tasit-account` directly and keep your app's dependencies leaner.
+
+```
+npm install --save tasit-account
+```
+
+Then the usage example from before becomes:
+
+```
+import Account from 'tasit-account'
+...
+```
+
+...with the rest of the code remaining the same.
 
 ### Features
 
@@ -143,6 +170,8 @@ A single company's financial incentives determining how a software product works
 We love getting feedback from the community, so please feel free to reach out.
 
 - [Website](https://tasit.io/)
+
+- [Twitter](https://twitter.com/tasitlabs)
 
 - [Telegram](https://t.me/tasitlabs)
 
