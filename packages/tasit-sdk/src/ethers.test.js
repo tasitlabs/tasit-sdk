@@ -86,7 +86,7 @@ describe("ethers.js", function() {
       "1eebe0a9aca05804e85eebc1de8d0c1de189ce2dafe94ed197565723a3b335c90d3f73" +
       "62eb7b";
 
-    expect(signedTx).to.be.equals(expectedSignedTx);
+    expect(signedTx).to.equal(expectedSignedTx);
   });
 
   it("should broadcast signed tx", async function() {
