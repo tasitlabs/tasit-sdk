@@ -129,7 +129,7 @@ describe("ethers.js", function() {
 
   it("should resolve ENS name", async function() {
     let address = await ensSample.provider.resolveName(ensSample.name);
-    expect(address).to.be.equals(ensSample.address);
+    expect(address).to.equal(ensSample.address);
   });
 
   it("should lookup ENS address", async function() {
