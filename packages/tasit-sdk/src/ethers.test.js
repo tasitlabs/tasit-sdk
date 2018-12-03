@@ -152,7 +152,7 @@ describe("ethers.js", function() {
 
     let newValue = await contract.getValue();
 
-    expect(newValue).to.be.equals(message);
+    expect(newValue).to.equal(message);
   });
 
   it("should watch contract's ValueChanged event", async function() {
