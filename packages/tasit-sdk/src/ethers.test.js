@@ -134,7 +134,7 @@ describe("ethers.js", function() {
 
   it("should lookup ENS address", async function() {
     let name = await ensSample.provider.lookupAddress(ensSample.address);
-    expect(name).to.be.equals(ensSample.name);
+    expect(name).to.equal(ensSample.name);
   });
 
   it("should instantiate a contract object", async function() {
