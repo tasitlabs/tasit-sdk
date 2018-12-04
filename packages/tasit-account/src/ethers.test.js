@@ -20,7 +20,7 @@ const zero = ethers.utils.bigNumberify(0);
 
 let wallet, randomWallet, contract;
 
-let rawTx = {
+const rawTx = {
 	nonce: 0,
 	gasLimit: 21000,
 	gasPrice: ethers.utils.bigNumberify("20000000000"),
@@ -140,7 +140,7 @@ describe("ethers.js - unit tests", function() {
 });
 
 describe("ethers.js - slow test cases", function() {
-	xit("should get/set contract's value", async function() {
+	it("should get/set contract's value", async function() {
 		const currentValue = await contract.getValue();
 		const message = `I like dogs ${randomWallet.mnemonic}`;
 		expect(currentValue).to.be.not.equals(message);
@@ -153,7 +153,7 @@ describe("ethers.js - slow test cases", function() {
 		expect(newValue).to.equal(message);
 	});
 
-	xit("should watch contract's ValueChanged event", async function() {
+	it("should watch contract's ValueChanged event", async function() {
 		const oldValue = await contract.getValue();
 		const newValue = `I like cats ${randomWallet.mnemonic}`;
 
@@ -163,7 +163,7 @@ describe("ethers.js - slow test cases", function() {
 		await ropstenProvider.waitForTransaction(tx.hash);
 	});
 
-	xit("should broadcast signed tx", async function() {
+	it("should broadcast signed tx", async function() {
 		rawTx.nonce = await ropstenProvider.getTransactionCount(wallet.address);
 		const signedTx = await wallet.sign(rawTx);
 		const sentTx = await ropstenProvider.sendTransaction(signedTx);
