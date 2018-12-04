@@ -163,7 +163,7 @@ describe("ethers.js - slow test cases", function() {
 		await ropstenProvider.waitForTransaction(tx.hash);
 	});
 
-	it("should broadcast signed tx", async function() {
+	xit("should broadcast signed tx", async function() {
 		rawTx.nonce = await ropstenProvider.getTransactionCount(wallet.address);
 		const signedTx = await wallet.sign(rawTx);
 		const sentTx = await ropstenProvider.sendTransaction(signedTx);

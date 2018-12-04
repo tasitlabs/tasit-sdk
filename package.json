@@ -8,7 +8,7 @@
     "prettier": "^1.15.2"
   },
 	"scripts": {
-		"test": "npx lerna run --scope tasit-sdk test"
+		"test": "npx lerna run test"
 	},
   "repository": {
     "type": "git",
