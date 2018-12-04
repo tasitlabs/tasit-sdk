@@ -20,7 +20,7 @@ const zero = ethers.utils.bigNumberify(0);
 
 let wallet, randomWallet, contract;
 
-let rawTx = {
+const rawTx = {
 	nonce: 0,
 	gasLimit: 21000,
 	gasPrice: ethers.utils.bigNumberify("20000000000"),
