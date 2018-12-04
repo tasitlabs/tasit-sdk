@@ -20,7 +20,7 @@ const zero = ethers.utils.bigNumberify(0);
 
 let wallet, randomWallet, contract;
 
-const rawTx = {
+let rawTx = {
 	nonce: 0,
 	gasLimit: 21000,
 	gasPrice: ethers.utils.bigNumberify("20000000000"),
@@ -140,7 +140,7 @@ describe("ethers.js - unit tests", function() {
 });
 
 describe("ethers.js - slow test cases", function() {
-	it("should get/set contract's value", async function() {
+	xit("should get/set contract's value", async function() {
 		const currentValue = await contract.getValue();
 		const message = `I like dogs ${randomWallet.mnemonic}`;
 		expect(currentValue).to.be.not.equals(message);
@@ -153,7 +153,7 @@ describe("ethers.js - slow test cases", function() {
 		expect(newValue).to.equal(message);
 	});
 
-	it("should watch contract's ValueChanged event", async function() {
+	xit("should watch contract's ValueChanged event", async function() {
 		const oldValue = await contract.getValue();
 		const newValue = `I like cats ${randomWallet.mnemonic}`;
 
