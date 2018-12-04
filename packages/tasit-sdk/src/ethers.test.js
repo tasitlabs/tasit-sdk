@@ -65,7 +65,7 @@ describe("ethers.js - pretests", function() {
 // For a detailed explanation of why, see this GitHub issue:
 // https://github.com/tasitlabs/TasitSDK/issues/24#issuecomment-443576993
 describe("ethers.js - unit tests", function() {
-	before("wallet used to sign transactions should has funds", async () => {
+	before("wallet used to sign transactions should have funds", async () => {
 		const balance = ethers.utils.bigNumberify(await wallet.getBalance());
 
 		assert(balance.gt(zero), "wallet balance is zero");
