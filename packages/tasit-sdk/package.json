@@ -17,7 +17,7 @@
 		"url": "git+https://github.com/tasitlabs/tasitsdk.git"
 	},
 	"scripts": {
-		"prepare": "npx babel src --out-dir lib --ignore **/*.test.js",
+		"prepare": "npx babel src --out-dir dist --ignore **/*.test.js",
 		"test": "npm run lint && npx mocha src/*.test.js --require @babel/register",
 		"lint": "npx prettier src/* --write"
 	},
