@@ -30,6 +30,9 @@ let rawTx = {
 	chainId: ethers.utils.getNetwork("ropsten").chainId,
 };
 
+// Note: Once we refactor this test suite for each test to require no prior state
+// other than what is in that describe's beforeEach hook, we'll give a more
+// descriptive name to this describe block
 describe("ethers.js - pretests", function() {
 	it("should create a wallet from priv key and provider", async function() {
 		const privateKey =
