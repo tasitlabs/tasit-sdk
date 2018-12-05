@@ -30,6 +30,9 @@ const rawTx = {
 	chainId: ethers.utils.getNetwork("ropsten").chainId,
 };
 
+// Note: Once we refactor this test suite for each test to require no prior state
+// other than what is in that describe's beforeEach hook, we'll give a more
+// descriptive name to this describe block
 describe("ethers.js - pretests", function() {
 	it("should create a wallet from priv key and provider", async function() {
 		const privateKey =
@@ -140,7 +143,7 @@ describe("ethers.js - unit tests", function() {
 });
 
 describe("ethers.js - slow test cases", function() {
-	it("should get/set contract's value", async function() {
+	xit("should get/set contract's value", async function() {
 		const currentValue = await contract.getValue();
 		const message = `I like dogs ${randomWallet.mnemonic}`;
 		expect(currentValue).to.be.not.equals(message);
@@ -153,7 +156,7 @@ describe("ethers.js - slow test cases", function() {
 		expect(newValue).to.equal(message);
 	});
 
-	it("should watch contract's ValueChanged event", async function() {
+	xit("should watch contract's ValueChanged event", async function() {
 		const oldValue = await contract.getValue();
 		const newValue = `I like cats ${randomWallet.mnemonic}`;
 
@@ -163,7 +166,7 @@ describe("ethers.js - slow test cases", function() {
 		await ropstenProvider.waitForTransaction(tx.hash);
 	});
 
-	it("should broadcast signed tx", async function() {
+	xit("should broadcast signed tx", async function() {
 		rawTx.nonce = await ropstenProvider.getTransactionCount(wallet.address);
 		const signedTx = await wallet.sign(rawTx);
 		const sentTx = await ropstenProvider.sendTransaction(signedTx);
