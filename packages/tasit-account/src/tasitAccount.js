@@ -4,16 +4,16 @@ import "ethers/dist/shims.js";
 import { ethers } from "ethers";
 
 const create = () => {
-	try {
-		const wallet = ethers.Wallet.createRandom();
-		return wallet;
-	} catch (error) {
-		throw new Error(`Error creating wallet: ${error.message}`);
-	}
+  try {
+    const wallet = ethers.Wallet.createRandom();
+    return wallet;
+  } catch (error) {
+    throw new Error(`Error creating wallet: ${error.message}`);
+  }
 };
 
 export const Account = {
-	create,
+  create,
 };
 
 export default Account;
