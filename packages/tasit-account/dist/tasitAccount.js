@@ -11,8 +11,7 @@ var _ethers = require("ethers");
 
 // Note: ethers SHOULD be imported from their main object
 // shims aren't injected with package import
-// import { Wallet } from "ethers/Wallet";
-const create = async () => {
+const create = () => {
   try {
     const wallet = _ethers.ethers.Wallet.createRandom();
 
@@ -26,8 +25,5 @@ const Account = {
   create
 };
 exports.Account = Account;
-const Tasit = {
-  Account
-};
-var _default = Tasit;
+var _default = Account;
 exports.default = _default;
