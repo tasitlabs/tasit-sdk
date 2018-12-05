@@ -7,9 +7,9 @@
     "lerna": "^3.4.3",
     "prettier": "^1.15.2"
   },
-	"scripts": {
-		"test": "npx lerna run test"
-	},
+  "scripts": {
+    "test": "npx lerna run test"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/tasitlabs/TasitSDK.git"
