@@ -112,6 +112,7 @@ The Tasit SDK provides tooling for ethers.js to be instantiated in each mobile a
 This is necessary to be able to initiate transactions on the Ethereum blockchain from within the app.
 
 JavaScript middleware for reading from and writing to smart contracts through an expressive API.
+[tasit-act docs](/packages/tasit-act/README.md)
 
 _This makes the experience for new developers working on a mobile app with the Tasit SDK simpler, which means more mobile dapps for end users._
 
