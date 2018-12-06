@@ -1,0 +1,29 @@
+{
+  "name": "tasit-contracts",
+  "version": "0.0.1",
+  "description": "",
+  "keywords": [
+    "ethereum",
+    "dapp",
+    "truffle",
+    "ganache",
+    "solidity"
+  ],
+  "author": "Tasit Labs",
+  "homepage": "https://github.com/tasitlabs/TasitSDK#readme",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tasitlabs/tasitsdk.git"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "bugs": {
+    "url": "https://github.com/tasitlabs/tasitsdk/issues"
+  },
+  "devDependencies": {
+    "ganache-cli": "^6.2.3",
+    "truffle": "^4.1.14"
+  }
+}
