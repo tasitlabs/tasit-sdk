@@ -73,17 +73,22 @@ Let's now consider a slightly lower level of abstraction, where we can construct
 
 There's functionality for determining what ERC721 features it supports beyond the basic, required ones using ERC165 interface detection.
 
-Or maybe there doesn't need to me if we decide the contract ABI will be present for sure. This is an _open question_ for now.
+Moreso than for an unknown contract with the lower-level `tasit-act` API, using ERC165 here is justified because it's a first-class feature for extensions of ERC721 in [OpenZeppelin](https://github.com/OpenZeppelin/openzeppelin-solidity/blob/5caecf548c04c97955b8f0487ceb804fab0e2ca1/contracts/token/ERC721/ERC721Metadata.sol#L5).
 
-Moreso than for an unknown contract with the lower-level `tasit-act` API, using ERC165 here is justified because it's a first-class feature for extensions of ERC721 in [OpenZeppelin](https://github.com/OpenZeppelin/openzeppelin-solidity/blob/5caecf548c04c97955b8f0487ceb804fab0e2ca1/contracts/token/ERC721/ERC721Metadata.sol#L5)
+But maybe there doesn't need to be if we decide the contract ABI will be present for sure. This is an _open question_ for now.
+
+Anyway, here's how to instantiate the contract:
 
 ```
-// TODO: Decide if this is all that is needed to instantiate it
+// TODO: Decide if we can instantiate this with more or less params
 const nft = new NFT(address, contractABI)
+// or
+const nft = new NFT(address) // with an assumed ABI
 ```
 
-detectInterfaces returns an object of ERC721-related interfaces it supports.
-Internally it calls the lower level `contract.supportsInterface()` first.
+`detectInterfaces()` returns an object of ERC721-related interfaces this ERC721 contract supports (since there is a basic ERC721 interface but also some more fully-featured extensions).
+
+Internally it calls the lower level `contract.usesSupportsInterface()` first to see if checking for specific interfaces is even worthwhile.
 
 ```
 const { supportsMetadata } = await nft.detectInterfaces()
@@ -93,12 +98,10 @@ if (supportsMetadata) {
 }
 ```
 
-Alternatively, because tokenURI is just an external or public view function you can get it directly using the underlying contract method approach you'll see used exclusively below
+Alternatively, because tokenURI is just an `external` or `public` `view` function you can get it directly using the underlying "call a contract method" approach you'll see used exclusively below in the lower-level `tasit-act` library with no prior knowledge about contract type.
 
 ```
-
 const tokenURI = await nft.tokenURI(tokenId)
-
 ```
 
 Fetching additional metadata from the tokenURI is obviously something we need to support. It doesn't feel like it makes sense to have a function for doing this as a `nft.xyz(...)` method, though.
@@ -107,19 +110,17 @@ Fetching images from additional URIs linked to in the JSON blob available at the
 
 ##### tasit-act
 
-A low-level library for calling all of the functions on a given smart contract and listening to events from a smart contract.
+A low-level library for calling all of the functions on a given smart contract and listening to events from the smart contract.
 
 To make this example comparable with the ERC721 example above, let's say the contract happens to be of the same type, ERC721.
 
 ```
-
-// TODO: Add way to instantiate contract.
+// TODO: Finalize way to instantiate contract.
 // Maybe just the same as ethers.js?
-const contract
+const contract = new contract(address, contractABI)
 
 const balance = await contract.balanceOf(owner)
 const owner = await contract.ownerOf(tokenId)
-
 ```
 
 Checks whether the contract will let you look up other interfaces it implements using ERC165
@@ -129,11 +130,13 @@ Checks whether the contract will let you look up other interfaces it implements 
 const supportsInterface = await contract.usesSupportsInterface()
 ```
 
-Let's use ERC165 to see if this contract uses the ERC721Metadata extension. Remember, this will be a longer shot because we're just using `tasit-act`, not the ERC721 abstraction that already "knows" ERC165 is popular for ERC721s. But if we decide the user of the SDK has to have the full ABI at this point, maybe this feature is less useful.
+Let's use ERC165 to see if this contract uses the ERC721Metadata extension. Remember, this will be a longer shot because we're just using `tasit-act`, not the ERC721 abstraction that already "knows" ERC165 is popular for ERC721s. Unlike above where we did `nft.detectInterfaces()`, we don't know the hashes of the interfaces to check for without the prior knowledge of what type of contract this is. So we'll need to check for ERC721Metadata using its hash as an argument.
+
+If we decide the user of the SDK has to have the full ABI at this point, maybe this feature is less useful.
 
 ```
 // TODO: Add the proper type conversion, etc.
-// Note: This is straight from Solidity, the string as it is probably isn't right.
+// Note: This is straight from Solidity - the string as it is probably isn't right.
 const INTERFACE_ID_ERC721_METADATA = "0x5b5e139f";
 
 // 0x5b5e139f ===
@@ -151,20 +154,21 @@ if (supportsMetadata) {
 
 ```
 
-Ideas for getting clever with ABIs at this level of abstraction:
-Find all view (external or public) functions and assume they're the interesting ones for looking up state, and infer from param types what they might do.
+_Ideas for getting clever with ABIs at this level of abstraction:_
 
-Optional function to consider:
+Find all `view` (`external` or `public`) functions. Assume they're the interesting ones for looking up state.
 
 `const data = await contract.getAllData()`
 
 `getAllData()` does all data-fetching it can in a single call based on what we know from the ABI or from ERC165.
 
+Possibly even infer from param types what they might do, but that's a lot harder.
+
 ##### contract from ethers.js
 
 Let's re-read the `tasit-act` section above when it is finalized and see how much it differs from the [ethers.js abstraction for connecting to contracts](https://docs.ethers.io/ethers.js/html/api-contract.html#connecting-to-existing-contracts).
 
-We'll want to do the same for setting data and listening for events too. As long as there's any abstraction we want on top of the ethers.js contract functions, `tasit-act` for contracts of unknown type seems justified.
+We'll want to do the same for setting data and listening for events too. As long as there's any abstraction we want on top of the ethers.js contract functions, `tasit-act` support for contracts of unknown type seems justified. Setting data / creating transactions is very likely to diverge from the ethers.js library.
 
 ### Setting data
 
@@ -194,34 +198,36 @@ function onMessage(message) {
 }
 
 subscription.on("confirmation", handlerFunction)
-
 ```
 
-Since remembering to remove the listener is a little clunky, we could also include
+You could even imagine pre-attaching a listener with a handlerFunction by default for a few pubsub topics that the user of the SDK is likely to want.
+
+Since remembering to remove the listener is a little clunky, we could also include a variant that unsubscribes after the first message for that topic. This is a pretty common pattern.
 
 `subscription.once("enough-confirmations", handlerFunction)`
 
-Perhaps during or before sending the transaction the user of the SDK picks what type of events they want to be subscribed to.
+For more customization of how this works, during or before sending the transaction the user of the SDK could pick which types of events they want to be subscribed to.
 
 ##### contract from ethers.js
 
-Setting data on a contract returns a tx hash. In the docs for ethers.js, next they `await` to see that the transaction has been confirmed. `tasit-act` has more of a "optimistic updates" but "be sure to handle error cases" philosophy.
+Setting data on a contract returns a tx hash. In the example in the ethers.js docs, the next step is to `await` to see that the transaction has been confirmed.
+
+`tasit-act` has more of a "optimistic updates" but "be sure to handle error cases" philosophy. Of course that could be achieved with the lower-level ethers.js API too, but the `tasit-act` abstraction gently guides the user towards that approach in a more opinionated fashion.
 
 ### Listening for events
 
 ##### tasit-act
 
-Listening for events has a similar API as when you're subscribed for being notified of block confirmations for a given "set" operation.
+Listening for events has a similar subcriptions API to the one you use after creating a transaction (see above).
 
 But unlike for "set" operations, the subscription isn't created implicitly.
 
 Here, it is initiated explicitly with a subscribe function.
 
 ```
-
-const subscription = contract.subscribe([events])
-subscription.on("exampleEvent", handlerFunction)
-
+const events = ["ExampleEvent", "AnotherExampleEvent"]
+const subscription = contract.subscribe(events)
+subscription.on("ExampleEvent", handlerFunction)
 ```
 
 ##### ERC 721
@@ -232,11 +238,11 @@ Note: The ERC721 level of abstraction for listening for events would already kno
 
 // Subscriptions is an object where the keys are the event names from ERC721
 const subscriptions = contract.subscribeAll()
-const { transfer } = subscriptions
+subscriptions.remove("Transfer")
 ```
 
-In this example there's an event `Transfer`, and `transfer` refers to that subscription. So you could do `transfer.removeAllListeners()` and still be subscribed to other events.
+In this example there's an event `Transfer` as one of the events supported by ERC721. After unsubscribing from transfer events, you're still be subscribed to other events emitted by the contract.
 
 ### Topics for the future
 
-Is it worth considering having upgradeable smart contracts being a first-class feature of this package? That would mean not assuming the ABI you have right now will always work. But, it could still potentially assume there will be a backwards compatibility guarantee and the existing ABI functions would continue to be supported.
+Is it worth considering having upgradeable smart contracts being a first-class feature of this package? That would mean not assuming the ABI you have right now will always work. But, it could still assume that there will be a backwards compatibility guarantee and that the existing ABI functions would continue to be supported.
