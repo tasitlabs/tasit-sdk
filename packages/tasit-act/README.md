@@ -52,7 +52,7 @@ const [x, y] = await decentraland.getLandCoordinates(landId)
 const landIds = decentraland.getAllLandIdsIncludingEstates(userId)
 ```
 
-All of this could be done with a little more work using just the ERC721 abstraction, below, though.
+All of this could be done with a little more work using just the ERC721 abstraction, below, though. Under the hood it uses `tokenOfOwnerByIndex` from ERC721Enumerable, for instance.
 
 Open questions:
 
