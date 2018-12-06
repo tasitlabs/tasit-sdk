@@ -8,11 +8,16 @@ Setting data could possibly be non-async if it's like publishing in pubsub.
 
 Then you subscribe for the data like it's pubsub as well. That would make subscribing to the "event" of 1 or 7 or 100 block confirmations for a set operation have a very similar API to the one for subscribing to events.
 
+[Getting data](#getting-data)
+[Setting data](#setting-data)
+[Listening for events](#listening-for-events)
+
 ### Getting data
 
 ##### Decentraland
 
-I think at this level of abstraction, we don't use ERC165 interface detection like we do at lower levels (see below).
+I think at this level of abstraction, we don't use ERC165 interface detection like we do at lower levels (see below). But actually, using it at all warrants more thought, depending on whether we're assuming the user knows the full contract ABI or not (and depending on whether ethers.js assumes that.)
+
 We just know the ABI for the open source contracts for that exact project and assume the presence of these functions. The developer can still use the lower-level APIs to confirm, though.
 
 ```
@@ -23,10 +28,10 @@ import { Decentraland } from tasit-act
 const decentraland = new Decentraland()
 ```
 
-Low level functions still work
+Low-level functions still work
 
 ```
-const balance = await decentraland.balanceOf(address owner)
+const balance = await decentraland.balanceOf(owner)
 ```
 
 Optional: Expose higher-level functions that are specific to this dapp
@@ -51,20 +56,20 @@ All of this could be done with a little more work using just the ERC721 abstract
 
 Open questions:
 
-- Whether the address should be configurable at this level of abstraction.
-- Whether the ABI should be in version control in this package or whether we want to add functionality for getting it from the web, using Etherscan's API or hopefully a decentralized npm where teams publish genearted files like ABI's down the road.
+- Whether the address should be configurable at this level of abstraction. For instance, the developer using this SDK might know sooner than the Tasit SDK project core devs do that non-upgradable contract project is deploying new contracts and will be using a new interface address from now on.
+- Whether the ABI should be in version control in this package or whether we want to add functionality for getting it from the web, using Etherscan's API or hopefully a decentralized npm where teams publish generated files like ABIs down the road.
 
 ##### ERC 721
 
-A higher-level API focused on ERC721. infering what it can with ERC165 interface detection.
+A higher-level API focused on ERC721. There's functionanlity for infering what it can above optional ERC721 features using ERC165 interface detection.
 
 ```
-const nft
+// TODO: Decide how to instantiate it
+const nft = new NFT(address, contractABI)
 
-// Returns an object of ERC721-related interfaces it supports
+// detectInterfaces returns an object of ERC721-related interfaces it supports
 // Internally it calls the lower level
 // contract.supportsInterface() first.
-
 const { supportsMetadata } = await nft.detectInterfaces()
 
 if (supportsMetadata) {
@@ -82,14 +87,11 @@ const tokenURI = await nft.tokenURI(tokenId)
 
 A low-level way for calling all of the functions on a given smart contract
 
-```
-// get data
-// supports whatever getters the contract implements
-// To make it comparable with the ERC721 example
-// above, let's say the contract happens to be
-// of type ERC721.
+To make this example comparable with the ERC721 example above, let's say the contract happens to be of type ERC721.
 
-// TODO: Add way to instantiate contract
+```
+// TODO: Add way to instantiate contract.
+// Maybe just the same as ethers.js?
 const contract
 
 const balance = await contract.balanceOf(owner)
@@ -118,7 +120,7 @@ const supportsMetadata = await contract.supportsInterface(INTERFACE_ID_ERC721_ME
 // implements that interface.
 
 if (supportsMetadata) {
-  const tokenURI = contract.tokenURI(tokenId)
+  const tokenURI = await contract.tokenURI(tokenId)
 }
 
 ```
@@ -126,9 +128,13 @@ if (supportsMetadata) {
 Ideas for getting clever with ABIs at this level of abstraction:
 Find all view (external or public) functions and assume they're the interesting ones for looking up state, and infer from param types what they might do.
 
+// Optional function:
+// Does all data-getting it can based on what we know about the ABI or from ERC165.
+const data = await contract.getAllData()
+
 ##### contract from ethers.js
 
-Let's read the `tasit-act` section above when we're done and see how much it differs from the ethers abstraction
+Let's read the `tasit-act` section above when we're done and see how much it differs from the ethers abstraction for connecting to contracts
 [Ethers](https://docs.ethers.io/ethers.js/html/api-contract.html#connecting-to-existing-contracts)
 
 ### Setting data
@@ -145,7 +151,7 @@ So the set should return something that lets the user subscribe for the 1st or o
 
 One option is:
 
-````
+```
 const subscription = contract.transferFrom(from, to, tokenId)
 
 function onMessage(message) {
@@ -160,10 +166,11 @@ function onMessage(message) {
 
 
 subscription.on("confirmation", handlerFunction)
-subscription.removeAllListeners()
+
 ```
 
 ##### contract from ethers.js
+
 setting the data returns a tx hash
 
 Then you subscribe for the data like it's pubsub as well. That would make subscribing to the "event" of 1 or 7 or 100 block confirmations for a set operation have a very similar API to the one for subscribing to events.
@@ -178,4 +185,7 @@ But the subscription is initiated with a subscribe function as opposed to it bei
 const subscription = contract.subscribe([events])
 subscription.on("exampleEvent", handlerFunction)
 ```
-````
+
+```
+
+```
