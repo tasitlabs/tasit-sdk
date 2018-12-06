@@ -171,13 +171,11 @@ subscription.on("confirmation", handlerFunction)
 
 ##### contract from ethers.js
 
-setting the data returns a tx hash
-
-Then you subscribe for the data like it's pubsub as well. That would make subscribing to the "event" of 1 or 7 or 100 block confirmations for a set operation have a very similar API to the one for subscribing to events.
+Setting data on a contract returns a tx hash
 
 ### Listening for events
 
-Almost the exact same API as when you're subscribed for x block confirmations for a given set operation.
+Listening for events has almost the exact same API as when you're subscribed for being notified of block confirmations for a given set operation.
 
 But the subscription is initiated with a subscribe function as opposed to it being the result of a set operation.
 
@@ -186,6 +184,12 @@ const subscription = contract.subscribe([events])
 subscription.on("exampleEvent", handlerFunction)
 ```
 
-```
+##### ERC 721
 
+Note: The ERC721 level of abstraction for listening for events would already know what events to listen for and let you subscribe to them like so:
+
+```
+// Subscriptions is an object where the keys are the event names from ERC721
+const subscriptions = contract.subscribeAll()
+const { transfer } = subscriptions
 ```
