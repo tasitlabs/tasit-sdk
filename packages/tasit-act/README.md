@@ -6,7 +6,7 @@ Why `tasit-act`? act: [akt], verb. "to do something". It's also nice that it's p
 
 Getting data is like an HTTP(S) request, so it should be async. Because doing the JSON-RPC request to Infura and getting data back has network lag.
 
-Setting data could possibly be non-async if it's like publishing in pubsub. It could be sync too if we're picturing a pubsub approach where successful publication is instantly ACK'ed.
+Setting data could possibly be sync (non-async) if it's like publishing in pubsub with no ACK and it's instant. It could be async too if we're picturing a pubsub approach where successful publication is ACK'ed, but not instantly. Or if the ACK is instant, then we're back to sync.
 
 Then you subscribe for the data like it's pubsub as well. That would make subscribing to the "event" of 1 or 7 or 100 block confirmations for a set operation have a very similar API to the one for subscribing to events.
 
@@ -180,7 +180,7 @@ When using the contract abstraction from ethers.js, the functions for setting da
 
 That's too blockchain-y for the target audience. The API is being informed too much by the underlying implementation as opposed to the most understandable abstraction. The `tasit-act` API for setting data should be indistinguishable from using pubsub on a non-blockchain architecture.
 
-So the "set" should return something that lets the user subscribe for the 1st or or 7th or nth confirmation of the result, but it shouldn't be a tx hash.
+So the "set" should return something that lets the user subscribe for the 1st or 7th or nth confirmation of the result, but it shouldn't be a tx hash.
 
 Here's one option for how it could work:
 
@@ -235,7 +235,6 @@ subscription.on("ExampleEvent", handlerFunction)
 Note: The ERC721 level of abstraction for listening for events would already know what events to listen for and let you subscribe to them like so:
 
 ```
-
 // Subscriptions is an object where the keys are the event names from ERC721
 const subscriptions = contract.subscribeAll()
 subscriptions.remove("Transfer")
