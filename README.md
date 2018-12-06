@@ -109,13 +109,15 @@ _This means a flow that users will be used to which decreases the friction for o
 
 Have a strong opinion on whether we should prioritize meta-transactions-style or personal-DAO-style first? Please [reach out](#contact-us)!
 
-#### Using ethers.js for JSON-RPC requests
+#### Using an abstraction around ethers.js for JSON-RPC requests
 
-The Tasit SDK provides tooling for ethers.js to be instantiated in each mobile app it is used in.
+The Tasit SDK provides tooling for an account to be instantiated in each mobile app it is used in.
 
 This is necessary to be able to initiate transactions on the Ethereum blockchain from within the app.
 
-JavaScript middleware for reading from and writing to smart contracts through an expressive API.
+The Tasit SDK provides JavaScript middleware for reading from and writing to smart contracts (and listening to events) through an expressive API.
+
+[Here are the docs for that](/packages/tasit-act/README.md).
 
 _This makes the experience for new developers working on a mobile app with the Tasit SDK simpler, which means more mobile dapps for end users._
 
