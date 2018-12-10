@@ -8,9 +8,7 @@
 
 The Tasit SDK is a JavaScript SDK for making mobile Ethereum dapps using React Native.
 
-### Disclaimer
-
-The alpha version of this SDK is under active development. We encourage you to try it out today for hackathons, etc., but it's not ready for anything involving real funds on mainnet. If you'd prefer to wait for a more battle-tested release, please watch this repo with the `Releases only` setting and/or sign up to be notified about our releases on the [tasit.io](https://tasit.io) website.
+_Disclaimer:_ The alpha version of this SDK is under active development. We encourage you to try it out today for hackathons, etc., but it's not ready for anything involving real funds on mainnet. If you'd prefer to wait for a more battle-tested release, please watch this repo with the `Releases only` setting and/or sign up to be notified about our releases on the [tasit.io](https://tasit.io) website.
 
 ##### Already convinced you've been looking for something like this?
 
@@ -36,8 +34,10 @@ You might want to jump ahead to the "why" sections to start:
 - [Onboarding](#onboarding)
 - [Configurable JSON-RPC client](#configurable-json-rpc-client)
 - [Apps generated with the Tasit SDK are customizable](#apps-generated-with-the-tasit-sdk-are-customizable)
-- [Tool for finding address of a popular smart contract](#tool-for-finding-address-of-a-popular-smart-contract)
+- [Tool for finding the address of a popular smart contract](#tool-for-finding-the-address-of-a-popular-smart-contract)
 - [Serenity support](#serenity-support)
+
+[Why](#why)
 
 [Contact us](#contact-us)
 
@@ -176,7 +176,7 @@ The Decentraland and CryptoKitties apps generated using `tasit init --nft` ship 
 
 _This also makes the experience for new developers working on a mobile app with the Tasit SDK simpler, which also means more mobile dapps for end users._
 
-#### Tool for finding address of a popular smart contract
+#### Tool for finding the address of a popular smart contract
 
 The Tasit SDK also provides a standalone tool for discovering the current address of a high-profile dapp project’s primary smart contract interface. We detect the interface / ERC standard a smart contract implements using ERC-165 standard interface detection. We also track the latest ABI and interface address for the most heavily used dapp projects directly via their open-source GitHub repos.
 
