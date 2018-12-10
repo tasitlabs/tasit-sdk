@@ -45,6 +45,8 @@ You might want to jump ahead to the "why" sections to start:
 
 You can use the Tasit SDK to create user-friendly mobile iOS and Android apps for a dapp using React Native.
 
+Looking for the entry point for the `tasit-sdk` package? [That's here](/packages/tasit-sdk/). The Tasit SDK is a collection of smaller packages exported as one using [lerna](https://lernajs.io/).
+
 #### Installation
 
 Getting started is as simple as running
@@ -103,6 +105,8 @@ Using the Tasit SDK, you can generate a new Ethereum account and private key.
 The Tasit SDK makes it simple for a new account to be instantiated in each mobile app it is used in.
 
 The intended UX is that this account should NOT have any significant amount of ETH, ERC20, or ERC721 tokens sent to it. This app is NOT a wallet. Instead, this address should be authorized to perform actions on behalf of a smart-contract-based identity or software wallet a user already has with some ETH or tokens. This is an ephemeral account for that app on the device, and as the user gets more familiar with it their account can be progressively upgraded to a personal DAO later or their funds can be stored in their preferred primary software wallet.
+
+[This is the subpackage](/packages/tasit-account/README.md) that implements these features for the Tasit SDK.
 
 _This means fewer steps that need to be taken to onboard a new user._
 
