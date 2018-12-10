@@ -24,6 +24,23 @@ You might want to jump ahead to the "why" sections to start:
 
 - [Why (from a developer / Ethereum enthusiast’s perspective)?](#why-from-a-developer--ethereum-enthusiasts-perspective)
 
+### Table of contents
+
+[Getting started](#getting-started)
+
+[Features](#features)
+
+- [Account and private key generation](#account-and-private-key-generation)
+- [Reading and writing data and reacting to events](##reading-and-writing-data-and-reacting-to-events)
+- [Advanced support for popular ERC standards](#advanced-support-for-popular-erc-standards)
+- [Onboarding](#onboarding)
+- [Configurable JSON-RPC client](#configurable-json-rpc-client)
+- [Apps generated with the Tasit SDK are customizable](#apps-generated-with-the-tasit-sdk-are-customizable)
+- [Tool for finding address of a popular smart contract](#tool-for-finding-address-of-a-popular-smart-contract)
+- [Serenity support](#serenity-support)
+
+[Contact us](#contact-us)
+
 ### Getting started
 
 You can use the Tasit SDK to create user-friendly mobile iOS and Android apps for a dapp using React Native.
@@ -89,6 +106,54 @@ The intended UX is that this account should NOT have any significant amount of E
 
 _This means fewer steps that need to be taken to onboard a new user._
 
+#### Reading and writing data and reacting to events
+
+The Tasit SDK provides JavaScript middleware for reading from and writing to smart contracts (and listening to events) through an expressive API. This middleware wraps the core ethers.js contract API for making JSON-RPC requests.
+
+This library is written in such a way that the developer using the SDK can just thinking about writing data and listening for more data. The fact that there's a blockchain powering this is an implementation detail that is abstracted away.
+
+[Here is a lot more info](/packages/tasit-act/README.md) about how this works.
+
+_This makes the experience for new developers working on a mobile app with the Tasit SDK simpler, which means more mobile dapps for end users._
+
+#### Advanced support for popular ERC standards
+
+Classes of smart contracts we support include [NFTs](http://erc721.org/), [TCRs](https://medium.com/@simondlr/city-walls-bo-taoshi-exploring-the-power-of-token-curated-registries-588f208c17d5), [DAOs](https://blog.aragon.org/bringing-daos-back-aragon-monthly-92756cb65639/), and two-sided marketplaces (like Gitcoin, CryptoCribs, Ethlance, etc.). There’s an ERC-standard-specific JavaScript API wrapping the lower-level Tasit SDK API for reading and writing and listening for data so that the function-names in the Tasit SDK are tailored to that type of dapp. As long as we’ve built the tooling to interact with that class of dapp at least once before, the Tasit SDK can “automagically” support any new dapp of that type.
+
+_This means there’s a network effect for the Tasit SDK, so once we have a few apps using it, it will be much faster to make new apps with it._
+
+#### Onboarding
+
+This SDK takes an opinionated approach to onboarding (although since it's a modular repo, you still retain the ability to use other subpackages and not the onboarding-related ones if you prefer). The SDK supports read-only mode, meta-transactions, smart-contract-based accounts, and connecting with your mobile Ethereum wallet.
+
+##### Read-only for as long as possible
+
+A native mobile dapp should be read-only for as long as possible. The user shouldn't know there's a blockchain involved or see anything about an account, and an Ethereum account shouldn't even be created until it becomes necessary. Why go through an onboarding flow at all right away?
+
+##### For users new to Ethereum with no funds
+
+For users without any ETH or tokens, any costs the user incurs at first should be subsidized. Give them a smart-contract-based account so that the UX around securing keys and recovering funds is simpler.
+
+This can be done using [meta-transactions](https://medium.com/@austin_48503/ethereum-meta-transactions-90ccf0859e84) or [UniversalLoginSDK (ERC 1077 and 1078)](https://universallogin.io/) or [GnosisSafe](https://safe.gnosis.io/) or an [Aragon personal DAO](http://blog.aragon.one/enter-the-world-of-personal-daos).
+
+The approach with meta-transactions (and universal login) is that the user's account is only used to sign messages, and then as a developer you can use your preferred centralized or decentralized solution to relay that as an Ethereum tx and pay and/or be rewarded as each solution sees fit.
+
+##### For users that do have funds
+
+Connects with your preferred mobile Ethereum wallet. Using ERC20+721 approvals or [WalletConnect](https://walletconnect.org/).
+
+Users can continue to keep their funds in a proper wallet with better security guarantees if they do already have ETH, tokens, etc. and use them with this dapp.
+
+A user flow where a dapp's ephemeral account requests an approval for X ERC20 tokens of type A or one ERC721 token of type B is supported in the SDK.
+
+Through compatibility with WalletConnect, any standalone dapp can be authorized to take actions in a way that has only been possible in wallet apps to date. The wallet might be the [Gnosis Safe personal edition](https://blog.gnosis.pm/announcing-the-gnosis-safe-beta-personal-edition-19a69a4453e8), the [Balance wallet](https://twitter.com/ricburton/status/1038772498756714496), Status, Coinbase Wallet, Argent, BRD, etc.
+
+##### Wrapping up onboarding
+
+_This means a flow that users will be used to which decreases the friction for onboarding people who have used other Ethereum dapps._
+
+Have a strong opinion on which onboarding flow we should prioritize the most? Please [reach out](#contact-us)!
+
 #### Configurable JSON-RPC client
 
 We realize that different developers have different takes on whether it's an acceptable compromise to use Infura like MetaMask does in the browser or whether a node more like the original version of Status or Augur is warranted. We anticipate that in the short term, almost all developers using this SDK will use Infura. It's a centralized compromise solution for now.
@@ -105,58 +170,11 @@ Light and ultralight client projects we're tracking for future first-class suppo
 
 As such, this SDK supports both. The approach with the light node is much like Status' current approach, except in each individual app instead of one main wallet/messaging app. If [Nimbus](https://blog.status.im/introducing-nimbus-3360367bb311) gets a lot of traction down the road, we'll happily support that as well.
 
-#### Onboarding
-
-This SDK takes an opinionated approach to onboarding (although since it's a modular repo, you still retain the ability to use other subpackages and not the onboarding-related ones if you prefer). The SDK supports read-only mode, meta-transactions, smart-contract-based accounts, and connecting with your mobile Ethereum wallet.
-
-##### Read-only for as long as possible
-
-A native mobile dapp should be read-only for as long as possible. The user shouldn't know there's a blockchain involved or see anything about an account, and an Ethereum account shouldn't even be created until it becomes necessary. Why go through an onboarding flow at all right away?
-
-##### For users new to Ethereum with no funds
-
-**Subsidize any costs at first and give them a smart-contract-based account so that the UX around securing keys and recovering funds is simpler.**
-Using [meta-transactions](https://medium.com/@austin_48503/ethereum-meta-transactions-90ccf0859e84) or [UniversalLoginSDK (ERC 1077 and 1078)](https://universallogin.io/) or [GnosisSafe](https://safe.gnosis.io/) or an [Aragon personal DAO](http://blog.aragon.one/enter-the-world-of-personal-daos)
-
-The approach with meta-transactions (and universal login) is that the user's account is only used to sign messages, and then as a developer you can use your preferred centralized or decentralized solution to relay that as an Ethereum tx and pay and/or be rewarded as each solution sees fit.
-
-##### For users that do have funds
-
-Connects with your preferred mobile Ethereum wallet. Using ERC20+721 approvals or [WalletConnect](https://walletconnect.org/)
-
-Users can continue to keep their funds in a proper wallet with better security guarantees if they do already have ETH, tokens, etc. and use them with this dapp.
-
-A user flow where a dapp's ephemeral account requests an approval for X ERC20 tokens of type A or one ERC721 token of type B is supported in the SDK.
-
-Through compatibility with WalletConnect, any standalone dapp can be authorized to take actions in a way that has only been possible in wallet apps to date. The wallet might be the [Gnosis Safe personal edition](https://blog.gnosis.pm/announcing-the-gnosis-safe-beta-personal-edition-19a69a4453e8), the [Balance wallet](https://twitter.com/ricburton/status/1038772498756714496), Status, Coinbase Wallet, Argent, BRD, etc.
-
-##### Wrapping up onboarding
-
-_This means a flow that users will be used to which decreases the friction for onboarding people who have used other Ethereum dapps._
-
-Have a strong opinion on which onboarding flow we should prioritize the most? Please [reach out](#contact-us)!
-
-#### Reading and writing data and reacting to events
-
-The Tasit SDK provides JavaScript middleware for reading from and writing to smart contracts (and listening to events) through an expressive API. This middleware wraps the core ethers.js contract API for making JSON-RPC requests.
-
-This library is written in such a way that the developer using the SDK can just thinking about writing data and listening for more data. The fact that there's a blockchain powering this is an implementation detail that is abstracted away.
-
-[Here is a lot more info](/packages/tasit-act/README.md) about how this works.
-
-_This makes the experience for new developers working on a mobile app with the Tasit SDK simpler, which means more mobile dapps for end users._
-
 #### Apps generated with the Tasit SDK are customizable
 
 The Decentraland and CryptoKitties apps generated using `tasit init --nft` ship with styled-but-customizable React Native components for using each feature of the dapp, leveraging the js middleware.
 
 _This also makes the experience for new developers working on a mobile app with the Tasit SDK simpler, which also means more mobile dapps for end users._
-
-#### Advanced support for popular ERC standards
-
-Classes of smart contracts we support include [NFTs](http://erc721.org/), [TCRs](https://medium.com/@simondlr/city-walls-bo-taoshi-exploring-the-power-of-token-curated-registries-588f208c17d5), [DAOs](https://blog.aragon.org/bringing-daos-back-aragon-monthly-92756cb65639/), and two-sided marketplaces (like Gitcoin, CryptoCribs, Ethlance, etc.). There’s an ERC-standard-specific JavaScript API wrapping the lower-level Tasit SDK API for reading and writing and listening for data so that the function-names in the Tasit SDK are tailored to that type of dapp. As long as we’ve built the tooling to interact with that class of dapp at least once before, the Tasit SDK can “automagically” support any new dapp of that type.
-
-_This means there’s a network effect for the Tasit SDK, so once we have a few apps using it, it will be much faster to make new apps with it._
 
 #### Tool for finding address of a popular smart contract
 
