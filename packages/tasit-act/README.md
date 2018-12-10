@@ -22,6 +22,8 @@ Then you subscribe for the data like it's pubsub as well. That would make subscr
 
 - [Listening for events](#listening-for-events)
 
+# Docs
+
 ### Getting data
 
 - [Decentraland](#getting-data---decentraland)
@@ -186,29 +188,13 @@ We'll want to do the same for setting data and listening for events too. As long
 
 Setting data could possibly be non-async if it's like publishing in pubsub. There's additional info on this in the [notes](#notes) section at the beginning.
 
-- [Decentraland](#setting-data---decentraland)
-
-- [ERC721](#setting-data---erc721)
-
 - [Low-level Tasit SDK middleware](#setting-data---low-level-tasit-sdk-middleware)
 
 - [Contract API from ethers.js](#setting-data---contract-api-from-ethersjs)
 
-##### Setting data - Decentraland
+- [Decentraland](#setting-data---decentraland)
 
-```
-// TODO: Add me
-// But this far down in in the docs, you can probably
-// extrapolate how this would work from the rest
-```
-
-##### Setting data - ERC721
-
-```
-// TODO: Add me
-// But this far down in in the docs, you can probably
-// extrapolate how this would work from the rest
-```
+- [ERC721](#setting-data---erc721)
 
 ##### Setting data - Low-level Tasit SDK middleware
 
@@ -250,13 +236,29 @@ Setting data on a contract returns a tx hash. In the example in the ethers.js do
 
 `tasit-act` has more of a "optimistic updates" but "be sure to handle error cases" philosophy. Of course that could be achieved with the lower-level ethers.js API too, but the `tasit-act` abstraction gently guides the user towards that approach in a more opinionated fashion.
 
+##### Setting data - Decentraland
+
+```
+// TODO: Add me
+// But this far down in in the docs, you can probably
+// extrapolate how this would work from the rest
+```
+
+##### Setting data - ERC721
+
+```
+// TODO: Add me
+// But this far down in in the docs, you can probably
+// extrapolate how this would work from the rest
+```
+
 ### Listening for events
 
-- [Decentraland](#listening-for-events---decentraland)
+- [Low-level Tasit SDK middleware](#listening-for-events---low-level-tasit-sdk-middleware)
 
 - [ERC721](#listening-for-events---erc721)
 
-- [Low-level Tasit SDK middleware](#listening-for-events---low-level-tasit-sdk-middleware)
+- [Decentraland](#listening-for-events---decentraland)
 
 - [Contract API from ethers.js](#listening-for-events---contract-api-from-ethersjs)
 
@@ -286,7 +288,7 @@ subscriptions.remove("Transfer")
 
 In this example there's an event `Transfer` as one of the events supported by ERC721. After unsubscribing from transfer events, you're still be subscribed to other events emitted by the contract.
 
-##### Listening for events - ERC721
+##### Listening for events - Decentraland
 
 ```
 // TODO: Add me
