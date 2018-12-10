@@ -1,6 +1,10 @@
-This explains how one might interact with smart contracts at different levels of abstraction using `tasit-act`.
+# Reading and writing data and reacting to events
 
-Why `tasit-act`? act: [akt], verb. "to do something". It's also nice that it's part of the word contract.
+This explains how one can use the Tasit SDK to interact with smart contracts at different levels of abstraction
+
+[For context, here is an overview](https://github.com/tasitlabs/TasitSDK#reading-and-writing-data-and-reacting-to-events) of how this fits in with the rest of the Tasit SDK.
+
+*Note:* `tasit-act` is a subpackage of the [`tasit-sdk`](https://github.com/tasitlabs/TasitSDK) that is also published to npm as a standalone module using [lerna](https://lernajs.io/). Why `tasit-act`? act: [akt], verb. "to do something". It's also nice that it's part of the words contract and abstraction.
 
 ### Notes
 
@@ -20,7 +24,15 @@ Then you subscribe for the data like it's pubsub as well. That would make subscr
 
 ### Getting data
 
-##### Decentraland
+- [Decentraland](#getting-data-decentraland)
+
+- [ERC721](#erc721)
+
+- [Low-level Tasit SDK middleware](#low--level-tasit-sdk-middleware)
+
+- [Contract API from ethers.js](#contract-api-from-ethers.js)
+
+##### Getting data - Decentraland
 
 Let's start at the highest level of abstraction possible, where we can construct our ideal API for the end user assuming we know the SDK is being used specifically for the Decentraland contracts.
 
@@ -67,7 +79,7 @@ Open questions:
 - Whether the address should be configurable at this level of abstraction. For instance, the developer using this SDK might know sooner than the Tasit SDK project core devs do that a non-upgradeable contract project (that is, a standard smart contract project - not a delegatecall + proxy project) is deploying new contracts and will be using a new interface address from now on.
 - Whether the ABI should be in version control in this package or whether we want to add functionality for getting it from the web, using Etherscan's API or hopefully a decentralized npm where teams publish generated files like ABIs down the road.
 
-##### ERC 721
+##### Getting data - ERC721
 
 Let's now consider a slightly lower level of abstraction, where we can construct our ideal API for the end user assuming we know the SDK is being used specifically for an ERC721 (NFT) contract, but not which one until the user instantiates the contract using the SDK.
 
@@ -108,7 +120,7 @@ Fetching additional metadata from the tokenURI is obviously something we need to
 
 Fetching images from additional URIs linked to in the JSON blob available at the main tokenURI will also be a common use case in the app.
 
-##### tasit-act
+##### Getting data - Low-level Tasit SDK middleware
 
 A low-level library for calling all of the functions on a given smart contract and listening to events from the smart contract.
 
@@ -164,7 +176,7 @@ Find all `view` (`external` or `public`) functions. Assume they're the interesti
 
 Possibly even infer from param types what they might do, but that's a lot harder.
 
-##### contract from ethers.js
+##### Getting data - Contract API from ethers.js
 
 Let's re-read the `tasit-act` section above when it is finalized and see how much it differs from the [ethers.js abstraction for connecting to contracts](https://docs.ethers.io/ethers.js/html/api-contract.html#connecting-to-existing-contracts).
 
@@ -174,7 +186,7 @@ We'll want to do the same for setting data and listening for events too. As long
 
 Setting data could possibly be non-async if it's like publishing in pubsub. There's additional info on this in the [notes](#notes) section at the beginning.
 
-##### tasit-act
+##### Setting data - Low-level Tasit SDK middleware
 
 When using the contract abstraction from ethers.js, the functions for setting data return a transaction hash.
 
@@ -208,7 +220,7 @@ Since remembering to remove the listener is a little clunky, we could also inclu
 
 For more customization of how this works, during or before sending the transaction the user of the SDK could pick which types of events they want to be subscribed to.
 
-##### contract from ethers.js
+##### Setting data - Contract API from ethers.js
 
 Setting data on a contract returns a tx hash. In the example in the ethers.js docs, the next step is to `await` to see that the transaction has been confirmed.
 
@@ -216,7 +228,7 @@ Setting data on a contract returns a tx hash. In the example in the ethers.js do
 
 ### Listening for events
 
-##### tasit-act
+##### Listening for events - Low-level Tasit SDK middleware
 
 Listening for events has a similar subcriptions API to the one you use after creating a transaction (see above).
 
@@ -230,7 +242,7 @@ const subscription = contract.subscribe(events)
 subscription.on("ExampleEvent", handlerFunction)
 ```
 
-##### ERC 721
+##### Listening for events - ERC721
 
 Note: The ERC721 level of abstraction for listening for events would already know what events to listen for and let you subscribe to them like so:
 
