@@ -1,10 +1,10 @@
 # Reading and writing data and reacting to events
 
-This explains how one can use the Tasit SDK to interact with smart contracts at different levels of abstraction
+This explains how one can use the Tasit SDK to interact with smart contracts at different levels of abstraction.
 
 [For context, here is an overview](https://github.com/tasitlabs/TasitSDK#reading-and-writing-data-and-reacting-to-events) of how this fits in with the rest of the Tasit SDK.
 
-*Note:* `tasit-act` is a subpackage of the [`tasit-sdk`](https://github.com/tasitlabs/TasitSDK) that is also published to npm as a standalone module using [lerna](https://lernajs.io/). Why `tasit-act`? act: [akt], verb. "to do something". It's also nice that it's part of the words contract and abstraction.
+_Note:_ This functionality all "lives" in `tasit-act`, a subpackage of the [`tasit-sdk`](https://github.com/tasitlabs/TasitSDK) that is also published to npm as a standalone module using [lerna](https://lernajs.io/). Why `tasit-act`? **act:** [akt], verb. "to do something". It's also nice that it's part of the words _contract_ and _abstraction_.
 
 ### Notes
 
@@ -24,13 +24,13 @@ Then you subscribe for the data like it's pubsub as well. That would make subscr
 
 ### Getting data
 
-- [Decentraland](#getting-data-decentraland)
+- [Decentraland](#getting-data---decentraland)
 
-- [ERC721](#erc721)
+- [ERC721](#getting-data---erc721)
 
-- [Low-level Tasit SDK middleware](#low--level-tasit-sdk-middleware)
+- [Low-level Tasit SDK middleware](#getting-data---low-level-tasit-sdk-middleware)
 
-- [Contract API from ethers.js](#contract-api-from-ethers.js)
+- [Contract API from ethers.js](#getting-data---contract-api-from-ethersjs)
 
 ##### Getting data - Decentraland
 
@@ -186,6 +186,30 @@ We'll want to do the same for setting data and listening for events too. As long
 
 Setting data could possibly be non-async if it's like publishing in pubsub. There's additional info on this in the [notes](#notes) section at the beginning.
 
+- [Decentraland](#setting-data---decentraland)
+
+- [ERC721](#setting-data---erc721)
+
+- [Low-level Tasit SDK middleware](#setting-data---low-level-tasit-sdk-middleware)
+
+- [Contract API from ethers.js](#setting-data---contract-api-from-ethersjs)
+
+##### Setting data - Decentraland
+
+```
+// TODO: Add me
+// But this far down in in the docs, you can probably
+// extrapolate how this would work from the rest
+```
+
+##### Setting data - ERC721
+
+```
+// TODO: Add me
+// But this far down in in the docs, you can probably
+// extrapolate how this would work from the rest
+```
+
 ##### Setting data - Low-level Tasit SDK middleware
 
 When using the contract abstraction from ethers.js, the functions for setting data return a transaction hash.
@@ -228,6 +252,14 @@ Setting data on a contract returns a tx hash. In the example in the ethers.js do
 
 ### Listening for events
 
+- [Decentraland](#listening-for-events---decentraland)
+
+- [ERC721](#listening-for-events---erc721)
+
+- [Low-level Tasit SDK middleware](#listening-for-events---low-level-tasit-sdk-middleware)
+
+- [Contract API from ethers.js](#listening-for-events---contract-api-from-ethersjs)
+
 ##### Listening for events - Low-level Tasit SDK middleware
 
 Listening for events has a similar subcriptions API to the one you use after creating a transaction (see above).
@@ -253,6 +285,22 @@ subscriptions.remove("Transfer")
 ```
 
 In this example there's an event `Transfer` as one of the events supported by ERC721. After unsubscribing from transfer events, you're still be subscribed to other events emitted by the contract.
+
+##### Listening for events - ERC721
+
+```
+// TODO: Add me
+// But this far down in in the docs, you can probably
+// extrapolate how this would work from the rest
+```
+
+##### Listening for events - Contract API from ethers.js
+
+```
+// TODO: Add me
+// But this far down in in the docs, you can probably
+// extrapolate how this would work from the rest
+```
 
 ### Topics for the future
 
