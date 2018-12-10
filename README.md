@@ -31,7 +31,7 @@ You might want to jump ahead to the "why" sections to start:
 [Features](#features)
 
 - [Account and private key generation](#account-and-private-key-generation)
-- [Reading and writing data and reacting to events](##reading-and-writing-data-and-reacting-to-events)
+- [Reading and writing data and reacting to events](#reading-and-writing-data-and-reacting-to-events)
 - [Advanced support for popular ERC standards](#advanced-support-for-popular-erc-standards)
 - [Onboarding](#onboarding)
 - [Configurable JSON-RPC client](#configurable-json-rpc-client)
