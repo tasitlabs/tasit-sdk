@@ -16,7 +16,7 @@ const waitForEvent = async (eventName, expected) => {
   });
 };
 
-const ropstenProvider = ethers.getDefaultProvider("ropsten");
+const provider = new ethers.providers.JsonRpcProvider();
 const zero = ethers.utils.bigNumberify(0);
 
 let wallet, randomWallet, contract;
@@ -37,9 +37,9 @@ const rawTx = {
 describe("ethers.js - pretests", function() {
   it("should create a wallet from priv key and provider", async function() {
     const privateKey =
-      "0x18bfdd05c1e63e4a27081352e2910c164a4d34588f8d7eecfdfcb654742934c2";
+      "0x11d943d7649fbdeb146dc57bd9cfc80b086bfab2330c7b25651dbaf382392f60";
 
-    wallet = new ethers.Wallet(privateKey, ropstenProvider);
+    wallet = new ethers.Wallet(privateKey, provider);
     expect(wallet.address).to.have.lengthOf(42);
     expect(wallet.provider).to.be.not.undefined;
   });
@@ -50,7 +50,7 @@ describe("ethers.js - pretests", function() {
   });
 
   it("should get balance of wallet", async function() {
-    randomWallet = randomWallet.connect(ropstenProvider);
+    randomWallet = randomWallet.connect(provider);
 
     const fundedWalletBalance = ethers.utils.bigNumberify(
       await wallet.getBalance()
@@ -80,9 +80,9 @@ describe("ethers.js - unit tests", function() {
 
     const expectedSignedTx =
       "0xf869808504a817c8008252089488a5c2d9919e46f883eb62f7b8dd9d0cc45bc29085" +
-      "174876e8008029a00ea09864b0757df77c4fddd91ab4cb585a1c56dd433de363ca98cd" +
-      "1eebe0a9aca05804e85eebc1de8d0c1de189ce2dafe94ed197565723a3b335c90d3f73" +
-      "62eb7b";
+      "174876e800802aa00e271049c09b8481c602dfafea0f01105cefdda47a9b13013dfb36" +
+      "3b53cf482ba015d6be31fedcfc6f50b97f16f24e8cfe8afeffe46708cb169cae8082a8" +
+      "ed76cf";
 
     expect(signedTx).to.equal(expectedSignedTx);
   });
@@ -92,8 +92,8 @@ describe("ethers.js - unit tests", function() {
     const signedMsg = await wallet.signMessage(rawMsg);
 
     const expectedSignedMsg =
-      "0xcdd313d56ac1945e799a8c9d28d971fe40231ab354178611fbfe9b5ec00f493a4e33" +
-      "2781e2e72c1978b0d5540ff9fb667c54dc5c0792d9cf9b0ec10485da0d021b";
+      "0x372577a100b677f28381347d58369557563ffddfbc523c0e4a2348ed489427d25bd7" +
+      "595ce0f5a0da811bd7cc558e9e6eeed09988cd06fe0c0c9e7df69d373fec1b";
 
     expect(signedMsg).to.be.equals(expectedSignedMsg);
   });
@@ -106,8 +106,8 @@ describe("ethers.js - unit tests", function() {
     const binData = ethers.utils.arrayify(hash);
 
     const expectedSignedBinData =
-      "0x4d6e6ed24078bbdb3e2d45a01276666c64f396915050271cc40e5874448b5e876ea6" +
-      "44cb1887e70cc6acd0cf6bfc13146261748c5450d8e21f8980ac7defda811b";
+      "0x9c9eab15e04614df2748f3515261b2c15c0cf0e2208d9f3a7610955d511a97c064d8" +
+      "7ed31e727052e695859aaa4b00b208a0d088fb17897dda42ac59aad0e1de1c";
 
     const signedBinData = await wallet.signMessage(binData);
 
@@ -120,12 +120,12 @@ describe("ethers.js - unit tests", function() {
     address: "0x6fC21092DA55B392b045eD78F4732bff3C580e2c",
   };
 
-  it("should resolve ENS name", async function() {
+  xit("should resolve ENS name", async function() {
     const address = await ensSample.provider.resolveName(ensSample.name);
     expect(address).to.equal(ensSample.address);
   });
 
-  it("should lookup ENS address", async function() {
+  xit("should lookup ENS address", async function() {
     const name = await ensSample.provider.lookupAddress(ensSample.address);
     expect(name).to.equal(ensSample.name);
   });
@@ -133,30 +133,33 @@ describe("ethers.js - unit tests", function() {
   it("should instantiate a contract object", async function() {
     const contractABI = [
       "event ValueChanged(address indexed author, string oldValue, string newValue)",
-      "constructor(string value)",
-      "function getValue() view returns (string value)",
-      "function setValue(string value)",
+      "constructor(string memory) public",
+      "function getValue() public view returns (string memory)",
+      "function setValue(string memory) public",
     ];
-    const contractAddress = "0x2bD9aAa2953F988153c8629926D22A6a5F69b14E";
+
+    const contractAddress = "0x6C4A015797DDDd87866451914eCe1e8b19261931";
     contract = new ethers.Contract(contractAddress, contractABI, wallet);
     expect(contract.address).to.be.equals(contractAddress);
   });
 });
 
 describe("ethers.js - slow test cases", function() {
-  xit("should get/set contract's value", async function() {
+  it("should get/set contract's value", async function() {
     const currentValue = await contract.getValue();
+
     const message = `I like dogs ${randomWallet.mnemonic}`;
     expect(currentValue).to.be.not.equals(message);
 
     const updateValueTx = await contract.setValue(message);
-    await ropstenProvider.waitForTransaction(updateValueTx.hash);
+    await provider.waitForTransaction(updateValueTx.hash);
 
     const newValue = await contract.getValue();
 
     expect(newValue).to.equal(message);
   });
 
+  // Note: This test is taking too long for now. A better way to test events should be used.
   xit("should watch contract's ValueChanged event", async function() {
     const oldValue = await contract.getValue();
     const newValue = `I like cats ${randomWallet.mnemonic}`;
@@ -164,17 +167,17 @@ describe("ethers.js - slow test cases", function() {
     const tx = await contract.setValue(newValue);
 
     await waitForEvent("ValueChanged", [wallet.address, oldValue, newValue]);
-    await ropstenProvider.waitForTransaction(tx.hash);
+    await provider.waitForTransaction(tx.hash);
   });
 
-  xit("should broadcast signed tx", async function() {
-    rawTx.nonce = await ropstenProvider.getTransactionCount(wallet.address);
+  it("should broadcast signed tx", async function() {
+    rawTx.nonce = await provider.getTransactionCount(wallet.address);
     const signedTx = await wallet.sign(rawTx);
-    const sentTx = await ropstenProvider.sendTransaction(signedTx);
+    const sentTx = await provider.sendTransaction(signedTx);
     expect(sentTx).not.to.be.undefined;
 
-    await ropstenProvider.waitForTransaction(sentTx.hash);
-    const txResponse = await ropstenProvider.getTransaction(sentTx.hash);
+    await provider.waitForTransaction(sentTx.hash);
+    const txResponse = await provider.getTransaction(sentTx.hash);
     expect(txResponse.blockHash).to.be.not.undefined;
   });
 });

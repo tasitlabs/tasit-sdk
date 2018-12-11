@@ -17,13 +17,14 @@
     "url": "git+https://github.com/tasitlabs/tasitsdk.git"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "ganache-cli": "npx ganache-cli -m 'beach swap combine paper music cook electric bullet trust actress liquid asthma'",
+    "test": "npx truffle test"
   },
   "bugs": {
     "url": "https://github.com/tasitlabs/tasitsdk/issues"
   },
   "devDependencies": {
-    "ganache-cli": "^6.2.3",
+    "ganache-cli": "^6.1.8",
     "truffle": "^5.0.0-beta.2"
   }
 }
