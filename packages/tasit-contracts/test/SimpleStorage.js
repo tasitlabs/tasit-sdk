@@ -1,13 +1,15 @@
-var SimpleStorage = artifacts.require("./SimpleStorage.sol");
+const SimpleStorage = artifacts.require("./SimpleStorage.sol");
 
-contract('SimpleStorage', function(accounts) {
+contract("SimpleStorage", function(accounts) {
+  it("should get the value", async function() {
+    const instance = await SimpleStorage.deployed();
 
-  it("should get the value", function() {
-    return SimpleStorage.deployed().then(function(instance) {
-      return instance.getValue.call();
-  }).then(function(value) {
-      assert.equal(value.valueOf(), "Hello World!", "Hello World! isn't the initial value.");
-    });
+    const value = await instance.getValue();
+
+    assert.equal(
+      value,
+      "Hello World!",
+      "Hello World! isn't the initial value."
+    );
   });
-
 });
