@@ -9,7 +9,11 @@
     "prettier-plugin-solidity": "^1.0.0-alpha.12"
   },
   "scripts": {
-    "test": "npx lerna run test"
+    "lerna:install": "npx lerna clean && npm lerna exec npm install && npx lerna add tasit-account --scope=tasit-sdk",
+    "ganache:start": "npm run ganache:stop && npx lerna run ganache:start --scope tasit-contracts",
+    "ganache:stop": "npx lerna run ganache:stop --scope tasit-contracts",
+    "truffle:migrate": "npx lerna run compile --scope tasit-contracts && npx lerna run migrate  --scope tasit-contracts",
+    "test": "npm run ganache:start && npm run truffle:migrate && sleep 5 && npx lerna run test && npm run ganache:stop"
   },
   "repository": {
     "type": "git",
