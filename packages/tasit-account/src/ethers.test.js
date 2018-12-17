@@ -16,7 +16,6 @@ const waitForEvent = async (eventName, expected) => {
   });
 };
 
-const provider = new ethers.providers.JsonRpcProvider();
 const zero = ethers.utils.bigNumberify(0);
 
 let wallet, randomWallet, contract;
@@ -28,13 +27,14 @@ const rawTx = {
   to: "0x88a5C2d9919e46F883EB62F7b8Dd9d0CC45bc290",
   value: ethers.utils.parseEther("0.0000001"),
   data: "0x",
-  chainId: ethers.utils.getNetwork("ropsten").chainId,
 };
 
 // Note: Once we refactor this test suite for each test to require no prior state
 // other than what is in that describe's beforeEach hook, we'll give a more
 // descriptive name to this describe block
 describe("ethers.js - pretests", function() {
+  const provider = new ethers.providers.JsonRpcProvider();
+
   it("should create a wallet from priv key and provider", async function() {
     const privateKey =
       "0x11d943d7649fbdeb146dc57bd9cfc80b086bfab2330c7b25651dbaf382392f60";
@@ -80,9 +80,9 @@ describe("ethers.js - unit tests", function() {
 
     const expectedSignedTx =
       "0xf869808504a817c8008252089488a5c2d9919e46f883eb62f7b8dd9d0cc45bc29085" +
-      "174876e800802aa00e271049c09b8481c602dfafea0f01105cefdda47a9b13013dfb36" +
-      "3b53cf482ba015d6be31fedcfc6f50b97f16f24e8cfe8afeffe46708cb169cae8082a8" +
-      "ed76cf";
+      "174876e800801ca0855408709023b3d4e827c7aeb7b1adc4a5480e37601a20d881d10e" +
+      "4fd39207aca0179492402dd7a8fdc6190ecdae6ce28f1b6900297b08ed1a18252142d9" +
+      "d8c95a";
 
     expect(signedTx).to.equal(expectedSignedTx);
   });
@@ -145,6 +145,8 @@ describe("ethers.js - unit tests", function() {
 });
 
 describe("ethers.js - slow test cases", function() {
+  const provider = new ethers.providers.JsonRpcProvider();
+
   it("should get/set contract's value", async function() {
     const currentValue = await contract.getValue();
 
