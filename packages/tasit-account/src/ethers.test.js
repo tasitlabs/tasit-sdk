@@ -34,6 +34,7 @@ const rawTx = {
 // descriptive name to this describe block
 describe("ethers.js - pretests", function() {
   const provider = new ethers.providers.JsonRpcProvider();
+  provider.pollingInterval = 50;
 
   it("should create a wallet from priv key and provider", async function() {
     const privateKey =
@@ -114,22 +115,6 @@ describe("ethers.js - unit tests", function() {
     expect(signedBinData).to.equal(expectedSignedBinData);
   });
 
-  const ensSample = {
-    provider: ethers.getDefaultProvider(),
-    name: "registrar.firefly.eth",
-    address: "0x6fC21092DA55B392b045eD78F4732bff3C580e2c",
-  };
-
-  xit("should resolve ENS name", async function() {
-    const address = await ensSample.provider.resolveName(ensSample.name);
-    expect(address).to.equal(ensSample.address);
-  });
-
-  xit("should lookup ENS address", async function() {
-    const name = await ensSample.provider.lookupAddress(ensSample.address);
-    expect(name).to.equal(ensSample.name);
-  });
-
   it("should instantiate a contract object", async function() {
     const contractABI = [
       "event ValueChanged(address indexed author, string oldValue, string newValue)",
@@ -162,7 +147,7 @@ describe("ethers.js - slow test cases", function() {
   });
 
   // Note: This test is taking too long for now. A better way to test events should be used.
-  xit("should watch contract's ValueChanged event", async function() {
+  it("should watch contract's ValueChanged event", async function() {
     const oldValue = await contract.getValue();
     const newValue = `I like cats ${randomWallet.mnemonic}`;
 
