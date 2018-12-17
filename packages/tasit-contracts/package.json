@@ -10,7 +10,7 @@
     "solidity"
   ],
   "author": "Tasit Labs",
-  "homepage": "https://github.com/tasitlabs/TasitSDK#readme",
+  "homepage": "https://github.com/tasitlabs/TasitSDK/tree/develop/packages/tasit-contracts#readme",
   "license": "MIT",
   "repository": {
     "type": "git",
