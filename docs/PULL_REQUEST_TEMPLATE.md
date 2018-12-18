@@ -7,7 +7,7 @@
 ### Auto-close the issue?
 
 <!---
-If this PR should close the associted issue when it's merged, please change XXX below to the issue number.
+If this PR should close the associated issue when it's merged, please change XXX below to the issue number.
 Otherwise, you can remove this section.
 --->
 
