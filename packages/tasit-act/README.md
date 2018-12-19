@@ -1,3 +1,9 @@
+# `tasit-act`
+
+This package helps with reading data from smart contracts, writing data to smart contracts, and listening for events.
+
+Most of the details are in the main README for the monorepo [here](https://github.com/tasitlabs/TasitSDK/blob/develop/README.md)
+
 # Reading and writing data and reacting to events
 
 This explains how one can use the Tasit SDK to interact with smart contracts at different levels of abstraction.
