@@ -1,0 +1,33 @@
+{
+  "name": "tasit-contracts",
+  "version": "0.0.1",
+  "description": "",
+  "keywords": [
+    "ethereum",
+    "dapp",
+    "truffle",
+    "ganache",
+    "solidity"
+  ],
+  "author": "Tasit Labs",
+  "homepage": "https://github.com/tasitlabs/TasitSDK/tree/develop/packages/tasit-contracts#readme",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tasitlabs/tasitsdk.git"
+  },
+  "scripts": {
+    "ganache:start": "npx ganache-cli -m 'beach swap combine paper music cook electric bullet trust actress liquid asthma' > /dev/null 2>&1 &",
+    "ganache:stop": "pkill -f ganache-cli",
+    "compile": "npx truffle compile",
+    "migrate": "npx truffle migrate --reset",
+    "test": "npx truffle test"
+  },
+  "bugs": {
+    "url": "https://github.com/tasitlabs/tasitsdk/issues"
+  },
+  "devDependencies": {
+    "npm-run-all": "^4.1.5",
+    "truffle": "^5.0.0-beta.2"
+  }
+}

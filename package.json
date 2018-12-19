@@ -4,11 +4,19 @@
   "description": "A monorepo for all npm packages in the Tasit ecosystem",
   "devDependencies": {
     "@babel/preset-env": "^7.1.6",
+    "ganache-cli": "^6.1.8",
     "lerna": "^3.4.3",
-    "prettier": "^1.15.2"
+    "prettier": "^1.15.3",
+    "prettier-plugin-solidity": "^1.0.0-alpha.12"
   },
   "scripts": {
-    "test": "npx lerna run test"
+    "bootstrap": "npx lerna bootstrap",
+    "ganache:start": "npx ganache-cli -m 'beach swap combine paper music cook electric bullet trust actress liquid asthma' > /dev/null 2>&1 &",
+    "ganache:stop": "kill `ps ax|grep ganache-cli|grep -v grep| awk '{print $1}'` 2> /dev/null; exit 0",
+    "truffle:migrate": "npx lerna run migrate --scope tasit-contracts",
+    "pretest": "npm run bootstrap && npm run ganache:stop && npm run ganache:start && npm run truffle:migrate",
+    "test": "npx lerna run test",
+    "posttest": "npm run ganache:stop"
   },
   "repository": {
     "type": "git",
