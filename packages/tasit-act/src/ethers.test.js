@@ -33,6 +33,7 @@ describe("ethers.js", () => {
   it("should get contract's value", async () => {
     const value = await contract.getValue();
     expect(value).to.exist;
+    expect(value).to.be.a("string");
   });
 
   it("should set contract's value", async () => {
