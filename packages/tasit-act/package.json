@@ -1,7 +1,7 @@
 {
   "name": "tasit-act",
   "version": "0.0.1",
-  "description": "Library for using Ethereum smart contracts",
+  "description": "A library for using Ethereum smart contracts that abstracts away the low-level blockchain-related details so that developers can focus on the core business logic for their app",
   "main": "dist/index.js",
   "keywords": [
     "ethereum",
