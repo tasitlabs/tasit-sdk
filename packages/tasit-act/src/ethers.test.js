@@ -28,28 +28,51 @@ describe("ethers.js", () => {
     }
   );
 
-  it("should get/set contract's value", async () => {
-    const currentValue = await contract.getValue();
+  it("should get contract's value", async () => {
+    const value = await contract.getValue();
+    expect(value).to.exist;
+  });
 
-    const message = `I like dogs`;
-    expect(currentValue).to.be.not.equals(message);
+  it("should set contract's value", async () => {
+    var rand = Math.floor(Math.random() * Math.floor(1000)).toString();
 
-    const updateValueTx = await contract.setValue(message);
-    await provider.waitForTransaction(updateValueTx.hash);
+    const sentTx = await contract.setValue(rand);
+    await provider.waitForTransaction(sentTx.hash);
 
-    const newValue = await contract.getValue();
+    const value = await contract.getValue();
 
-    expect(newValue).to.equal(message);
+    expect(value).to.equal(rand);
+  });
+
+  it("should set contract's value using signed tx", async () => {
+    var rand = Math.floor(Math.random() * Math.floor(1000)).toString();
+
+    const data = contract.interface.functions.setValue.encode([rand]);
+
+    const rawTx = {
+      gasLimit: 64000,
+      to: contract.address,
+      data: data,
+      nonce: await provider.getTransactionCount(wallet.address),
+    };
+
+    const signedTx = await wallet.sign(rawTx);
+    const sentTx = await provider.sendTransaction(signedTx);
+
+    await provider.waitForTransaction(sentTx.hash);
+
+    const value = await contract.getValue();
+    expect(value).to.equal(rand);
   });
 
   it("should watch contract's ValueChanged event", async () => {
     const oldValue = await contract.getValue();
     const newValue = `I like cats`;
 
-    const tx = await contract.setValue(newValue);
+    const sentTx = await contract.setValue(newValue);
 
     await waitForEvent("ValueChanged", [wallet.address, oldValue, newValue]);
-    await provider.waitForTransaction(tx.hash);
+    await provider.waitForTransaction(sentTx.hash);
   });
 });
 
