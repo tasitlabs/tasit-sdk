@@ -1,6 +1,7 @@
 import Contract from "./tasitAct";
 import { expect, assert } from "chai";
-// Note: This file is originally genarated by `tasit-contracts` and was pasted here manually
+
+// Note: SimpleStorage.json is originally genarated by `tasit-contracts` and was pasted here manually
 // See https://github.com/tasitlabs/TasitSDK/issues/45
 import { abi as contractABI } from "./helpers/SimpleStorage.json";
 // Note: Under the current `tasit-contracts` setup SimpleStorage aways will deployed with this address
