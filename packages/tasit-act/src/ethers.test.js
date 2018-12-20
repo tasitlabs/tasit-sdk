@@ -27,6 +27,21 @@ describe("ethers.js", () => {
     expect(contract.address).to.be.equals(contractAddress);
   });
 
+  it("should instatiate contract object using human-readable ABI", async () => {
+    const humanReadableABI = [
+      "event ValueChanged(address indexed author, string oldValue, string newValue)",
+      "constructor(string memory) public",
+      "function getValue() public view returns (string memory)",
+      "function setValue(string memory) public",
+    ];
+
+    contract = undefined;
+    contract = new ethers.Contract(contractAddress, humanReadableABI, wallet);
+    expect(contract.interface.functions.getValue).to.exist;
+    expect(contract.interface.functions.setValue).to.exist;
+    expect(contract.interface.events.ValueChanged).to.exist;
+  });
+
   it("should get contract's value", async () => {
     const value = await contract.getValue();
     expect(value).to.exist;
