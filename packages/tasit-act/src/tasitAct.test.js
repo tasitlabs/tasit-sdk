@@ -79,5 +79,5 @@ describe.skip("Contract", function() {
     const sentTx = simpleStorage.sendTransaction(signedTx); // Same as provider.sendTransaction
   });
 
-  it("should listening to an event", async () => {});
+  it("should listen to an event", async () => {});
 });
