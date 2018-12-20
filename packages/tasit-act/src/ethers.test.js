@@ -72,7 +72,6 @@ describe("ethers.js", () => {
     const sentTx = await contract.setValue(newValue);
 
     await waitForEvent("ValueChanged", [wallet.address, oldValue, newValue]);
-    await provider.waitForTransaction(sentTx.hash);
   });
 });
 
