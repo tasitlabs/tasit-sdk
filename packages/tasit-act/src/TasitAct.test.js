@@ -1,4 +1,4 @@
-import Contract from "./tasitAct";
+import Contract from "./TasitAct";
 import { expect, assert } from "chai";
 
 // Note: SimpleStorage.json is originally genarated by `tasit-contracts` and was pasted here manually
