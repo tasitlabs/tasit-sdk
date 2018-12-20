@@ -67,7 +67,7 @@ describe.skip("Contract", function() {
     // nonce: Can be get easly from wallet.address
     //
     // That said, we can do Step 1 & 2 with one command like that:
-    // In the case, command above will be unecessary
+    // In the case, command above will be unnecessary
     const rawTx = simpleStorage.interface.functions.setValue(rand).toRawTx();
 
     // Step 3
