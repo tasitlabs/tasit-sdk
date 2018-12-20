@@ -12,7 +12,7 @@ const contractAddress = "0x6C4A015797DDDd87866451914eCe1e8b19261931";
 describe.skip("Contract", function() {
   let simpleStorage;
 
-  beforeEach("should connect to and existing contract", async () => {
+  beforeEach("should connect to an existing contract", async () => {
     // Connection with blockchain
     // Ethers.js allows sets a "connector" (provider or already connected wallet) on constructor of Contract
     // or later with contract.connect() method.
