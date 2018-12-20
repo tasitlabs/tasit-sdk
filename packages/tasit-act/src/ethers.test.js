@@ -12,23 +12,20 @@ const contractAddress = "0x6C4A015797DDDd87866451914eCe1e8b19261931";
 let provider, wallet, contract;
 
 describe("ethers.js", () => {
-  beforeEach(
-    "instantiate provider, wallet and contract objects",
-    async function() {
-      provider = new ethers.providers.JsonRpcProvider();
-      provider.pollingInterval = 50;
+  beforeEach("instantiate provider, wallet and contract objects", async () => {
+    provider = new ethers.providers.JsonRpcProvider();
+    provider.pollingInterval = 50;
 
-      const privateKey =
-        "0x11d943d7649fbdeb146dc57bd9cfc80b086bfab2330c7b25651dbaf382392f60";
+    const privateKey =
+      "0x11d943d7649fbdeb146dc57bd9cfc80b086bfab2330c7b25651dbaf382392f60";
 
-      wallet = new ethers.Wallet(privateKey, provider);
-      expect(wallet.address).to.have.lengthOf(42);
-      expect(wallet.provider).to.be.not.undefined;
+    wallet = new ethers.Wallet(privateKey, provider);
+    expect(wallet.address).to.have.lengthOf(42);
+    expect(wallet.provider).to.be.not.undefined;
 
-      contract = new ethers.Contract(contractAddress, contractABI, wallet);
-      expect(contract.address).to.be.equals(contractAddress);
-    }
-  );
+    contract = new ethers.Contract(contractAddress, contractABI, wallet);
+    expect(contract.address).to.be.equals(contractAddress);
+  });
 
   it("should get contract's value", async () => {
     const value = await contract.getValue();
