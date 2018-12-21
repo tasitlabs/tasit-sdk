@@ -13,7 +13,7 @@ var _SimpleStorage = require("./helpers/SimpleStorage.json");
 const contractAddress = "0x6C4A015797DDDd87866451914eCe1e8b19261931";
 let provider, wallet, contract;
 describe("ethers.js", () => {
-  beforeEach("instantiate provider, wallet and contract objects", async function () {
+  beforeEach("instantiate provider, wallet and contract objects", async () => {
     provider = new _ethers.ethers.providers.JsonRpcProvider();
     provider.pollingInterval = 50;
     const privateKey = "0x11d943d7649fbdeb146dc57bd9cfc80b086bfab2330c7b25651dbaf382392f60";
@@ -23,21 +23,46 @@ describe("ethers.js", () => {
     contract = new _ethers.ethers.Contract(contractAddress, _SimpleStorage.abi, wallet);
     (0, _chai.expect)(contract.address).to.be.equals(contractAddress);
   });
-  it("should get/set contract's value", async () => {
-    const currentValue = await contract.getValue();
-    const message = `I like dogs`;
-    (0, _chai.expect)(currentValue).to.be.not.equals(message);
-    const updateValueTx = await contract.setValue(message);
-    await provider.waitForTransaction(updateValueTx.hash);
-    const newValue = await contract.getValue();
-    (0, _chai.expect)(newValue).to.equal(message);
+  it("should instatiate contract object using human-readable ABI", async () => {
+    const humanReadableABI = ["event ValueChanged(address indexed author, string oldValue, string newValue)", "constructor(string memory) public", "function getValue() public view returns (string memory)", "function setValue(string memory) public"];
+    contract = undefined;
+    contract = new _ethers.ethers.Contract(contractAddress, humanReadableABI, wallet);
+    (0, _chai.expect)(contract.interface.functions.getValue).to.exist;
+    (0, _chai.expect)(contract.interface.functions.setValue).to.exist;
+    (0, _chai.expect)(contract.interface.events.ValueChanged).to.exist;
+  });
+  it("should get contract's value", async () => {
+    const value = await contract.getValue();
+    (0, _chai.expect)(value).to.exist;
+    (0, _chai.expect)(value).to.be.a("string");
+  });
+  it("should set contract's value", async () => {
+    var rand = Math.floor(Math.random() * Math.floor(1000)).toString();
+    const sentTx = await contract.setValue(rand);
+    await provider.waitForTransaction(sentTx.hash);
+    const value = await contract.getValue();
+    (0, _chai.expect)(value).to.equal(rand);
+  });
+  it("should set contract's value using signed tx", async () => {
+    var rand = Math.floor(Math.random() * Math.floor(1000)).toString();
+    const data = contract.interface.functions.setValue.encode([rand]);
+    const rawTx = {
+      gasLimit: 64000,
+      to: contract.address,
+      data: data,
+      nonce: await provider.getTransactionCount(wallet.address)
+    };
+    const signedTx = await wallet.sign(rawTx);
+    const sentTx = await provider.sendTransaction(signedTx);
+    await provider.waitForTransaction(sentTx.hash);
+    const value = await contract.getValue();
+    (0, _chai.expect)(value).to.equal(rand);
   });
   it("should watch contract's ValueChanged event", async () => {
     const oldValue = await contract.getValue();
     const newValue = `I like cats`;
-    const tx = await contract.setValue(newValue);
+    const sentTx = await contract.setValue(newValue);
     await waitForEvent("ValueChanged", [wallet.address, oldValue, newValue]);
-    await provider.waitForTransaction(tx.hash);
   });
 });
 

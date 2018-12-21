@@ -6,10 +6,10 @@ Object.defineProperty(exports, "__esModule", {
 Object.defineProperty(exports, "default", {
   enumerable: true,
   get: function () {
-    return _tasitAct.default;
+    return _TasitAct.default;
   }
 });
 
-var _tasitAct = _interopRequireDefault(require("./tasitAct"));
+var _TasitAct = _interopRequireDefault(require("./TasitAct"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }

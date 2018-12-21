@@ -18,7 +18,7 @@
   },
   "scripts": {
     "prepare": "npx babel src --out-dir dist --ignore **/*.test.js",
-    "test": "npm run lint && npx mocha src/*.test.js --require @babel/register",
+    "test": "npm run lint && npx mocha src/*.test.js --require @babel/register --no-timeouts",
     "lint": "npx prettier src/* --write"
   },
   "bugs": {
@@ -35,6 +35,7 @@
     "@babel/preset-env": "^7.1.6",
     "@babel/register": "^7.0.0",
     "chai": "^4.2.0",
-    "mocha": "^5.2.0"
+    "mocha": "^5.2.0",
+    "tasit-account": "^0.0.1"
   }
 }
