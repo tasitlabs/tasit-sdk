@@ -4,6 +4,8 @@ var _chai = require("chai");
 
 var _ethers = require("ethers");
 
+var _utils = require("./helpers/utils.js");
+
 var _SimpleStorage = require("./helpers/SimpleStorage.json");
 
 // Note: This file is originally genarated by `tasit-contracts` and was pasted here manually
@@ -62,18 +64,6 @@ describe("ethers.js", () => {
     const oldValue = await contract.getValue();
     const newValue = `I like cats`;
     const sentTx = await contract.setValue(newValue);
-    await waitForEvent("ValueChanged", [wallet.address, oldValue, newValue]);
+    await (0, _utils.waitForEvent)(contract, "ValueChanged", [wallet.address, oldValue, newValue]);
   });
 });
-
-const waitForEvent = async (eventName, expected) => {
-  return new Promise(function (resolve, reject) {
-    contract.on(eventName, function () {
-      const args = Array.prototype.slice.call(arguments);
-      const event = args.pop();
-      event.removeListener();
-      (0, _chai.expect)(args, `${event.event} event should have expected args`).to.deep.equal(expected);
-      resolve();
-    });
-  });
-};
