@@ -3,10 +3,21 @@ import "ethers/dist/shims.js";
 // shims aren't injected with package import
 import { ethers } from "ethers";
 
-// Note:
-// This class stills as a PoC
-// TODO:
-// - Software robustness (try...catch)
+class Utils {
+  static isAddress = address => {
+    return typeof address === "string" && address.match(/^0x[0-9A-Fa-f]{40}$/);
+  };
+
+  static isABI = abi => {
+    return abi && Array.isArray(abi);
+  };
+
+  // https://github.com/ethers-io/ethers.js/blob/db383a3121bb8cf5c80c5488e853101d8c1df353/src.ts/utils/properties.ts#L20
+  static isEthersJsSigner = signer => {
+    return signer && signer._ethersType === "Signer";
+  };
+}
+
 class Subscription {
   #txPromise;
   #provider;
@@ -22,35 +33,37 @@ class Subscription {
 
     const tx = await this.#txPromise;
 
-    this.#provider.on(tx.hash, receipt => {
+    this.#provider.on(tx.hash, async receipt => {
       const message = {
         data: {
           confirmations: receipt.confirmations,
         },
       };
 
-      callback(message);
+      try {
+        await callback(message);
+      } catch (error) {
+        // UnhandledPromiseRejectionWarning
+        throw new Error(`Callback function with error: ${error.message}`);
+      }
     });
   };
 
   removeAllListeners = async () => {
     const tx = await this.#txPromise;
     this.#provider.removeAllListeners(tx.hash);
-    console.log("all listeners removed");
   };
 }
 
-// Note:
-// This class stills as a PoC
-// TODO:
-// - Software robustness (try...catch)
 export class Contract {
   address;
-  wallet; // necessarY?
   #provider;
   #contract;
 
   constructor(address, abi, wallet) {
+    if (!Utils.isAddress(address) || !Utils.isABI(abi))
+      throw new Error(`Cannot create a Contract without a address and ABI`);
+
     this.#provider = this.#getDefaultProvider();
 
     const signerOrProvider = wallet
@@ -58,17 +71,22 @@ export class Contract {
       : this.#provider;
 
     this.#contract = new ethers.Contract(address, abi, signerOrProvider);
+
     this.address = this.#contract.address;
     this.#addFunctionsToContract();
   }
 
-  toEthersJs = () => {
-    return this.#contract;
-  };
-
   // Note: For now, `tasit-account` creates a wallet object
   setWallet = wallet => {
+    if (!Utils.isEthersJsSigner(wallet))
+      throw new Error(`Cannot set a invalid wallet to a Contract`);
+
     return new Contract(this.address, this.#contract.interface.abi, wallet);
+  };
+
+  // For tests purpose
+  getProvider = () => {
+    return this.#provider;
   };
 
   // Notes:
@@ -101,9 +119,11 @@ export class Contract {
     };
   };
 
-  // Check for account before calling write functions
   #attachWriteFunction = f => {
     this[f.name] = (...args) => {
+      if (!Utils.isEthersJsSigner(this.#contract.signer))
+        throw new Error(`Cannot setting data to Contract without a wallet`);
+
       const tx = this.#contract[f.name].apply(null, args);
       const subscription = new Subscription(tx, this.#provider);
       return subscription;

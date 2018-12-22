@@ -1,5 +1,6 @@
 import { expect, assert } from "chai";
 import { ethers } from "ethers";
+import { waitForEvent } from "./helpers/utils.js";
 
 // Note: This file is originally genarated by `tasit-contracts` and was pasted here manually
 // See https://github.com/tasitlabs/TasitSDK/issues/45
@@ -86,21 +87,10 @@ describe("ethers.js", () => {
 
     const sentTx = await contract.setValue(newValue);
 
-    await waitForEvent("ValueChanged", [wallet.address, oldValue, newValue]);
+    await waitForEvent(contract, "ValueChanged", [
+      wallet.address,
+      oldValue,
+      newValue,
+    ]);
   });
 });
-
-const waitForEvent = async (eventName, expected) => {
-  return new Promise(function(resolve, reject) {
-    contract.on(eventName, function() {
-      const args = Array.prototype.slice.call(arguments);
-      const event = args.pop();
-      event.removeListener();
-      expect(
-        args,
-        `${event.event} event should have expected args`
-      ).to.deep.equal(expected);
-      resolve();
-    });
-  });
-};
