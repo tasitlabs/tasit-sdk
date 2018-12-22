@@ -104,15 +104,7 @@ describe.only("Contract", function() {
     await mineBlocks(simpleStorage.getProvider(), 8);
   });
 
-  it.skip("should send a signed message", async () => {
-    // Step 3
-    const signedTx = simpleStorage.getAccount().sign(rawTx);
-    // or we can do 1..3 steps:
-    // const signedTx = simpleStorage.interface.functions.setValue(rand).toSignedTx();
-
-    // Step 4
-    const sentTx = simpleStorage.sendTransaction(signedTx); // Same as provider.sendTransaction
-  });
+  it.skip("should send a signed message", async () => {});
 
   it.skip("should listen to an event", async () => {});
 });
