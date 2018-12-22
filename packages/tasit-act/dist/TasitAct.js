@@ -43,7 +43,10 @@ class Subscription {
 
     _defineProperty(this, "on", async (trigger, callback) => {
       let blockHeight = 0;
-      if (trigger === "confirmation") blockHeight = 1;
+      if (trigger === "confirmation") blockHeight = 1;else {
+        await _classPrivateFieldGet(this, _txPromise);
+        throw new Error(`Invalid subscrition trigger, use: ["confirmation"]`);
+      }
       const tx = await _classPrivateFieldGet(this, _txPromise);
 
       _classPrivateFieldGet(this, _provider).on(tx.hash, async receipt => {

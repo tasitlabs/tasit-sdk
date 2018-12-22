@@ -29,7 +29,17 @@ class Subscription {
 
   on = async (trigger, callback) => {
     let blockHeight = 0;
+
     if (trigger === "confirmation") blockHeight = 1;
+    else {
+      // UnhandledPromiseRejectionWarning
+      throw new Error(`Invalid subscription trigger, use: ["confirmation"]`);
+    }
+
+    if (!callback || typeof callback !== "function") {
+      // UnhandledPromiseRejectionWarning
+      throw new Error(`Cannot subscribe without a function`);
+    }
 
     const tx = await this.#txPromise;
 
@@ -71,7 +81,6 @@ export class Contract {
       : this.#provider;
 
     this.#contract = new ethers.Contract(address, abi, signerOrProvider);
-
     this.address = this.#contract.address;
     this.#addFunctionsToContract();
   }

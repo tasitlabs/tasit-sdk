@@ -11,10 +11,17 @@ import { abi as contractABI } from "./helpers/SimpleStorage.json";
 // See https://github.com/tasitlabs/TasitSDK/pull/59#discussion_r242258739
 const contractAddress = "0x6C4A015797DDDd87866451914eCe1e8b19261931";
 
-describe.only("Contract", function() {
-  let simpleStorage;
+describe("Contract", function() {
+  let simpleStorage, wallet;
 
   beforeEach("should connect to an existing contract", async () => {
+    // Account creates a wallet, should it create an account object that encapsulate the wallet?
+    // TasitAcount.create()
+    // > Acount { wallet: ..., metaTxInfos..., etc }
+    wallet = Account.createFromPrivateKey(
+      "0x11d943d7649fbdeb146dc57bd9cfc80b086bfab2330c7b25651dbaf382392f60"
+    );
+
     simpleStorage = new Contract(contractAddress, contractABI);
     expect(simpleStorage).to.exist;
     expect(simpleStorage.address).to.equal(contractAddress);
@@ -71,13 +78,33 @@ describe.only("Contract", function() {
     }
   });
 
+  it("should throw when subscribing with invalid trigger", async () => {
+    simpleStorage = simpleStorage.setWallet(wallet);
+    const subscription = simpleStorage.setValue("hello world");
+
+    try {
+      // UnhandledPromiseRejectionWarning
+      subscription.on("invalid", () => {});
+      assert(false, "subscribing with invalid trigger");
+    } catch (e) {
+      assert(true);
+    }
+  });
+
+  it("should throw when subscribing without callback", async () => {
+    simpleStorage = simpleStorage.setWallet(wallet);
+    const subscription = simpleStorage.setValue("hello world");
+
+    try {
+      // UnhandledPromiseRejectionWarning
+      subscription.on("confirmation");
+      assert(false, "subscribing without a callback");
+    } catch (e) {
+      assert(true);
+    }
+  });
+
   it("should call a write contract method (send tx)", async () => {
-    // Account creates a wallet, should it create an account object that encapsulate the wallet?
-    // TasitAcount.create()
-    // > Acount { wallet: ..., metaTxInfos..., etc }
-    const wallet = Account.createFromPrivateKey(
-      "0x11d943d7649fbdeb146dc57bd9cfc80b086bfab2330c7b25651dbaf382392f60"
-    );
     simpleStorage = simpleStorage.setWallet(wallet);
 
     var rand = Math.floor(Math.random() * Math.floor(1000)).toString();
@@ -94,7 +121,7 @@ describe.only("Contract", function() {
         const value = await simpleStorage.getValue();
         expect(value).to.equal(rand);
 
-        // force UnhandledPromiseRejectionWarning
+        // UnhandledPromiseRejectionWarning
         //expect(1).to.equal(2);
       }
     };

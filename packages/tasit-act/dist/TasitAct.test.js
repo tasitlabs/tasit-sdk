@@ -17,9 +17,13 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 // Note: Under the current `tasit-contracts` setup SimpleStorage aways will deployed with this address
 // See https://github.com/tasitlabs/TasitSDK/pull/59#discussion_r242258739
 const contractAddress = "0x6C4A015797DDDd87866451914eCe1e8b19261931";
-describe.only("Contract", function () {
-  let simpleStorage;
+describe("Contract", function () {
+  let simpleStorage, wallet;
   beforeEach("should connect to an existing contract", async () => {
+    // Account creates a wallet, should it create an account object that encapsulate the wallet?
+    // TasitAcount.create()
+    // > Acount { wallet: ..., metaTxInfos..., etc }
+    wallet = _tasitAccount.default.createFromPrivateKey("0x11d943d7649fbdeb146dc57bd9cfc80b086bfab2330c7b25651dbaf382392f60");
     simpleStorage = new _TasitAct.Contract(contractAddress, _SimpleStorage.abi);
     (0, _chai.expect)(simpleStorage).to.exist;
     (0, _chai.expect)(simpleStorage.address).to.equal(contractAddress);
@@ -65,12 +69,26 @@ describe.only("Contract", function () {
       (0, _chai.assert)(true);
     }
   });
-  it("should call a write contract method (send tx)", async () => {
-    // Account creates a wallet, should it create an account object that encapsulate the wallet?
-    // TasitAcount.create()
-    // > Acount { wallet: ..., metaTxInfos..., etc }
-    const wallet = _tasitAccount.default.createFromPrivateKey("0x11d943d7649fbdeb146dc57bd9cfc80b086bfab2330c7b25651dbaf382392f60");
+  it("should throw when subscribing with invalid trigger", async () => {
+    simpleStorage = simpleStorage.setWallet(wallet);
+    const subscription = simpleStorage.setValue("hello world");
+    subscription.on("invalid", () => {}).catch(e => {
+      (0, _chai.assert)(true);
+    });
+    (0, _chai.assert)(false, "subscribing with invalid trigger");
+  });
+  it.skip("should throw when subscribing without callback", async () => {
+    simpleStorage = simpleStorage.setWallet(wallet);
+    const subscription = simpleStorage.setValue("hello world");
 
+    try {
+      subscription.on("invalid");
+      (0, _chai.assert)(false, "subscribing without a callback");
+    } catch (e) {
+      (0, _chai.assert)(true);
+    }
+  });
+  it("should call a write contract method (send tx)", async () => {
     simpleStorage = simpleStorage.setWallet(wallet);
     var rand = Math.floor(Math.random() * Math.floor(1000)).toString();
     const subscription = simpleStorage.setValue(rand);
