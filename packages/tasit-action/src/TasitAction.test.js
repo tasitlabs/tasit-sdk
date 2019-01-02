@@ -183,10 +183,10 @@ describe("Contract", () => {
   it.skip("should listen to an event", async () => {
     const events = ["ValueChanged"];
     const subscription = simpleStorage.subscribe(events);
+    const handlerFunction = async message => {};
+
     subscription.on("ValueChanged", handlerFunction);
   });
-
-  it.skip("should listen to an event", async () => {});
 
   it.skip("should send a signed message", async () => {});
 });
