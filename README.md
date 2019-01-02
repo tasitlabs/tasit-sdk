@@ -60,12 +60,12 @@ Are you looking to add functionality to a pre-existing app using the Tasit SDK?
 Using the Tasit SDK from within your app is simple.
 In `App.js` or the appropriate React Native component, import whichever APIs you need from the Tasit SDK.
 
-```
+````javascript
 import { Account } from 'tasit-sdk'
 const wallet = Account.create();
 console.log(wallet.address); // '0x...'
 ...
-```
+```javascript
 
 #### Automatic scaffolding using the Tasit CLI
 
@@ -83,16 +83,16 @@ The Tasit SDK is designed with modularity in mind. Are you only planning on usin
 
 You can install `tasit-account` directly and keep your app's dependencies leaner.
 
-```
+```javascript
 npm install --save tasit-account
-```
+```javascript
 
 Then the usage example from before becomes:
 
-```
+```javascript
 import Account from 'tasit-account'
 ...
-```
+```javascript
 
 ...with the rest of the code remaining the same.
 
@@ -235,3 +235,4 @@ We love getting feedback from the community, so please feel free to reach out.
 - [Feature requests](https://tasit.canny.io/feature-requests)
 
 - [Project Kanban board](https://github.com/orgs/tasitlabs/projects/1)
+````
