@@ -116,9 +116,9 @@ The Tasit SDK provides JavaScript middleware for reading from and writing to sma
 
 This library is written in such a way that the developer using the SDK can just think about writing data and listening for more data. The fact that there's a blockchain powering this is an implementation detail that is abstracted away.
 
-[Here is a lot more info](/packages/tasit-act/README.md) about how this works.
+[Here is a lot more info](/packages/tasit-action/README.md) about how this works.
 
-[This is the subpackage](/packages/tasit-act/) that implements these features for the Tasit SDK.
+[This is the subpackage](/packages/tasit-action/) that implements these features for the Tasit SDK.
 
 _This makes the experience for new developers working on a mobile app with the Tasit SDK simpler, which means more mobile dapps for end users._
 
