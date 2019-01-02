@@ -1,5 +1,5 @@
 {
-  "name": "tasit-act",
+  "name": "tasit-action",
   "version": "0.0.1",
   "description": "A library for using Ethereum smart contracts that abstracts away the low-level blockchain-related details so that developers can focus on the core business logic for their app",
   "main": "dist/index.js",
@@ -10,7 +10,7 @@
     "native"
   ],
   "author": "Tasit Labs",
-  "homepage": "https://github.com/tasitlabs/TasitSDK/tree/develop/packages/tasit-act#readme",
+  "homepage": "https://github.com/tasitlabs/TasitSDK/tree/develop/packages/tasit-action#readme",
   "license": "MIT",
   "repository": {
     "type": "git",
