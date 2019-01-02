@@ -1,11 +1,12 @@
-import { Contract } from "./TasitAct";
+import { Contract } from "./TasitAction";
 import Account from "tasit-account";
 import { expect, assert } from "chai";
-import { waitForEvent, mineBlocks } from "./helpers/utils.js";
+import { waitForEvent, mineBlocks } from "./testHelpers/helpers";
+import { createFromPrivateKey } from "tasit-account/dist/testHelpers/helpers";
 
 // Note: SimpleStorage.json is originally genarated by `tasit-contracts` and was pasted here manually
 // See https://github.com/tasitlabs/TasitSDK/issues/45
-import { abi as contractABI } from "./helpers/SimpleStorage.json";
+import { abi as contractABI } from "./testHelpers/SimpleStorage.json";
 
 // Note: Under the current `tasit-contracts` setup SimpleStorage aways will deployed with this address
 // See https://github.com/tasitlabs/TasitSDK/pull/59#discussion_r242258739
@@ -18,7 +19,7 @@ describe("Contract", function() {
     // Account creates a wallet, should it create an account object that encapsulate the wallet?
     // TasitAcount.create()
     // > Acount { wallet: ..., metaTxInfos..., etc }
-    wallet = Account.createFromPrivateKey(
+    wallet = createFromPrivateKey(
       "0x11d943d7649fbdeb146dc57bd9cfc80b086bfab2330c7b25651dbaf382392f60"
     );
 
@@ -131,7 +132,56 @@ describe("Contract", function() {
     await mineBlocks(simpleStorage.getProvider(), 8);
   });
 
-  it.skip("should send a signed message", async () => {});
+  it("should throw error when subscribing on invalid event", async () => {
+    const events = ["ValueChanged", "InvalidEvent"];
+    try {
+      const subscription = simpleStorage.subscribe(events);
+      assert(false, "subscription with invalid event");
+    } catch (e) {
+      assert(true);
+    }
+  });
 
-  it.skip("should listen to an event", async () => {});
+  it("should throw error then listening on invalid event", async () => {
+    const events = ["ValueChanged"];
+    const subscription = simpleStorage.subscribe(events);
+
+    try {
+      subscription.on("InvalidEvent", () => {});
+      assert(false, "listening with invalid event");
+    } catch (e) {
+      assert(true);
+    }
+  });
+
+  it.skip("should listen to an event", async () => {
+    const events = ["ValueChanged"];
+    const subscription = simpleStorage.subscribe(events);
+    subscription.on("ValueChanged", handlerFunction);
+  });
+
+  // const events = ["ExampleEvent", "AnotherExampleEvent"]
+  // const subscription = contract.subscribe(events)
+  // subscription.on("ExampleEvent", handlerFunction)
+  it.skip("should listen to an event", async () => {
+    const subscription = simpleStorage.subscribe(
+      "ValueChanged",
+      async message => {
+        // message.data = Contents of the message.
+        const { data } = message;
+        const { topics } = data;
+
+        subscription.removeAllListeners();
+
+        console.log(topics);
+
+        //expect(value).to.equal(rand);
+
+        // UnhandledPromiseRejectionWarning
+        //expect(1).to.equal(2);
+      }
+    );
+  });
+
+  it.skip("should send a signed message", async () => {});
 });

@@ -1,10 +1,10 @@
 import { expect, assert } from "chai";
 import { ethers } from "ethers";
-import { waitForEvent } from "./helpers/utils.js";
+import { waitForEvent } from "./testHelpers/helpers.js";
 
 // Note: This file is originally genarated by `tasit-contracts` and was pasted here manually
 // See https://github.com/tasitlabs/TasitSDK/issues/45
-import { abi as contractABI } from "./helpers/SimpleStorage.json";
+import { abi as contractABI } from "./testHelpers/SimpleStorage.json";
 
 // Note: Under the current `tasit-contracts` setup SimpleStorage aways will deployed with this address
 // See https://github.com/tasitlabs/TasitSDK/pull/59#discussion_r242258739

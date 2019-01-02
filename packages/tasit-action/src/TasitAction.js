@@ -62,6 +62,25 @@ class Subscription {
   };
 }
 
+class EventSubscription {
+  #eventNames;
+  #provider;
+
+  constructor(eventNames, provider) {
+    this.#eventNames = eventNames;
+    this.#provider = provider;
+  }
+
+  on = (eventName, callback) => {
+    if (!this.#eventNames.includes(eventName))
+      throw new Error(
+        `This subscription isn't subscribed on '${eventName}' event.`
+      );
+  };
+
+  //removeAllListeners = async () => {};
+}
+
 export class Contract {
   address;
   #provider;
@@ -93,6 +112,16 @@ export class Contract {
   // For tests purpose
   getProvider = () => {
     return this.#provider;
+  };
+
+  subscribe = eventNames => {
+    eventNames.forEach(eventName => {
+      if (this.#contract.interface.events[eventName] === undefined)
+        throw new Error(`Event '${eventName}' not found.`);
+    });
+
+    const subscription = new EventSubscription(eventNames, this.#provider);
+    return subscription;
   };
 
   // Notes:
@@ -137,8 +166,8 @@ export class Contract {
   };
 }
 
-export const TasitAct = {
+export const TasitAction = {
   Contract,
 };
 
-export default TasitAct;
+export default TasitAction;
