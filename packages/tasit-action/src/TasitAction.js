@@ -28,10 +28,7 @@ class Subscription {
   }
 
   on = async (trigger, callback) => {
-    let blockHeight = 0;
-
-    if (trigger === "confirmation") blockHeight = 1;
-    else {
+    if (trigger !== "confirmation") {
       throw new Error(`Invalid subscription trigger, use: ["confirmation"]`);
     }
 
@@ -39,6 +36,7 @@ class Subscription {
       throw new Error(`Cannot subscribe without a function`);
     }
 
+    const blockHeight = 1;
     const tx = await this.#txPromise;
 
     this.#provider.on(tx.hash, async receipt => {
