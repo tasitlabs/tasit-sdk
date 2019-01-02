@@ -1,4 +1,4 @@
-import Account from "./tasitAccount";
+import Account from "./TasitAccount";
 import { expect, assert } from "chai";
 
 describe("Account", function() {
