@@ -81,7 +81,7 @@ class EventSubscription {
 }
 
 export class Contract {
-  address;
+  #address;
   #provider;
   #contract;
 
