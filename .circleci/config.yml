@@ -31,8 +31,8 @@ jobs:
             - dependency-cache-
 
       - run:
-          name: install-npm
-          command: npm install
+          name: install-npm-packages
+          command: npm run bootstrap
 
       - save_cache:
           paths:
