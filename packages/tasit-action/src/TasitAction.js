@@ -40,9 +40,10 @@ class Subscription {
     const tx = await this.#txPromise;
 
     this.#provider.on(tx.hash, async receipt => {
+      const { confirmations } = receipt;
       const message = {
         data: {
-          confirmations: receipt.confirmations,
+          confirmations: confirmations,
         },
       };
 
