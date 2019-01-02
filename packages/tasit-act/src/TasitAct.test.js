@@ -83,10 +83,10 @@ describe("Contract", function() {
     const subscription = simpleStorage.setValue("hello world");
 
     try {
-      // UnhandledPromiseRejectionWarning
-      subscription.on("invalid", () => {});
+      await subscription.on("invalid", () => {});
       assert(false, "subscribing with invalid trigger");
     } catch (e) {
+      await subscription.removeAllListeners();
       assert(true);
     }
   });
@@ -96,10 +96,10 @@ describe("Contract", function() {
     const subscription = simpleStorage.setValue("hello world");
 
     try {
-      // UnhandledPromiseRejectionWarning
-      subscription.on("confirmation");
+      await subscription.on("confirmation");
       assert(false, "subscribing without a callback");
     } catch (e) {
+      await subscription.removeAllListeners();
       assert(true);
     }
   });

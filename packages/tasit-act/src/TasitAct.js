@@ -32,12 +32,10 @@ class Subscription {
 
     if (trigger === "confirmation") blockHeight = 1;
     else {
-      // UnhandledPromiseRejectionWarning
       throw new Error(`Invalid subscription trigger, use: ["confirmation"]`);
     }
 
     if (!callback || typeof callback !== "function") {
-      // UnhandledPromiseRejectionWarning
       throw new Error(`Cannot subscribe without a function`);
     }
 
@@ -53,7 +51,6 @@ class Subscription {
       try {
         await callback(message);
       } catch (error) {
-        // UnhandledPromiseRejectionWarning
         throw new Error(`Callback function with error: ${error.message}`);
       }
     });
