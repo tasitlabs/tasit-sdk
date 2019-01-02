@@ -16,7 +16,7 @@ describe("Contract", function() {
   let simpleStorage, wallet;
 
   beforeEach("should connect to an existing contract", async () => {
-    // Account creates a wallet, should it create an account object that encapsulate the wallet?
+    // Account creates a wallet, should it create an account object that encapsulates the wallet?
     // TasitAcount.create()
     // > Acount { wallet: ..., metaTxInfos..., etc }
     wallet = createFromPrivateKey(
