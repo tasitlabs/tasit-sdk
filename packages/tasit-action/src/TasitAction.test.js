@@ -12,7 +12,7 @@ import { abi as contractABI } from "./testHelpers/SimpleStorage.json";
 // See https://github.com/tasitlabs/TasitSDK/pull/59#discussion_r242258739
 const contractAddress = "0x6C4A015797DDDd87866451914eCe1e8b19261931";
 
-describe("Contract", function() {
+describe("Contract", () => {
   let simpleStorage, wallet;
 
   beforeEach("should connect to an existing contract", async () => {
@@ -32,25 +32,51 @@ describe("Contract", function() {
     //expect(simpleStorage.ValueChanged).to.exist;
   });
 
-  it("should throw error when instantiated with invalid args", async () => {
-    try {
-      new Contract();
-      assert(false, "constructor without address and ABI");
+  describe("should throw error when instantiated with invalid args", () => {
+    it("constructor without address and ABI", async () => {
+      try {
+        new Contract();
+        assert(false);
+      } catch (e) {
+        assert(true);
+      }
+    });
 
-      new Contract(contractAddress);
-      assert(false, "constructor without ABI");
+    it("constructor without ABI", async () => {
+      try {
+        new Contract(contractAddress);
+        assert(false);
+      } catch (e) {
+        assert(true);
+      }
+    });
 
-      new Contract("invalid address");
-      assert(false, "constructor with invalid address");
+    it("constructor with invalid address", async () => {
+      try {
+        new Contract("invalid address");
+        assert(false);
+      } catch (e) {
+        assert(true);
+      }
+    });
 
-      new Contract("invalid address", contractABI);
-      assert(false, "constructor with invalid address and valid ABI");
+    it("constructor with invalid address and valid ABI", async () => {
+      try {
+        new Contract("invalid address", contractABI);
+        assert(false);
+      } catch (e) {
+        assert(true);
+      }
+    });
 
-      new Contract(contractAddress, "invalid abi");
-      assert(false, "constructor with valid address and invalid ABI");
-    } catch (e) {
-      assert(true);
-    }
+    it("constructor with valid address and invalid ABI", async () => {
+      try {
+        new Contract(contractAddress, "invalid abi");
+        assert(false);
+      } catch (e) {
+        assert(true);
+      }
+    });
   });
 
   it("should call a read-only contract method", async () => {
@@ -160,28 +186,7 @@ describe("Contract", function() {
     subscription.on("ValueChanged", handlerFunction);
   });
 
-  // const events = ["ExampleEvent", "AnotherExampleEvent"]
-  // const subscription = contract.subscribe(events)
-  // subscription.on("ExampleEvent", handlerFunction)
-  it.skip("should listen to an event", async () => {
-    const subscription = simpleStorage.subscribe(
-      "ValueChanged",
-      async message => {
-        // message.data = Contents of the message.
-        const { data } = message;
-        const { topics } = data;
-
-        subscription.removeAllListeners();
-
-        console.log(topics);
-
-        //expect(value).to.equal(rand);
-
-        // UnhandledPromiseRejectionWarning
-        //expect(1).to.equal(2);
-      }
-    );
-  });
+  it.skip("should listen to an event", async () => {});
 
   it.skip("should send a signed message", async () => {});
 });
