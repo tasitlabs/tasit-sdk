@@ -113,7 +113,7 @@ describe("Contract", () => {
       await subscription.on("invalid", () => {});
       assert(false, "subscribing with invalid trigger");
     } catch (e) {
-      await subscription.removeAllListeners();
+      await subscription.waitForMessage();
       assert(true);
     }
   });
@@ -126,7 +126,7 @@ describe("Contract", () => {
       await subscription.on("confirmation");
       assert(false, "subscribing without a callback");
     } catch (e) {
-      await subscription.removeAllListeners();
+      await subscription.waitForMessage();
       assert(true);
     }
   });

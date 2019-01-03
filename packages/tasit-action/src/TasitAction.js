@@ -21,6 +21,7 @@ class Utils {
 class Subscription {
   #txPromise;
   #provider;
+  #tx;
 
   constructor(txPromise, provider) {
     this.#txPromise = txPromise;
@@ -37,9 +38,9 @@ class Subscription {
     }
 
     const blockHeight = 1;
-    const tx = await this.#txPromise;
+    this.#tx = await this.#txPromise;
 
-    this.#provider.on(tx.hash, async receipt => {
+    this.#provider.on(this.#tx.hash, async receipt => {
       const { confirmations } = receipt;
       const message = {
         data: {
@@ -55,9 +56,16 @@ class Subscription {
     });
   };
 
-  removeAllListeners = async () => {
-    const tx = await this.#txPromise;
-    this.#provider.removeAllListeners(tx.hash);
+  removeAllListeners = () => {
+    if (this.#tx) this.#provider.removeAllListeners(this.#tx.hash);
+  };
+
+  // Tech debt
+  // This method avoid duplicated nonce generation when rapid succession of several transactions
+  // See: https://github.com/ethereumbook/ethereumbook/blob/04f66ae45cd9405cce04a088556144be11979699/06transactions.asciidoc#keeping-track-of-nonces
+  // How we'll should keeping track of nonces?
+  waitForMessage = async () => {
+    await this.#txPromise;
   };
 }
 
