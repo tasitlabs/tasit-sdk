@@ -93,30 +93,18 @@ export class Contract {
   #contract;
 
   constructor(address, abi, wallet) {
-    if (!Utils.isAddress(address) || !Utils.isABI(abi))
-      throw new Error(`Cannot create a Contract without a address and ABI`);
-
     this.#provider = this.#getDefaultProvider();
-
-    const signerOrProvider = wallet
-      ? wallet.connect(this.#provider)
-      : this.#provider;
-
-    this.#contract = new ethers.Contract(address, abi, signerOrProvider);
-    this.#addFunctionsToContract();
+    this.#initializeContract(address, abi, wallet);
   }
 
-  // Note: For now, `tasit-account` creates a wallet object
+  // Note: For now, `tasit-account` creates a ethers.js wallet object
+  // In future, maybe this method could be renamed to setAccount()
   setWallet = wallet => {
-    if (!Utils.isEthersJsSigner(wallet))
-      throw new Error(`Cannot set a invalid wallet to a Contract`);
-
-    this.#contract = new ethers.Contract(
+    this.#initializeContract(
       this.#contract.address,
       this.#contract.interface.abi,
-      wallet.connect(this.#provider)
+      wallet
     );
-    this.#addFunctionsToContract();
   };
 
   getAddress = () => {
@@ -145,6 +133,21 @@ export class Contract {
     const provider = new ethers.providers.JsonRpcProvider();
     provider.pollingInterval = 50;
     return provider;
+  };
+
+  #initializeContract = (address, abi, wallet) => {
+    if (!Utils.isAddress(address) || !Utils.isABI(abi))
+      throw new Error(`Cannot create a Contract without a address and ABI`);
+
+    if (wallet && !Utils.isEthersJsSigner(wallet))
+      throw new Error(`Cannot set a invalid wallet to a Contract`);
+
+    const signerOrProvider = wallet
+      ? wallet.connect(this.#provider)
+      : this.#provider;
+
+    this.#contract = new ethers.Contract(address, abi, signerOrProvider);
+    this.#addFunctionsToContract();
   };
 
   #addFunctionsToContract = () => {
