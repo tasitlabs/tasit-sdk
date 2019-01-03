@@ -114,11 +114,11 @@ _This means fewer steps that need to be taken to onboard a new user._
 
 The Tasit SDK provides JavaScript middleware for reading from and writing to smart contracts (and listening to events) through an expressive API. This middleware wraps the core ethers.js contract API for making JSON-RPC requests.
 
-This library is written in such a way that the developer using the SDK can just thinking about writing data and listening for more data. The fact that there's a blockchain powering this is an implementation detail that is abstracted away.
+This library is written in such a way that the developer using the SDK can just think about writing data and listening for more data. The fact that there's a blockchain powering this is an implementation detail that is abstracted away.
 
-[Here is a lot more info](/packages/tasit-act/README.md) about how this works.
+[Here is a lot more info](/packages/tasit-action/README.md) about how this works.
 
-[This is the subpackage](/packages/tasit-act/) that implements these features for the Tasit SDK.
+[This is the subpackage](/packages/tasit-action/) that implements these features for the Tasit SDK.
 
 _This makes the experience for new developers working on a mobile app with the Tasit SDK simpler, which means more mobile dapps for end users._
 
@@ -162,7 +162,7 @@ Have a strong opinion on which onboarding flow we should prioritize the most? Pl
 
 #### Configurable JSON-RPC client
 
-We realize that different developers have different takes on whether it's an acceptable compromise to use Infura like MetaMask does in the browser or whether a node more like the original version of Status or Augur is warranted. We anticipate that in the short term, almost all developers using this SDK will use Infura. It's a centralized compromise solution for now.
+We realize that different developers have different takes on whether it's an acceptable compromise to use Infura like MetaMask does in the browser or whether a local Ethereum light client is warranted more like in the original version of Status or Augur. We anticipate that in the short term, almost all developers using this SDK will use Infura. It's a centralized compromise solution for now.
 
 There are a couple projects working to make it simple to spin up your own high-availability, high-performance JSON-RPC client(s) (including Infura), so that should decentralize things a bit until we get to Serenity. See [DAppNode](https://dappnode.io/), [denode](https://github.com/ChainSafeSystems/denode), [Vipnode](https://vipnode.org/), and [Incubed](https://slock.it/incubed.html) by slock.it.
 
@@ -198,7 +198,7 @@ _In order for the Tasit SDK to make a difference for current and future users of
 
 #### Why (from the user's perspective)?
 
-Today, using a dapp from your phone is painful. Almost no dapps have standalone mobile apps, and I’m not easily able to use the dapp without ETH or with the ETH I have in another wallet. We lose mainstream people from the onboarding funnel because of this. Some dapps can be used inside a single app like Coinbase Wallet or Status that serves as a dapp browser, but this feels like a terribly broken UX for anyone who has been using a mobile phone for a while, and it also feels like broken UX for people who are used to using web-based dapps with MetaMask. The ideal UX would be installing each mobile dapp in a way that feels the same as installing any mobile app, and giving it permission to take actions during onboarding with the costs subsidized by others or with my ETH held in a separate wallet.
+Today, using a dapp from a phone is painful. Almost no dapps have standalone mobile apps, and you're not easily able to use the dapp without ETH/tokens or with the ETH/tokens you have in another wallet. We lose mainstream people from the onboarding funnel because of this. Some dapps can be used inside a single app like Coinbase Wallet or Status that serves as a dapp browser, but this feels like a terribly broken UX for anyone who has been using a mobile phone for a while, and it also feels like broken UX for people who are used to using web-based dapps with MetaMask (where the wallet mostly stays out of the way until you need it). The ideal UX would be installing each mobile dapp in a way that feels the same as installing any mobile app, and giving it permission to take actions during onboarding with the costs subsidized by others or with your ETH/tokens held in a separate wallet.
 
 The idea is that the Tasit SDK would be used by many different mobile apps on a user's device. Once the Tasit SDK is around, more dapps will have dedicated mobile apps. This will remove a key barrier to mainstream adoption of Ethereum dapps.
 
@@ -208,7 +208,7 @@ The user-facing answer for "Why?" focused on the UX/product, since that's the ma
 
 One major reason most dapps don’t have standalone mobile apps today is because it’s hard for developers to build mobile Ethereum dapps. There isn’t much good tooling for it. Most developers building interesting new mobile apps these days use React Native to automatically support both iOS and Android, but there is little-to-no tooling for Ethereum in the React Native ecosystem. The Tasit SDK provides that tooling.
 
-The web-based front end for most dapps these days are written with React, so using React Native for the native mobile version is a natural fit.
+The web-based front ends for most dapps these days are written with React, so using React Native for the native mobile version is a natural fit.
 
 Developers shouldn't need to reinvent the wheel for each new dapp: account and private key generation, linking to another wallet or adding meta-transaction support, etc. Let the Tasit SDK handle that bit and focus on the business logic for your dapp.
 
