@@ -1,6 +1,6 @@
 import { Contract } from "./TasitAction";
 import Account from "tasit-account";
-import { expect, assert } from "chai";
+import { expect } from "chai";
 import { waitForEvent, mineBlocks } from "./testHelpers/helpers";
 import { createFromPrivateKey } from "tasit-account/dist/testHelpers/helpers";
 
@@ -34,48 +34,33 @@ describe("Contract", () => {
 
   describe("should throw error when instantiated with invalid args", () => {
     it("constructor without address and ABI", async () => {
-      try {
+      expect(() => {
         new Contract();
-        assert(false);
-      } catch (e) {
-        assert(true);
-      }
+      }).to.throw;
     });
 
     it("constructor without ABI", async () => {
-      try {
+      expect(() => {
         new Contract(contractAddress);
-        assert(false);
-      } catch (e) {
-        assert(true);
-      }
+      }).to.throw;
     });
 
     it("constructor with invalid address", async () => {
-      try {
+      expect(() => {
         new Contract("invalid address");
-        assert(false);
-      } catch (e) {
-        assert(true);
-      }
+      }).to.throw;
     });
 
     it("constructor with invalid address and valid ABI", async () => {
-      try {
+      expect(() => {
         new Contract("invalid address", contractABI);
-        assert(false);
-      } catch (e) {
-        assert(true);
-      }
+      }).to.throw;
     });
 
     it("constructor with valid address and invalid ABI", async () => {
-      try {
+      expect(() => {
         new Contract(contractAddress, "invalid abi");
-        assert(false);
-      } catch (e) {
-        assert(true);
-      }
+      }).to.throw;
     });
   });
 
@@ -84,51 +69,44 @@ describe("Contract", () => {
     expect(value).to.exist;
   });
 
-  it("should throw error when setting invalid wallet", async () => {
-    try {
+  it("should throw error when setting no wallet", async () => {
+    expect(() => {
       simpleStorage.setWallet();
-      assert(false, "setting no wallet");
+    }).to.throw;
+  });
 
+  it("should throw error when setting invalid wallet", async () => {
+    expect(() => {
       simpleStorage.setWallet("invalid wallet");
-      assert(false, "setting invalid wallet");
-    } catch (e) {
-      assert(true);
-    }
+    }).to.throw;
   });
 
   it("should throw error when calling write method without account/wallet/signer", async () => {
-    try {
+    expect(() => {
       simpleStorage.setValue("hello world");
-      assert(false, "calling write function without account");
-    } catch (e) {
-      assert(true);
-    }
+    }).to.throw;
   });
 
   it("should throw when subscribing with invalid trigger", async () => {
     simpleStorage.setWallet(wallet);
     const subscription = simpleStorage.setValue("hello world");
 
-    try {
+    expect(async () => {
       await subscription.on("invalid", () => {});
-      assert(false, "subscribing with invalid trigger");
-    } catch (e) {
-      await subscription.waitForMessage();
-      assert(true);
-    }
+    }).to.throw;
+
+    await subscription.waitForMessage();
   });
 
   it("should throw when subscribing without callback", async () => {
     simpleStorage.setWallet(wallet);
     const subscription = simpleStorage.setValue("hello world");
 
-    try {
+    expect(async () => {
       await subscription.on("confirmation");
-      assert(false, "subscribing without a callback");
-    } catch (e) {
-      await subscription.waitForMessage();
-      assert(true);
-    }
+    }).to.throw;
+
+    await subscription.waitForMessage();
   });
 
   it("should call a write contract method (send tx)", async () => {
@@ -160,24 +138,19 @@ describe("Contract", () => {
 
   it("should throw error when subscribing on invalid event", async () => {
     const events = ["ValueChanged", "InvalidEvent"];
-    try {
+
+    expect(() => {
       const subscription = simpleStorage.subscribe(events);
-      assert(false, "subscription with invalid event");
-    } catch (e) {
-      assert(true);
-    }
+    }).to.throw;
   });
 
   it("should throw error then listening on invalid event", async () => {
     const events = ["ValueChanged"];
     const subscription = simpleStorage.subscribe(events);
 
-    try {
+    expect(() => {
       subscription.on("InvalidEvent", () => {});
-      assert(false, "listening with invalid event");
-    } catch (e) {
-      assert(true);
-    }
+    }).to.throw;
   });
 
   it.skip("should listen to an event", async () => {

@@ -174,7 +174,7 @@ export class Contract {
   #attachWriteFunction = f => {
     this[f.name] = (...args) => {
       if (!Utils.isEthersJsSigner(this.#contract.signer))
-        throw new Error(`Cannot setting data to Contract without a wallet`);
+        throw new Error(`Cannot write data to a Contract without a wallet`);
 
       const tx = this.#contract[f.name].apply(null, args);
       const subscription = new Subscription(tx, this.#provider);
