@@ -86,10 +86,10 @@ describe("Contract", () => {
 
   it("should throw error when setting invalid wallet", async () => {
     try {
-      simpleStorage = simpleStorage.setWallet();
+      simpleStorage.setWallet();
       assert(false, "setting no wallet");
 
-      simpleStorage = simpleStorage.setWallet("invalid wallet");
+      simpleStorage.setWallet("invalid wallet");
       assert(false, "setting invalid wallet");
     } catch (e) {
       assert(true);
@@ -106,7 +106,7 @@ describe("Contract", () => {
   });
 
   it("should throw when subscribing with invalid trigger", async () => {
-    simpleStorage = simpleStorage.setWallet(wallet);
+    simpleStorage.setWallet(wallet);
     const subscription = simpleStorage.setValue("hello world");
 
     try {
@@ -119,7 +119,7 @@ describe("Contract", () => {
   });
 
   it("should throw when subscribing without callback", async () => {
-    simpleStorage = simpleStorage.setWallet(wallet);
+    simpleStorage.setWallet(wallet);
     const subscription = simpleStorage.setValue("hello world");
 
     try {
@@ -132,7 +132,7 @@ describe("Contract", () => {
   });
 
   it("should call a write contract method (send tx)", async () => {
-    simpleStorage = simpleStorage.setWallet(wallet);
+    simpleStorage.setWallet(wallet);
 
     var rand = Math.floor(Math.random() * Math.floor(1000)).toString();
     const subscription = simpleStorage.setValue(rand);

@@ -111,11 +111,12 @@ export class Contract {
     if (!Utils.isEthersJsSigner(wallet))
       throw new Error(`Cannot set a invalid wallet to a Contract`);
 
-    return new Contract(
+    this.#contract = new ethers.Contract(
       this.#contract.address,
       this.#contract.interface.abi,
-      wallet
+      wallet.connect(this.#provider)
     );
+    this.#addFunctionsToContract();
   };
 
   getAddress = () => {
