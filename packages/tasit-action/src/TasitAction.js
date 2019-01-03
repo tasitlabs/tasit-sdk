@@ -156,7 +156,7 @@ export class Contract {
         return json.type === "function";
       })
       .forEach(f => {
-        var isWrite = !f.constant;
+        var isWrite = f.stateMutability !== "view";
         if (isWrite) this.#attachWriteFunction(f);
         else {
           this.#attachReadFunction(f);
