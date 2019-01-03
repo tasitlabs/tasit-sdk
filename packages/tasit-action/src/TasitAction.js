@@ -111,7 +111,7 @@ export class Contract {
     return this.#contract.address;
   };
 
-  // For tests purpose
+  // For testing purposes
   getProvider = () => {
     return this.#provider;
   };
@@ -127,7 +127,7 @@ export class Contract {
   };
 
   // Notes:
-  // - JsonRpcProvider will only be used for testing purpose;
+  // - Ethers.js localhost JsonRpcProvider will only be used for testing purpose;
   // - Default provider should be customized (.env file).
   #getDefaultProvider = () => {
     const provider = new ethers.providers.JsonRpcProvider();
