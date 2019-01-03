@@ -142,6 +142,7 @@ export class Contract {
     if (wallet && !Utils.isEthersJsSigner(wallet))
       throw new Error(`Cannot set a invalid wallet to a Contract`);
 
+    // If there's a wallet, connect it with provider otherwise uses provider directly (for read operations only)
     const signerOrProvider = wallet
       ? wallet.connect(this.#provider)
       : this.#provider;

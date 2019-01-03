@@ -2,6 +2,9 @@ import { Contract } from "./TasitAction";
 import Account from "tasit-account";
 import { expect } from "chai";
 import { waitForEvent, mineBlocks } from "./testHelpers/helpers";
+
+// Note:  Using dist file because babel doesn't compile node_modules files.
+// Any changes on src should be following by compilation to avoid unexpected behaviors.
 import { createFromPrivateKey } from "tasit-account/dist/testHelpers/helpers";
 
 // Note: SimpleStorage.json is originally genarated by `tasit-contracts` and was pasted here manually
