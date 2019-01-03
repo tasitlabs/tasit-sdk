@@ -90,102 +90,109 @@ describe("Contract", () => {
     }).to.throw;
   });
 
-  it("should throw when subscribing with invalid trigger", async () => {
-    simpleStorage.setWallet(wallet);
-    const subscription = simpleStorage.setValue("hello world");
+  describe("messages/transaction subscriptions tests", async () => {
+    let subscription;
 
-    expect(async () => {
-      await subscription.on("invalid", () => {});
-    }).to.throw;
+    beforeEach("assign a wallet to the contract", async () => {
+      simpleStorage.setWallet(wallet);
+    });
 
-    await subscription.waitForMessage();
-  });
-
-  it("should throw when subscribing without callback", async () => {
-    simpleStorage.setWallet(wallet);
-    const subscription = simpleStorage.setValue("hello world");
-
-    expect(async () => {
-      await subscription.on("confirmation");
-    }).to.throw;
-
-    await subscription.waitForMessage();
-  });
-
-  it("should call a write contract method (send tx) - imediate subscription", async () => {
-    simpleStorage.setWallet(wallet);
-
-    var rand = Math.floor(Math.random() * Math.floor(1000)).toString();
-    const subscription = simpleStorage.setValue(rand);
-
-    const onMessage = async message => {
-      // message.data = Contents of the message.
-      const { data } = message;
-      const { confirmations } = data;
-
-      if (confirmations === 7) {
+    afterEach("waiting for message/tx confirmation", async () => {
+      if (subscription) {
+        await subscription.waitForMessage();
         subscription.removeAllListeners();
-
-        const value = await simpleStorage.getValue();
-        expect(value).to.equal(rand);
-
-        // UnhandledPromiseRejectionWarning
-        //expect(1).to.equal(2);
       }
-    };
+    });
 
-    subscription.on("confirmation", onMessage);
+    it("should throw when subscribing with invalid trigger", async () => {
+      subscription = simpleStorage.setValue("hello world");
 
-    await mineBlocks(simpleStorage.getProvider(), 8);
+      expect(async () => {
+        await subscription.on("invalid", () => {});
+      }).to.throw;
+    });
+
+    it("should throw when subscribing without callback", async () => {
+      subscription = simpleStorage.setValue("hello world");
+
+      expect(async () => {
+        await subscription.on("confirmation");
+      }).to.throw;
+    });
+
+    it("should call a write contract method (send tx) - imediate subscription", async () => {
+      var rand = Math.floor(Math.random() * Math.floor(1000)).toString();
+      subscription = simpleStorage.setValue(rand);
+
+      const onMessage = async message => {
+        // message.data = Contents of the message.
+        const { data } = message;
+        const { confirmations } = data;
+
+        if (confirmations >= 7) {
+          subscription.removeAllListeners();
+
+          const value = await simpleStorage.getValue();
+          expect(value).to.equal(rand);
+
+          // UnhandledPromiseRejectionWarning
+          //expect(1).to.equal(2);
+        }
+      };
+
+      subscription.on("confirmation", onMessage);
+
+      await mineBlocks(simpleStorage.getProvider(), 8);
+    });
+
+    it("should call a write contract method (send tx) - late subscription", async () => {
+      var rand = Math.floor(Math.random() * Math.floor(1000)).toString();
+      subscription = simpleStorage.setValue(rand);
+
+      await mineBlocks(simpleStorage.getProvider(), 15);
+
+      const onMessage = async message => {
+        // message.data = Contents of the message.
+        const { data } = message;
+        const { confirmations } = data;
+
+        if (confirmations >= 7) {
+          subscription.removeAllListeners();
+
+          const value = await simpleStorage.getValue();
+          expect(value).to.equal(rand);
+        }
+      };
+
+      subscription.on("confirmation", onMessage);
+    });
   });
 
-  it("should call a write contract method (send tx) - late subscription", async () => {
-    simpleStorage.setWallet(wallet);
+  describe("contract events subscriptions tests", async () => {
+    it("should throw error when subscribing on invalid event", async () => {
+      const events = ["ValueChanged", "InvalidEvent"];
 
-    var rand = Math.floor(Math.random() * Math.floor(1000)).toString();
-    const subscription = simpleStorage.setValue(rand);
+      expect(() => {
+        subscription = simpleStorage.subscribe(events);
+      }).to.throw;
+    });
 
-    await mineBlocks(simpleStorage.getProvider(), 15);
-
-    const onMessage = async message => {
-      // message.data = Contents of the message.
-      const { data } = message;
-      const { confirmations } = data;
-
-      if (confirmations >= 7) {
-        subscription.removeAllListeners();
-
-        const value = await simpleStorage.getValue();
-        expect(value).to.equal(rand);
-      }
-    };
-
-    subscription.on("confirmation", onMessage);
-  });
-
-  it("should throw error when subscribing on invalid event", async () => {
-    const events = ["ValueChanged", "InvalidEvent"];
-
-    expect(() => {
+    it("should throw error then listening on invalid event", async () => {
+      const events = ["ValueChanged"];
       const subscription = simpleStorage.subscribe(events);
-    }).to.throw;
-  });
 
-  it("should throw error then listening on invalid event", async () => {
-    const events = ["ValueChanged"];
-    const subscription = simpleStorage.subscribe(events);
+      expect(() => {
+        subscription.on("InvalidEvent", () => {});
+      }).to.throw;
+    });
 
-    expect(() => {
-      subscription.on("InvalidEvent", () => {});
-    }).to.throw;
-  });
+    it.skip("should listen to an event", async () => {
+      const events = ["ValueChanged"];
+      const subscription = simpleStorage.subscribe(events);
+      const handlerFunction = async message => {};
 
-  it.skip("should listen to an event", async () => {
-    const events = ["ValueChanged"];
-    const subscription = simpleStorage.subscribe(events);
-    const handlerFunction = async message => {};
-
-    subscription.on("ValueChanged", handlerFunction);
+      subscription.on("ValueChanged", handlerFunction);
+    });
   });
 
   // Send method interface: Contract.send(tx: msg, bool: free) => Subscription
