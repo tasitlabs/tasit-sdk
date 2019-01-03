@@ -109,7 +109,7 @@ describe("Contract", () => {
     await subscription.waitForMessage();
   });
 
-  it("should call a write contract method (send tx)", async () => {
+  it("should call a write contract method (send tx) - imediate subscription", async () => {
     simpleStorage.setWallet(wallet);
 
     var rand = Math.floor(Math.random() * Math.floor(1000)).toString();
@@ -134,6 +134,30 @@ describe("Contract", () => {
     subscription.on("confirmation", onMessage);
 
     await mineBlocks(simpleStorage.getProvider(), 8);
+  });
+
+  it("should call a write contract method (send tx) - late subscription", async () => {
+    simpleStorage.setWallet(wallet);
+
+    var rand = Math.floor(Math.random() * Math.floor(1000)).toString();
+    const subscription = simpleStorage.setValue(rand);
+
+    await mineBlocks(simpleStorage.getProvider(), 15);
+
+    const onMessage = async message => {
+      // message.data = Contents of the message.
+      const { data } = message;
+      const { confirmations } = data;
+
+      if (confirmations >= 7) {
+        subscription.removeAllListeners();
+
+        const value = await simpleStorage.getValue();
+        expect(value).to.equal(rand);
+      }
+    };
+
+    subscription.on("confirmation", onMessage);
   });
 
   it("should throw error when subscribing on invalid event", async () => {
