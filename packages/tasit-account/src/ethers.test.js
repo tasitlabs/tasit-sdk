@@ -1,42 +1,19 @@
 import { expect, assert } from "chai";
 import { ethers } from "ethers";
 
-const waitForEvent = async (eventName, expected) => {
-  return new Promise(function(resolve, reject) {
-    contract.on(eventName, function() {
-      const args = Array.prototype.slice.call(arguments);
-      const event = args.pop();
-      event.removeListener();
-      expect(
-        args,
-        `${event.event} event should have expected args`
-      ).to.deep.equal(expected);
-      resolve();
-    });
-  });
-};
-
 const zero = ethers.utils.bigNumberify(0);
 
-let wallet, randomWallet, contract;
+let wallet, provider;
 
-const rawTx = {
-  nonce: 0,
-  gasLimit: 21000,
-  gasPrice: ethers.utils.bigNumberify("20000000000"),
-  to: "0x88a5C2d9919e46F883EB62F7b8Dd9d0CC45bc290",
-  value: ethers.utils.parseEther("0.0000001"),
-  data: "0x",
-};
+// Note: We're intentionally not testing the `fromEncryptedJson` or `encrypt` functions
+// from `ethers.js` because we don't plan to expose that functionality in the Tasit SDK.
+// For a detailed explanation of why, see this GitHub issue:
+// https://github.com/tasitlabs/TasitSDK/issues/24#issuecomment-443576993
+describe("ethers.js", () => {
+  beforeEach("instantiate wallet and provider objects", async function() {
+    provider = new ethers.providers.JsonRpcProvider();
+    provider.pollingInterval = 50;
 
-// Note: Once we refactor this test suite for each test to require no prior state
-// other than what is in that describe's beforeEach hook, we'll give a more
-// descriptive name to this describe block
-describe("ethers.js - pretests", function() {
-  const provider = new ethers.providers.JsonRpcProvider();
-  provider.pollingInterval = 50;
-
-  it("should create a wallet from priv key and provider", async function() {
     const privateKey =
       "0x11d943d7649fbdeb146dc57bd9cfc80b086bfab2330c7b25651dbaf382392f60";
 
@@ -45,12 +22,13 @@ describe("ethers.js - pretests", function() {
     expect(wallet.provider).to.be.not.undefined;
   });
 
-  it("should create a random wallet ", async function() {
-    randomWallet = ethers.Wallet.createRandom();
+  it("should create a random wallet ", async () => {
+    const randomWallet = ethers.Wallet.createRandom();
     expect(randomWallet.address).to.have.lengthOf(42);
   });
 
-  it("should get balance of wallet", async function() {
+  it("should get balance of wallet", async () => {
+    let randomWallet = ethers.Wallet.createRandom();
     randomWallet = randomWallet.connect(provider);
 
     const fundedWalletBalance = ethers.utils.bigNumberify(
@@ -63,32 +41,8 @@ describe("ethers.js - pretests", function() {
     expect(fundedWalletBalance).not.to.be.undefined;
     assert(emptyWalletBalance.eq(zero));
   });
-});
 
-// Note: We're intentionally not testing the `fromEncryptedJson` or `encrypt` functions
-// from `ethers.js` because we don't plan to expose that functionality in the Tasit SDK.
-// For a detailed explanation of why, see this GitHub issue:
-// https://github.com/tasitlabs/TasitSDK/issues/24#issuecomment-443576993
-describe("ethers.js - unit tests", function() {
-  before("wallet used to sign transactions should have funds", async () => {
-    const balance = ethers.utils.bigNumberify(await wallet.getBalance());
-
-    assert(balance.gt(zero), "wallet balance is zero");
-  });
-
-  it("should sign a raw transaction", async function() {
-    const signedTx = await wallet.sign(rawTx);
-
-    const expectedSignedTx =
-      "0xf869808504a817c8008252089488a5c2d9919e46f883eb62f7b8dd9d0cc45bc29085" +
-      "174876e800801ca0855408709023b3d4e827c7aeb7b1adc4a5480e37601a20d881d10e" +
-      "4fd39207aca0179492402dd7a8fdc6190ecdae6ce28f1b6900297b08ed1a18252142d9" +
-      "d8c95a";
-
-    expect(signedTx).to.equal(expectedSignedTx);
-  });
-
-  it("should sign a message", async function() {
+  it("should sign a message", async () => {
     const rawMsg = "Hello World!";
     const signedMsg = await wallet.signMessage(rawMsg);
 
@@ -99,7 +53,7 @@ describe("ethers.js - unit tests", function() {
     expect(signedMsg).to.be.equals(expectedSignedMsg);
   });
 
-  it("should sign a binary message", async function() {
+  it("should sign a binary message", async () => {
     // The 66 character hex string MUST be converted to a 32-byte array first!
     const hash =
       "0x3ea2f1d0abf3fc66cf29eebb70cbd4e7fe762ef8a09bcc06c8edf641230afec0";
@@ -115,49 +69,28 @@ describe("ethers.js - unit tests", function() {
     expect(signedBinData).to.equal(expectedSignedBinData);
   });
 
-  it("should instantiate a contract object", async function() {
-    const contractABI = [
-      "event ValueChanged(address indexed author, string oldValue, string newValue)",
-      "constructor(string memory) public",
-      "function getValue() public view returns (string memory)",
-      "function setValue(string memory) public",
-    ];
+  const rawTx = {
+    nonce: 0,
+    gasLimit: 21000,
+    gasPrice: ethers.utils.bigNumberify("20000000000"),
+    to: "0x88a5C2d9919e46F883EB62F7b8Dd9d0CC45bc290",
+    value: ethers.utils.parseEther("0.0000001"),
+    data: "0x",
+  };
 
-    const contractAddress = "0x6C4A015797DDDd87866451914eCe1e8b19261931";
-    contract = new ethers.Contract(contractAddress, contractABI, wallet);
-    expect(contract.address).to.be.equals(contractAddress);
-  });
-});
+  it("should sign a raw transaction", async () => {
+    const signedTx = await wallet.sign(rawTx);
 
-describe("ethers.js - slow test cases", function() {
-  const provider = new ethers.providers.JsonRpcProvider();
+    const expectedSignedTx =
+      "0xf869808504a817c8008252089488a5c2d9919e46f883eb62f7b8dd9d0cc45bc29085" +
+      "174876e800801ca0855408709023b3d4e827c7aeb7b1adc4a5480e37601a20d881d10e" +
+      "4fd39207aca0179492402dd7a8fdc6190ecdae6ce28f1b6900297b08ed1a18252142d9" +
+      "d8c95a";
 
-  it("should get/set contract's value", async function() {
-    const currentValue = await contract.getValue();
-
-    const message = `I like dogs ${randomWallet.mnemonic}`;
-    expect(currentValue).to.be.not.equals(message);
-
-    const updateValueTx = await contract.setValue(message);
-    await provider.waitForTransaction(updateValueTx.hash);
-
-    const newValue = await contract.getValue();
-
-    expect(newValue).to.equal(message);
+    expect(signedTx).to.equal(expectedSignedTx);
   });
 
-  // Note: This test is taking too long for now. A better way to test events should be used.
-  it("should watch contract's ValueChanged event", async function() {
-    const oldValue = await contract.getValue();
-    const newValue = `I like cats ${randomWallet.mnemonic}`;
-
-    const tx = await contract.setValue(newValue);
-
-    await waitForEvent("ValueChanged", [wallet.address, oldValue, newValue]);
-    await provider.waitForTransaction(tx.hash);
-  });
-
-  it("should broadcast signed tx", async function() {
+  it("should broadcast signed tx", async () => {
     rawTx.nonce = await provider.getTransactionCount(wallet.address);
     const signedTx = await wallet.sign(rawTx);
     const sentTx = await provider.sendTransaction(signedTx);
