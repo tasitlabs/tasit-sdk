@@ -313,3 +313,7 @@ In this example there's an event `Transfer` as one of the events supported by ER
 ### Topics for the future
 
 Is it worth considering having upgradeable smart contracts being a first-class feature of this package? That would mean not assuming the ABI you have right now will always work. But, it could still assume that there will be a backwards compatibility guarantee and that the existing ABI functions would continue to be supported.
+
+### Help make this document better
+
+This guide and the rest of our docs are open-source and available on GitHub. We welcome your contributions. Feel free to open a PR with an edit to this page or open an issue!
