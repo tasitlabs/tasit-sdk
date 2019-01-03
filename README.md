@@ -60,11 +60,11 @@ Are you looking to add functionality to a pre-existing app using the Tasit SDK?
 Using the Tasit SDK from within your app is simple.
 In `App.js` or the appropriate React Native component, import whichever APIs you need from the Tasit SDK.
 
-```
-import { Account } from 'tasit-sdk'
+```javascript
+import { Account } from "tasit-sdk";
 const wallet = Account.create();
 console.log(wallet.address); // '0x...'
-...
+// ...
 ```
 
 #### Automatic scaffolding using the Tasit CLI
@@ -89,9 +89,9 @@ npm install --save tasit-account
 
 Then the usage example from before becomes:
 
-```
-import Account from 'tasit-account'
-...
+```javascript
+import Account from "tasit-account";
+// ...
 ```
 
 ...with the rest of the code remaining the same.
