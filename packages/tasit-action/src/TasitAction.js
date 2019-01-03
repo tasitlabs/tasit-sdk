@@ -81,7 +81,6 @@ class EventSubscription {
 }
 
 export class Contract {
-  #address;
   #provider;
   #contract;
 
@@ -96,7 +95,6 @@ export class Contract {
       : this.#provider;
 
     this.#contract = new ethers.Contract(address, abi, signerOrProvider);
-    this.address = this.#contract.address;
     this.#addFunctionsToContract();
   }
 
@@ -105,7 +103,15 @@ export class Contract {
     if (!Utils.isEthersJsSigner(wallet))
       throw new Error(`Cannot set a invalid wallet to a Contract`);
 
-    return new Contract(this.address, this.#contract.interface.abi, wallet);
+    return new Contract(
+      this.#contract.address,
+      this.#contract.interface.abi,
+      wallet
+    );
+  };
+
+  getAddress = () => {
+    return this.#contract.address;
   };
 
   // For tests purpose

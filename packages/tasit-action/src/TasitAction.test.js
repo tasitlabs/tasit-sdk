@@ -25,7 +25,7 @@ describe("Contract", () => {
 
     simpleStorage = new Contract(contractAddress, contractABI);
     expect(simpleStorage).to.exist;
-    expect(simpleStorage.address).to.equal(contractAddress);
+    expect(simpleStorage.getAddress()).to.equal(contractAddress);
     expect(simpleStorage.getValue).to.exist;
     expect(simpleStorage.setValue).to.exist;
     // Events are not implemented yet
@@ -188,5 +188,7 @@ describe("Contract", () => {
     subscription.on("ValueChanged", handlerFunction);
   });
 
+  // Send method interface: Contract.send(tx: msg, bool: free) => Subscription
+  // On free send how know if identity-contract should be used?
   it.skip("should send a signed message", async () => {});
 });
