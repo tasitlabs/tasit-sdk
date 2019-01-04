@@ -18,10 +18,15 @@ class Utils {
   };
 }
 
-class Subscription {
+// Tech debt:
+// For now we are assuming that a TransactionSubscription has maxListeners = 1
+// To avoid the wheel reinventing, maybe using NodeJS EventEmitter object could be a way to go
+class TransactionSubscription {
   #txPromise;
   #provider;
   #tx;
+  #timeout = 2000;
+  #listener;
 
   constructor(txPromise, provider) {
     this.#txPromise = txPromise;
@@ -30,16 +35,20 @@ class Subscription {
 
   on = async (trigger, callback) => {
     if (trigger !== "confirmation") {
-      throw new Error(`Invalid subscription trigger, use: ["confirmation"]`);
+      throw new Error(`Invalid listener trigger, use: ["confirmation"]`);
     }
 
     if (!callback || typeof callback !== "function") {
-      throw new Error(`Cannot subscribe without a function`);
+      throw new Error(`Cannot listening without a function`);
+    }
+
+    if (this.hasListener()) {
+      throw new Error(`Subscription already listening`);
     }
 
     this.#tx = await this.#txPromise;
 
-    const emitterFunction = async receipt => {
+    const listenerFunction = async receipt => {
       const { confirmations } = receipt;
       const message = {
         data: {
@@ -57,12 +66,55 @@ class Subscription {
     const receipt = await this.#provider.getTransactionReceipt(this.#tx.hash);
     const alreadyMined = receipt != null;
 
-    if (alreadyMined) emitterFunction(receipt);
-    else this.#provider.on(this.#tx.hash, emitterFunction);
+    if (alreadyMined) {
+      this.#listener = {
+        eventName: "block",
+        listenerFunction: async () => {
+          const receipt = await this.#provider.getTransactionReceipt(
+            this.#tx.hash
+          );
+          listenerFunction(receipt);
+        },
+      };
+    } else {
+      this.#listener = {
+        eventName: this.#tx.hash,
+        listenerFunction,
+      };
+    }
+
+    this.#provider.on(
+      this.#listener.eventName,
+      this.#listener.listenerFunction
+    );
+
+    setTimeout(() => {
+      this.removeListener();
+    }, this.#timeout);
+  };
+
+  hasListener = () => {
+    return this.#listener !== undefined;
+  };
+
+  removeListener = () => {
+    if (this.hasListener()) {
+      const { eventName, listenerFunction } = this.#listener;
+      this.#provider.removeListener(eventName, listenerFunction);
+      this.#listener = undefined;
+    }
   };
 
   removeAllListeners = () => {
-    if (this.#tx) this.#provider.removeAllListeners(this.#tx.hash);
+    this.removeListener();
+  };
+
+  off = () => {
+    this.removeListener();
+  };
+
+  unsubscribe = () => {
+    this.removeListener();
   };
 
   // Tech debt
@@ -194,7 +246,7 @@ export class Contract {
         throw new Error(`Cannot write data to a Contract without a wallet`);
 
       const tx = this.#contract[f.name].apply(null, args);
-      const subscription = new Subscription(tx, this.#provider);
+      const subscription = new TransactionSubscription(tx, this.#provider);
       return subscription;
     };
   };

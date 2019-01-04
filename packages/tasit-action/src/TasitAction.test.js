@@ -180,9 +180,31 @@ describe("Contract", () => {
 
       await subscription.on("confirmation", onMessage);
 
-      await mineBlocks(simpleStorage.getProvider(), 5);
+      await mineBlocks(simpleStorage.getProvider(), 20);
 
       expect(fakeFn.called).to.be.true;
+    });
+
+    it("should remove listener after timeout", async () => {
+      subscription = simpleStorage.setValue("hello world");
+      const fakeFn = sinon.fake();
+
+      const foreverCallback = async message => {
+        fakeFn();
+      };
+
+      await subscription.on("confirmation", foreverCallback);
+
+      await mineBlocks(simpleStorage.getProvider(), 20);
+
+      expect(fakeFn.called).to.be.true;
+
+      await new Promise(resolve => setTimeout(resolve, 3000));
+
+      expect(
+        subscription.hasListener(),
+        "listener should be removed after 5 seconds"
+      ).to.be.false;
     });
   });
 
