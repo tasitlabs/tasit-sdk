@@ -26,7 +26,8 @@ class TransactionSubscription {
   #provider;
   #tx;
   #timeout = 2000;
-  #listener;
+  #listeners = [];
+  #errorListener;
 
   constructor(txPromise, provider) {
     this.#txPromise = txPromise;
@@ -34,74 +35,32 @@ class TransactionSubscription {
   }
 
   on = async (trigger, callback) => {
-    if (trigger !== "confirmation") {
-      throw new Error(`Invalid listener trigger, use: ["confirmation"]`);
+    const triggers = ["confirmation", "failed"];
+
+    if (!triggers.includes(trigger)) {
+      throw new Error(`Invalid listener trigger, use: [${triggers}]`);
     }
 
     if (!callback || typeof callback !== "function") {
       throw new Error(`Cannot listening without a function`);
     }
 
-    if (this.hasListener()) {
-      throw new Error(`Subscription already listening`);
-    }
-
-    this.#tx = await this.#txPromise;
-
-    const listenerFunction = async receipt => {
-      const { confirmations } = receipt;
-      const message = {
-        data: {
-          confirmations: confirmations,
-        },
-      };
-
-      try {
-        await callback(message);
-      } catch (error) {
-        throw new Error(`Callback function with error: ${error.message}`);
-      }
-    };
-
-    const receipt = await this.#provider.getTransactionReceipt(this.#tx.hash);
-    const alreadyMined = receipt != null;
-
-    if (alreadyMined) {
-      this.#listener = {
-        eventName: "block",
-        listenerFunction: async () => {
-          const receipt = await this.#provider.getTransactionReceipt(
-            this.#tx.hash
-          );
-          listenerFunction(receipt);
-        },
-      };
+    if (trigger === "failed") {
+      this.#addErrorListener(callback);
     } else {
-      this.#listener = {
-        eventName: this.#tx.hash,
-        listenerFunction,
-      };
+      this.#addListener(trigger, callback);
     }
-
-    this.#provider.on(
-      this.#listener.eventName,
-      this.#listener.listenerFunction
-    );
-
-    setTimeout(() => {
-      this.removeListener();
-    }, this.#timeout);
   };
 
   hasListener = () => {
-    return this.#listener !== undefined;
+    return this.#listeners.length > 0;
   };
 
   removeListener = () => {
     if (this.hasListener()) {
-      const { eventName, listenerFunction } = this.#listener;
+      const listener = this.#listeners.pop();
+      const { eventName, listenerFunction } = listener;
       this.#provider.removeListener(eventName, listenerFunction);
-      this.#listener = undefined;
     }
   };
 
@@ -115,6 +74,71 @@ class TransactionSubscription {
 
   unsubscribe = () => {
     this.removeListener();
+  };
+
+  #addErrorListener = callback => {
+    this.#errorListener = callback;
+  };
+
+  #addListener = async (trigger, callback) => {
+    if (this.hasListener()) {
+      throw new Error(`Subscription already listening`);
+    }
+
+    this.#tx = await this.#txPromise;
+
+    const emitterFunction = async receipt => {
+      const { confirmations } = receipt;
+      const message = {
+        data: {
+          confirmations: confirmations,
+        },
+      };
+
+      try {
+        await callback(message);
+      } catch (error) {
+        this.#emitErrorEvent(
+          new Error(`Callback function with error: ${error.message}`)
+        );
+      }
+    };
+
+    const receipt = await this.#provider.getTransactionReceipt(this.#tx.hash);
+    const alreadyMined = receipt != null;
+
+    if (alreadyMined) {
+      this.#listeners.push({
+        eventName: "block",
+        listenerFunction: async () => {
+          const receipt = await this.#provider.getTransactionReceipt(
+            this.#tx.hash
+          );
+          emitterFunction(receipt);
+        },
+      });
+    } else {
+      this.#listeners.push({
+        eventName: this.#tx.hash,
+        listenerFunction: emitterFunction,
+      });
+    }
+
+    const { eventName, listenerFunction } = this.#listeners[
+      this.#listeners.length - 1
+    ];
+    this.#provider.on(eventName, listenerFunction);
+
+    setTimeout(() => {
+      this.removeListener();
+      this.#emitErrorEvent(new Error(`Listener removed after reached timeout`));
+    }, this.#timeout);
+  };
+
+  #emitErrorEvent = error => {
+    if (this.#errorListener) {
+      this.#errorListener(error);
+    }
   };
 
   // Tech debt
