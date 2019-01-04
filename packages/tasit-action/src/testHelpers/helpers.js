@@ -27,4 +27,12 @@ export const mineBlocks = async (provider, n) => {
   }
 };
 
-export default { waitForEvent, mineBlocks };
+const createSnapshot = async provider => {
+  await provider.send("evm_snapshot", []);
+};
+
+const revertFromSnapshot = async provider => {
+  await provider.send("evm_revert", []);
+};
+
+export default { waitForEvent, mineBlocks, createSnapshot, revertFromSnapshot };

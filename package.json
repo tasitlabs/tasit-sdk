@@ -4,7 +4,7 @@
   "description": "A monorepo for all npm packages in the Tasit ecosystem",
   "devDependencies": {
     "@babel/preset-env": "^7.1.6",
-    "ganache-cli": "^6.1.8",
+    "ganache-cli": "^6.2.4",
     "lerna": "^3.4.3",
     "prettier": "^1.15.3",
     "prettier-plugin-solidity": "^1.0.0-alpha.12"
