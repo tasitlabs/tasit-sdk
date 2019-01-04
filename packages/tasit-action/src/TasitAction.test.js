@@ -73,24 +73,32 @@ describe("Contract", () => {
     expect(value).to.exist;
   });
 
-  //describe("messages/transaction subscriptions tests", async () => {});
+  describe("wallet/account setup tests", async () => {
+    it("should throw error when setting no wallet", async () => {
+      expect(() => {
+        simpleStorage.setWallet();
+      }).to.throw();
+    });
 
-  it("should throw error when setting no wallet", async () => {
-    expect(() => {
-      simpleStorage.setWallet();
-    }).to.throw();
-  });
+    it("should throw error when setting invalid wallet", async () => {
+      expect(() => {
+        simpleStorage.setWallet("invalid wallet");
+      }).to.throw();
+    });
 
-  it("should throw error when setting invalid wallet", async () => {
-    expect(() => {
-      simpleStorage.setWallet("invalid wallet");
-    }).to.throw();
-  });
+    it("should throw error when calling write method without account/wallet", async () => {
+      expect(() => {
+        simpleStorage.setValue("hello world");
+      }).to.throw();
+    });
 
-  it("should throw error when calling write method without account/wallet/signer", async () => {
-    expect(() => {
-      simpleStorage.setValue("hello world");
-    }).to.throw();
+    it("should throw error when calling write method after account/wallet removal", async () => {
+      simpleStorage.setWallet(wallet);
+      simpleStorage.removeWallet();
+      expect(() => {
+        simpleStorage.setValue("hello world");
+      }).to.throw();
+    });
   });
 
   describe("messages/transaction subscriptions tests", async () => {
