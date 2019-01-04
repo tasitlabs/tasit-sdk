@@ -1,6 +1,7 @@
 import { Contract } from "./TasitAction";
 import Account from "tasit-account";
-import { expect } from "chai";
+import chai, { expect } from "chai";
+chai.use(require("chai-as-promised"));
 import { waitForEvent, mineBlocks } from "./testHelpers/helpers";
 
 // Note:  Using dist file because babel doesn't compile node_modules files.
@@ -39,31 +40,31 @@ describe("Contract", () => {
     it("constructor without address and ABI", async () => {
       expect(() => {
         new Contract();
-      }).to.throw;
+      }).to.throw();
     });
 
     it("constructor without ABI", async () => {
       expect(() => {
         new Contract(contractAddress);
-      }).to.throw;
+      }).to.throw();
     });
 
     it("constructor with invalid address", async () => {
       expect(() => {
         new Contract("invalid address");
-      }).to.throw;
+      }).to.throw();
     });
 
     it("constructor with invalid address and valid ABI", async () => {
       expect(() => {
         new Contract("invalid address", contractABI);
-      }).to.throw;
+      }).to.throw();
     });
 
     it("constructor with valid address and invalid ABI", async () => {
       expect(() => {
         new Contract(contractAddress, "invalid abi");
-      }).to.throw;
+      }).to.throw();
     });
   });
 
@@ -72,29 +73,33 @@ describe("Contract", () => {
     expect(value).to.exist;
   });
 
+  //describe("messages/transaction subscriptions tests", async () => {});
+
   it("should throw error when setting no wallet", async () => {
     expect(() => {
       simpleStorage.setWallet();
-    }).to.throw;
+    }).to.throw();
   });
 
   it("should throw error when setting invalid wallet", async () => {
     expect(() => {
       simpleStorage.setWallet("invalid wallet");
-    }).to.throw;
+    }).to.throw();
   });
 
   it("should throw error when calling write method without account/wallet/signer", async () => {
     expect(() => {
       simpleStorage.setValue("hello world");
-    }).to.throw;
+    }).to.throw();
   });
 
   describe("messages/transaction subscriptions tests", async () => {
     let subscription;
 
-    beforeEach("assign a wallet to the contract", async () => {
-      simpleStorage.setWallet(wallet);
+    beforeEach("assign a wallet to the contract", () => {
+      expect(() => {
+        simpleStorage.setWallet(wallet);
+      }).to.not.throw();
     });
 
     afterEach("waiting for message/tx confirmation", async () => {
@@ -106,18 +111,12 @@ describe("Contract", () => {
 
     it("should throw when subscribing with invalid trigger", async () => {
       subscription = simpleStorage.setValue("hello world");
-
-      expect(async () => {
-        await subscription.on("invalid", () => {});
-      }).to.throw;
+      return expect(subscription.on("invalid", () => {})).to.be.rejected;
     });
 
     it("should throw when subscribing without callback", async () => {
       subscription = simpleStorage.setValue("hello world");
-
-      expect(async () => {
-        await subscription.on("confirmation");
-      }).to.throw;
+      return expect(subscription.on("confirmation")).to.be.rejected;
     });
 
     it("should call a write contract method (send tx) - imediate subscription", async () => {
@@ -174,7 +173,7 @@ describe("Contract", () => {
 
       expect(() => {
         subscription = simpleStorage.subscribe(events);
-      }).to.throw;
+      }).to.throw();
     });
 
     it("should throw error then listening on invalid event", async () => {
@@ -183,7 +182,7 @@ describe("Contract", () => {
 
       expect(() => {
         subscription.on("InvalidEvent", () => {});
-      }).to.throw;
+      }).to.throw();
     });
 
     it.skip("should listen to an event", async () => {

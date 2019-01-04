@@ -100,10 +100,20 @@ export class Contract {
   // Note: For now, `tasit-account` creates a ethers.js wallet object
   // In future, maybe this method could be renamed to setAccount()
   setWallet = wallet => {
+    if (!Utils.isEthersJsSigner(wallet))
+      throw new Error(`Cannot set an invalid wallet to a Contract`);
+
     this.#initializeContract(
       this.#contract.address,
       this.#contract.interface.abi,
       wallet
+    );
+  };
+
+  removeWallet = () => {
+    this.#initializeContract(
+      this.#contract.address,
+      this.#contract.interface.abi
     );
   };
 
@@ -140,7 +150,7 @@ export class Contract {
       throw new Error(`Cannot create a Contract without a address and ABI`);
 
     if (wallet && !Utils.isEthersJsSigner(wallet))
-      throw new Error(`Cannot set a invalid wallet to a Contract`);
+      throw new Error(`Cannot set an invalid wallet to a Contract`);
 
     // If there's a wallet, connect it with provider otherwise uses provider directly (for read operations only)
     const signerOrProvider = wallet
