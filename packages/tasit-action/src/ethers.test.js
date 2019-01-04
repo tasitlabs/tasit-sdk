@@ -10,13 +10,13 @@ import { abi as contractABI } from "./testHelpers/SimpleStorage.json";
 // See https://github.com/tasitlabs/TasitSDK/pull/59#discussion_r242258739
 const contractAddress = "0x6C4A015797DDDd87866451914eCe1e8b19261931";
 
-let provider, wallet, contract;
+let wallet, contract;
 
 describe("ethers.js", () => {
-  beforeEach("instantiate provider, wallet and contract objects", async () => {
-    provider = new ethers.providers.JsonRpcProvider();
-    provider.pollingInterval = 50;
+  const provider = new ethers.providers.JsonRpcProvider();
+  provider.pollingInterval = 50;
 
+  beforeEach("instantiate provider, wallet and contract objects", async () => {
     const privateKey =
       "0x11d943d7649fbdeb146dc57bd9cfc80b086bfab2330c7b25651dbaf382392f60";
 

@@ -2,6 +2,7 @@ import { Contract } from "./TasitAction";
 import Account from "tasit-account";
 import chai, { expect } from "chai";
 chai.use(require("chai-as-promised"));
+import sinon from "sinon";
 import { waitForEvent, mineBlocks } from "./testHelpers/helpers";
 
 // Note:  Using dist file because babel doesn't compile node_modules files.
@@ -130,12 +131,16 @@ describe("Contract", () => {
     it("should call a write contract method (send tx) - imediate subscription", async () => {
       var rand = Math.floor(Math.random() * Math.floor(1000)).toString();
       subscription = simpleStorage.setValue(rand);
+      const fakeFn = sinon.fake();
 
       const onMessage = async message => {
         // message.data = Contents of the message.
         const { data } = message;
         const { confirmations } = data;
+
         if (confirmations >= 7) {
+          fakeFn();
+
           subscription.removeAllListeners();
 
           const value = await simpleStorage.getValue();
@@ -148,14 +153,15 @@ describe("Contract", () => {
 
       await subscription.on("confirmation", onMessage);
 
-      await mineBlocks(simpleStorage.getProvider(), 8);
+      await mineBlocks(simpleStorage.getProvider(), 15);
 
-      // TODO: add an assertion to verify if handler function was called
+      expect(fakeFn.called).to.be.true;
     });
 
-    it("should call a write contract method (send tx) - late subscription", async () => {
+    it.skip("should call a write contract method (send tx) - late subscription", async () => {
       var rand = Math.floor(Math.random() * Math.floor(1000)).toString();
       subscription = simpleStorage.setValue(rand);
+      const fakeFn = sinon.fake();
 
       await mineBlocks(simpleStorage.getProvider(), 15);
 
@@ -163,8 +169,10 @@ describe("Contract", () => {
         // message.data = Contents of the message.
         const { data } = message;
         const { confirmations } = data;
-
+        console.log("late", confirmations);
         if (confirmations >= 7) {
+          fakeFn();
+
           subscription.removeAllListeners();
 
           const value = await simpleStorage.getValue();
@@ -174,7 +182,9 @@ describe("Contract", () => {
 
       await subscription.on("confirmation", onMessage);
 
-      // TODO: add an assertion to verify if handler function was called
+      await mineBlocks(simpleStorage.getProvider(), 5);
+
+      expect(fakeFn.called).to.be.true;
     });
   });
 

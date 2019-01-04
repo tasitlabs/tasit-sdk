@@ -38,7 +38,16 @@ class Subscription {
     }
 
     const blockHeight = 1;
+
     this.#tx = await this.#txPromise;
+    // const { confirmations } = await this.#provider.getTransactionReceipt(
+    //   this.#tx.hash
+    // );
+    //
+    // if (confirmations && confirmations >= blockHeight) {
+    //   await callback();
+    //   return;
+    // }
 
     this.#provider.on(this.#tx.hash, async receipt => {
       const { confirmations } = receipt;
@@ -65,7 +74,8 @@ class Subscription {
   // See: https://github.com/ethereumbook/ethereumbook/blob/04f66ae45cd9405cce04a088556144be11979699/06transactions.asciidoc#keeping-track-of-nonces
   // How we'll should keeping track of nonces?
   waitForMessage = async () => {
-    await this.#txPromise;
+    const tx = await this.#txPromise;
+    await this.#provider.waitForTransaction(tx.hash);
   };
 }
 
