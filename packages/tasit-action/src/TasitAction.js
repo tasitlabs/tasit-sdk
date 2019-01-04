@@ -37,19 +37,9 @@ class Subscription {
       throw new Error(`Cannot subscribe without a function`);
     }
 
-    const blockHeight = 1;
-
     this.#tx = await this.#txPromise;
-    // const { confirmations } = await this.#provider.getTransactionReceipt(
-    //   this.#tx.hash
-    // );
-    //
-    // if (confirmations && confirmations >= blockHeight) {
-    //   await callback();
-    //   return;
-    // }
 
-    this.#provider.on(this.#tx.hash, async receipt => {
+    const emitterFunction = async receipt => {
       const { confirmations } = receipt;
       const message = {
         data: {
@@ -62,7 +52,13 @@ class Subscription {
       } catch (error) {
         throw new Error(`Callback function with error: ${error.message}`);
       }
-    });
+    };
+
+    const receipt = await this.#provider.getTransactionReceipt(this.#tx.hash);
+    const alreadyMined = receipt != null;
+
+    if (alreadyMined) emitterFunction(receipt);
+    else this.#provider.on(this.#tx.hash, emitterFunction);
   };
 
   removeAllListeners = () => {
