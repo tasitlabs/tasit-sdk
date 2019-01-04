@@ -135,7 +135,6 @@ describe("Contract", () => {
         // message.data = Contents of the message.
         const { data } = message;
         const { confirmations } = data;
-
         if (confirmations >= 7) {
           subscription.removeAllListeners();
 
@@ -147,9 +146,11 @@ describe("Contract", () => {
         }
       };
 
-      subscription.on("confirmation", onMessage);
+      await subscription.on("confirmation", onMessage);
 
       await mineBlocks(simpleStorage.getProvider(), 8);
+
+      // TODO: add an assertion to verify if handler function was called
     });
 
     it("should call a write contract method (send tx) - late subscription", async () => {
@@ -171,7 +172,9 @@ describe("Contract", () => {
         }
       };
 
-      subscription.on("confirmation", onMessage);
+      await subscription.on("confirmation", onMessage);
+
+      // TODO: add an assertion to verify if handler function was called
     });
   });
 
