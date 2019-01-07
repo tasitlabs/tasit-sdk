@@ -24,18 +24,9 @@ class Utils {
 class Subscription {
   #emitter;
   #events = [];
-  #timeout = EVENTS_CONFIG.timeout;
 
   constructor(eventEmitter) {
     this.#emitter = eventEmitter;
-  }
-
-  getTimeout() {
-    return this.#timeout;
-  }
-
-  setTimeout(timeout) {
-    this.#timeout = timeout;
   }
 
   removeListener = (eventName, listener) => {
@@ -71,7 +62,7 @@ class Subscription {
     this.removeAllListeners();
   };
 
-  // TODO: Make private/protected
+  // TODO: Make protected
   emitErrorEvent = error => {
     this.#events.forEach(event => {
       if (event.eventName === "error") {
@@ -80,7 +71,7 @@ class Subscription {
     });
   };
 
-  // TODO: Make private/protected
+  // TODO: Make protected
   addErrorListener = listener => {
     const eventName = "error";
     this.#events.push({
@@ -91,6 +82,7 @@ class Subscription {
     });
   };
 
+  // TODO: Make protected
   getEventInfo = (wrappedEventName, wrappedListener) => {
     return this.#events.find(
       event =>
@@ -99,6 +91,7 @@ class Subscription {
     ).info;
   };
 
+  // TODO: Make protected
   setEventInfo = (wrappedEventName, wrappedListener, info) => {
     this.#events.forEach(event => {
       if (
@@ -109,14 +102,8 @@ class Subscription {
     });
   };
 
-  // TODO: Make private/protected
-  addListener = (
-    eventName,
-    wrappedEventName,
-    listener,
-    wrappedListener,
-    extra
-  ) => {
+  // TODO: Make protected
+  addListener = (eventName, wrappedEventName, listener, wrappedListener) => {
     this.#emitter.on(wrappedEventName, wrappedListener);
 
     this.#events.push({
@@ -129,7 +116,7 @@ class Subscription {
     setTimeout(() => {
       this.emitErrorEvent(new Error(`Listener removed after reached timeout`));
       this.removeListener(eventName, listener);
-    }, this.getTimeout());
+    }, EVENTS_CONFIG.timeout);
   };
 }
 
