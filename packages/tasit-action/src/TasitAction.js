@@ -24,9 +24,18 @@ class Utils {
 class Subscription {
   #emitter;
   #events = [];
+  #timeout = EVENTS_CONFIG.timeout;
 
   constructor(eventEmitter) {
     this.#emitter = eventEmitter;
+  }
+
+  getTimeout() {
+    return this.#timeout;
+  }
+
+  setTimeout(timeout) {
+    this.#timeout = timeout;
   }
 
   removeListener = (eventName, listener) => {
@@ -82,8 +91,32 @@ class Subscription {
     });
   };
 
+  getEventInfo = (wrappedEventName, wrappedListener) => {
+    return this.#events.find(
+      event =>
+        event.wrappedEventName === wrappedEventName &&
+        event.wrappedListener === wrappedListener
+    ).info;
+  };
+
+  setEventInfo = (wrappedEventName, wrappedListener, info) => {
+    this.#events.forEach(event => {
+      if (
+        event.wrappedEventName === wrappedEventName &&
+        event.wrappedListener === wrappedListener
+      )
+        event.info = info;
+    });
+  };
+
   // TODO: Make private/protected
-  addListener = (eventName, wrappedEventName, listener, wrappedListener) => {
+  addListener = (
+    eventName,
+    wrappedEventName,
+    listener,
+    wrappedListener,
+    extra
+  ) => {
     this.#emitter.on(wrappedEventName, wrappedListener);
 
     this.#events.push({
@@ -96,7 +129,7 @@ class Subscription {
     setTimeout(() => {
       this.emitErrorEvent(new Error(`Listener removed after reached timeout`));
       this.removeListener(eventName, listener);
-    }, EVENTS_CONFIG.timeout);
+    }, this.getTimeout());
   };
 }
 
@@ -129,15 +162,37 @@ class TransactionSubscription extends Subscription {
 
     this.#tx = await this.#txPromise;
 
-    let wrappedListener = async receipt => {
-      const { confirmations } = receipt;
-      const message = {
-        data: {
-          confirmations: confirmations,
-        },
-      };
-
+    let wrappedListener = async blockNumber => {
       try {
+        const receipt = await this.#provider.getTransactionReceipt(
+          this.#tx.hash
+        );
+        const txConfirmed = receipt !== null;
+
+        if (txConfirmed) {
+          this.setEventInfo("block", wrappedListener, {
+            hasBeenConfirmed: true,
+          });
+        } else {
+          const { hasBeenConfirmed } = this.getEventInfo(
+            "block",
+            wrappedListener
+          );
+          if (hasBeenConfirmed)
+            this.emitErrorEvent(
+              new Error(`Your message has been included in an uncle block.`)
+            );
+
+          return;
+        }
+
+        const { confirmations } = receipt;
+        const message = {
+          data: {
+            confirmations: confirmations,
+          },
+        };
+
         await listener(message);
       } catch (error) {
         this.emitErrorEvent(
@@ -146,19 +201,7 @@ class TransactionSubscription extends Subscription {
       }
     };
 
-    const receipt = await this.#provider.getTransactionReceipt(this.#tx.hash);
-    const alreadyMined = receipt != null;
-
-    if (alreadyMined) {
-      this.addListener(eventName, "block", listener, async () => {
-        const receipt = await this.#provider.getTransactionReceipt(
-          this.#tx.hash
-        );
-        wrappedListener(receipt);
-      });
-    } else {
-      this.addListener(eventName, this.#tx.hash, listener, wrappedListener);
-    }
+    this.addListener(eventName, "block", listener, wrappedListener);
   };
 
   // Tech debt
@@ -167,6 +210,7 @@ class TransactionSubscription extends Subscription {
   // How we'll should keeping track of nonces?
   waitForMessage = async () => {
     const tx = await this.#txPromise;
+
     await this.#provider.waitForTransaction(tx.hash);
   };
 }

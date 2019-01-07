@@ -3,7 +3,12 @@ import Account from "tasit-account";
 import chai, { expect } from "chai";
 chai.use(require("chai-as-promised"));
 import sinon from "sinon";
-import { waitForEvent, mineBlocks } from "./testHelpers/helpers";
+import {
+  waitForEvent,
+  mineBlocks,
+  createSnapshot,
+  revertFromSnapshot,
+} from "./testHelpers/helpers";
 
 // Note:  Using dist file because babel doesn't compile node_modules files.
 // Any changes on src should be following by compilation to avoid unexpected behaviors.
@@ -143,7 +148,7 @@ describe("Contract", () => {
           const value = await simpleStorage.getValue();
           expect(value).to.equal(rand);
 
-          // UnhandledPromiseRejectionWarning
+          // FIXME: UnhandledPromiseRejectionWarning
           //expect(1).to.equal(2);
         }
       };
@@ -208,6 +213,43 @@ describe("Contract", () => {
         subscription.listenerCount("confirmation"),
         "listener should be removed after timeout"
       ).to.be.equals(0);
+
+      expect(errorFn.called).to.be.true;
+    });
+
+    it("should emit error event when orphan/uncle block occurs", async () => {
+      subscription = simpleStorage.setValue("hello world");
+
+      const confirmationFn = sinon.fake();
+      const errorFn = sinon.fake();
+
+      const callback = message => {
+        confirmationFn();
+      };
+
+      await subscription.on("confirmation", callback);
+
+      await subscription.on("error", error => {
+        errorFn();
+        subscription.removeAllListeners();
+
+        // FIXME: Assertion not working
+        //expect(1).to.equal(2);
+        expect(error.message).to.match(/uncle/);
+      });
+
+      const snapshotId = await createSnapshot(simpleStorage.getProvider());
+
+      await mineBlocks(simpleStorage.getProvider(), 15);
+
+      expect(confirmationFn.called).to.be.true;
+
+      await revertFromSnapshot(simpleStorage.getProvider(), snapshotId);
+
+      await mineBlocks(simpleStorage.getProvider(), 20);
+
+      // Broadcast same message again (simulate reorg)
+      subscription = simpleStorage.setValue("hello world");
 
       expect(errorFn.called).to.be.true;
     });
