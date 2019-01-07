@@ -322,6 +322,7 @@ describe("Contract", () => {
 
       expect(eventFn.called).to.be.true;
 
+      // TODO: Use fake timer
       await new Promise(resolve => setTimeout(resolve, 3000));
 
       expect(
