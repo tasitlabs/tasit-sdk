@@ -1,1 +1,1 @@
-export { default } from "./TasitAct";
+export * from "./TasitAction";

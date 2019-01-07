@@ -1,4 +1,4 @@
-import { Account } from "./tasitSdk";
+import { Account, Contract } from "./TasitSdk";
 import { expect, assert } from "chai";
 
 describe("Account", function() {
