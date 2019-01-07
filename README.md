@@ -26,9 +26,14 @@ You might want to jump ahead to the "why" sections to start:
 
 [Getting started](#getting-started)
 
+- [Installation](#installation)
+- [Usage](#usage)
+- [Automatic scaffolding using the Tasit CLI](#automatic-scaffolding-using-the-tasit-cli)
+- [Modular](#modular)
+
 [Features](#features)
 
-- [Account and private key generation](#account-and-private-key-generation)
+- [Ephemeral account and private key generation](#ephemeral-account-and-private-key-generation)
 - [Reading and writing data and reacting to events](#reading-and-writing-data-and-reacting-to-events)
 - [Advanced support for popular ERC standards](#advanced-support-for-popular-erc-standards)
 - [Onboarding](#onboarding)
@@ -98,7 +103,7 @@ import Account from "tasit-account";
 
 ### Features
 
-#### Account and private key generation
+#### Ephemeral account and private key generation
 
 Using the Tasit SDK, you can generate a new Ethereum account and private key.
 
@@ -178,7 +183,7 @@ There are a couple projects working to make it simple to spin up your own high-a
 
 ##### In the future
 
-We have no plans until Serenity to make a special abstraction for running a local a light geth node like Status did originally. The Tasit SDK works with whatever JSON-RPC client you point it at, but we won't be adding an abstraction for using a light client within the native mobile dapp until Serenity. People have had too many issues with this on mobile (dropped network connections, using all disk space, battery usage, etc.
+We have no plans until Serenity to make a special abstraction for running a local light geth node like Status did originally. The Tasit SDK works with whatever JSON-RPC client you point it at, but we won't be adding an abstraction for using a light client within the native mobile dapp until Serenity. People have had too many issues with this on mobile (dropped network connections, using all disk space, battery usage, etc.
 
 Looking towards the future, light and ultralight client projects we're tracking for first-class support in this SDK include:
 
