@@ -2,6 +2,9 @@ import "ethers/dist/shims.js";
 // Note: ethers SHOULD be imported from their main object
 // shims aren't injected with package import
 import { ethers } from "ethers";
+import EventEmitter from "events";
+// TODO: Get via config file
+const DEFAULT_TIMEOUT = 2000;
 
 class Utils {
   static isAddress = address => {
@@ -18,76 +21,115 @@ class Utils {
   };
 }
 
-// Tech debt:
-// For now we are assuming that a TransactionSubscription has maxListeners = 1
-// To avoid the wheel reinventing, maybe using NodeJS EventEmitter object could be a way to go
-class TransactionSubscription {
+class Subscription {
+  #timeout = DEFAULT_TIMEOUT;
+  #emitter;
+  #events = [];
+
+  constructor(eventEmitter) {
+    this.#emitter = eventEmitter;
+  }
+
+  removeListener = (eventName, listener) => {
+    this.#events = this.#events.filter(event => {
+      if (event.eventName === eventName && event.listener === listener) {
+        this.#emitter.removeListener(
+          event.wrappedEventName,
+          event.wrappedListener
+        );
+        return false;
+      }
+      return true;
+    });
+  };
+
+  off = (eventName, listener) => {
+    this.removeListener(eventName, listener);
+  };
+
+  listenerCount = eventName => {
+    return this.#events.filter(event => {
+      return event.eventName === eventName;
+    }).length;
+  };
+
+  removeAllListeners = () => {
+    this.#events.forEach(event => {
+      this.removeListener(event.eventName, event.listener);
+    });
+  };
+
+  unsubscribe = () => {
+    this.removeAllListeners();
+  };
+
+  // TODO: Make private
+  emitErrorEvent = error => {
+    this.#events.forEach(event => {
+      if (event.eventName === "error") {
+        event.listener(error);
+      }
+    });
+  };
+
+  addErrorListener = listener => {
+    const eventName = "error";
+    this.#events.push({
+      eventName,
+      wrappedEventName: eventName,
+      listener,
+      wrappedListener: listener,
+    });
+  };
+
+  // TODO: Make private
+  addListener = (eventName, wrappedEventName, listener, wrappedListener) => {
+    this.#emitter.on(wrappedEventName, wrappedListener);
+
+    this.#events.push({
+      eventName,
+      wrappedEventName,
+      listener,
+      wrappedListener,
+    });
+
+    setTimeout(() => {
+      this.emitErrorEvent(new Error(`Listener removed after reached timeout`));
+      this.removeListener(eventName, listener);
+    }, this.#timeout);
+  };
+}
+
+class TransactionSubscription extends Subscription {
   #txPromise;
   #provider;
   #tx;
-  #timeout = 2000;
-  #listeners = [];
-  #errorListener;
 
   constructor(txPromise, provider) {
+    super(provider);
     this.#txPromise = txPromise;
     this.#provider = provider;
   }
 
-  on = async (trigger, callback) => {
-    const triggers = ["confirmation", "failed"];
+  on = async (eventName, listener) => {
+    const triggers = ["confirmation", "error"];
 
-    if (!triggers.includes(trigger)) {
+    if (!triggers.includes(eventName)) {
       throw new Error(`Invalid listener trigger, use: [${triggers}]`);
     }
 
-    if (!callback || typeof callback !== "function") {
+    if (!listener || typeof listener !== "function") {
       throw new Error(`Cannot listening without a function`);
     }
 
-    if (trigger === "failed") {
-      this.#addErrorListener(callback);
-    } else {
-      this.#addListener(trigger, callback);
-    }
-  };
-
-  hasListener = () => {
-    return this.#listeners.length > 0;
-  };
-
-  removeListener = () => {
-    if (this.hasListener()) {
-      const listener = this.#listeners.pop();
-      const { eventName, listenerFunction } = listener;
-      this.#provider.removeListener(eventName, listenerFunction);
-    }
-  };
-
-  removeAllListeners = () => {
-    this.removeListener();
-  };
-
-  off = () => {
-    this.removeListener();
-  };
-
-  unsubscribe = () => {
-    this.removeListener();
-  };
-
-  #addErrorListener = callback => {
-    this.#errorListener = callback;
-  };
-
-  #addListener = async (trigger, callback) => {
-    if (this.hasListener()) {
-      throw new Error(`Subscription already listening`);
+    if (eventName === "error") {
+      this.addErrorListener(listener);
+      return;
     }
 
     this.#tx = await this.#txPromise;
 
-    const emitterFunction = async receipt => {
+    let wrappedListener = async receipt => {
       const { confirmations } = receipt;
       const message = {
         data: {
@@ -96,9 +138,9 @@ class TransactionSubscription {
       };
 
       try {
-        await callback(message);
+        await listener(message);
       } catch (error) {
-        this.#emitErrorEvent(
+        this.emitErrorEvent(
           new Error(`Callback function with error: ${error.message}`)
         );
       }
@@ -108,36 +150,14 @@ class TransactionSubscription {
     const alreadyMined = receipt != null;
 
     if (alreadyMined) {
-      this.#listeners.push({
-        eventName: "block",
-        listenerFunction: async () => {
-          const receipt = await this.#provider.getTransactionReceipt(
-            this.#tx.hash
-          );
-          emitterFunction(receipt);
-        },
+      this.addListener(eventName, "block", listener, async () => {
+        const receipt = await this.#provider.getTransactionReceipt(
+          this.#tx.hash
+        );
+        wrappedListener(receipt);
       });
     } else {
-      this.#listeners.push({
-        eventName: this.#tx.hash,
-        listenerFunction: emitterFunction,
-      });
-    }
-
-    const { eventName, listenerFunction } = this.#listeners[
-      this.#listeners.length - 1
-    ];
-    this.#provider.on(eventName, listenerFunction);
-
-    setTimeout(() => {
-      this.removeListener();
-      this.#emitErrorEvent(new Error(`Listener removed after reached timeout`));
-    }, this.#timeout);
-  };
-
-  #emitErrorEvent = error => {
-    if (this.#errorListener) {
-      this.#errorListener(error);
+      this.addListener(eventName, this.#tx.hash, listener, wrappedListener);
     }
   };
 
@@ -151,23 +171,55 @@ class TransactionSubscription {
   };
 }
 
-class EventSubscription {
-  #eventNames;
+class ContractSubscription extends Subscription {
+  #contract;
   #provider;
+  #eventNames;
 
-  constructor(eventNames, provider) {
-    this.#eventNames = eventNames;
+  // Why eventNames shoud be passed here?
+  constructor(contract, provider, eventNames) {
+    eventNames.forEach(eventName => {
+      if (contract.interface.events[eventName] === undefined)
+        throw new Error(`Event '${eventName}' not found.`);
+    });
+
+    super(contract);
+    this.#contract = contract;
     this.#provider = provider;
+    this.#eventNames = eventNames;
   }
 
-  on = (eventName, callback) => {
-    if (!this.#eventNames.includes(eventName))
+  on = (eventName, listener) => {
+    if (!this.#eventNames.includes(eventName) && eventName !== "error") {
       throw new Error(
         `This subscription isn't subscribed on '${eventName}' event.`
       );
-  };
+    }
 
-  //removeAllListeners = async () => {};
+    if (eventName === "error") {
+      this.addErrorListener(listener);
+      return;
+    }
+
+    const wrappedListener = async (...args) => {
+      const event = args.pop();
+      const message = {
+        data: {
+          args: event.args,
+        },
+      };
+
+      try {
+        await listener(message);
+      } catch (error) {
+        this.emitErrorEvent(
+          new Error(`Callback function with error: ${error.message}`)
+        );
+      }
+    };
+
+    this.addListener(eventName, eventName, listener, wrappedListener);
+  };
 }
 
 export class Contract {
@@ -209,12 +261,11 @@ export class Contract {
   };
 
   subscribe = eventNames => {
-    eventNames.forEach(eventName => {
-      if (this.#contract.interface.events[eventName] === undefined)
-        throw new Error(`Event '${eventName}' not found.`);
-    });
-
-    const subscription = new EventSubscription(eventNames, this.#provider);
+    const subscription = new ContractSubscription(
+      this.#contract,
+      this.#provider,
+      eventNames
+    );
     return subscription;
   };
 

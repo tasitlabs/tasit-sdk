@@ -60,8 +60,8 @@ describe("ethers.js", () => {
     expect(value).to.equal(rand);
   });
 
-  // Note: Non-Deterministisc test (It's falling sometimes).
-  // TODO: Use mineBlocks utils maybe could fix it.
+  // Note: Non-Deterministisc test (It's failing sometimes).
+  // TODO: Using mineBlocks utils maybe could fix it.
   it("should watch contract's ValueChanged event", async () => {
     const oldValue = await contract.getValue();
     const newValue = `I like cats`;
