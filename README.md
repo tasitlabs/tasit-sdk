@@ -241,7 +241,7 @@ A single company's financial incentives determining how a software product works
 
 ### Contact us
 
-We love getting feedback from the community, so please feel free to reach out.
+We love getting feedback, so please feel free to reach out.
 
 - [Website](https://tasit.io/)
 
@@ -254,3 +254,5 @@ We love getting feedback from the community, so please feel free to reach out.
 - [Feature requests](https://tasit.canny.io/feature-requests)
 
 - [Project Kanban board](https://github.com/orgs/tasitlabs/projects/1)
+
+- [Medium](https://medium.com/tasit)
