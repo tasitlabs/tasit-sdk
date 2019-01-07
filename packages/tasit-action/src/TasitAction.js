@@ -2,9 +2,9 @@ import "ethers/dist/shims.js";
 // Note: ethers SHOULD be imported from their main object
 // shims aren't injected with package import
 import { ethers } from "ethers";
-import EventEmitter from "events";
-// TODO: Get via config file
-const DEFAULT_TIMEOUT = 2000;
+const config = require("config");
+const PROVIDER_CONFIG = config.provider;
+const EVENTS_CONFIG = config.events;
 
 class Utils {
   static isAddress = address => {
@@ -22,7 +22,6 @@ class Utils {
 }
 
 class Subscription {
-  #timeout = DEFAULT_TIMEOUT;
   #emitter;
   #events = [];
 
@@ -63,7 +62,7 @@ class Subscription {
     this.removeAllListeners();
   };
 
-  // TODO: Make private
+  // TODO: Make private/protected
   emitErrorEvent = error => {
     this.#events.forEach(event => {
       if (event.eventName === "error") {
@@ -72,6 +71,7 @@ class Subscription {
     });
   };
 
+  // TODO: Make private/protected
   addErrorListener = listener => {
     const eventName = "error";
     this.#events.push({
@@ -82,7 +82,7 @@ class Subscription {
     });
   };
 
-  // TODO: Make private
+  // TODO: Make private/protected
   addListener = (eventName, wrappedEventName, listener, wrappedListener) => {
     this.#emitter.on(wrappedEventName, wrappedListener);
 
@@ -96,7 +96,7 @@ class Subscription {
     setTimeout(() => {
       this.emitErrorEvent(new Error(`Listener removed after reached timeout`));
       this.removeListener(eventName, listener);
-    }, this.#timeout);
+    }, EVENTS_CONFIG.timeout);
   };
 }
 
@@ -222,12 +222,84 @@ class ContractSubscription extends Subscription {
   };
 }
 
+class ProviderFactory {
+  static getProvider = () => {
+    let json;
+    try {
+      json = PROVIDER_CONFIG;
+    } catch (error) {
+      console.warn(
+        `Error on parsing config.json file, using default configuration.`
+      );
+      json = ProviderFactory.getDefaultConfig();
+    }
+
+    return ProviderFactory.createProvider(json);
+  };
+
+  static getDefaultConfig = () => {
+    return {
+      network: "other",
+      provider: "jsonrpc",
+      pollingInterval: 50,
+      jsonRpc: {
+        url: "http://localhost:8545",
+        user: "",
+        password: "",
+        allowInsecure: true,
+      },
+    };
+  };
+
+  static createProvider = ({
+    network,
+    provider,
+    pollingInterval,
+    jsonRpc,
+    infura,
+    etherscan,
+  }) => {
+    const networks = ["mainnet", "rinkeby", "ropsten", "kovan", "other"];
+    const providers = ["default", "infura", "etherscan", "jsonrpc"];
+
+    if (!networks.includes(network)) {
+      throw new Error(`Invalid network, use: [${networks}].`);
+    }
+
+    if (!providers.includes(provider)) {
+      throw new Error(`Invalid provider, use: [${providers}].`);
+    }
+
+    if (network === "mainnet") network = "homestead";
+    else if (network === "other") network = undefined;
+
+    switch (provider) {
+      case "default":
+        return ethers.getDefaultProvider(network);
+      case "infura":
+        return new ethers.providers.InfuraProvider(
+          network,
+          infura.apiAccessToken
+        );
+      case "etherscan":
+        return new ethers.providers.EtherscanProvider(
+          network,
+          ethescan.apiToken
+        );
+      case "jsonrpc":
+        let p = new ethers.providers.JsonRpcProvider(jsonRpc, network);
+        if (pollingInterval) p.pollingInterval = pollingInterval;
+        return p;
+    }
+  };
+}
+
 export class Contract {
   #provider;
   #contract;
 
   constructor(address, abi, wallet) {
-    this.#provider = this.#getDefaultProvider();
+    this.#provider = ProviderFactory.getProvider();
     this.#initializeContract(address, abi, wallet);
   }
 
@@ -267,15 +339,6 @@ export class Contract {
       eventNames
     );
     return subscription;
-  };
-
-  // Notes:
-  // - Ethers.js localhost JsonRpcProvider will only be used for testing purpose;
-  // - Default provider should be customized (.env file).
-  #getDefaultProvider = () => {
-    const provider = new ethers.providers.JsonRpcProvider();
-    provider.pollingInterval = 50;
-    return provider;
   };
 
   #initializeContract = (address, abi, wallet) => {
