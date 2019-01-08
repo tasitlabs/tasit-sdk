@@ -3,8 +3,6 @@ import "ethers/dist/shims.js";
 // shims aren't injected with package import
 import { ethers } from "ethers";
 const config = require("config");
-const PROVIDER_CONFIG = config.provider;
-const EVENTS_CONFIG = config.events;
 
 class Utils {
   static isAddress = address => {
@@ -83,26 +81,6 @@ class Subscription {
   };
 
   // TODO: Make protected
-  getEventInfo = (wrappedEventName, wrappedListener) => {
-    return this.#events.find(
-      event =>
-        event.wrappedEventName === wrappedEventName &&
-        event.wrappedListener === wrappedListener
-    ).info;
-  };
-
-  // TODO: Make protected
-  setEventInfo = (wrappedEventName, wrappedListener, info) => {
-    this.#events.forEach(event => {
-      if (
-        event.wrappedEventName === wrappedEventName &&
-        event.wrappedListener === wrappedListener
-      )
-        event.info = info;
-    });
-  };
-
-  // TODO: Make protected
   addListener = (eventName, wrappedEventName, listener, wrappedListener) => {
     this.#emitter.on(wrappedEventName, wrappedListener);
 
@@ -112,11 +90,6 @@ class Subscription {
       listener,
       wrappedListener,
     });
-
-    setTimeout(() => {
-      this.emitErrorEvent(new Error(`Listener removed after reached timeout`));
-      this.removeListener(eventName, listener);
-    }, EVENTS_CONFIG.timeout);
   };
 }
 
@@ -124,6 +97,7 @@ class TransactionSubscription extends Subscription {
   #txPromise;
   #provider;
   #tx;
+  #txConfirmed = false;
 
   constructor(txPromise, provider) {
     super(provider);
@@ -131,41 +105,20 @@ class TransactionSubscription extends Subscription {
     this.#provider = provider;
   }
 
-  on = async (eventName, listener) => {
-    const triggers = ["confirmation", "error"];
-
-    if (!triggers.includes(eventName)) {
-      throw new Error(`Invalid listener trigger, use: [${triggers}]`);
-    }
-
-    if (!listener || typeof listener !== "function") {
-      throw new Error(`Cannot listening without a function`);
-    }
-
-    if (eventName === "error") {
-      this.addErrorListener(listener);
-      return;
-    }
-
+  #addConfirmationListener = async listener => {
+    const eventName = "confirmation";
     this.#tx = await this.#txPromise;
 
-    let wrappedListener = async blockNumber => {
+    const wrappedListener = async blockNumber => {
       try {
         const receipt = await this.#provider.getTransactionReceipt(
           this.#tx.hash
         );
-        const txConfirmed = receipt !== null;
 
-        if (txConfirmed) {
-          this.setEventInfo("block", wrappedListener, {
-            hasBeenConfirmed: true,
-          });
+        if (receipt !== null) {
+          this.#txConfirmed = true;
         } else {
-          const { hasBeenConfirmed } = this.getEventInfo(
-            "block",
-            wrappedListener
-          );
-          if (hasBeenConfirmed)
+          if (this.#txConfirmed)
             this.emitErrorEvent(
               new Error(`Your message has been included in an uncle block.`)
             );
@@ -189,43 +142,61 @@ class TransactionSubscription extends Subscription {
     };
 
     this.addListener(eventName, "block", listener, wrappedListener);
+
+    setTimeout(() => {
+      this.emitErrorEvent(
+        new Error(
+          `Listener removed after reached timeout - event took too long.`
+        )
+      );
+      this.removeListener(eventName, listener);
+    }, config.events.timeout);
+  };
+
+  on = async (eventName, listener) => {
+    const triggers = ["confirmation", "error"];
+
+    if (!triggers.includes(eventName)) {
+      throw new Error(`Invalid listener trigger, use: [${triggers}]`);
+    }
+
+    if (!listener || typeof listener !== "function") {
+      throw new Error(`Cannot listen without a function`);
+    }
+
+    if (eventName === "error") {
+      this.addErrorListener(listener);
+    } else if (eventName === "confirmation") {
+      await this.#addConfirmationListener(listener);
+    }
   };
 
   // Tech debt
-  // This method avoid duplicated nonce generation when rapid succession of several transactions
+  // This method avoids duplicated nonce generation when several transactions happen in rapid succession
   // See: https://github.com/ethereumbook/ethereumbook/blob/04f66ae45cd9405cce04a088556144be11979699/06transactions.asciidoc#keeping-track-of-nonces
   // How we'll should keeping track of nonces?
   waitForMessage = async () => {
     const tx = await this.#txPromise;
-
     await this.#provider.waitForTransaction(tx.hash);
   };
 }
 
 class ContractSubscription extends Subscription {
   #contract;
-  #provider;
-  #eventNames;
 
-  // Why eventNames shoud be passed here?
-  constructor(contract, provider, eventNames) {
-    eventNames.forEach(eventName => {
-      if (contract.interface.events[eventName] === undefined)
-        throw new Error(`Event '${eventName}' not found.`);
-    });
-
+  // Note: We're considering listening multiple events at once
+  //    adding eventName, listener params to constructor.
+  constructor(contract) {
     super(contract);
     this.#contract = contract;
-    this.#provider = provider;
-    this.#eventNames = eventNames;
   }
 
   on = (eventName, listener) => {
-    if (!this.#eventNames.includes(eventName) && eventName !== "error") {
-      throw new Error(
-        `This subscription isn't subscribed on '${eventName}' event.`
-      );
-    }
+    if (
+      eventName !== "error" &&
+      this.#contract.interface.events[eventName] === undefined
+    )
+      throw new Error(`Event '${eventName}' not found.`);
 
     if (eventName === "error") {
       this.addErrorListener(listener);
@@ -233,7 +204,14 @@ class ContractSubscription extends Subscription {
     }
 
     const wrappedListener = async (...args) => {
+      // Note: This depends on the current ethers.js specification of contract events to work:
+      // "All event callbacks receive the parameters specified in the ABI as well as
+      // one additional Event Object"
+      // https://docs.ethers.io/ethers.js/html/api-contract.html#event-object
+      // TODO: Consider checking that the event looks like what we expect and
+      // erroring out if not
       const event = args.pop();
+
       const message = {
         data: {
           args: event.args,
@@ -257,7 +235,7 @@ class ProviderFactory {
   static getProvider = () => {
     let json;
     try {
-      json = PROVIDER_CONFIG;
+      json = config.provider;
     } catch (error) {
       console.warn(
         `Error on parsing config.json file, using default configuration.`
@@ -270,14 +248,13 @@ class ProviderFactory {
 
   static getDefaultConfig = () => {
     return {
-      network: "other",
-      provider: "jsonrpc",
-      pollingInterval: 50,
+      network: "mainnet",
+      provider: "fallback",
+      pollingInterval: 4000,
       jsonRpc: {
-        url: "http://localhost:8545",
-        user: "",
-        password: "",
-        allowInsecure: true,
+        url: "http://localhost",
+        port: 8545,
+        allowInsecure: false,
       },
     };
   };
@@ -301,27 +278,45 @@ class ProviderFactory {
       throw new Error(`Invalid provider, use: [${providers}].`);
     }
 
+    if (provider === "fallback") network = "default";
     if (network === "mainnet") network = "homestead";
     else if (network === "other") network = undefined;
 
+    const defaultConfig = ProviderFactory.getDefaultConfig();
+
+    let ethersProvider;
+
     switch (provider) {
       case "default":
-        return ethers.getDefaultProvider(network);
+        ethersProvider = ethers.getDefaultProvider(network);
+
       case "infura":
-        return new ethers.providers.InfuraProvider(
+        ethersProvider = new ethers.providers.InfuraProvider(
           network,
-          infura.apiAccessToken
+          infura.apiKey
         );
+
       case "etherscan":
-        return new ethers.providers.EtherscanProvider(
+        ethersProvider = new ethers.providers.EtherscanProvider(
           network,
-          ethescan.apiToken
+          etherscan.apiKey
         );
+
       case "jsonrpc":
-        let p = new ethers.providers.JsonRpcProvider(jsonRpc, network);
-        if (pollingInterval) p.pollingInterval = pollingInterval;
-        return p;
+        let { url, port, user, password, allowInsecure } = jsonRpc;
+        if (url === undefined) url = defaultConfig.jsonRpc.url;
+        if (port === undefined) port = defaultConfig.jsonRpc.port;
+        if (allowInsecure === undefined)
+          allowInsecure = defaultConfig.jsonRpc.allowInsecure;
+
+        ethersProvider = new ethers.providers.JsonRpcProvider(
+          { url: `${url}:${port}`, user, password, allowInsecure },
+          network
+        );
     }
+
+    if (pollingInterval) ethersProvider.pollingInterval = pollingInterval;
+    return ethersProvider;
   };
 }
 
@@ -335,10 +330,10 @@ export class Contract {
   }
 
   // Note: For now, `tasit-account` creates a ethers.js wallet object
-  // In future, maybe this method could be renamed to setAccount()
+  // If that changes, maybe this method could be renamed to setAccount()
   setWallet = wallet => {
     if (!Utils.isEthersJsSigner(wallet))
-      throw new Error(`Cannot set an invalid wallet to a Contract`);
+      throw new Error(`Cannot set an invalid wallet for a Contract`);
 
     this.#initializeContract(
       this.#contract.address,
@@ -363,12 +358,8 @@ export class Contract {
     return this.#provider;
   };
 
-  subscribe = eventNames => {
-    const subscription = new ContractSubscription(
-      this.#contract,
-      this.#provider,
-      eventNames
-    );
+  subscribe = () => {
+    const subscription = new ContractSubscription(this.#contract);
     return subscription;
   };
 
@@ -377,9 +368,9 @@ export class Contract {
       throw new Error(`Cannot create a Contract without a address and ABI`);
 
     if (wallet && !Utils.isEthersJsSigner(wallet))
-      throw new Error(`Cannot set an invalid wallet to a Contract`);
+      throw new Error(`Cannot set an invalid wallet for a Contract`);
 
-    // If there's a wallet, connect it with provider otherwise uses provider directly (for read operations only)
+    // If there's a wallet, connect it with provider. Otherwise use provider directly (for read operations only).
     const signerOrProvider = wallet
       ? wallet.connect(this.#provider)
       : this.#provider;
@@ -394,7 +385,8 @@ export class Contract {
         return json.type === "function";
       })
       .forEach(f => {
-        var isWrite = f.stateMutability !== "view";
+        var isWrite =
+          f.stateMutability !== "view" && f.stateMutability !== "pure";
         if (isWrite) this.#attachWriteFunction(f);
         else {
           this.#attachReadFunction(f);

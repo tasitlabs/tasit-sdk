@@ -11,7 +11,7 @@ import {
 } from "./testHelpers/helpers";
 
 // Note:  Using dist file because babel doesn't compile node_modules files.
-// Any changes on src should be following by compilation to avoid unexpected behaviors.
+// Any changes on src should be followed by compilation to avoid unexpected behaviors.
 import { createFromPrivateKey } from "tasit-account/dist/testHelpers/helpers";
 
 // Note: SimpleStorage.json is originally genarated by `tasit-contracts` and was pasted here manually
@@ -78,7 +78,7 @@ describe("Contract", () => {
   });
 
   describe("wallet/account setup tests", async () => {
-    it("should throw error when setting no wallet", async () => {
+    it("should throw error when setting a wallet with no wallet argument", async () => {
       expect(() => {
         simpleStorage.setWallet();
       }).to.throw();
@@ -131,7 +131,7 @@ describe("Contract", () => {
       return expect(subscription.on("confirmation")).to.be.rejected;
     });
 
-    it("should call a write contract method (send tx) - imediate subscription", async () => {
+    it("should call a write contract method (send tx) - immediate subscription", async () => {
       var rand = Math.floor(Math.random() * Math.floor(1000)).toString();
       subscription = simpleStorage.setValue(rand);
       const fakeFn = sinon.fake();
@@ -200,6 +200,9 @@ describe("Contract", () => {
       await subscription.on("confirmation", foreverCallback);
 
       await subscription.on("error", err => {
+        expect(err.message).to.equal(
+          "Listener removed after reached timeout - event took too long."
+        );
         errorFn();
       });
 
@@ -207,12 +210,13 @@ describe("Contract", () => {
 
       expect(confirmationFn.called).to.be.true;
 
+      // TODO: Use fake timer
       await new Promise(resolve => setTimeout(resolve, 3000));
 
       expect(
         subscription.listenerCount("confirmation"),
         "listener should be removed after timeout"
-      ).to.be.equals(0);
+      ).to.equal(0);
 
       expect(errorFn.called).to.be.true;
     });
@@ -262,17 +266,8 @@ describe("Contract", () => {
       }).to.not.throw();
     });
 
-    it("should throw error when subscribing on invalid event", async () => {
-      const events = ["ValueChanged", "InvalidEvent"];
-
-      expect(() => {
-        subscription = simpleStorage.subscribe(events);
-      }).to.throw();
-    });
-
     it("should throw error then listening on invalid event", async () => {
-      const events = ["ValueChanged"];
-      const subscription = simpleStorage.subscribe(events);
+      const subscription = simpleStorage.subscribe();
 
       expect(() => {
         subscription.on("InvalidEvent", () => {});
@@ -280,8 +275,7 @@ describe("Contract", () => {
     });
 
     it("should listen to an event", async () => {
-      const events = ["ValueChanged"];
-      const subscription = simpleStorage.subscribe(events);
+      const subscription = simpleStorage.subscribe();
       const fakeFn = sinon.fake();
 
       const handlerFunction = message => {
@@ -300,9 +294,8 @@ describe("Contract", () => {
       expect(fakeFn.called).to.be.true;
     });
 
-    it("should remove listener after timeout", async () => {
-      const events = ["ValueChanged"];
-      const subscription = simpleStorage.subscribe(events);
+    it.skip("should remove listener after timeout", async () => {
+      const subscription = simpleStorage.subscribe();
       const eventFn = sinon.fake();
       const errorFn = sinon.fake();
 
@@ -328,37 +321,36 @@ describe("Contract", () => {
       expect(
         subscription.listenerCount("ValueChanged"),
         "listener should be removed after timeout"
-      ).to.be.equals(0);
+      ).to.equal(0);
 
       expect(errorFn.called).to.be.true;
     });
 
     it("should manage many listeners", async () => {
-      const events = ["ValueChanged"];
-      const subscription = simpleStorage.subscribe(events);
+      const subscription = simpleStorage.subscribe();
 
       const listener1 = message => {};
       const listener2 = message => {};
       const listener3 = message => {};
 
-      expect(subscription.listenerCount("ValueChanged")).to.be.equal(0);
+      expect(subscription.listenerCount("ValueChanged")).to.equal(0);
 
       subscription.on("ValueChanged", listener1);
       subscription.on("ValueChanged", listener2);
 
-      expect(subscription.listenerCount("ValueChanged")).to.be.equal(2);
+      expect(subscription.listenerCount("ValueChanged")).to.equal(2);
 
       subscription.off("ValueChanged", listener2);
 
-      expect(subscription.listenerCount("ValueChanged")).to.be.equal(1);
+      expect(subscription.listenerCount("ValueChanged")).to.equal(1);
 
       subscription.on("ValueChanged", listener3);
 
-      expect(subscription.listenerCount("ValueChanged")).to.be.equal(2);
+      expect(subscription.listenerCount("ValueChanged")).to.equal(2);
 
       subscription.removeAllListeners();
 
-      expect(subscription.listenerCount("ValueChanged")).to.be.equal(0);
+      expect(subscription.listenerCount("ValueChanged")).to.equal(0);
     });
   });
 
