@@ -279,8 +279,8 @@ describe("Contract", () => {
     });
 
     // Note: Non-Deterministic test (It's failing sometimes).
-    // Failed on CI
-    it("should listen to an event", async () => {
+    // Failed on CI - Skiping for now
+    it.skip("should listen to an event", async () => {
       const subscription = simpleStorage.subscribe();
       const fakeFn = sinon.fake();
 
