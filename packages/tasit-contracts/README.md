@@ -13,4 +13,4 @@ This child package is still in a _coming soon_ state. If you're checking out thi
 
 This functionality all "lives" in `tasit-contracts`, a child package of the [`tasit-sdk`](https://github.com/tasitlabs/TasitSDK) that is also published to npm as a standalone module using [lerna](https://lernajs.io/).
 
-[For context, here is an overview](../../README#tool-for-finding-the-address-of-a-popular-smart-contract) of how this fits in with the rest of the Tasit SDK. But this can be used as a stand-alone, modular package if you prefer!
+[For context, here is an overview](../../README.md#tool-for-finding-the-address-of-a-popular-smart-contract) of how this fits in with the rest of the Tasit SDK. But this can be used as a stand-alone, modular package if you prefer!

@@ -10,7 +10,7 @@ This explains how one can use the Tasit SDK to interact with smart contracts at 
 
 _Note:_ This functionality all "lives" in `tasit-action`, a child package of the [`tasit-sdk`](https://github.com/tasitlabs/TasitSDK) that is also published to npm as a standalone module using [lerna](https://lernajs.io/).
 
-[For context, here is an overview](../../README#reading-and-writing-data-and-reacting-to-events) of how this fits in with the rest of the Tasit SDK.
+[For context, here is an overview](../../README.md#reading-and-writing-data-and-reacting-to-events) of how this fits in with the rest of the Tasit SDK.
 
 Why `tasit-action`? **action:** [ak-shən], noun. "a thing done". It's also nice that "act" (the verb form) is part of the words _contract_ and _abstraction_ and _transaction_. Finally, directors say “action” before starting to film a scene in a movie. Also, since this package supports meta-transactions, it's not quite correct to call them transactions. "action" is our catch-all word for transactions and meta-transactions.
 
