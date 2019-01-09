@@ -10,13 +10,13 @@ import { abi as contractABI } from "./testHelpers/SimpleStorage.json";
 // See https://github.com/tasitlabs/TasitSDK/pull/59#discussion_r242258739
 const contractAddress = "0x6C4A015797DDDd87866451914eCe1e8b19261931";
 
-let provider, wallet, contract;
+let wallet, contract;
 
 describe("ethers.js", () => {
-  beforeEach("instantiate provider, wallet and contract objects", async () => {
-    provider = new ethers.providers.JsonRpcProvider();
-    provider.pollingInterval = 50;
+  const provider = new ethers.providers.JsonRpcProvider();
+  provider.pollingInterval = 50;
 
+  beforeEach("instantiate provider, wallet and contract objects", async () => {
     const privateKey =
       "0x11d943d7649fbdeb146dc57bd9cfc80b086bfab2330c7b25651dbaf382392f60";
 
@@ -60,27 +60,8 @@ describe("ethers.js", () => {
     expect(value).to.equal(rand);
   });
 
-  it("should set contract's value using signed tx", async () => {
-    var rand = Math.floor(Math.random() * Math.floor(1000)).toString();
-
-    const data = contract.interface.functions.setValue.encode([rand]);
-
-    const rawTx = {
-      gasLimit: 64000,
-      to: contract.address,
-      data: data,
-      nonce: await provider.getTransactionCount(wallet.address),
-    };
-
-    const signedTx = await wallet.sign(rawTx);
-    const sentTx = await provider.sendTransaction(signedTx);
-
-    await provider.waitForTransaction(sentTx.hash);
-
-    const value = await contract.getValue();
-    expect(value).to.equal(rand);
-  });
-
+  // Note: Non-Deterministisc test (It's failing sometimes).
+  // TODO: Using mineBlocks utils maybe could fix it.
   it("should watch contract's ValueChanged event", async () => {
     const oldValue = await contract.getValue();
     const newValue = `I like cats`;
@@ -92,5 +73,35 @@ describe("ethers.js", () => {
       oldValue,
       newValue,
     ]);
+  });
+
+  describe("message signing", () => {
+    const rand = Math.floor(Math.random() * Math.floor(1000)).toString();
+    let rawTx, signedTx;
+
+    beforeEach("", async () => {
+      const data = contract.interface.functions.setValue.encode([rand]);
+
+      rawTx = {
+        gasLimit: 64000,
+        to: contract.address,
+        data: data,
+        nonce: await provider.getTransactionCount(wallet.address),
+      };
+    });
+
+    it("should sign set contract's value tx", async () => {
+      signedTx = await wallet.sign(rawTx);
+      expect(signedTx).to.exist;
+    });
+
+    it("should set contract's value using signed tx", async () => {
+      const sentTx = await provider.sendTransaction(signedTx);
+
+      await provider.waitForTransaction(sentTx.hash);
+
+      const value = await contract.getValue();
+      expect(value).to.equal(rand);
+    });
   });
 });

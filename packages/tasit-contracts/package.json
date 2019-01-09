@@ -17,8 +17,6 @@
     "url": "git+https://github.com/tasitlabs/tasitsdk.git"
   },
   "scripts": {
-    "ganache:start": "npx ganache-cli -m 'beach swap combine paper music cook electric bullet trust actress liquid asthma' > /dev/null 2>&1 &",
-    "ganache:stop": "pkill -f ganache-cli",
     "compile": "npx truffle compile",
     "migrate": "npx truffle migrate --reset",
     "test": "npx truffle test"
