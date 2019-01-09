@@ -50,7 +50,7 @@ const development = {
 };
 
 // Testnet using Infura
-const test = {
+const testnet = {
   network: "ropsten",
   provider: "infura",
   pollingInterval: 4000,

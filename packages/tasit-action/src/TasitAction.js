@@ -100,6 +100,8 @@ class TransactionSubscription extends Subscription {
   #txConfirmed = false;
 
   constructor(txPromise, provider) {
+    // Provider implements EventEmitter API and it's enough
+    //  to handle with transactions events
     super(provider);
     this.#txPromise = txPromise;
     this.#provider = provider;
@@ -233,16 +235,8 @@ class ContractSubscription extends Subscription {
 
 class ProviderFactory {
   static getProvider = () => {
-    let json;
-    try {
-      json = config.provider;
-    } catch (error) {
-      console.warn(
-        `Error on parsing config.json file, using default configuration.`
-      );
-      json = ProviderFactory.getDefaultConfig();
-    }
-
+    const { provider } = config;
+    const json = provider;
     return ProviderFactory.createProvider(json);
   };
 

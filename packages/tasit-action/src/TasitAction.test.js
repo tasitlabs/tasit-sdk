@@ -111,7 +111,7 @@ describe("Contract", () => {
     beforeEach("assign a wallet to the contract", () => {
       expect(() => {
         simpleStorage.setWallet(wallet);
-      }).to.not.throw();
+      }).not.to.throw();
     });
 
     afterEach("waiting for message/tx confirmation", async () => {
@@ -126,7 +126,7 @@ describe("Contract", () => {
       return expect(subscription.on("invalid", () => {})).to.be.rejected;
     });
 
-    it("should throw when subscribing without callback", async () => {
+    it("should throw when subscribing without listener", async () => {
       subscription = simpleStorage.setValue("hello world");
       return expect(subscription.on("confirmation")).to.be.rejected;
     });
@@ -199,12 +199,14 @@ describe("Contract", () => {
 
       await subscription.on("confirmation", foreverCallback);
 
-      await subscription.on("error", err => {
+      const errorCallback = err => {
         expect(err.message).to.equal(
           "Listener removed after reached timeout - event took too long."
         );
         errorFn();
-      });
+      };
+
+      await subscription.on("error", errorCallback);
 
       await mineBlocks(simpleStorage.getProvider(), 20);
 
@@ -227,20 +229,22 @@ describe("Contract", () => {
       const confirmationFn = sinon.fake();
       const errorFn = sinon.fake();
 
-      const callback = message => {
+      const confirmationListener = message => {
         confirmationFn();
       };
 
-      await subscription.on("confirmation", callback);
+      await subscription.on("confirmation", confirmationListener);
 
-      await subscription.on("error", error => {
+      const errorListener = error => {
         errorFn();
         subscription.removeAllListeners();
 
         // FIXME: Assertion not working
         //expect(1).to.equal(2);
         expect(error.message).to.match(/uncle/);
-      });
+      };
+
+      await subscription.on("error", errorListener);
 
       const snapshotId = await createSnapshot(simpleStorage.getProvider());
 
@@ -252,18 +256,18 @@ describe("Contract", () => {
 
       await mineBlocks(simpleStorage.getProvider(), 20);
 
-      // Broadcast same message again (simulate reorg)
+      // Broadcast same transaction again (simulate reorg)
       subscription = simpleStorage.setValue("hello world");
 
       expect(errorFn.called).to.be.true;
     });
   });
 
-  describe("contract events subscriptions tests", async () => {
+  describe("contract events subscription", async () => {
     beforeEach("assign a wallet to the contract", () => {
       expect(() => {
         simpleStorage.setWallet(wallet);
-      }).to.not.throw();
+      }).not.to.throw();
     });
 
     it("should throw error then listening on invalid event", async () => {
@@ -274,6 +278,8 @@ describe("Contract", () => {
       }).to.throw();
     });
 
+    // Note: Non-Deterministic test (It's failing sometimes).
+    // Failed on CI
     it("should listen to an event", async () => {
       const subscription = simpleStorage.subscribe();
       const fakeFn = sinon.fake();
@@ -282,6 +288,8 @@ describe("Contract", () => {
         const { data } = message;
         const { args } = data;
         fakeFn();
+
+        // TODO: Remove this and add afterEach removeAllListeners
         subscription.removeListener("ValueChanged", handlerFunction);
       };
 
