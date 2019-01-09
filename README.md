@@ -143,7 +143,7 @@ This SDK takes an opinionated approach to onboarding (although since it's a modu
 
 A native mobile dapp should be read-only for as long as possible. The user shouldn't know there's a blockchain involved or see anything about an account, and an Ethereum account shouldn't even be created until it becomes necessary. Why go through an onboarding flow at all right away?
 
-[`tasit-action` is the child package](/packages/tasit-action/) that implements these features for the Tasit SDK.
+This flow for reading data from contracts without onboarding first just works with no special configuration. So in a sense [`tasit-action` is the child package](/packages/tasit-action/) that implements these features, but really these are just the basic features of that child package we've already discussed.
 
 ##### For users new to Ethereum with no funds
 
