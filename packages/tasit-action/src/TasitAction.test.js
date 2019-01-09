@@ -297,7 +297,7 @@ describe("Contract", () => {
 
       simpleStorage.setValue("hello world");
 
-      await mineBlocks(simpleStorage.getProvider(), 10);
+      await mineBlocks(simpleStorage.getProvider(), 15);
 
       expect(fakeFn.called).to.be.true;
     });
