@@ -2,7 +2,7 @@
 
 This package helps with reading data from smart contracts, writing data to smart contracts, and listening for events.
 
-Most of the details are in the main README for the monorepo [here](https://github.com/tasitlabs/TasitSDK/blob/develop/README.md)
+Most of the details are in the main README for the monorepo [here](../../README.md#reading-and-writing-data-and-reacting-to-events)
 
 # Reading and writing data and reacting to events
 
