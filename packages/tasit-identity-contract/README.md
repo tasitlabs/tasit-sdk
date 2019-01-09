@@ -3,6 +3,7 @@
 This package helps with onboarding a user using a smart-contract-based identity. Examples of such smart-contract-based identities include the [Gnosis Safe](https://safe.gnosis.io/) and [universal login](https://universallogin.io/).
 
 **Important note**
+
 This onboarding-related child package is still in a _coming soon_ state. If you're checking out this repo for the purposes of considering whether the code is up to your standards, here are some completed portions of the code base to check out:
 
 - [tasit-action](../tasit-action)

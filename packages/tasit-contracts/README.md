@@ -5,6 +5,7 @@ This package contains the smart contracts (and tests, etc.) from a few of the mo
 `tasit-contracts` contains a collection of the latest smart contracts from major projects that could be a useful standalone utility even when used outside of the context of the Tasit SDK. Other developers could use this package for testing their own libraries too.
 
 **Important note**
+
 This child package is still in a _coming soon_ state. If you're checking out this repo for the purposes of considering whether the code is up to your standards, here are some completed portions of the code base to check out:
 
 - [tasit-action](../tasit-action)
