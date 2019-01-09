@@ -1,6 +1,10 @@
 import { expect, assert } from "chai";
 import { ethers } from "ethers";
-import { waitForEvent } from "./testHelpers/helpers.js";
+import {
+  waitForEvent,
+  createSnapshot,
+  revertFromSnapshot,
+} from "./testHelpers/helpers.js";
 
 // Note: This file is originally genarated by `tasit-contracts` and was pasted here manually
 // See https://github.com/tasitlabs/TasitSDK/issues/45
@@ -10,7 +14,7 @@ import { abi as contractABI } from "./testHelpers/SimpleStorage.json";
 // See https://github.com/tasitlabs/TasitSDK/pull/59#discussion_r242258739
 const contractAddress = "0x6C4A015797DDDd87866451914eCe1e8b19261931";
 
-let wallet, contract;
+let wallet, contract, testcaseSnaphotId;
 
 describe("ethers.js", () => {
   const provider = new ethers.providers.JsonRpcProvider();
@@ -26,6 +30,12 @@ describe("ethers.js", () => {
 
     contract = new ethers.Contract(contractAddress, contractABI, wallet);
     expect(contract.address).to.be.equals(contractAddress);
+
+    testcaseSnaphotId = await createSnapshot(provider);
+  });
+
+  afterEach("revert blockchain snapshot", async () => {
+    await revertFromSnapshot(provider, testcaseSnaphotId);
   });
 
   it("should instatiate contract object using human-readable ABI", async () => {
@@ -60,8 +70,6 @@ describe("ethers.js", () => {
     expect(value).to.equal(rand);
   });
 
-  // Note: Non-Deterministisc test (It's failing sometimes).
-  // TODO: Using mineBlocks utils maybe could fix it.
   it("should watch contract's ValueChanged event", async () => {
     const oldValue = await contract.getValue();
     const newValue = `I like cats`;

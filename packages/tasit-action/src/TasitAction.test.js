@@ -22,8 +22,8 @@ import { abi as contractABI } from "./testHelpers/SimpleStorage.json";
 // See https://github.com/tasitlabs/TasitSDK/pull/59#discussion_r242258739
 const contractAddress = "0x6C4A015797DDDd87866451914eCe1e8b19261931";
 
-describe("Contract", () => {
-  let simpleStorage, wallet;
+describe("TasitAction.Contract", () => {
+  let simpleStorage, wallet, testcaseSnaphotId, provider;
 
   beforeEach("should connect to an existing contract", async () => {
     // Account creates a wallet, should it create an account object that encapsulates the wallet?
@@ -38,6 +38,14 @@ describe("Contract", () => {
     expect(simpleStorage.getAddress()).to.equal(contractAddress);
     expect(simpleStorage.getValue).to.exist;
     expect(simpleStorage.setValue).to.exist;
+    expect(simpleStorage.getProvider()).to.exist;
+
+    provider = simpleStorage.getProvider();
+    testcaseSnaphotId = await createSnapshot(provider);
+  });
+
+  afterEach("revert blockchain snapshot", async () => {
+    await revertFromSnapshot(provider, testcaseSnaphotId);
   });
 
   describe("should throw error when instantiated with invalid args", () => {
@@ -155,7 +163,7 @@ describe("Contract", () => {
 
       await subscription.on("confirmation", onMessage);
 
-      await mineBlocks(simpleStorage.getProvider(), 15);
+      await mineBlocks(provider, 15);
 
       expect(fakeFn.called).to.be.true;
     });
@@ -165,7 +173,7 @@ describe("Contract", () => {
       subscription = simpleStorage.setValue(rand);
       const fakeFn = sinon.fake();
 
-      await mineBlocks(simpleStorage.getProvider(), 15);
+      await mineBlocks(provider, 15);
 
       const onMessage = async message => {
         const { data } = message;
@@ -183,7 +191,7 @@ describe("Contract", () => {
 
       await subscription.on("confirmation", onMessage);
 
-      await mineBlocks(simpleStorage.getProvider(), 20);
+      await mineBlocks(provider, 20);
 
       expect(fakeFn.called).to.be.true;
     });
@@ -208,7 +216,7 @@ describe("Contract", () => {
 
       await subscription.on("error", errorCallback);
 
-      await mineBlocks(simpleStorage.getProvider(), 20);
+      await mineBlocks(provider, 20);
 
       expect(confirmationFn.called).to.be.true;
 
@@ -246,15 +254,15 @@ describe("Contract", () => {
 
       await subscription.on("error", errorListener);
 
-      const snapshotId = await createSnapshot(simpleStorage.getProvider());
+      const snapshotId = await createSnapshot(provider);
 
-      await mineBlocks(simpleStorage.getProvider(), 15);
+      await mineBlocks(provider, 15);
 
       expect(confirmationFn.called).to.be.true;
 
-      await revertFromSnapshot(simpleStorage.getProvider(), snapshotId);
+      await revertFromSnapshot(provider, snapshotId);
 
-      await mineBlocks(simpleStorage.getProvider(), 20);
+      await mineBlocks(provider, 20);
 
       // Broadcast same transaction again (simulate reorg)
       subscription = simpleStorage.setValue("hello world");
@@ -278,9 +286,7 @@ describe("Contract", () => {
       }).to.throw();
     });
 
-    // Note: Non-Deterministic test (It's failing sometimes).
-    // Failed on CI - Skiping for now
-    it.skip("should listen to an event", async () => {
+    it("should listen to an event", async () => {
       const subscription = simpleStorage.subscribe();
       const fakeFn = sinon.fake();
 
@@ -297,41 +303,9 @@ describe("Contract", () => {
 
       simpleStorage.setValue("hello world");
 
-      await mineBlocks(simpleStorage.getProvider(), 15);
+      await mineBlocks(provider, 15);
 
       expect(fakeFn.called).to.be.true;
-    });
-
-    it.skip("should remove listener after timeout", async () => {
-      const subscription = simpleStorage.subscribe();
-      const eventFn = sinon.fake();
-      const errorFn = sinon.fake();
-
-      const foreverCallback = async message => {
-        eventFn();
-      };
-
-      await subscription.on("ValueChanged", foreverCallback);
-
-      await subscription.on("error", err => {
-        errorFn();
-      });
-
-      simpleStorage.setValue("hello world");
-
-      await mineBlocks(simpleStorage.getProvider(), 10);
-
-      expect(eventFn.called).to.be.true;
-
-      // TODO: Use fake timer
-      await new Promise(resolve => setTimeout(resolve, 3000));
-
-      expect(
-        subscription.listenerCount("ValueChanged"),
-        "listener should be removed after timeout"
-      ).to.equal(0);
-
-      expect(errorFn.called).to.be.true;
     });
 
     it("should manage many listeners", async () => {
