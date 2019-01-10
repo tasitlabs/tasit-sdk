@@ -117,6 +117,7 @@ describe("TasitAction.Contract", () => {
     let subscription, rand;
 
     beforeEach("assign a wallet to the contract", () => {
+      subscription = rand = undefined;
       expect(() => {
         simpleStorage.setWallet(wallet);
       }).not.to.throw();
@@ -340,22 +341,28 @@ describe("TasitAction.Contract", () => {
   });
 
   describe("ContractSubscription - contract events subscription", async () => {
-    let subscription;
+    let eventSubscription, txSubscription;
 
     beforeEach("assign a wallet to the contract", () => {
+      eventSubscription = txSubscription = undefined;
+
       expect(() => {
         simpleStorage.setWallet(wallet);
       }).not.to.throw();
     });
 
     afterEach("waiting for message/tx confirmation", async () => {
-      if (subscription) {
-        subscription.unsubscribe();
+      if (eventSubscription) {
+        eventSubscription.unsubscribe();
+      }
+      if (txSubscription) {
+        await txSubscription.waitForNonceToUpdate();
+        txSubscription.unsubscribe();
       }
     });
 
     it("should listening contract trigger event once time", async () => {
-      subscription = simpleStorage.subscribe();
+      eventSubscription = simpleStorage.subscribe();
       const confirmationFakeFn = sinon.fake();
       const errorFakeFn = sinon.fake();
 
@@ -366,106 +373,105 @@ describe("TasitAction.Contract", () => {
         confirmationFakeFn();
       };
 
-      subscription.once("ValueChanged", confirmationListener);
+      eventSubscription.once("ValueChanged", confirmationListener);
 
       const errorListener = message => {
         const { error, eventName } = message;
         errorFakeFn();
       };
 
-      subscription.on("error", errorListener);
+      eventSubscription.on("error", errorListener);
 
-      // Assign return subscribe?
-      simpleStorage.setValue("hello world");
+      txSubscription = simpleStorage.setValue("hello world");
 
       await mineBlocks(provider, 15);
 
-      subscription.off("error");
+      eventSubscription.off("error");
 
       expect(confirmationFakeFn.callCount).to.equal(1);
       expect(errorFakeFn.called).to.be.false;
-      expect(subscription.eventNames()).to.be.empty;
+      expect(eventSubscription.eventNames()).to.be.empty;
     });
 
     it("should throw error when listening on invalid event", async () => {
-      subscription = simpleStorage.subscribe();
+      eventSubscription = simpleStorage.subscribe();
 
       expect(() => {
-        subscription.on("InvalidEvent", () => {});
+        eventSubscription.on("InvalidEvent", () => {});
       }).to.throw();
     });
 
     it("subscription should has one listener per event", async () => {
-      subscription = simpleStorage.subscribe();
+      eventSubscription = simpleStorage.subscribe();
 
       const listener1 = message => {};
       const listener2 = message => {};
 
-      expect(subscription.eventNames()).to.be.empty;
+      expect(eventSubscription.eventNames()).to.be.empty;
 
-      subscription.on("ValueChanged", listener1);
+      eventSubscription.on("ValueChanged", listener1);
 
       expect(() => {
-        subscription.on("ValueChanged", listener2);
+        eventSubscription.on("ValueChanged", listener2);
       }).to.throw();
 
-      expect(subscription.eventNames()).to.deep.equal(["ValueChanged"]);
+      expect(eventSubscription.eventNames()).to.deep.equal(["ValueChanged"]);
     });
 
     it("should remove an event", async () => {
-      subscription = simpleStorage.subscribe();
+      eventSubscription = simpleStorage.subscribe();
 
       const listener1 = message => {};
 
-      expect(subscription.eventNames()).to.be.empty;
+      expect(eventSubscription.eventNames()).to.be.empty;
 
-      subscription.on("ValueChanged", listener1);
+      eventSubscription.on("ValueChanged", listener1);
 
-      expect(subscription.eventNames()).to.deep.equal(["ValueChanged"]);
+      expect(eventSubscription.eventNames()).to.deep.equal(["ValueChanged"]);
 
-      subscription.off("ValueChanged");
+      eventSubscription.off("ValueChanged");
 
-      expect(subscription.eventNames()).to.be.empty;
+      expect(eventSubscription.eventNames()).to.be.empty;
     });
 
     // TODO: Rewrite w/ different events (upgrade contract)
     it.skip("should manage many listeners", async () => {
-      subscription = simpleStorage.subscribe();
+      eventSubscription = simpleStorage.subscribe();
 
       const listener1 = message => {};
       const listener2 = message => {};
       const listener3 = message => {};
 
-      expect(subscription.eventNames()).to.be.empty;
+      expect(eventSubscription.eventNames()).to.be.empty;
 
-      subscription.on("ValueChanged", listener1);
-      subscription.on("ValueRemoved", listener2);
+      eventSubscription.on("ValueChanged", listener1);
+      eventSubscription.on("ValueRemoved", listener2);
 
-      expect(subscription.eventNames()).to.deep.equal([
+      expect(eventSubscription.eventNames()).to.deep.equal([
         "ValueChanged",
         "ValueRemoved",
       ]);
 
-      subscription.off("ValueRemoved");
+      eventSubscription.off("ValueRemoved");
 
-      expect(subscription.eventNames()).to.deep.equal(["ValueChanged"]);
+      expect(eventSubscription.eventNames()).to.deep.equal(["ValueChanged"]);
 
-      subscription.on("ValueRemoved", listener3);
+      eventSubscription.on("ValueRemoved", listener3);
 
-      expect(subscription.eventNames()).to.deep.equal([
+      expect(eventSubscription.eventNames()).to.deep.equal([
         "ValueChanged",
         "ValueRemoved",
       ]);
 
-      subscription.unsubscribe();
+      eventSubscription.unsubscribe();
 
-      expect(subscription.eventNames()).to.be.empty;
+      expect(eventSubscription.eventNames()).to.be.empty;
     });
 
     // FIXME: Non-deterministic tests - Quarantine
     // More info: https://github.com/tasitlabs/TasitSDK/pull/95
     it.skip("should listen to an event", async () => {
-      subscription = simpleStorage.subscribe();
+      eventSubscription = simpleStorage.subscribe();
       const fakeFn = sinon.fake();
 
       const handlerFunction = async message => {
@@ -474,7 +480,7 @@ describe("TasitAction.Contract", () => {
         fakeFn();
       };
 
-      await subscription.on("ValueChanged", handlerFunction);
+      await eventSubscription.on("ValueChanged", handlerFunction);
 
       simpleStorage.setValue("hello world");
 
