@@ -386,6 +386,8 @@ describe("TasitAction.Contract", () => {
 
       await mineBlocks(provider, 15);
 
+      await txSubscription.waitForNonceToUpdate();
+
       eventSubscription.off("error");
 
       expect(confirmationFakeFn.callCount).to.equal(1);
