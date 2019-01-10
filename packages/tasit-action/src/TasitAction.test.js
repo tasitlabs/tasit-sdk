@@ -365,7 +365,6 @@ describe.only("TasitAction.Contract", () => {
         const { confirmations } = data;
 
         confirmationFakeFn();
-        contractSubscription.off("error");
       };
 
       contractSubscription.once("ValueChanged", eventListener);
@@ -377,11 +376,13 @@ describe.only("TasitAction.Contract", () => {
 
       contractSubscription.on("error", errorListener);
 
-      txSubscription = simpleStorage.setValue("hello world");
+      const txSubscription = simpleStorage.setValue("hello world");
 
       await mineBlocks(provider, 15);
 
       await txSubscription.waitForNonceToUpdate();
+
+      contractSubscription.off("error");
 
       expect(confirmationFakeFn.callCount).to.equal(1);
       expect(errorFakeFn.called).to.be.false;
@@ -402,7 +403,7 @@ describe.only("TasitAction.Contract", () => {
 
       await contractSubscription.on("ValueChanged", eventListener);
 
-      txSubscription = simpleStorage.setValue("hello world");
+      const txSubscription = simpleStorage.setValue("hello world");
 
       await mineBlocks(provider, 15);
 
