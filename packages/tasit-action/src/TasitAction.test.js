@@ -304,7 +304,7 @@ describe("TasitAction.Contract", () => {
         fakeFn();
       };
 
-      subscription.on("ValueChanged", handlerFunction);
+      await subscription.on("ValueChanged", handlerFunction);
 
       simpleStorage.setValue("hello world");
 
