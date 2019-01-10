@@ -30,18 +30,17 @@ class Subscription {
   off = eventName => {
     this.#events = this.#events.filter(event => {
       if (event.eventName === eventName) {
-        this.#emitter.removeListener(
-          event.wrappedEventName,
-          event.wrappedListener
-        );
+        if (eventName !== "error") {
+          this.#emitter.removeListener(
+            event.wrappedEventName,
+            event.wrappedListener
+          );
+        }
         return false;
       }
       return true;
     });
   };
-
-  // TODO
-  once = (eventName, listener) => {};
 
   unsubscribe = () => {
     this.#events.forEach(event => {
@@ -104,7 +103,33 @@ class TransactionSubscription extends Subscription {
     this.#provider = provider;
   }
 
-  #addConfirmationListener = listener => {
+  on = (eventName, listener) => {
+    this.#addListener(eventName, listener, false);
+  };
+
+  once = (eventName, listener) => {
+    this.#addListener(eventName, listener, true);
+  };
+
+  #addListener = (eventName, listener, once) => {
+    const triggers = ["confirmation", "error"];
+
+    if (!triggers.includes(eventName)) {
+      throw new Error(`Invalid listener trigger, use: [${triggers}]`);
+    }
+
+    if (!listener || typeof listener !== "function") {
+      throw new Error(`Cannot listen without a function`);
+    }
+
+    if (eventName === "error") {
+      this._addErrorListener(listener);
+    } else if (eventName === "confirmation") {
+      this.#addConfirmationListener(listener, once);
+    }
+  };
+
+  #addConfirmationListener = (listener, once) => {
     const eventName = "confirmation";
 
     const wrappedListener = async blockNumber => {
@@ -134,6 +159,7 @@ class TransactionSubscription extends Subscription {
           },
         };
 
+        if (once) this.off(eventName);
         await listener(message);
       } catch (error) {
         this._emitErrorEvent(
@@ -151,24 +177,6 @@ class TransactionSubscription extends Subscription {
         eventName
       );
     }, config.events.timeout);
-  };
-
-  on = (eventName, listener) => {
-    const triggers = ["confirmation", "error"];
-
-    if (!triggers.includes(eventName)) {
-      throw new Error(`Invalid listener trigger, use: [${triggers}]`);
-    }
-
-    if (!listener || typeof listener !== "function") {
-      throw new Error(`Cannot listen without a function`);
-    }
-
-    if (eventName === "error") {
-      this._addErrorListener(listener);
-    } else if (eventName === "confirmation") {
-      this.#addConfirmationListener(listener);
-    }
   };
 
   // Tech debt
@@ -191,14 +199,26 @@ class ContractSubscription extends Subscription {
     this.#contract = contract;
   }
 
-  #isValidEvent = eventName => {
-    return (
-      eventName === "error" ||
-      this.#contract.interface.events[eventName] !== undefined
-    );
+  on = (eventName, listener) => {
+    this.#addListener(eventName, listener, false);
   };
 
-  #addContractEventListener = (eventName, listener) => {
+  once = (eventName, listener) => {
+    this.#addListener(eventName, listener, true);
+  };
+
+  #addListener = (eventName, listener, once) => {
+    if (!this.#isValidEvent(eventName))
+      throw new Error(`Event '${eventName}' not found.`);
+
+    if (eventName === "error") {
+      this._addErrorListener(listener);
+    } else {
+      this.#addContractEventListener(eventName, listener, once);
+    }
+  };
+
+  #addContractEventListener = (eventName, listener, once) => {
     const wrappedListener = async (...args) => {
       try {
         // Note: This depends on the current ethers.js specification of contract events to work:
@@ -216,6 +236,7 @@ class ContractSubscription extends Subscription {
         };
 
         await listener(message);
+        if (once) this.off(eventName);
       } catch (error) {
         this._emitErrorEvent(
           new Error(`Listener function with error: ${error.message}`),
@@ -227,15 +248,11 @@ class ContractSubscription extends Subscription {
     this._addListener(eventName, eventName, listener, wrappedListener);
   };
 
-  on = (eventName, listener) => {
-    if (!this.#isValidEvent(eventName))
-      throw new Error(`Event '${eventName}' not found.`);
-
-    if (eventName === "error") {
-      this._addErrorListener(listener);
-    } else {
-      this.#addContractEventListener(eventName, listener);
-    }
+  #isValidEvent = eventName => {
+    return (
+      eventName === "error" ||
+      this.#contract.interface.events[eventName] !== undefined
+    );
   };
 }
 

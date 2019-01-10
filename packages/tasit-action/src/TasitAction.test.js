@@ -113,13 +113,15 @@ describe("TasitAction.Contract", () => {
     });
   });
 
-  describe("actions (tx) subscriptions tests", async () => {
-    let subscription;
+  describe("TransactionSubscription - actions (tx) subscriptions tests", async () => {
+    let subscription, rand;
 
     beforeEach("assign a wallet to the contract", () => {
       expect(() => {
         simpleStorage.setWallet(wallet);
       }).not.to.throw();
+
+      rand = Math.floor(Math.random() * Math.floor(1000)).toString();
     });
 
     afterEach("waiting for message/tx confirmation", async () => {
@@ -145,8 +147,40 @@ describe("TasitAction.Contract", () => {
       }).to.throw();
     });
 
-    it("should call a contract action (tx) - immediate subscription", async () => {
-      var rand = Math.floor(Math.random() * Math.floor(1000)).toString();
+    it("should change contract state and trigger confirmation event once time", async () => {
+      subscription = simpleStorage.setValue(rand);
+      const confirmationFakeFn = sinon.fake();
+      const errorFakeFn = sinon.fake();
+
+      const confirmationListener = async message => {
+        const { data } = message;
+        const { confirmations } = data;
+
+        confirmationFakeFn();
+
+        const value = await simpleStorage.getValue();
+        expect(value).to.equal(rand);
+      };
+
+      subscription.once("confirmation", confirmationListener);
+
+      const errorListener = message => {
+        const { error, eventName } = message;
+        errorFakeFn();
+      };
+
+      subscription.on("error", errorListener);
+
+      await mineBlocks(provider, 15);
+
+      subscription.off("error");
+
+      expect(confirmationFakeFn.callCount).to.equal(1);
+      expect(errorFakeFn.called).to.be.false;
+      expect(subscription.eventNames()).to.be.empty;
+    });
+
+    it("should change contract state and trigger confirmation event", async () => {
       subscription = simpleStorage.setValue(rand);
       const fakeFn = sinon.fake();
 
@@ -174,8 +208,7 @@ describe("TasitAction.Contract", () => {
       expect(fakeFn.called).to.be.true;
     });
 
-    it("should call a contract action (tx) - late subscription", async () => {
-      var rand = Math.floor(Math.random() * Math.floor(1000)).toString();
+    it("should change contract state and trigger confirmation event - late subscription", async () => {
       subscription = simpleStorage.setValue(rand);
       const fakeFn = sinon.fake();
 
@@ -306,7 +339,7 @@ describe("TasitAction.Contract", () => {
     });
   });
 
-  describe("contract events subscription", async () => {
+  describe("ContractSubscription - contract events subscription", async () => {
     let subscription;
 
     beforeEach("assign a wallet to the contract", () => {
@@ -319,6 +352,39 @@ describe("TasitAction.Contract", () => {
       if (subscription) {
         subscription.unsubscribe();
       }
+    });
+
+    it("should listening contract trigger event once time", async () => {
+      subscription = simpleStorage.subscribe();
+      const confirmationFakeFn = sinon.fake();
+      const errorFakeFn = sinon.fake();
+
+      const confirmationListener = async message => {
+        const { data } = message;
+        const { confirmations } = data;
+
+        confirmationFakeFn();
+      };
+
+      subscription.once("ValueChanged", confirmationListener);
+
+      const errorListener = message => {
+        const { error, eventName } = message;
+        errorFakeFn();
+      };
+
+      subscription.on("error", errorListener);
+
+      // Assign return subscribe?
+      simpleStorage.setValue("hello world");
+
+      await mineBlocks(provider, 15);
+
+      subscription.off("error");
+
+      expect(confirmationFakeFn.callCount).to.equal(1);
+      expect(errorFakeFn.called).to.be.false;
+      expect(subscription.eventNames()).to.be.empty;
     });
 
     it("should throw error when listening on invalid event", async () => {
