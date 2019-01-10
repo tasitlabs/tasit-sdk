@@ -198,22 +198,22 @@ describe("TasitAction.Contract", () => {
 
         if (confirmations >= 7) {
           fakeFn();
-
+          console.log("confirmed");
           txSubscription.off("confirmation");
-
-          const value = await simpleStorage.getValue();
-          expect(value).to.equal(rand);
 
           // FIXME: UnhandledPromiseRejectionWarning
           //expect(1).to.equal(2);
         }
       };
 
-      txSubscription.on("confirmation", listener);
+      txSubscription.on("confirmation", fakeFn);
 
       await mineBlocks(provider, 15);
 
+      const value = await simpleStorage.getValue();
+
       expect(fakeFn.called).to.be.true;
+      expect(value).to.equal(rand);
     });
 
     it("should change contract state and trigger confirmation event - late subscription", async () => {
@@ -240,6 +240,8 @@ describe("TasitAction.Contract", () => {
 
       await mineBlocks(provider, 20);
 
+      await txSubscription.waitForNonceToUpdate();
+
       expect(fakeFn.called).to.be.true;
     });
 
@@ -248,7 +250,7 @@ describe("TasitAction.Contract", () => {
       const confirmationFn = sinon.fake();
       const errorFn = sinon.fake();
 
-      const foreverListener = async message => {
+      const foreverListener = message => {
         confirmationFn();
       };
 
@@ -267,7 +269,7 @@ describe("TasitAction.Contract", () => {
       expect(confirmationFn.called).to.be.true;
 
       // TODO: Use fake timer
-      await new Promise(resolve => setTimeout(resolve, 3000));
+      await new Promise(resolve => setTimeout(resolve, 1000));
 
       expect(errorFn.called).to.be.true;
     });
@@ -354,21 +356,10 @@ describe("TasitAction.Contract", () => {
       }).not.to.throw();
     });
 
-    // FIXME: Non-deterministic tests - Quarantine
-    // More info: https://github.com/tasitlabs/TasitSDK/pull/95
-    it.skip("should listening contract trigger event one time", async () => {
+    it("should listening contract trigger event one time", async () => {
       contractSubscription = simpleStorage.subscribe();
       const confirmationFakeFn = sinon.fake();
       const errorFakeFn = sinon.fake();
-
-      const eventListener = message => {
-        const { data } = message;
-        const { confirmations } = data;
-
-        confirmationFakeFn();
-      };
-
-      contractSubscription.once("ValueChanged", eventListener);
 
       const errorListener = message => {
         console.log(message);
@@ -381,7 +372,17 @@ describe("TasitAction.Contract", () => {
       txSubscription = simpleStorage.setValue("hello world");
       await txSubscription.waitForNonceToUpdate();
 
-      await mineBlocks(provider, 15);
+      // Is possible do that using async/await?
+      // If not, TODO: Make a function
+      await new Promise(function(resolve, reject) {
+        contractSubscription.once("ValueChanged", message => {
+          const { data } = message;
+          const { args } = data;
+
+          confirmationFakeFn();
+          resolve();
+        });
+      });
 
       contractSubscription.off("error");
 
@@ -392,18 +393,10 @@ describe("TasitAction.Contract", () => {
 
     // FIXME: Non-deterministic tests - Quarantine
     // More info: https://github.com/tasitlabs/TasitSDK/pull/95
-    it.skip("should listening contract trigger event", async () => {
+    it("should listening contract trigger event", async () => {
       contractSubscription = simpleStorage.subscribe();
       const fakeFn = sinon.fake();
       const errorFakeFn = sinon.fake();
-
-      const eventListener = async message => {
-        const { data } = message;
-        const { args } = data;
-        fakeFn();
-      };
-
-      await contractSubscription.on("ValueChanged", eventListener);
 
       const errorListener = message => {
         console.log(message);
@@ -416,7 +409,17 @@ describe("TasitAction.Contract", () => {
       txSubscription = simpleStorage.setValue("hello world");
       await txSubscription.waitForNonceToUpdate();
 
-      await mineBlocks(provider, 15);
+      // Is possible do that using async/await?
+      // If not, TODO: Make a function
+      await new Promise(function(resolve, reject) {
+        contractSubscription.on("ValueChanged", message => {
+          const { data } = message;
+          const { args } = data;
+
+          fakeFn();
+          resolve();
+        });
+      });
 
       contractSubscription.off("error");
 

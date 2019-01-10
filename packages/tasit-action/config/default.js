@@ -38,14 +38,14 @@ const development = {
   provider: {
     network: "other",
     provider: "jsonrpc",
-    pollingInterval: 50,
+    pollingInterval: 100,
     jsonRpc: {
       url: "http://localhost",
       port: 8545,
     },
   },
   events: {
-    timeout: 2000,
+    timeout: 500,
   },
 };
 
