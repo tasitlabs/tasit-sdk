@@ -294,7 +294,8 @@ describe("TasitAction.Contract", () => {
       }).to.throw();
     });
 
-    it("should listen to an event", async () => {
+    // FIXME: Non-deterministic tests - Quarantine
+    it.skip("should listen to an event", async () => {
       subscription = simpleStorage.subscribe();
       const fakeFn = sinon.fake();
 
