@@ -27,7 +27,7 @@ class Subscription {
     this.#emitter = eventEmitter;
   }
 
-  removeListener = eventName => {
+  off = eventName => {
     this.#events = this.#events.filter(event => {
       if (event.eventName === eventName) {
         this.#emitter.removeListener(
@@ -40,31 +40,25 @@ class Subscription {
     });
   };
 
-  off = eventName => {
-    this.removeListener(eventName);
-  };
+  // TODO
+  once = (eventName, listener) => {};
 
-  listenerCount = eventName => {
-    return this.#events.filter(event => {
-      return event.eventName === eventName;
-    }).length;
-  };
-
-  removeAllListeners = () => {
+  unsubscribe = () => {
     this.#events.forEach(event => {
-      this.removeListener(event.eventName, event.listener);
+      this.off(event.eventName, event.listener);
     });
   };
 
-  unsubscribe = () => {
-    this.removeAllListeners();
+  eventNames = () => {
+    return this.#events.map(event => event.eventName);
   };
 
   // TODO: Make protected
-  _emitErrorEvent = error => {
+  _emitErrorEvent = (error, eventName) => {
     this.#events.forEach(event => {
       if (event.eventName === "error") {
-        event.listener(error);
+        const message = { error, eventName };
+        event.listener(message);
       }
     });
   };
@@ -82,7 +76,7 @@ class Subscription {
 
   // TODO: Make protected
   _addListener = (eventName, wrappedEventName, listener, wrappedListener) => {
-    if (this._eventNames().includes(eventName))
+    if (this.eventNames().includes(eventName))
       throw new Error(`Event '${eventName}' already registred.`);
 
     this.#events.push({
@@ -93,11 +87,6 @@ class Subscription {
     });
 
     this.#emitter.on(wrappedEventName, wrappedListener);
-  };
-
-  // TODO: Make protected
-  _eventNames = () => {
-    return this.#events.map(event => event.eventName);
   };
 }
 
@@ -120,7 +109,8 @@ class TransactionSubscription extends Subscription {
 
     const wrappedListener = async blockNumber => {
       try {
-        this.#tx = await this.#txPromise;
+        if (!this.#tx) this.#tx = await this.#txPromise;
+
         const receipt = await this.#provider.getTransactionReceipt(
           this.#tx.hash
         );
@@ -130,7 +120,8 @@ class TransactionSubscription extends Subscription {
         } else {
           if (this.#txConfirmed)
             this._emitErrorEvent(
-              new Error(`Your message has been included in an uncle block.`)
+              new Error(`Your message has been included in an uncle block.`),
+              eventName
             );
 
           return;
@@ -146,7 +137,8 @@ class TransactionSubscription extends Subscription {
         await listener(message);
       } catch (error) {
         this._emitErrorEvent(
-          new Error(`Listener function with error: ${error.message}`)
+          new Error(`Listener function with error: ${error.message}`),
+          eventName
         );
       }
     };
@@ -154,7 +146,10 @@ class TransactionSubscription extends Subscription {
     this._addListener(eventName, "block", listener, wrappedListener);
 
     setTimeout(() => {
-      this._emitErrorEvent(new Error(`Event ${eventName} reached timeout.`));
+      this._emitErrorEvent(
+        new Error(`Event ${eventName} reached timeout.`),
+        eventName
+      );
     }, config.events.timeout);
   };
 
@@ -223,7 +218,8 @@ class ContractSubscription extends Subscription {
         await listener(message);
       } catch (error) {
         this._emitErrorEvent(
-          new Error(`Listener function with error: ${error.message}`)
+          new Error(`Listener function with error: ${error.message}`),
+          eventName
         );
       }
     };

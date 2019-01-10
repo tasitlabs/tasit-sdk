@@ -125,7 +125,7 @@ describe("TasitAction.Contract", () => {
     afterEach("waiting for message/tx confirmation", async () => {
       if (subscription) {
         await subscription.waitForNonceToUpdate();
-        subscription.removeAllListeners();
+        subscription.unsubscribe();
       }
     });
 
@@ -157,7 +157,7 @@ describe("TasitAction.Contract", () => {
         if (confirmations >= 7) {
           fakeFn();
 
-          subscription.removeAllListeners();
+          subscription.unsubscribe();
 
           const value = await simpleStorage.getValue();
           expect(value).to.equal(rand);
@@ -188,7 +188,7 @@ describe("TasitAction.Contract", () => {
         if (confirmations >= 7) {
           fakeFn();
 
-          subscription.removeAllListeners();
+          subscription.off("confirmation");
 
           const value = await simpleStorage.getValue();
           expect(value).to.equal(rand);
@@ -213,8 +213,9 @@ describe("TasitAction.Contract", () => {
 
       subscription.on("confirmation", foreverListener);
 
-      const errorListener = err => {
-        expect(err.message).to.equal("Event confirmation reached timeout.");
+      const errorListener = message => {
+        const { error, eventName } = message;
+        expect(error.message).to.equal("Event confirmation reached timeout.");
         errorFn();
       };
 
@@ -236,7 +237,7 @@ describe("TasitAction.Contract", () => {
       const listener1 = message => {};
       const listener2 = message => {};
 
-      expect(subscription.listenerCount("confirmation")).to.equal(0);
+      expect(subscription.eventNames()).to.be.empty;
 
       subscription.on("confirmation", listener1);
 
@@ -244,7 +245,7 @@ describe("TasitAction.Contract", () => {
         subscription.on("confirmation", listener2);
       }).to.throw();
 
-      expect(subscription.listenerCount("confirmation")).to.equal(1);
+      expect(subscription.eventNames()).to.deep.equal(["confirmation"]);
     });
 
     it("should remove an event", async () => {
@@ -252,15 +253,15 @@ describe("TasitAction.Contract", () => {
 
       const listener1 = message => {};
 
-      expect(subscription.listenerCount("confirmation")).to.equal(0);
+      expect(subscription.eventNames()).to.be.empty;
 
       subscription.on("confirmation", listener1);
 
-      expect(subscription.listenerCount("confirmation")).to.equal(1);
+      expect(subscription.eventNames()).to.deep.equal(["confirmation"]);
 
       subscription.off("confirmation");
 
-      expect(subscription.listenerCount("confirmation")).to.equal(0);
+      expect(subscription.eventNames()).to.be.empty;
     });
 
     it("should emit error event when orphan/uncle block occurs", async () => {
@@ -275,9 +276,11 @@ describe("TasitAction.Contract", () => {
 
       subscription.on("confirmation", confirmationListener);
 
-      const errorListener = error => {
+      const errorListener = message => {
+        const { error, eventName } = message;
+
         errorFn();
-        subscription.removeAllListeners();
+        subscription.unsubscribe();
 
         // FIXME: Assertion not working
         //expect(1).to.equal(2);
@@ -314,7 +317,7 @@ describe("TasitAction.Contract", () => {
 
     afterEach("waiting for message/tx confirmation", async () => {
       if (subscription) {
-        subscription.removeAllListeners();
+        subscription.unsubscribe();
       }
     });
 
@@ -332,7 +335,7 @@ describe("TasitAction.Contract", () => {
       const listener1 = message => {};
       const listener2 = message => {};
 
-      expect(subscription.listenerCount("ValueChanged")).to.equal(0);
+      expect(subscription.eventNames()).to.be.empty;
 
       subscription.on("ValueChanged", listener1);
 
@@ -340,7 +343,7 @@ describe("TasitAction.Contract", () => {
         subscription.on("ValueChanged", listener2);
       }).to.throw();
 
-      expect(subscription.listenerCount("ValueChanged")).to.equal(1);
+      expect(subscription.eventNames()).to.deep.equal(["ValueChanged"]);
     });
 
     it("should remove an event", async () => {
@@ -348,15 +351,15 @@ describe("TasitAction.Contract", () => {
 
       const listener1 = message => {};
 
-      expect(subscription.listenerCount("ValueChanged")).to.equal(0);
+      expect(subscription.eventNames()).to.be.empty;
 
       subscription.on("ValueChanged", listener1);
 
-      expect(subscription.listenerCount("ValueChanged")).to.equal(1);
+      expect(subscription.eventNames()).to.deep.equal(["ValueChanged"]);
 
       subscription.off("ValueChanged");
 
-      expect(subscription.listenerCount("ValueChanged")).to.equal(0);
+      expect(subscription.eventNames()).to.be.empty;
     });
 
     // TODO: Rewrite w/ different events (upgrade contract)
@@ -367,24 +370,30 @@ describe("TasitAction.Contract", () => {
       const listener2 = message => {};
       const listener3 = message => {};
 
-      expect(subscription.listenerCount("ValueChanged")).to.equal(0);
+      expect(subscription.eventNames()).to.be.empty;
 
       subscription.on("ValueChanged", listener1);
-      subscription.on("ValueChanged", listener2);
+      subscription.on("ValueRemoved", listener2);
 
-      expect(subscription.listenerCount("ValueChanged")).to.equal(2);
+      expect(subscription.eventNames()).to.deep.equal([
+        "ValueChanged",
+        "ValueRemoved",
+      ]);
 
-      subscription.off("ValueChanged", listener2);
+      subscription.off("ValueRemoved");
 
-      expect(subscription.listenerCount("ValueChanged")).to.equal(1);
+      expect(subscription.eventNames()).to.deep.equal(["ValueChanged"]);
 
-      subscription.on("ValueChanged", listener3);
+      subscription.on("ValueRemoved", listener3);
 
-      expect(subscription.listenerCount("ValueChanged")).to.equal(2);
+      expect(subscription.eventNames()).to.deep.equal([
+        "ValueChanged",
+        "ValueRemoved",
+      ]);
 
-      subscription.removeAllListeners();
+      subscription.unsubscribe();
 
-      expect(subscription.listenerCount("ValueChanged")).to.equal(0);
+      expect(subscription.eventNames()).to.be.empty;
     });
 
     // FIXME: Non-deterministic tests - Quarantine
