@@ -272,14 +272,22 @@ describe("TasitAction.Contract", () => {
   });
 
   describe("contract events subscription", async () => {
+    let subscription;
+
     beforeEach("assign a wallet to the contract", () => {
       expect(() => {
         simpleStorage.setWallet(wallet);
       }).not.to.throw();
     });
 
+    afterEach("waiting for message/tx confirmation", async () => {
+      if (subscription) {
+        subscription.removeAllListeners();
+      }
+    });
+
     it("should throw error then listening on invalid event", async () => {
-      const subscription = simpleStorage.subscribe();
+      subscription = simpleStorage.subscribe();
 
       expect(() => {
         subscription.on("InvalidEvent", () => {});
@@ -287,7 +295,7 @@ describe("TasitAction.Contract", () => {
     });
 
     it("should listen to an event", async () => {
-      const subscription = simpleStorage.subscribe();
+      subscription = simpleStorage.subscribe();
       const fakeFn = sinon.fake();
 
       const handlerFunction = message => {
@@ -303,13 +311,10 @@ describe("TasitAction.Contract", () => {
       await mineBlocks(provider, 15);
 
       expect(fakeFn.called).to.be.true;
-
-      // TODO: Move to afterEach
-      subscription.removeAllListeners();
     });
 
     it("should manage many listeners", async () => {
-      const subscription = simpleStorage.subscribe();
+      subscription = simpleStorage.subscribe();
 
       const listener1 = message => {};
       const listener2 = message => {};
