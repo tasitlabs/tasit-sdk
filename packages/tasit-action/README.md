@@ -2,23 +2,17 @@
 
 This package helps with reading data from smart contracts, writing data to smart contracts, and listening for events.
 
-Most of the details are in the main README for the monorepo [here](https://github.com/tasitlabs/TasitSDK/blob/develop/README.md)
+Most of the details are in the main README for the monorepo [here](../../README.md#reading-and-writing-data-and-reacting-to-events)
 
 # Reading and writing data and reacting to events
 
 This explains how one can use the Tasit SDK to interact with smart contracts at different levels of abstraction.
 
-[For context, here is an overview](https://github.com/tasitlabs/TasitSDK#reading-and-writing-data-and-reacting-to-events) of how this fits in with the rest of the Tasit SDK.
+_Note:_ This functionality all "lives" in `tasit-action`, a child package of the [`tasit-sdk`](https://github.com/tasitlabs/TasitSDK) that is also published to npm as a standalone module using [lerna](https://lernajs.io/).
 
-_Note:_ This functionality all "lives" in `tasit-action`, a child package of the [`tasit-sdk`](https://github.com/tasitlabs/TasitSDK) that is also published to npm as a standalone module using [lerna](https://lernajs.io/). Why `tasit-action`? **action:** [ak-shən], noun. "a thing done". It's also nice that "act" (the verb form) is part of the words _contract_ and _abstraction_. Finally, directors say “action” before starting to film a scene in a movie.
+[For context, here is an overview](../../README.md#reading-and-writing-data-and-reacting-to-events) of how this fits in with the rest of the Tasit SDK.
 
-### Notes
-
-Getting data is like an HTTP(S) request, so it should be async. Because doing the JSON-RPC request to Infura and getting data back has network lag.
-
-Setting data could possibly be sync (non-async) if it's like publishing in pubsub with no ACK and it's instant. It could be async too if we're picturing a pubsub approach where successful publication is ACK'ed, but not instantly. Or if the ACK is instant, then we're back to sync.
-
-Then you subscribe for the data like it's pubsub as well. That would make subscribing to the "event" of 1 or 7 or 100 block confirmations for a set operation have a very similar API to the one for subscribing to events.
+Why `tasit-action`? **action:** [ak-shən], noun. "a thing done". It's also nice that "act" (the verb form) is part of the words _contract_ and _abstraction_ and _transaction_. Finally, directors say “action” before starting to film a scene in a movie. Also, since this package supports meta-transactions, it's not quite correct to call them transactions. "action" is our catch-all word for transactions and meta-transactions.
 
 ### Table of Contents
 
@@ -27,6 +21,10 @@ Then you subscribe for the data like it's pubsub as well. That would make subscr
 - [Setting data](#setting-data)
 
 - [Listening for events](#listening-for-events)
+
+- [Topics for the future](#topics-for-the-future)
+
+- [Notes](#notes)
 
 # Docs
 
@@ -313,6 +311,14 @@ In this example there's an event `Transfer` as one of the events supported by ER
 ### Topics for the future
 
 Is it worth considering having upgradeable smart contracts being a first-class feature of this package? That would mean not assuming the ABI you have right now will always work. But, it could still assume that there will be a backwards compatibility guarantee and that the existing ABI functions would continue to be supported.
+
+### Notes
+
+Getting data is like an HTTP(S) request, so it should be async. Because doing the JSON-RPC request to Infura and getting data back has network lag.
+
+Setting data could possibly be sync (non-async) if it's like publishing in pubsub with no ACK and it's instant. It could be async too if we're picturing a pubsub approach where successful publication is ACK'ed, but not instantly. Or if the ACK is instant, then we're back to sync.
+
+Then you subscribe for the data like it's pubsub as well. That would make subscribing to the "event" of 1 or 7 or 100 block confirmations for a set operation have a very similar API to the one for subscribing to events.
 
 ### Help make this document better
 
