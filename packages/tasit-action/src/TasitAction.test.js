@@ -22,7 +22,7 @@ import { abi as contractABI } from "./testHelpers/SimpleStorage.json";
 // See https://github.com/tasitlabs/TasitSDK/pull/59#discussion_r242258739
 const contractAddress = "0x6C4A015797DDDd87866451914eCe1e8b19261931";
 
-describe("TasitAction.Contract", () => {
+describe.only("TasitAction.Contract", () => {
   let simpleStorage,
     wallet,
     testcaseSnaphotId,
@@ -305,7 +305,8 @@ describe("TasitAction.Contract", () => {
       expect(txSubscription.eventNames()).to.be.empty;
     });
 
-    it("should emit error event when orphan/uncle block occurs", async () => {
+    // TODO: Review if txSubscription used twice could be a problem
+    it.skip("should emit error event when orphan/uncle block occurs", async () => {
       txSubscription = simpleStorage.setValue("hello world");
 
       const confirmationFn = sinon.fake();
