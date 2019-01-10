@@ -298,7 +298,7 @@ describe("TasitAction.Contract", () => {
       subscription = simpleStorage.subscribe();
       const fakeFn = sinon.fake();
 
-      const handlerFunction = message => {
+      const handlerFunction = async message => {
         const { data } = message;
         const { args } = data;
         fakeFn();
