@@ -357,7 +357,7 @@ describe("TasitAction.Contract", () => {
 
     // FIXME: Non-deterministic tests - Quarantine
     // More info: https://github.com/tasitlabs/TasitSDK/pull/95
-    it("should listening contract trigger event one time", async () => {
+    it.skip("should listening contract trigger event one time", async () => {
       contractSubscription = simpleStorage.subscribe();
       const confirmationFakeFn = sinon.fake();
       const errorFakeFn = sinon.fake();
@@ -393,7 +393,7 @@ describe("TasitAction.Contract", () => {
 
     // FIXME: Non-deterministic tests - Quarantine
     // More info: https://github.com/tasitlabs/TasitSDK/pull/95
-    it("should listening contract trigger event", async () => {
+    it.skip("should listening contract trigger event", async () => {
       contractSubscription = simpleStorage.subscribe();
       const fakeFn = sinon.fake();
       const errorFakeFn = sinon.fake();
