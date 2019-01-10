@@ -360,7 +360,7 @@ describe.only("TasitAction.Contract", () => {
       const confirmationFakeFn = sinon.fake();
       const errorFakeFn = sinon.fake();
 
-      const confirmationListener = message => {
+      const eventListener = message => {
         const { data } = message;
         const { confirmations } = data;
 
@@ -368,7 +368,7 @@ describe.only("TasitAction.Contract", () => {
         contractSubscription.off("error");
       };
 
-      contractSubscription.once("ValueChanged", confirmationListener);
+      contractSubscription.once("ValueChanged", eventListener);
 
       const errorListener = message => {
         const { error, eventName } = message;
@@ -390,21 +390,23 @@ describe.only("TasitAction.Contract", () => {
 
     // FIXME: Non-deterministic tests - Quarantine
     // More info: https://github.com/tasitlabs/TasitSDK/pull/95
-    it("should listening contract trigger event one time", async () => {
+    it("should listening contract trigger event", async () => {
       contractSubscription = simpleStorage.subscribe();
       const fakeFn = sinon.fake();
 
-      const handlerFunction = async message => {
+      const eventListener = async message => {
         const { data } = message;
         const { args } = data;
         fakeFn();
       };
 
-      await contractSubscription.on("ValueChanged", handlerFunction);
+      await contractSubscription.on("ValueChanged", eventListener);
 
-      simpleStorage.setValue("hello world");
+      txSubscription = simpleStorage.setValue("hello world");
 
       await mineBlocks(provider, 15);
+
+      await txSubscription.waitForNonceToUpdate();
 
       expect(fakeFn.called).to.be.true;
     });
