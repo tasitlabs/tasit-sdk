@@ -295,6 +295,7 @@ describe("TasitAction.Contract", () => {
     });
 
     // FIXME: Non-deterministic tests - Quarantine
+    // More info: https://github.com/tasitlabs/TasitSDK/pull/95
     it.skip("should listen to an event", async () => {
       subscription = simpleStorage.subscribe();
       const fakeFn = sinon.fake();
