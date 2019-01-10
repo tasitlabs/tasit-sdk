@@ -294,9 +294,6 @@ describe("TasitAction.Contract", () => {
         const { data } = message;
         const { args } = data;
         fakeFn();
-
-        // TODO: Remove this and add afterEach removeAllListeners
-        subscription.removeListener("ValueChanged", handlerFunction);
       };
 
       subscription.on("ValueChanged", handlerFunction);
@@ -306,6 +303,9 @@ describe("TasitAction.Contract", () => {
       await mineBlocks(provider, 15);
 
       expect(fakeFn.called).to.be.true;
+
+      // TODO: Move to afterEach
+      subscription.removeAllListeners();
     });
 
     it("should manage many listeners", async () => {
