@@ -19,4 +19,13 @@ contract("SimpleStorage", function(accounts) {
       "Hello World! isn't the initial value."
     );
   });
+
+  it("should remove the value", async function() {
+    const instance = await SimpleStorage.deployed();
+
+    await instance.removeValue();
+    const value = await instance.getValue();
+
+    assert.equal(value, "", "Value wasn't removed.");
+  });
 });

@@ -305,7 +305,6 @@ describe("TasitAction.Contract", () => {
       expect(txSubscription.eventNames()).to.be.empty;
     });
 
-    // TODO: Review if txSubscription used twice could be a problem
     it("should emit error event when orphan/uncle block occurs", async () => {
       txSubscription = simpleStorage.setValue("hello world");
 
@@ -466,8 +465,7 @@ describe("TasitAction.Contract", () => {
       expect(contractSubscription.eventNames()).to.be.empty;
     });
 
-    // TODO: Rewrite w/ different events (upgrade contract)
-    it.skip("should manage many listeners", async () => {
+    it("should manage many listeners", async () => {
       contractSubscription = simpleStorage.subscribe();
 
       const listener1 = message => {};
