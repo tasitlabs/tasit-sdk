@@ -22,7 +22,7 @@ import { abi as contractABI } from "./testHelpers/SimpleStorage.json";
 // See https://github.com/tasitlabs/TasitSDK/pull/59#discussion_r242258739
 const contractAddress = "0x6C4A015797DDDd87866451914eCe1e8b19261931";
 
-describe.only("TasitAction.Contract", () => {
+describe("TasitAction.Contract", () => {
   let simpleStorage,
     wallet,
     testcaseSnaphotId,
@@ -199,7 +199,7 @@ describe.only("TasitAction.Contract", () => {
         if (confirmations >= 7) {
           fakeFn();
 
-          txSubscription.unsubscribe();
+          txSubscription.off("confirmation");
 
           const value = await simpleStorage.getValue();
           expect(value).to.equal(rand);
@@ -306,7 +306,7 @@ describe.only("TasitAction.Contract", () => {
     });
 
     // TODO: Review if txSubscription used twice could be a problem
-    it.skip("should emit error event when orphan/uncle block occurs", async () => {
+    it("should emit error event when orphan/uncle block occurs", async () => {
       txSubscription = simpleStorage.setValue("hello world");
 
       const confirmationFn = sinon.fake();
@@ -355,6 +355,8 @@ describe.only("TasitAction.Contract", () => {
       }).not.to.throw();
     });
 
+    // FIXME: Non-deterministic tests - Quarantine
+    // More info: https://github.com/tasitlabs/TasitSDK/pull/95
     it("should listening contract trigger event one time", async () => {
       contractSubscription = simpleStorage.subscribe();
       const confirmationFakeFn = sinon.fake();
@@ -370,22 +372,22 @@ describe.only("TasitAction.Contract", () => {
       contractSubscription.once("ValueChanged", eventListener);
 
       const errorListener = message => {
+        console.log(message);
         const { error, eventName } = message;
         errorFakeFn();
       };
 
       contractSubscription.on("error", errorListener);
 
-      const txSubscription = simpleStorage.setValue("hello world");
+      txSubscription = simpleStorage.setValue("hello world");
+      await txSubscription.waitForNonceToUpdate();
 
       await mineBlocks(provider, 15);
 
-      await txSubscription.waitForNonceToUpdate();
-
       contractSubscription.off("error");
 
-      expect(confirmationFakeFn.callCount).to.equal(1);
       expect(errorFakeFn.called).to.be.false;
+      expect(confirmationFakeFn.callCount).to.equal(1);
       expect(contractSubscription.eventNames()).to.be.empty;
     });
 
@@ -394,6 +396,7 @@ describe.only("TasitAction.Contract", () => {
     it("should listening contract trigger event", async () => {
       contractSubscription = simpleStorage.subscribe();
       const fakeFn = sinon.fake();
+      const errorFakeFn = sinon.fake();
 
       const eventListener = async message => {
         const { data } = message;
@@ -403,12 +406,22 @@ describe.only("TasitAction.Contract", () => {
 
       await contractSubscription.on("ValueChanged", eventListener);
 
-      const txSubscription = simpleStorage.setValue("hello world");
+      const errorListener = message => {
+        console.log(message);
+        const { error, eventName } = message;
+        errorFakeFn();
+      };
+
+      contractSubscription.on("error", errorListener);
+
+      txSubscription = simpleStorage.setValue("hello world");
+      await txSubscription.waitForNonceToUpdate();
 
       await mineBlocks(provider, 15);
 
-      await txSubscription.waitForNonceToUpdate();
+      contractSubscription.off("error");
 
+      expect(errorFakeFn.called).to.be.false;
       expect(fakeFn.called).to.be.true;
     });
 
