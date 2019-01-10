@@ -27,9 +27,9 @@ class Subscription {
     this.#emitter = eventEmitter;
   }
 
-  removeListener = (eventName, listener) => {
+  removeListener = eventName => {
     this.#events = this.#events.filter(event => {
-      if (event.eventName === eventName && event.listener === listener) {
+      if (event.eventName === eventName) {
         this.#emitter.removeListener(
           event.wrappedEventName,
           event.wrappedListener
@@ -40,8 +40,8 @@ class Subscription {
     });
   };
 
-  off = (eventName, listener) => {
-    this.removeListener(eventName, listener);
+  off = eventName => {
+    this.removeListener(eventName);
   };
 
   listenerCount = eventName => {
@@ -61,7 +61,7 @@ class Subscription {
   };
 
   // TODO: Make protected
-  emitErrorEvent = error => {
+  _emitErrorEvent = error => {
     this.#events.forEach(event => {
       if (event.eventName === "error") {
         event.listener(error);
@@ -70,7 +70,7 @@ class Subscription {
   };
 
   // TODO: Make protected
-  addErrorListener = listener => {
+  _addErrorListener = listener => {
     const eventName = "error";
     this.#events.push({
       eventName,
@@ -81,8 +81,9 @@ class Subscription {
   };
 
   // TODO: Make protected
-  addListener = (eventName, wrappedEventName, listener, wrappedListener) => {
-    this.#emitter.on(wrappedEventName, wrappedListener);
+  _addListener = (eventName, wrappedEventName, listener, wrappedListener) => {
+    if (this._eventNames().includes(eventName))
+      throw new Error(`Event '${eventName}' already registred.`);
 
     this.#events.push({
       eventName,
@@ -90,6 +91,13 @@ class Subscription {
       listener,
       wrappedListener,
     });
+
+    this.#emitter.on(wrappedEventName, wrappedListener);
+  };
+
+  // TODO: Make protected
+  _eventNames = () => {
+    return this.#events.map(event => event.eventName);
   };
 }
 
@@ -107,12 +115,12 @@ class TransactionSubscription extends Subscription {
     this.#provider = provider;
   }
 
-  #addConfirmationListener = async listener => {
+  #addConfirmationListener = listener => {
     const eventName = "confirmation";
-    this.#tx = await this.#txPromise;
 
     const wrappedListener = async blockNumber => {
       try {
+        this.#tx = await this.#txPromise;
         const receipt = await this.#provider.getTransactionReceipt(
           this.#tx.hash
         );
@@ -121,7 +129,7 @@ class TransactionSubscription extends Subscription {
           this.#txConfirmed = true;
         } else {
           if (this.#txConfirmed)
-            this.emitErrorEvent(
+            this._emitErrorEvent(
               new Error(`Your message has been included in an uncle block.`)
             );
 
@@ -137,25 +145,20 @@ class TransactionSubscription extends Subscription {
 
         await listener(message);
       } catch (error) {
-        this.emitErrorEvent(
-          new Error(`Callback function with error: ${error.message}`)
+        this._emitErrorEvent(
+          new Error(`Listener function with error: ${error.message}`)
         );
       }
     };
 
-    this.addListener(eventName, "block", listener, wrappedListener);
+    this._addListener(eventName, "block", listener, wrappedListener);
 
     setTimeout(() => {
-      this.emitErrorEvent(
-        new Error(
-          `Listener removed after reached timeout - event took too long.`
-        )
-      );
-      this.removeListener(eventName, listener);
+      this._emitErrorEvent(new Error(`Event ${eventName} reached timeout.`));
     }, config.events.timeout);
   };
 
-  on = async (eventName, listener) => {
+  on = (eventName, listener) => {
     const triggers = ["confirmation", "error"];
 
     if (!triggers.includes(eventName)) {
@@ -167,9 +170,9 @@ class TransactionSubscription extends Subscription {
     }
 
     if (eventName === "error") {
-      this.addErrorListener(listener);
+      this._addErrorListener(listener);
     } else if (eventName === "confirmation") {
-      await this.#addConfirmationListener(listener);
+      this.#addConfirmationListener(listener);
     }
   };
 
@@ -193,43 +196,50 @@ class ContractSubscription extends Subscription {
     this.#contract = contract;
   }
 
-  on = (eventName, listener) => {
-    if (
-      eventName !== "error" &&
-      this.#contract.interface.events[eventName] === undefined
-    )
-      throw new Error(`Event '${eventName}' not found.`);
+  #isValidEvent = eventName => {
+    return (
+      eventName === "error" ||
+      this.#contract.interface.events[eventName] !== undefined
+    );
+  };
 
-    if (eventName === "error") {
-      this.addErrorListener(listener);
-      return;
-    }
-
+  #addContractEventListener = (eventName, listener) => {
     const wrappedListener = async (...args) => {
-      // Note: This depends on the current ethers.js specification of contract events to work:
-      // "All event callbacks receive the parameters specified in the ABI as well as
-      // one additional Event Object"
-      // https://docs.ethers.io/ethers.js/html/api-contract.html#event-object
-      // TODO: Consider checking that the event looks like what we expect and
-      // erroring out if not
-      const event = args.pop();
-
-      const message = {
-        data: {
-          args: event.args,
-        },
-      };
-
       try {
+        // Note: This depends on the current ethers.js specification of contract events to work:
+        // "All event callbacks receive the parameters specified in the ABI as well as
+        // one additional Event Object"
+        // https://docs.ethers.io/ethers.js/html/api-contract.html#event-object
+        // TODO: Consider checking that the event looks like what we expect and
+        // erroring out if not
+        const event = args.pop();
+
+        const message = {
+          data: {
+            args: event.args,
+          },
+        };
+
         await listener(message);
       } catch (error) {
-        this.emitErrorEvent(
-          new Error(`Callback function with error: ${error.message}`)
+        this._emitErrorEvent(
+          new Error(`Listener function with error: ${error.message}`)
         );
       }
     };
 
-    this.addListener(eventName, eventName, listener, wrappedListener);
+    this._addListener(eventName, eventName, listener, wrappedListener);
+  };
+
+  on = (eventName, listener) => {
+    if (!this.#isValidEvent(eventName))
+      throw new Error(`Event '${eventName}' not found.`);
+
+    if (eventName === "error") {
+      this._addErrorListener(listener);
+    } else {
+      this.#addContractEventListener(eventName, listener);
+    }
   };
 }
 
