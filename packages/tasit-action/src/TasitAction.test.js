@@ -305,7 +305,7 @@ describe("TasitAction.Contract", () => {
       expect(txSubscription.eventNames()).to.be.empty;
     });
 
-    it.skip("should emit error event when orphan/uncle block occurs", async () => {
+    it("should emit error event when orphan/uncle block occurs", async () => {
       txSubscription = simpleStorage.setValue("hello world");
 
       const confirmationFn = sinon.fake();
@@ -359,11 +359,12 @@ describe("TasitAction.Contract", () => {
       const confirmationFakeFn = sinon.fake();
       const errorFakeFn = sinon.fake();
 
-      const confirmationListener = async message => {
+      const confirmationListener = message => {
         const { data } = message;
         const { confirmations } = data;
 
         confirmationFakeFn();
+        contractSubscription.off("error");
       };
 
       contractSubscription.once("ValueChanged", confirmationListener);
@@ -380,8 +381,6 @@ describe("TasitAction.Contract", () => {
       await mineBlocks(provider, 15);
 
       await txSubscription.waitForNonceToUpdate();
-
-      contractSubscription.off("error");
 
       expect(confirmationFakeFn.callCount).to.equal(1);
       expect(errorFakeFn.called).to.be.false;

@@ -208,7 +208,7 @@ class ContractSubscription extends Subscription {
   };
 
   #addListener = (eventName, listener, once) => {
-    if (!this.#isValidEvent(eventName))
+    if (!this.#isEventValid(eventName))
       throw new Error(`Event '${eventName}' not found.`);
 
     if (eventName === "error") {
@@ -248,7 +248,7 @@ class ContractSubscription extends Subscription {
     this._addListener(eventName, eventName, listener, wrappedListener);
   };
 
-  #isValidEvent = eventName => {
+  #isEventValid = eventName => {
     return (
       eventName === "error" ||
       this.#contract.interface.events[eventName] !== undefined
