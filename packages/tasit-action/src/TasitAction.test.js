@@ -124,7 +124,7 @@ describe("TasitAction.Contract", () => {
 
     afterEach("waiting for message/tx confirmation", async () => {
       if (subscription) {
-        await subscription.waitForMessage();
+        await subscription.waitForNonceToUpdate();
         subscription.removeAllListeners();
       }
     });
@@ -286,7 +286,7 @@ describe("TasitAction.Contract", () => {
       }
     });
 
-    it("should throw error then listening on invalid event", async () => {
+    it("should throw error when listening on invalid event", async () => {
       subscription = simpleStorage.subscribe();
 
       expect(() => {
