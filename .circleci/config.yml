@@ -38,7 +38,7 @@ jobs:
       - save_cache:
           paths:
             - ./node_modules
-          key: v3-{{ checksum "packages/tasit-account/package.json" }}-{{ checksum "packages/tasit-action/package.json" }}-{{ checksum "packages/tasit-contracts/package.json" }}-{{ checksum "packages/tasit-sdk/package.json" }}
+          key: v3-{{ checksum "package.json" }}-{{ checksum "packages/tasit-account/package.json" }}-{{ checksum "packages/tasit-action/package.json" }}-{{ checksum "packages/tasit-contracts/package.json" }}-{{ checksum "packages/tasit-sdk/package.json" }}
 
       # run tests!
       - run:
