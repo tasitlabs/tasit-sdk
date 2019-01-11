@@ -44,7 +44,7 @@ class Subscription {
 
   unsubscribe = () => {
     this.#events.forEach(event => {
-      this.off(event.eventName, event.listener);
+      this.off(event.eventName);
     });
   };
 
