@@ -40,16 +40,8 @@ jobs:
 
       # run tests!
       - run:
-          name: ganache-cli
-          command: npx ganache-cli -m 'beach swap combine paper music cook electric bullet trust actress liquid asthma'
-
-      - run:
-          name: truffle migrate
-          command: npx lerna run migrate --scope tasit-contracts
-
-      - run:
           name: test
-          command: npx lerna run test
+          command: npm test
 
       - store_artifacts:
           path: test-results.xml
