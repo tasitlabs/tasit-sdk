@@ -326,7 +326,7 @@ describe("TasitAction.Contract", () => {
         // (node:543) UnhandledPromiseRejectionWarning: TypeError: Cannot read property 'unsubscribe' of undefined
         // at Object.unsubscribe (/home/circleci/tasit-sdk/packages/tasit-action/src/TasitAction.test.js:325:24)
         // at listener (/home/circleci/tasit-sdk/packages/tasit-action/src/TasitAction.js:60:15)
-        //txSubscription.unsubscribe();
+        txSubscription.unsubscribe();
 
         // FIXME: Assertion not working
         //expect(1).to.equal(2);
