@@ -14,7 +14,7 @@
     "ganache:start": "npx ganache-cli -m 'beach swap combine paper music cook electric bullet trust actress liquid asthma' > /dev/null 2>&1 &",
     "ganache:stop": "kill `ps ax|grep ganache-cli|grep -v grep| awk '{print $1}'` 2> /dev/null; exit 0",
     "truffle:migrate": "npx lerna run migrate --scope tasit-contracts",
-    "pretest": "npm run bootstrap && npm run ganache:stop && npm run ganache:start && npm run truffle:migrate",
+    "pretest": "npm run bootstrap && npm run ganache:stop && npm run ganache:start && sleep 5 && npm run truffle:migrate && sleep 5",
     "test": "npx lerna run test",
     "posttest": "npm run ganache:stop"
   },
