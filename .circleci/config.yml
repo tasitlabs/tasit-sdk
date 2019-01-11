@@ -25,7 +25,15 @@ jobs:
 
       # Download and cache dependencies
       - restore_cache:
-          key: v3-{{ checksum "package.json" }}-{{ checksum "packages/tasit-account/package.json" }}-{{ checksum "packages/tasit-action/package.json" }}-{{ checksum "packages/tasit-contracts/package.json" }}-{{ checksum "packages/tasit-sdk/package.json" }}
+          keys:
+            - v1
+            - { { checksum "package.json" } }
+            - { { checksum "packages/tasit-account/package.json" } }
+            - { { checksum "packages/tasit-action/src/TasitAction.js" } }
+            - { { checksum "packages/tasit-action/src/TasitAction.test.js" } }
+            - { { checksum "packages/tasit-sdk/package.json" } }
+            - { { checksum "packages/tasit-contracts/package.json" } }
+            - { { checksum "packages/tasit-sdk/package.json" } }
           # fallback to using the latest cache if no exact match is found
           #- dependency-cache-
 
@@ -38,7 +46,15 @@ jobs:
       - save_cache:
           paths:
             - ./node_modules
-          key: v3-{{ checksum "package.json" }}-{{ checksum "packages/tasit-account/package.json" }}-{{ checksum "packages/tasit-action/package.json" }}-{{ checksum "packages/tasit-contracts/package.json" }}-{{ checksum "packages/tasit-sdk/package.json" }}
+          keys:
+            - v1
+            - { { checksum "package.json" } }
+            - { { checksum "packages/tasit-account/package.json" } }
+            - { { checksum "packages/tasit-action/src/TasitAction.js" } }
+            - { { checksum "packages/tasit-action/src/TasitAction.test.js" } }
+            - { { checksum "packages/tasit-sdk/package.json" } }
+            - { { checksum "packages/tasit-contracts/package.json" } }
+            - { { checksum "packages/tasit-sdk/package.json" } }
 
       # run tests!
       - run:
