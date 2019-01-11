@@ -45,7 +45,7 @@ const development = {
     },
   },
   events: {
-    timeout: 500,
+    timeout: 2000,
   },
 };
 

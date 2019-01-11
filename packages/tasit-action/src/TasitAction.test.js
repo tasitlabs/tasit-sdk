@@ -269,7 +269,7 @@ describe("TasitAction.Contract", () => {
       expect(confirmationFn.called).to.be.true;
 
       // TODO: Use fake timer
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise(resolve => setTimeout(resolve, 3000));
 
       expect(errorFn.called).to.be.true;
     });
@@ -356,6 +356,8 @@ describe("TasitAction.Contract", () => {
       }).not.to.throw();
     });
 
+    // FIXME: Non-deterministic tests - Quarantine
+    // More info: https://github.com/tasitlabs/TasitSDK/pull/95
     it("should listening contract trigger event one time", async () => {
       contractSubscription = simpleStorage.subscribe();
       const confirmationFakeFn = sinon.fake();
@@ -370,7 +372,6 @@ describe("TasitAction.Contract", () => {
       contractSubscription.on("error", errorListener);
 
       txSubscription = simpleStorage.setValue("hello world");
-      await txSubscription.waitForNonceToUpdate();
 
       // Is possible do that using async/await?
       // If not, TODO: Make a function
@@ -407,7 +408,6 @@ describe("TasitAction.Contract", () => {
       contractSubscription.on("error", errorListener);
 
       txSubscription = simpleStorage.setValue("hello world");
-      await txSubscription.waitForNonceToUpdate();
 
       // Is possible do that using async/await?
       // If not, TODO: Make a function
