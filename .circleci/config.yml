@@ -21,7 +21,7 @@ jobs:
 
       - run:
           name: update-npm
-          command: "sudo npm install -g npm@6.4.1"
+          command: "sudo npm install -g npm@latest"
 
       # Download and cache dependencies
       - restore_cache:
