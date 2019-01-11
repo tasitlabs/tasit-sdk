@@ -322,7 +322,7 @@ describe("TasitAction.Contract", () => {
       const errorListener = message => {
         const { error, eventName } = message;
 
-        txSubscription.unsubscribe();
+        //txSubscription.unsubscribe();
 
         // FIXME: Assertion not working
         //expect(1).to.equal(2);
