@@ -23,6 +23,9 @@ jobs:
           name: update-npm
           command: "sudo npm install -g npm@6.4.1"
 
+      # Note: Cicle CI was caching lerna packages dependencies
+      #     it is one reason for that non-deterministic tests occurs
+      #
       # Download and cache dependencies
       #  - restore_cache:
       #      keys:
@@ -30,14 +33,18 @@ jobs:
       # fallback to using the latest cache if no exact match is found
       #        - dependency-cache-
 
-      - run:
-          name: install-npm-packages
-          command: npm run bootstrap
+      # Note: Test script runs bootstrap already
+      #
+      #- run:
+      #      name: install-npm-packages
+      #      command: npm run bootstrap
 
-      - save_cache:
-          paths:
-            - ./node_modules
-          key: dependency-cache-{{ checksum "package.json" }}
+      # Note: Caching isn't being used
+      #
+      #- save_cache:
+      #      paths:
+      #        - ./node_modules
+      #      key: dependency-cache-{{ checksum "package.json" }}
 
       # run tests!
       - run:
