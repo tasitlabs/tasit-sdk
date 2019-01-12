@@ -38,7 +38,7 @@ const development = {
   provider: {
     network: "other",
     provider: "jsonrpc",
-    pollingInterval: 100,
+    pollingInterval: 50,
     jsonRpc: {
       url: "http://localhost",
       port: 8545,

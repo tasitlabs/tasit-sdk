@@ -4,7 +4,6 @@ import {
   waitForEvent,
   createSnapshot,
   revertFromSnapshot,
-  mineBlocks,
 } from "./testHelpers/helpers.js";
 
 // Note: This file is originally genarated by `tasit-contracts` and was pasted here manually
@@ -19,7 +18,7 @@ let wallet, contract, testcaseSnaphotId;
 
 describe("ethers.js", () => {
   const provider = new ethers.providers.JsonRpcProvider();
-  provider.pollingInterval = 100;
+  provider.pollingInterval = 50;
 
   beforeEach("instantiate provider, wallet and contract objects", async () => {
     const privateKey =
