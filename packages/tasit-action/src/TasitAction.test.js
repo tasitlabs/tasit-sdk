@@ -207,42 +207,36 @@ describe("TasitAction.Contract", () => {
         const { confirmations } = data;
 
         if (confirmations >= 7) {
-          fakeFn();
-          console.log("confirmed");
           txSubscription.off("confirmation");
 
-          // FIXME: UnhandledPromiseRejectionWarning
-          //expect(1).to.equal(2);
+          const value = await simpleStorage.getValue();
+          expect(value).to.equal(rand);
+
+          fakeFn();
         }
       };
 
-      txSubscription.on("confirmation", fakeFn);
+      txSubscription.on("confirmation", listener);
 
       await mineBlocks(provider, 15);
 
-      const value = await simpleStorage.getValue();
-
       expect(fakeFn.called).to.be.true;
-      expect(value).to.equal(rand);
     });
 
     it("should change contract state and trigger confirmation event - late subscription", async () => {
       txSubscription = simpleStorage.setValue(rand);
       const fakeFn = sinon.fake();
 
-      await mineBlocks(provider, 15);
-
       const listener = async message => {
         const { data } = message;
         const { confirmations } = data;
 
         if (confirmations >= 7) {
-          fakeFn();
-
           txSubscription.off("confirmation");
 
           const value = await simpleStorage.getValue();
           expect(value).to.equal(rand);
+          fakeFn();
         }
       };
 
@@ -257,6 +251,7 @@ describe("TasitAction.Contract", () => {
 
     it("should call error listener after timeout", async () => {
       txSubscription = simpleStorage.setValue("hello world");
+      txSubscription.setEventsTimeout(100);
 
       const errorFn = sinon.fake();
       const confirmationFn = sinon.fake();
@@ -278,7 +273,7 @@ describe("TasitAction.Contract", () => {
       await mineBlocks(provider, 10);
 
       // TODO: Use fake timer
-      await new Promise(resolve => setTimeout(resolve, 3000));
+      await new Promise(resolve => setTimeout(resolve, 200));
 
       expect(errorFn.called).to.be.true;
       expect(confirmationFn.called).to.be.true;
@@ -337,12 +332,12 @@ describe("TasitAction.Contract", () => {
         const { error, eventName } = message;
         txSubscription.off("confirmation");
 
-        // Note: Assertion not working (UnhandledPromiseRejectionWarning)
-        // But asseting fake function, if this throws, test case will fail.
+        // Note: This assertion will not fail the test case (UnhandledPromiseRejectionWarning)
         expect(error.message).to.equal(
           "Your message has been included in an uncle block."
         );
 
+        // But asseting fake function, if that's throws, test case will fail.
         errorFn();
       };
 
@@ -372,8 +367,6 @@ describe("TasitAction.Contract", () => {
       }).not.to.throw();
     });
 
-    // FIXME: Non-deterministic tests - Quarantine
-    // More info: https://github.com/tasitlabs/TasitSDK/pull/95
     it("should listening contract trigger event one time", async () => {
       contractSubscription = simpleStorage.subscribe();
       const fakeFn = sinon.fake();
@@ -405,18 +398,11 @@ describe("TasitAction.Contract", () => {
       contractSubscription.off("error");
       contractSubscription.off("ValueChanged");
 
-      //await mineBlocks(provider, 15);
-
-      //console.log(provider);
-
       expect(errorFakeFn.called).to.be.false;
       expect(fakeFn.callCount).to.equal(1);
       expect(contractSubscription.eventNames()).to.be.empty;
     });
 
-    // FIXME: Non-deterministic tests - Quarantine
-    // More info: https://github.com/tasitlabs/TasitSDK/pull/95
-    // Note: This testcase has a listener leak
     it("should listening contract trigger event", async () => {
       contractSubscription = simpleStorage.subscribe();
       const fakeFn = sinon.fake();

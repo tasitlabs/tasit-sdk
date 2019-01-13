@@ -20,16 +20,16 @@ class Utils {
 }
 
 class Subscription {
-  #emitter;
+  #ethersEventEmitter;
   #events = new Map();
 
   constructor(eventEmitter) {
-    this.#emitter = eventEmitter;
+    this.#ethersEventEmitter = eventEmitter;
   }
 
-  // Debug
-  getEmitter = () => {
-    return this.#emitter;
+  _toEthersEventName = eventName => {
+    if (eventName === "confirmation") return "block";
+    return eventName;
   };
 
   off = eventName => {
@@ -38,10 +38,12 @@ class Subscription {
     if (!event) return;
 
     if (eventName !== "error") {
+      const { listener } = event;
+
       // Note: ethers.removeAllListeners(name) not working!
-      this.#emitter.removeListener(
-        event.wrappedEventName,
-        event.wrappedListener
+      this.#ethersEventEmitter.removeListener(
+        this._toEthersEventName(eventName),
+        listener
       );
     }
     this.#events.delete(eventName);
@@ -60,36 +62,43 @@ class Subscription {
   // TODO: Make protected
   _emitErrorEvent = (error, eventName) => {
     const errorEvent = this.#events.get("error");
-    const message = { error, eventName };
-
-    if (errorEvent) errorEvent.listener(message);
-    else {
+    if (!errorEvent) {
       // Note: Throw error?
       console.warn(`Error emission without listener: ${error}`);
+      return;
     }
+
+    const message = { error, eventName };
+    errorEvent.listener(message);
   };
 
   // TODO: Make protected
   _addErrorListener = listener => {
     this.#events.set("error", {
-      wrappedEventName: "error",
       listener,
-      wrappedListener: listener,
     });
   };
 
   // TODO: Make protected
-  _addListener = (eventName, wrappedEventName, listener, wrappedListener) => {
+  _addEventListener = (eventName, listener) => {
+    if (eventName === "error")
+      throw new Error(
+        `Use _addErrorListener function to subscribe an error event.`
+      );
+
     if (this.eventNames().includes(eventName))
       throw new Error(`Event '${eventName}' already registred.`);
 
     this.#events.set(eventName, {
-      wrappedEventName,
       listener,
-      wrappedListener,
     });
 
-    this.#emitter.on(wrappedEventName, wrappedListener);
+    this.#ethersEventEmitter.on(this._toEthersEventName(eventName), listener);
+  };
+
+  // For testing purposes
+  getEmitter = () => {
+    return this.#ethersEventEmitter;
   };
 }
 
@@ -98,6 +107,7 @@ class TransactionSubscription extends Subscription {
   #provider;
   #tx;
   #txConfirmed = false;
+  #timeout = config.events.timeout;
 
   constructor(txPromise, provider) {
     // Provider implements EventEmitter API and it's enough
@@ -115,16 +125,25 @@ class TransactionSubscription extends Subscription {
     this.#addListener(eventName, listener, true);
   };
 
+  getEventsTimeout = () => {
+    return this.#timeout;
+  };
+
+  setEventsTimeout = timeout => {
+    this.#timeout = timeout;
+  };
+
   #addListener = (eventName, listener, once) => {
     const triggers = ["confirmation", "error"];
 
-    if (!triggers.includes(eventName)) {
+    if (!triggers.includes(eventName))
       throw new Error(`Invalid listener trigger, use: [${triggers}]`);
-    }
 
-    if (!listener || typeof listener !== "function") {
+    if (eventName === "error" && once)
+      throw new Error(`Use on() function to subscribe an error event.`);
+
+    if (!listener || typeof listener !== "function")
       throw new Error(`Cannot listen without a function`);
-    }
 
     if (eventName === "error") {
       this._addErrorListener(listener);
@@ -136,7 +155,7 @@ class TransactionSubscription extends Subscription {
   #addConfirmationListener = (listener, once) => {
     const eventName = "confirmation";
 
-    const wrappedListener = async blockNumber => {
+    const ethersListener = async blockNumber => {
       try {
         // Note: There is a better location to do that?
         if (once) this.off(eventName);
@@ -175,15 +194,16 @@ class TransactionSubscription extends Subscription {
       }
     };
 
-    this._addListener(eventName, "block", listener, wrappedListener);
+    this._addEventListener(eventName, ethersListener);
 
-    // https://github.com/ethers-io/ethers.js/issues/283
+    // Which condition should  be true to emit an error?
+    // Timeout example: https://github.com/ethers-io/ethers.js/issues/283#issuecomment-423248566
     setTimeout(() => {
       this._emitErrorEvent(
         new Error(`Event ${eventName} reached timeout.`),
         eventName
       );
-    }, config.events.timeout);
+    }, this.getEventsTimeout());
   };
 
   // Tech debt
@@ -218,6 +238,9 @@ class ContractSubscription extends Subscription {
     if (!this.#isEventValid(eventName))
       throw new Error(`Event '${eventName}' not found.`);
 
+    if (eventName === "error" && once)
+      throw new Error(`Use on() function to subscribe an error event.`);
+
     if (eventName === "error") {
       this._addErrorListener(listener);
     } else {
@@ -226,7 +249,7 @@ class ContractSubscription extends Subscription {
   };
 
   #addContractEventListener = (eventName, listener, once) => {
-    const wrappedListener = async (...args) => {
+    const ethersListener = async (...args) => {
       try {
         // Note: This depends on the current ethers.js specification of contract events to work:
         // "All event callbacks receive the parameters specified in the ABI as well as
@@ -253,7 +276,7 @@ class ContractSubscription extends Subscription {
       }
     };
 
-    this._addListener(eventName, eventName, listener, wrappedListener);
+    this._addEventListener(eventName, ethersListener);
   };
 
   #isEventValid = eventName => {
