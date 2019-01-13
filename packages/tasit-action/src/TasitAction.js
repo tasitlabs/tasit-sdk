@@ -21,53 +21,58 @@ class Utils {
 
 class Subscription {
   #emitter;
-  #events = [];
+  #events = new Map();
 
   constructor(eventEmitter) {
     this.#emitter = eventEmitter;
   }
 
+  // Debug
+  getEmitter = () => {
+    return this.#emitter;
+  };
+
   off = eventName => {
-    this.#events = this.#events.filter(event => {
-      if (event.eventName === eventName) {
-        if (eventName !== "error") {
-          this.#emitter.removeListener(
-            event.wrappedEventName,
-            event.wrappedListener
-          );
-        }
-        return false;
-      }
-      return true;
-    });
+    const event = this.#events.get(eventName);
+
+    if (!event) return;
+
+    if (eventName !== "error") {
+      // Note: ethers.removeAllListeners(name) not working!
+      this.#emitter.removeListener(
+        event.wrappedEventName,
+        event.wrappedListener
+      );
+    }
+    this.#events.delete(eventName);
   };
 
   unsubscribe = () => {
-    this.#events.forEach(event => {
-      this.off(event.eventName);
+    this.#events.forEach((event, eventName) => {
+      this.off(eventName);
     });
   };
 
   eventNames = () => {
-    return this.#events.map(event => event.eventName);
+    return Array.from(this.#events.keys());
   };
 
   // TODO: Make protected
   _emitErrorEvent = (error, eventName) => {
-    this.#events.forEach(event => {
-      if (event.eventName === "error") {
-        const message = { error, eventName };
-        event.listener(message);
-      }
-    });
+    const errorEvent = this.#events.get("error");
+    const message = { error, eventName };
+
+    if (errorEvent) errorEvent.listener(message);
+    else {
+      // Note: Throw error?
+      console.warn(`Error emission without listener: ${error}`);
+    }
   };
 
   // TODO: Make protected
   _addErrorListener = listener => {
-    const eventName = "error";
-    this.#events.push({
-      eventName,
-      wrappedEventName: eventName,
+    this.#events.set("error", {
+      wrappedEventName: "error",
       listener,
       wrappedListener: listener,
     });
@@ -78,8 +83,7 @@ class Subscription {
     if (this.eventNames().includes(eventName))
       throw new Error(`Event '${eventName}' already registred.`);
 
-    this.#events.push({
-      eventName,
+    this.#events.set(eventName, {
       wrappedEventName,
       listener,
       wrappedListener,
@@ -134,6 +138,9 @@ class TransactionSubscription extends Subscription {
 
     const wrappedListener = async blockNumber => {
       try {
+        // Note: There is a better location to do that?
+        if (once) this.off(eventName);
+
         if (!this.#tx) this.#tx = await this.#txPromise;
 
         const receipt = await this.#provider.getTransactionReceipt(
@@ -159,7 +166,6 @@ class TransactionSubscription extends Subscription {
           },
         };
 
-        if (once) this.off(eventName);
         await listener(message);
       } catch (error) {
         this._emitErrorEvent(
@@ -171,6 +177,7 @@ class TransactionSubscription extends Subscription {
 
     this._addListener(eventName, "block", listener, wrappedListener);
 
+    // https://github.com/ethers-io/ethers.js/issues/283
     setTimeout(() => {
       this._emitErrorEvent(
         new Error(`Event ${eventName} reached timeout.`),
@@ -235,8 +242,9 @@ class ContractSubscription extends Subscription {
           },
         };
 
-        await listener(message);
         if (once) this.off(eventName);
+
+        await listener(message);
       } catch (error) {
         this._emitErrorEvent(
           new Error(`Listener function with error: ${error.message}`),

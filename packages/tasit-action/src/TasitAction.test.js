@@ -53,11 +53,21 @@ describe("TasitAction.Contract", () => {
   afterEach("revert blockchain snapshot", async () => {
     if (contractSubscription) {
       contractSubscription.unsubscribe();
+
+      expect(
+        contractSubscription.getEmitter()._events,
+        "EthersJS should listen no event."
+      ).to.be.empty;
     }
 
     if (txSubscription) {
       await txSubscription.waitForNonceToUpdate();
       txSubscription.unsubscribe();
+
+      expect(
+        txSubscription.getEmitter()._events,
+        "EthersJS should listen no event."
+      ).to.be.empty;
     }
 
     await revertFromSnapshot(provider, testcaseSnaphotId);
@@ -247,8 +257,9 @@ describe("TasitAction.Contract", () => {
 
     it("should call error listener after timeout", async () => {
       txSubscription = simpleStorage.setValue("hello world");
-      const confirmationFn = sinon.fake();
+
       const errorFn = sinon.fake();
+      const confirmationFn = sinon.fake();
 
       const foreverListener = message => {
         confirmationFn();
@@ -264,14 +275,17 @@ describe("TasitAction.Contract", () => {
 
       txSubscription.on("error", errorListener);
 
-      await mineBlocks(provider, 20);
-
-      expect(confirmationFn.called).to.be.true;
+      await mineBlocks(provider, 10);
 
       // TODO: Use fake timer
       await new Promise(resolve => setTimeout(resolve, 3000));
 
       expect(errorFn.called).to.be.true;
+      expect(confirmationFn.called).to.be.true;
+      expect(txSubscription.eventNames()).to.deep.equal([
+        "confirmation",
+        "error",
+      ]);
     });
 
     it("subscription should has one listener per event", async () => {
@@ -321,16 +335,14 @@ describe("TasitAction.Contract", () => {
 
       const errorListener = message => {
         const { error, eventName } = message;
+        txSubscription.off("confirmation");
 
-        // Note: Why Circle CI is throwing error with this line?
-        // (node:543) UnhandledPromiseRejectionWarning: TypeError: Cannot read property 'unsubscribe' of undefined
-        // at Object.unsubscribe (/home/circleci/tasit-sdk/packages/tasit-action/src/TasitAction.test.js:325:24)
-        // at listener (/home/circleci/tasit-sdk/packages/tasit-action/src/TasitAction.js:60:15)
-        //txSubscription.unsubscribe();
+        // Note: Assertion not working (UnhandledPromiseRejectionWarning)
+        // But asseting fake function, if this throws, test case will fail.
+        expect(error.message).to.equal(
+          "Your message has been included in an uncle block."
+        );
 
-        // FIXME: Assertion not working
-        //expect(1).to.equal(2);
-        expect(error.message).to.match(/uncle/);
         errorFn();
       };
 
@@ -364,7 +376,7 @@ describe("TasitAction.Contract", () => {
     // More info: https://github.com/tasitlabs/TasitSDK/pull/95
     it("should listening contract trigger event one time", async () => {
       contractSubscription = simpleStorage.subscribe();
-      const confirmationFakeFn = sinon.fake();
+      const fakeFn = sinon.fake();
       const errorFakeFn = sinon.fake();
 
       const errorListener = message => {
@@ -384,20 +396,27 @@ describe("TasitAction.Contract", () => {
           const { data } = message;
           const { args } = data;
 
-          confirmationFakeFn();
+          fakeFn();
+
           resolve();
         });
       });
 
       contractSubscription.off("error");
+      contractSubscription.off("ValueChanged");
+
+      //await mineBlocks(provider, 15);
+
+      //console.log(provider);
 
       expect(errorFakeFn.called).to.be.false;
-      expect(confirmationFakeFn.callCount).to.equal(1);
+      expect(fakeFn.callCount).to.equal(1);
       expect(contractSubscription.eventNames()).to.be.empty;
     });
 
     // FIXME: Non-deterministic tests - Quarantine
     // More info: https://github.com/tasitlabs/TasitSDK/pull/95
+    // Note: This testcase has a listener leak
     it("should listening contract trigger event", async () => {
       contractSubscription = simpleStorage.subscribe();
       const fakeFn = sinon.fake();
@@ -442,8 +461,12 @@ describe("TasitAction.Contract", () => {
     it("subscription should has one listener per event", async () => {
       contractSubscription = simpleStorage.subscribe();
 
-      const listener1 = message => {};
-      const listener2 = message => {};
+      const listener1 = message => {
+        console.log("1");
+      };
+      const listener2 = message => {
+        console.log("2");
+      };
 
       expect(contractSubscription.eventNames()).to.be.empty;
 
