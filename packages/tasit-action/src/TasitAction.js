@@ -83,7 +83,7 @@ class Subscription {
   _addEventListener = (eventName, listener) => {
     if (eventName === "error")
       throw new Error(
-        `Use _addErrorListener function to subscribe an error event.`
+        `Use _addErrorListener function to subscribe to an error event.`
       );
 
     if (this.subscribedEventNames().includes(eventName))
