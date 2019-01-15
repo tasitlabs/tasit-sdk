@@ -20,7 +20,7 @@ You might want to jump ahead to the "why" sections to start:
 
 - [Why (from the user's perspective)?](#why-from-the-users-perspective)
 
-- [Why (from a developer / Ethereum enthusiast’s perspective)?](#why-from-a-developer--ethereum-enthusiasts-perspective)
+- [Why (from a developer's / Ethereum enthusiast’s perspective)?](#why-from-a-developers--ethereum-enthusiasts-perspective)
 
 ### Table of contents
 
@@ -221,7 +221,7 @@ Today, using a dapp from a phone is painful. Almost no dapps have standalone mob
 
 The idea is that the Tasit SDK would be used by many different mobile apps on a user's device. Once the Tasit SDK is around, more dapps will have dedicated mobile apps. This will remove a key barrier to mainstream adoption of Ethereum dapps.
 
-#### Why (from a developer / Ethereum enthusiast's perspective)?
+#### Why (from a developer's / Ethereum enthusiast's perspective)?
 
 The user-facing answer for "Why?" focused on the UX/product, since that's the main thing that mainstream users care about. Here we'll touch on more technical/ideological arguments for why it's important that the Ethereum community creates more mobile dapps.
 
