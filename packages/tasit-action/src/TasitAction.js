@@ -239,7 +239,7 @@ class ContractSubscription extends Subscription {
       throw new Error(`Event '${eventName}' not found.`);
 
     if (eventName === "error" && once)
-      throw new Error(`Use on() function to subscribe an error event.`);
+      throw new Error(`Use on() function to subscribe to an error event.`);
 
     if (eventName === "error") {
       this._addErrorListener(listener);
