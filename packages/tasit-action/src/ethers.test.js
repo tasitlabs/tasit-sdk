@@ -1,4 +1,5 @@
 import { expect, assert } from "chai";
+import sinon from "sinon";
 import { ethers } from "ethers";
 import {
   waitForEvent,
@@ -81,6 +82,33 @@ describe("ethers.js", () => {
       oldValue,
       newValue,
     ]);
+  });
+
+  // Note: BUG on ethers.removeAllListeners functions
+  // See more: https://github.com/ethers-io/ethers.js/issues/391
+  it.skip("ethers.js removeAllListeners bug - listeners remain registered", async () => {
+    const eventFakeFn = sinon.fake();
+
+    const sentTx = await contract.setValue("hello world");
+
+    let eventListener;
+
+    await new Promise(function(resolve, reject) {
+      eventListener = () => {
+        eventFakeFn();
+        resolve();
+      };
+      contract.on("ValueChanged", eventListener);
+    });
+
+    // Not working
+    contract.removeAllListeners("ValueChanged");
+    // Working
+    // contract.removeListener("ValueChanged", eventListener);
+
+    expect(eventFakeFn.called).to.be.true;
+    expect(contract.listenerCount("ValueChanged")).to.equal(0);
+    expect(contract.provider._events).to.be.empty;
   });
 
   describe("message signing", () => {
