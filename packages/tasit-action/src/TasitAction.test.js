@@ -280,7 +280,11 @@ describe("TasitAction.Contract", () => {
 
       await mineBlocks(provider, 10);
 
-      // TODO: Use fake timer
+      // TODO: Use fake timer when Sinon/Lolex supports it.
+      // See more:
+      //  https://github.com/sinonjs/sinon/issues/1739
+      //  https://github.com/sinonjs/lolex/issues/114
+      //  https://stackoverflow.com/a/50785284
       await new Promise(resolve => setTimeout(resolve, 200));
 
       expect(errorFn.called).to.be.true;
