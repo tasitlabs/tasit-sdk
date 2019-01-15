@@ -199,11 +199,10 @@ describe("TasitAction.Contract", () => {
 
       await mineBlocks(provider, 15);
 
-      txSubscription.off("error");
-
       expect(confirmationFakeFn.callCount).to.equal(1);
       expect(errorFakeFn.called).to.be.false;
-      expect(txSubscription.subscribedEventNames()).to.be.empty;
+
+      txSubscription.off("error");
     });
 
     it("should change contract state and trigger confirmation event", async () => {
