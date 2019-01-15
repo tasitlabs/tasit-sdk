@@ -64,7 +64,7 @@ describe("TasitAction.Contract", () => {
 
       expect(
         contractSubscription.getEmitter()._events,
-        "EthersJS should listen no event."
+        "ethers.js should not be listening to any events."
       ).to.be.empty;
     }
 
