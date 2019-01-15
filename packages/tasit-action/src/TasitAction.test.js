@@ -228,7 +228,7 @@ describe("TasitAction.Contract", () => {
 
       await mineBlocks(provider, 15);
 
-      expect(fakeFn.called).to.be.true;
+      expect(fakeFn.callCount).to.be.at.most(7);
     });
 
     it("should change contract state and trigger confirmation event - late subscription", async () => {
@@ -445,7 +445,7 @@ describe("TasitAction.Contract", () => {
       contractSubscription.off("error");
 
       expect(errorFakeFn.called).to.be.false;
-      expect(fakeFn.called).to.be.true;
+      expect(fakeFn.callCount).to.equal(1);
     });
 
     it("should throw error when listening on invalid event", async () => {
