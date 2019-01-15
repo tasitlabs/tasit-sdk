@@ -379,7 +379,7 @@ describe("TasitAction.Contract", () => {
       }).not.to.throw();
     });
 
-    it("should listening contract trigger event one time", async () => {
+    it("should trigger an event one time when you're listening to that event and the contract triggers it", async () => {
       contractSubscription = simpleStorage.subscribe();
       const fakeFn = sinon.fake();
       const errorFakeFn = sinon.fake();
