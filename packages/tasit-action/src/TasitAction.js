@@ -140,7 +140,7 @@ class TransactionSubscription extends Subscription {
       throw new Error(`Invalid listener trigger, use: [${triggers}]`);
 
     if (eventName === "error" && once)
-      throw new Error(`Use on() function to subscribe an error event.`);
+      throw new Error(`Use on() function to subscribe to an error event.`);
 
     if (!listener || typeof listener !== "function")
       throw new Error(`Cannot listen without a function`);
