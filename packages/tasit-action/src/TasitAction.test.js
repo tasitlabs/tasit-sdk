@@ -39,7 +39,13 @@ describe("TasitAction.Contract", () => {
       expect(txSubscription.subscribedEventNames()).to.be.empty;
     }
 
-    simpleStorage = wallet = testcaseSnaphotId = provider = txSubscription = contractSubscription = undefined;
+    simpleStorage = undefined;
+    wallet = undefined;
+    testcaseSnaphotId = undefined;
+    provider = undefined;
+    txSubscription = undefined;
+    contractSubscription = undefined;
+
     // Account creates a wallet, should it create an account object that encapsulates the wallet?
     // TasitAcount.create()
     // > Acount { wallet: ..., metaTxInfos..., etc }
