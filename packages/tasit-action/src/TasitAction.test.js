@@ -415,7 +415,7 @@ describe("TasitAction.Contract", () => {
       expect(contractSubscription.subscribedEventNames()).to.be.empty;
     });
 
-    it("should listening contract trigger event", async () => {
+    it("should be able to listen to an event triggered by the contract", async () => {
       contractSubscription = simpleStorage.subscribe();
       const fakeFn = sinon.fake();
       const errorFakeFn = sinon.fake();
