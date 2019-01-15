@@ -209,6 +209,8 @@ describe("TasitAction.Contract", () => {
       expect(errorFakeFn.called).to.be.false;
 
       txSubscription.off("error");
+
+      expect(txSubscription.subscribedEventNames()).to.be.empty;
     });
 
     it("should change contract state and trigger confirmation event", async () => {
