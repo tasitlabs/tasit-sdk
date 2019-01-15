@@ -291,7 +291,7 @@ describe("TasitAction.Contract", () => {
       ]);
     });
 
-    it("subscription should has one listener per event", async () => {
+    it("subscription should have one listener per event", async () => {
       txSubscription = simpleStorage.setValue("hello world");
 
       const listener1 = message => {};
