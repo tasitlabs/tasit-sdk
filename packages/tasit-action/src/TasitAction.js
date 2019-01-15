@@ -87,7 +87,7 @@ class Subscription {
       );
 
     if (this.subscribedEventNames().includes(eventName))
-      throw new Error(`Event '${eventName}' already registred.`);
+      throw new Error(`A listener for event '${eventName}' is already registered.`);
 
     this.#events.set(eventName, {
       listener,
