@@ -456,7 +456,7 @@ describe("TasitAction.Contract", () => {
       }).to.throw();
     });
 
-    it("subscription should has one listener per event", async () => {
+    it("subscription should have one listener per event", async () => {
       contractSubscription = simpleStorage.subscribe();
 
       const listener1 = message => {
