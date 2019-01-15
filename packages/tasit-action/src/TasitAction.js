@@ -35,12 +35,14 @@ class Subscription {
   off = eventName => {
     const event = this.#events.get(eventName);
 
-    if (!event) return;
+    if (!event) {
+      console.warn(`A listener for event '${eventName}' isn't registred.`);
+      return;
+    }
 
     if (eventName !== "error") {
       const { listener } = event;
 
-      // Note: ethers.removeAllListeners(name) not working!
       this.#ethersEventEmitter.removeListener(
         this._toEthersEventName(eventName),
         listener
@@ -87,7 +89,9 @@ class Subscription {
       );
 
     if (this.subscribedEventNames().includes(eventName))
-      throw new Error(`A listener for event '${eventName}' is already registered.`);
+      throw new Error(
+        `A listener for event '${eventName}' is already registered.`
+      );
 
     this.#events.set(eventName, {
       listener,
