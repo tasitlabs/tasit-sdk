@@ -55,7 +55,7 @@ class Subscription {
     });
   };
 
-  eventNames = () => {
+  subscribedEventNames = () => {
     return Array.from(this.#events.keys());
   };
 
@@ -86,7 +86,7 @@ class Subscription {
         `Use _addErrorListener function to subscribe an error event.`
       );
 
-    if (this.eventNames().includes(eventName))
+    if (this.subscribedEventNames().includes(eventName))
       throw new Error(`Event '${eventName}' already registred.`);
 
     this.#events.set(eventName, {

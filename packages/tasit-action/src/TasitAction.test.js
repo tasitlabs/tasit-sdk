@@ -31,6 +31,14 @@ describe("TasitAction.Contract", () => {
     contractSubscription;
 
   beforeEach("should connect to an existing contract", async () => {
+    if (contractSubscription) {
+      expect(contractSubscription.subscribedEventNames()).to.be.empty;
+    }
+
+    if (txSubscription) {
+      expect(txSubscription.subscribedEventNames()).to.be.empty;
+    }
+
     simpleStorage = wallet = testcaseSnaphotId = provider = txSubscription = contractSubscription = undefined;
     // Account creates a wallet, should it create an account object that encapsulates the wallet?
     // TasitAcount.create()
@@ -195,7 +203,7 @@ describe("TasitAction.Contract", () => {
 
       expect(confirmationFakeFn.callCount).to.equal(1);
       expect(errorFakeFn.called).to.be.false;
-      expect(txSubscription.eventNames()).to.be.empty;
+      expect(txSubscription.subscribedEventNames()).to.be.empty;
     });
 
     it("should change contract state and trigger confirmation event", async () => {
@@ -277,7 +285,7 @@ describe("TasitAction.Contract", () => {
 
       expect(errorFn.called).to.be.true;
       expect(confirmationFn.called).to.be.true;
-      expect(txSubscription.eventNames()).to.deep.equal([
+      expect(txSubscription.subscribedEventNames()).to.deep.equal([
         "confirmation",
         "error",
       ]);
@@ -289,7 +297,7 @@ describe("TasitAction.Contract", () => {
       const listener1 = message => {};
       const listener2 = message => {};
 
-      expect(txSubscription.eventNames()).to.be.empty;
+      expect(txSubscription.subscribedEventNames()).to.be.empty;
 
       txSubscription.on("confirmation", listener1);
 
@@ -297,7 +305,9 @@ describe("TasitAction.Contract", () => {
         txSubscription.on("confirmation", listener2);
       }).to.throw();
 
-      expect(txSubscription.eventNames()).to.deep.equal(["confirmation"]);
+      expect(txSubscription.subscribedEventNames()).to.deep.equal([
+        "confirmation",
+      ]);
     });
 
     it("should remove an event", async () => {
@@ -305,15 +315,17 @@ describe("TasitAction.Contract", () => {
 
       const listener1 = message => {};
 
-      expect(txSubscription.eventNames()).to.be.empty;
+      expect(txSubscription.subscribedEventNames()).to.be.empty;
 
       txSubscription.on("confirmation", listener1);
 
-      expect(txSubscription.eventNames()).to.deep.equal(["confirmation"]);
+      expect(txSubscription.subscribedEventNames()).to.deep.equal([
+        "confirmation",
+      ]);
 
       txSubscription.off("confirmation");
 
-      expect(txSubscription.eventNames()).to.be.empty;
+      expect(txSubscription.subscribedEventNames()).to.be.empty;
     });
 
     it("should emit error event when orphan/uncle block occurs", async () => {
@@ -400,7 +412,7 @@ describe("TasitAction.Contract", () => {
 
       expect(errorFakeFn.called).to.be.false;
       expect(fakeFn.callCount).to.equal(1);
-      expect(contractSubscription.eventNames()).to.be.empty;
+      expect(contractSubscription.subscribedEventNames()).to.be.empty;
     });
 
     it("should listening contract trigger event", async () => {
@@ -454,7 +466,7 @@ describe("TasitAction.Contract", () => {
         console.log("2");
       };
 
-      expect(contractSubscription.eventNames()).to.be.empty;
+      expect(contractSubscription.subscribedEventNames()).to.be.empty;
 
       contractSubscription.on("ValueChanged", listener1);
 
@@ -462,7 +474,9 @@ describe("TasitAction.Contract", () => {
         contractSubscription.on("ValueChanged", listener2);
       }).to.throw();
 
-      expect(contractSubscription.eventNames()).to.deep.equal(["ValueChanged"]);
+      expect(contractSubscription.subscribedEventNames()).to.deep.equal([
+        "ValueChanged",
+      ]);
     });
 
     it("should remove an event", async () => {
@@ -470,15 +484,17 @@ describe("TasitAction.Contract", () => {
 
       const listener1 = message => {};
 
-      expect(contractSubscription.eventNames()).to.be.empty;
+      expect(contractSubscription.subscribedEventNames()).to.be.empty;
 
       contractSubscription.on("ValueChanged", listener1);
 
-      expect(contractSubscription.eventNames()).to.deep.equal(["ValueChanged"]);
+      expect(contractSubscription.subscribedEventNames()).to.deep.equal([
+        "ValueChanged",
+      ]);
 
       contractSubscription.off("ValueChanged");
 
-      expect(contractSubscription.eventNames()).to.be.empty;
+      expect(contractSubscription.subscribedEventNames()).to.be.empty;
     });
 
     it("should manage many listeners", async () => {
@@ -488,30 +504,32 @@ describe("TasitAction.Contract", () => {
       const listener2 = message => {};
       const listener3 = message => {};
 
-      expect(contractSubscription.eventNames()).to.be.empty;
+      expect(contractSubscription.subscribedEventNames()).to.be.empty;
 
       contractSubscription.on("ValueChanged", listener1);
       contractSubscription.on("ValueRemoved", listener2);
 
-      expect(contractSubscription.eventNames()).to.deep.equal([
+      expect(contractSubscription.subscribedEventNames()).to.deep.equal([
         "ValueChanged",
         "ValueRemoved",
       ]);
 
       contractSubscription.off("ValueRemoved");
 
-      expect(contractSubscription.eventNames()).to.deep.equal(["ValueChanged"]);
+      expect(contractSubscription.subscribedEventNames()).to.deep.equal([
+        "ValueChanged",
+      ]);
 
       contractSubscription.on("ValueRemoved", listener3);
 
-      expect(contractSubscription.eventNames()).to.deep.equal([
+      expect(contractSubscription.subscribedEventNames()).to.deep.equal([
         "ValueChanged",
         "ValueRemoved",
       ]);
 
       contractSubscription.unsubscribe();
 
-      expect(contractSubscription.eventNames()).to.be.empty;
+      expect(contractSubscription.subscribedEventNames()).to.be.empty;
     });
   });
 
