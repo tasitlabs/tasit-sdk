@@ -349,7 +349,7 @@ describe("TasitAction.Contract", () => {
           "Your message has been included in an uncle block."
         );
 
-        // But asseting fake function, if that's throws, test case will fail.
+        // But asserting fake function, if that throws, test case will fail.
         errorFn();
       };
 
