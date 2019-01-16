@@ -228,6 +228,7 @@ describe("TasitAction.Contract", () => {
 
       await mineBlocks(provider, 15);
 
+      // not exactly 7 because block mining is faster than polling
       expect(fakeFn.callCount).to.be.at.most(7);
     });
 
