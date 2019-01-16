@@ -94,15 +94,15 @@ class Subscription {
 
   // TODO: Make protected
   _emitErrorEvent = (error, eventName) => {
-    const errorEvent = this.#eventListeners.get("error");
-    if (!errorEvent) {
+    const errorEventListener = this.#eventListeners.get("error");
+    if (!errorEventListener) {
       // Note: Throw error?
       console.warn(`Error emission without listener: ${error}`);
       return;
     }
 
     const message = { error, eventName };
-    errorEvent.listener(message);
+    errorEventListener.listener(message);
   };
 
   // TODO: Make protected
