@@ -4,10 +4,10 @@ import chai, { expect } from "chai";
 chai.use(require("chai-as-promised"));
 import sinon from "sinon";
 import {
-  waitForEvent,
   mineBlocks,
   createSnapshot,
   revertFromSnapshot,
+  wait,
 } from "./testHelpers/helpers";
 
 // Note:  Using dist file because babel doesn't compile node_modules files.
@@ -281,7 +281,7 @@ describe("TasitAction.Contract", () => {
       await mineBlocks(provider, 10);
 
       // TODO: Use fake timer
-      await new Promise(resolve => setTimeout(resolve, 200));
+      await wait(200);
 
       expect(errorFn.called).to.be.true;
       expect(confirmationFn.called).to.be.true;

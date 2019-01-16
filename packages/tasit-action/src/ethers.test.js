@@ -2,9 +2,10 @@ import { expect, assert } from "chai";
 import sinon from "sinon";
 import { ethers } from "ethers";
 import {
-  waitForEvent,
+  waitForEthersEvent,
   createSnapshot,
   revertFromSnapshot,
+  mineBlocks,
 } from "./testHelpers/helpers.js";
 
 // Note: This file is originally genarated by `tasit-contracts` and was pasted here manually
@@ -37,6 +38,10 @@ describe("ethers.js", () => {
 
   afterEach("revert blockchain snapshot", async () => {
     await revertFromSnapshot(provider, testcaseSnaphotId);
+
+    // Note: Without that test suite is broking.
+    // It is still unclear why
+    await mineBlocks(provider, 1);
   });
 
   it("should instatiate contract object using human-readable ABI", async () => {
@@ -72,39 +77,50 @@ describe("ethers.js", () => {
   });
 
   it("should watch contract's ValueChanged event", async () => {
+    const eventFakeFn = sinon.fake();
+
     const oldValue = await contract.getValue();
     const newValue = `I like cats`;
 
+    const listener = event => {
+      const {
+        author: eventAuthor,
+        oldValue: eventOldValue,
+        newValue: eventNewValue,
+      } = event.args;
+
+      expect([eventAuthor, eventOldValue, eventNewValue]).to.deep.equal([
+        wallet.address,
+        oldValue,
+        newValue,
+      ]);
+
+      event.removeListener();
+
+      eventFakeFn();
+    };
+
     const sentTx = await contract.setValue(newValue);
 
-    await waitForEvent(contract, "ValueChanged", [
-      wallet.address,
-      oldValue,
-      newValue,
-    ]);
+    await waitForEthersEvent(contract, "ValueChanged", listener);
+
+    expect(eventFakeFn.called).to.be.true;
+    expect(contract.listenerCount("ValueChanged")).to.equal(0);
+    expect(contract.provider._events).to.be.empty;
   });
 
-  // Note: BUG on ethers.removeAllListeners functions
-  // See more: https://github.com/ethers-io/ethers.js/issues/391
-  it.skip("ethers.js removeAllListeners bug - listeners remain registered", async () => {
+  it("should remove listener using removeAllListeners function", async () => {
     const eventFakeFn = sinon.fake();
+
+    const listener = () => {
+      eventFakeFn();
+    };
 
     const sentTx = await contract.setValue("hello world");
 
-    let eventListener;
+    await waitForEthersEvent(contract, "ValueChanged", listener);
 
-    await new Promise(function(resolve, reject) {
-      eventListener = () => {
-        eventFakeFn();
-        resolve();
-      };
-      contract.on("ValueChanged", eventListener);
-    });
-
-    // Not working
     contract.removeAllListeners("ValueChanged");
-    // Working
-    // contract.removeListener("ValueChanged", eventListener);
 
     expect(eventFakeFn.called).to.be.true;
     expect(contract.listenerCount("ValueChanged")).to.equal(0);
