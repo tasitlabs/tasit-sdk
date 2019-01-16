@@ -21,7 +21,7 @@ class Utils {
 
 class Subscription {
   #ethersEventEmitter;
-  #events = new Map();
+  #eventListeners = new Map();
 
   constructor(eventEmitter) {
     this.#ethersEventEmitter = eventEmitter;
@@ -33,33 +33,37 @@ class Subscription {
   };
 
   off = eventName => {
-    const event = this.#events.get(eventName);
+    const eventListener = this.#eventListeners.get(eventName);
 
-    if (!event) return;
+    if (!eventListener) {
+      console.warn(`A listener for event '${eventName}' isn't registered.`);
+      return;
+    }
 
     if (eventName !== "error") {
-      const { listener } = event;
+      const { listener } = eventListener;
 
       this.#ethersEventEmitter.removeAllListeners(
         this._toEthersEventName(eventName)
+
       );
     }
-    this.#events.delete(eventName);
+    this.#eventListeners.delete(eventName);
   };
 
   unsubscribe = () => {
-    this.#events.forEach((event, eventName) => {
+    this.#eventListeners.forEach((eventListener, eventName) => {
       this.off(eventName);
     });
   };
 
   subscribedEventNames = () => {
-    return Array.from(this.#events.keys());
+    return Array.from(this.#eventListeners.keys());
   };
 
   // TODO: Make protected
   _emitErrorEvent = (error, eventName) => {
-    const errorEvent = this.#events.get("error");
+    const errorEvent = this.#eventListeners.get("error");
     if (!errorEvent) {
       // Note: Throw error?
       console.warn(`Error emission without listener: ${error}`);
@@ -72,7 +76,7 @@ class Subscription {
 
   // TODO: Make protected
   _addErrorListener = listener => {
-    this.#events.set("error", {
+    this.#eventListeners.set("error", {
       listener,
     });
   };
@@ -89,7 +93,7 @@ class Subscription {
         `A listener for event '${eventName}' is already registered.`
       );
 
-    this.#events.set(eventName, {
+    this.#eventListeners.set(eventName, {
       listener,
     });
 

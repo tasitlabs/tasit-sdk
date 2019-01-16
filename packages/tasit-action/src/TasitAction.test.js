@@ -39,7 +39,13 @@ describe("TasitAction.Contract", () => {
       expect(txSubscription.subscribedEventNames()).to.be.empty;
     }
 
-    simpleStorage = wallet = testcaseSnaphotId = provider = txSubscription = contractSubscription = undefined;
+    simpleStorage = undefined;
+    wallet = undefined;
+    testcaseSnaphotId = undefined;
+    provider = undefined;
+    txSubscription = undefined;
+    contractSubscription = undefined;
+
     // Account creates a wallet, should it create an account object that encapsulates the wallet?
     // TasitAcount.create()
     // > Acount { wallet: ..., metaTxInfos..., etc }
@@ -199,10 +205,11 @@ describe("TasitAction.Contract", () => {
 
       await mineBlocks(provider, 15);
 
-      txSubscription.off("error");
-
       expect(confirmationFakeFn.callCount).to.equal(1);
       expect(errorFakeFn.called).to.be.false;
+
+      txSubscription.off("error");
+
       expect(txSubscription.subscribedEventNames()).to.be.empty;
     });
 
@@ -280,7 +287,11 @@ describe("TasitAction.Contract", () => {
 
       await mineBlocks(provider, 10);
 
-      // TODO: Use fake timer
+      // TODO: Use fake timer when Sinon/Lolex supports it.
+      // See more:
+      //  https://github.com/sinonjs/sinon/issues/1739
+      //  https://github.com/sinonjs/lolex/issues/114
+      //  https://stackoverflow.com/a/50785284
       await wait(200);
 
       expect(errorFn.called).to.be.true;
