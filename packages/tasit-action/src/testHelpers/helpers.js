@@ -1,16 +1,11 @@
 import { expect } from "chai";
 import { ethers } from "ethers";
 
-export const waitForEvent = async (contract, eventName, expected) => {
+export const waitForEthersEvent = async (eventEmitter, eventName, callback) => {
   return new Promise(function(resolve, reject) {
-    contract.on(eventName, function() {
-      const args = Array.prototype.slice.call(arguments);
+    eventEmitter.on(eventName, (...args) => {
       const event = args.pop();
-      event.removeListener();
-      expect(
-        args,
-        `${event.event} event should have expected args`
-      ).to.deep.equal(expected);
+      callback(event);
       resolve();
     });
   });
@@ -35,4 +30,14 @@ export const revertFromSnapshot = async (provider, snapshotId) => {
   await provider.send("evm_revert", [snapshotId]);
 };
 
-export default { waitForEvent, mineBlocks, createSnapshot, revertFromSnapshot };
+export const wait = async ms => {
+  return new Promise(resolve => setTimeout(resolve, ms));
+};
+
+export default {
+  waitForEthersEvent,
+  mineBlocks,
+  createSnapshot,
+  revertFromSnapshot,
+  wait,
+};

@@ -42,10 +42,12 @@ class Subscription {
 
     if (eventName !== "error") {
       const { listener } = eventListener;
+
       this._clearEventTimerIfExists(eventName);
-      this.#ethersEventEmitter.removeListener(
-        this._toEthersEventName(eventName),
-        listener
+
+      this.#ethersEventEmitter.removeAllListeners(
+        this._toEthersEventName(eventName)
+
       );
     }
     this.#eventListeners.delete(eventName);

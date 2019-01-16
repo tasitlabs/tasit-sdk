@@ -4,10 +4,10 @@ import chai, { expect } from "chai";
 chai.use(require("chai-as-promised"));
 import sinon from "sinon";
 import {
-  waitForEvent,
   mineBlocks,
   createSnapshot,
   revertFromSnapshot,
+  wait,
 } from "./testHelpers/helpers";
 
 // Note:  Using dist file because babel doesn't compile node_modules files.
@@ -235,7 +235,8 @@ describe("TasitAction.Contract", () => {
 
       await mineBlocks(provider, 15);
 
-      expect(fakeFn.called).to.be.true;
+      // not exactly 7 because block mining is faster than polling
+      expect(fakeFn.callCount).to.be.at.most(7);
     });
 
     it("should change contract state and trigger confirmation event - late subscription", async () => {
@@ -292,9 +293,8 @@ describe("TasitAction.Contract", () => {
       //  https://github.com/sinonjs/sinon/issues/1739
       //  https://github.com/sinonjs/lolex/issues/114
       //  https://stackoverflow.com/a/50785284
-      await new Promise(resolve =>
-        setTimeout(resolve, txSubscription.getEventsTimeout() * 2)
-      );
+      await wait(txSubscription.getEventsTimeout() * 2);
+
 
       expect(errorFn.called).to.be.true;
       expect(confirmationFn.called).to.be.true;
@@ -458,7 +458,7 @@ describe("TasitAction.Contract", () => {
       contractSubscription.off("error");
 
       expect(errorFakeFn.called).to.be.false;
-      expect(fakeFn.called).to.be.true;
+      expect(fakeFn.callCount).to.equal(1);
     });
 
     it("should throw error when listening on invalid event", async () => {
