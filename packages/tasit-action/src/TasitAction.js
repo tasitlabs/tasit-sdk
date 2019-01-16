@@ -108,7 +108,7 @@ class TransactionSubscription extends Subscription {
   #txPromise;
   #provider;
   #tx;
-  #txConfirmed = false;
+  #txConfirmations = 0;
   #timeout = config.events.timeout;
 
   constructor(txPromise, provider) {
@@ -168,22 +168,29 @@ class TransactionSubscription extends Subscription {
           this.#tx.hash
         );
 
-        if (receipt !== null) {
-          this.#txConfirmed = true;
-        } else {
-          if (this.#txConfirmed)
-            this._emitErrorEvent(
-              new Error(`Your message has been included in an uncle block.`),
-              eventName
-            );
+        const includedInAnUncle =
+          (receipt === null && this.#txConfirmations > 0) ||
+          (receipt !== null && receipt.confirmations < this.#txConfirmations);
 
+        if (includedInAnUncle) {
+          this._emitErrorEvent(
+            new Error(`Your message has been included in an uncle block.`),
+            eventName
+          );
+        }
+
+        if (receipt === null) {
+          this.#txConfirmations = 0;
           return;
         }
 
         const { confirmations } = receipt;
+
+        this.#txConfirmations = confirmations;
+
         const message = {
           data: {
-            confirmations: confirmations,
+            confirmations,
           },
         };
 
@@ -215,6 +222,11 @@ class TransactionSubscription extends Subscription {
   waitForNonceToUpdate = async () => {
     const tx = await this.#txPromise;
     await this.#provider.waitForTransaction(tx.hash);
+  };
+
+  // For testing purposes
+  refreshProvider = () => {
+    this.#provider = ProviderFactory.getProvider();
   };
 }
 

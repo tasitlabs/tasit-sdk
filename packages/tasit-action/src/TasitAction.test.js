@@ -328,9 +328,11 @@ describe("TasitAction.Contract", () => {
       expect(txSubscription.subscribedEventNames()).to.be.empty;
     });
 
-    it("should emit error event when orphan/uncle block occurs", async () => {
-      txSubscription = simpleStorage.setValue("hello world");
-
+    // Note: Block reorganization is the situation where a client discovers a
+    //  new difficultywise-longest well-formed blockchain which excludes one or more blocks that
+    //  the client previously thought were part of the difficultywise-longest well-formed blockchain.
+    //  These excluded blocks become orphans.
+    it("should emit error event when block reorganization occurs - block excluded", async () => {
       const confirmationFn = sinon.fake();
       const errorFn = sinon.fake();
 
@@ -338,11 +340,8 @@ describe("TasitAction.Contract", () => {
         confirmationFn();
       };
 
-      txSubscription.on("confirmation", confirmationListener);
-
       const errorListener = message => {
         const { error, eventName } = message;
-        txSubscription.off("confirmation");
 
         // Note: This assertion will not fail the test case (UnhandledPromiseRejectionWarning)
         expect(error.message).to.equal(
@@ -353,20 +352,73 @@ describe("TasitAction.Contract", () => {
         errorFn();
       };
 
-      txSubscription.on("error", errorListener);
-
       const snapshotId = await createSnapshot(provider);
 
-      await mineBlocks(provider, 15);
+      txSubscription = simpleStorage.setValue("hello world");
+
+      txSubscription.on("confirmation", confirmationListener);
+
+      txSubscription.on("error", errorListener);
+
+      await mineBlocks(provider, 10);
 
       expect(confirmationFn.called).to.be.true;
 
       await revertFromSnapshot(provider, snapshotId);
 
+      await mineBlocks(provider, 10);
+
+      txSubscription.off("confirmation");
+      txSubscription = undefined;
+
+      expect(errorFn.called).to.be.true;
+    });
+
+    // Note: Block reorganization is the situation where a client discovers a
+    //  new difficultywise-longest well-formed blockchain which excludes one or more blocks that
+    //  the client previously thought were part of the difficultywise-longest well-formed blockchain.
+    //  These excluded blocks become orphans.
+    it("should emit error event when block reorganization occurs - tx confirmed twice", async () => {
+      const confirmationFn = sinon.fake();
+      const errorFn = sinon.fake();
+
+      const confirmationListener = message => {
+        confirmationFn();
+      };
+
+      const errorListener = message => {
+        const { error, eventName } = message;
+
+        // Note: This assertion will not fail the test case (UnhandledPromiseRejectionWarning)
+        expect(error.message).to.equal(
+          "Your message has been included in an uncle block."
+        );
+
+        // But asserting fake function, if that throws, test case will fail.
+        errorFn();
+      };
+
+      txSubscription = simpleStorage.setValue("hello world");
+
+      txSubscription.on("error", errorListener);
+
+      txSubscription.on("confirmation", confirmationListener);
+
+      await mineBlocks(provider, 5);
+
+      const snapshotId = await createSnapshot(provider);
+
       await mineBlocks(provider, 20);
 
-      // Broadcast same transaction again (simulate reorg)
-      txSubscription = simpleStorage.setValue("hello world");
+      expect(confirmationFn.called).to.be.true;
+
+      await revertFromSnapshot(provider, snapshotId);
+
+      // Note: Without that, ethers.provider will keep the same
+      // receipt.confirmations as before snapshot reversion
+      txSubscription.refreshProvider();
+
+      await mineBlocks(provider, 15);
 
       expect(errorFn.called).to.be.true;
     });
