@@ -170,7 +170,7 @@ class TransactionSubscription extends Subscription {
 
         const includedInAnUncle =
           (receipt === null && this.#txConfirmations > 0) ||
-          (receipt !== null && receipt.confirmations < this.#txConfirmations);
+          (receipt !== null && receipt.confirmations <= this.#txConfirmations);
 
         if (includedInAnUncle) {
           this._emitErrorEvent(
