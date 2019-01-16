@@ -168,11 +168,11 @@ class TransactionSubscription extends Subscription {
           this.#tx.hash
         );
 
-        const includedInAnUncle =
+        const blockReorgOccurred =
           (receipt === null && this.#txConfirmations > 0) ||
           (receipt !== null && receipt.confirmations <= this.#txConfirmations);
 
-        if (includedInAnUncle) {
+        if (blockReorgOccurred) {
           this._emitErrorEvent(
             new Error(`Your message has been included in an uncle block.`),
             eventName
