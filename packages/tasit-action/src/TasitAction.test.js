@@ -368,6 +368,8 @@ describe("TasitAction.Contract", () => {
 
       await mineBlocks(provider, 10);
 
+      // Note: Transaction no longer exists
+      // If it isn't unset, afterEach hook will execute waitForNonceToUpdate forever
       txSubscription.off("confirmation");
       txSubscription = undefined;
 
