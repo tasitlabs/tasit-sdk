@@ -278,10 +278,12 @@ describe("TasitAction.Contract", () => {
 
       txSubscription.on("error", errorListener);
 
-      await mineBlocks(provider, 10);
+      await mineBlocks(provider, 1);
 
       // TODO: Use fake timer
-      await new Promise(resolve => setTimeout(resolve, 200));
+      await new Promise(resolve =>
+        setTimeout(resolve, txSubscription.getEventsTimeout() * 2)
+      );
 
       expect(errorFn.called).to.be.true;
       expect(confirmationFn.called).to.be.true;

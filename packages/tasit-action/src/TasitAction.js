@@ -110,6 +110,7 @@ class TransactionSubscription extends Subscription {
   #tx;
   #txConfirmed = false;
   #timeout = config.events.timeout;
+  #lastConfirmationTime;
 
   constructor(txPromise, provider) {
     // Provider implements EventEmitter API and it's enough
@@ -170,6 +171,7 @@ class TransactionSubscription extends Subscription {
 
         if (receipt !== null) {
           this.#txConfirmed = true;
+          this.#lastConfirmationTime = Date.now();
         } else {
           if (this.#txConfirmed)
             this._emitErrorEvent(
@@ -179,6 +181,19 @@ class TransactionSubscription extends Subscription {
 
           return;
         }
+
+        setTimeout(() => {
+          const currentTime = Date.now();
+          const timedOut =
+            currentTime - this.#lastConfirmationTime >= this.getEventsTimeout();
+
+          if (timedOut) {
+            this._emitErrorEvent(
+              new Error(`Event ${eventName} reached timeout.`),
+              eventName
+            );
+          }
+        }, this.getEventsTimeout());
 
         const { confirmations } = receipt;
         const message = {
@@ -197,15 +212,6 @@ class TransactionSubscription extends Subscription {
     };
 
     this._addEventListener(eventName, ethersListener);
-
-    // Which condition should  be true to emit an error?
-    // Timeout example: https://github.com/ethers-io/ethers.js/issues/283#issuecomment-423248566
-    setTimeout(() => {
-      this._emitErrorEvent(
-        new Error(`Event ${eventName} reached timeout.`),
-        eventName
-      );
-    }, this.getEventsTimeout());
   };
 
   // Tech debt
