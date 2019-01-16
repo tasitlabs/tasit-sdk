@@ -35,7 +35,7 @@ class Subscription {
   off = eventName => {
     const eventListener = this.#eventListeners.get(eventName);
 
-    if (!event) {
+    if (!eventListener) {
       console.warn(`A listener for event '${eventName}' isn't registered.`);
       return;
     }
