@@ -422,6 +422,8 @@ describe("TasitAction.Contract", () => {
 
       await mineBlocks(provider, 15);
 
+      // not always on the first new block because of pollingInterval vs blockTime issue
+      // but the first poll after that 15 new blocks is emitting error event
       expect(errorFn.called).to.be.true;
     });
   });
