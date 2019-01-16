@@ -295,7 +295,6 @@ describe("TasitAction.Contract", () => {
       //  https://stackoverflow.com/a/50785284
       await wait(txSubscription.getEventsTimeout() * 2);
 
-
       expect(errorFn.called).to.be.true;
       expect(confirmationFn.called).to.be.true;
       expect(txSubscription.subscribedEventNames()).to.deep.equal([

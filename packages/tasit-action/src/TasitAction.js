@@ -47,7 +47,6 @@ class Subscription {
 
       this.#ethersEventEmitter.removeAllListeners(
         this._toEthersEventName(eventName)
-
       );
     }
     this.#eventListeners.delete(eventName);
