@@ -42,13 +42,43 @@ class Subscription {
 
     if (eventName !== "error") {
       const { listener } = eventListener;
-
+      this._clearEventTimerIfExists(eventName);
       this.#ethersEventEmitter.removeListener(
         this._toEthersEventName(eventName),
         listener
       );
     }
     this.#eventListeners.delete(eventName);
+  };
+
+  // TODO: Make protected
+  _setEventTimer = (eventName, timer) => {
+    const eventListener = this.#eventListeners.get(eventName);
+
+    if (!eventListener) {
+      console.warn(`A listener for event '${eventName}' isn't registered.`);
+      return;
+    }
+
+    const { listener } = eventListener;
+
+    this.#eventListeners.set(eventName, { listener, timer });
+  };
+
+  // TODO: Make protected
+  _clearEventTimerIfExists = eventName => {
+    const eventListener = this.#eventListeners.get(eventName);
+
+    if (!eventListener) {
+      console.warn(`A listener for event '${eventName}' isn't registered.`);
+      return;
+    }
+
+    const { timer } = eventListener;
+
+    if (!timer) return;
+
+    clearTimeout(timer);
   };
 
   unsubscribe = () => {
@@ -184,7 +214,9 @@ class TransactionSubscription extends Subscription {
           return;
         }
 
-        setTimeout(() => {
+        this._clearEventTimerIfExists(eventName);
+
+        const timer = setTimeout(() => {
           const currentTime = Date.now();
           const timedOut =
             currentTime - this.#lastConfirmationTime >= this.getEventsTimeout();
@@ -196,6 +228,8 @@ class TransactionSubscription extends Subscription {
             );
           }
         }, this.getEventsTimeout());
+
+        this._setEventTimer(eventName, timer);
 
         const { confirmations } = receipt;
         const message = {
