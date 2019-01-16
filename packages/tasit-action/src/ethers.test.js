@@ -39,7 +39,7 @@ describe("ethers.js", () => {
   afterEach("revert blockchain snapshot", async () => {
     await revertFromSnapshot(provider, testcaseSnaphotId);
 
-    // Note: Without that test suite is broking.
+    // Note: Without this the test suite is breaking.
     // It is still unclear why
     await mineBlocks(provider, 1);
   });
