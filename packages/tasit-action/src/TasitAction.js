@@ -141,7 +141,7 @@ class TransactionSubscription extends Subscription {
   #txPromise;
   #provider;
   #tx;
-  #txConfirmed = false;
+  #txConfirmations = 0;
   #timeout = config.events.timeout;
   #lastConfirmationTime;
 
@@ -202,21 +202,26 @@ class TransactionSubscription extends Subscription {
           this.#tx.hash
         );
 
-        if (receipt !== null) {
-          this.#txConfirmed = true;
-          this.#lastConfirmationTime = Date.now();
-        } else {
-          if (this.#txConfirmed)
-            this._emitErrorEvent(
-              new Error(`Your message has been included in an uncle block.`),
-              eventName
-            );
+        const blockReorgOccurred =
+          (receipt === null && this.#txConfirmations > 0) ||
+          (receipt !== null && receipt.confirmations <= this.#txConfirmations);
 
-          return;
+        if (blockReorgOccurred) {
+          this._emitErrorEvent(
+            new Error(`Your message has been included in an uncle block.`),
+            eventName
+          );
         }
 
+        if (receipt === null) {
+          this.#txConfirmations = 0;
+          return;
+        }
+          
         this._clearEventTimerIfExists(eventName);
-
+          
+        this.#lastConfirmationTime = Date.now();
+          
         const timer = setTimeout(() => {
           const currentTime = Date.now();
           const timedOut =
@@ -233,9 +238,12 @@ class TransactionSubscription extends Subscription {
         this._setEventTimer(eventName, timer);
 
         const { confirmations } = receipt;
+
+        this.#txConfirmations = confirmations;
+
         const message = {
           data: {
-            confirmations: confirmations,
+            confirmations,
           },
         };
 
@@ -258,6 +266,11 @@ class TransactionSubscription extends Subscription {
   waitForNonceToUpdate = async () => {
     const tx = await this.#txPromise;
     await this.#provider.waitForTransaction(tx.hash);
+  };
+
+  // For testing purposes
+  refreshProvider = () => {
+    this.#provider = ProviderFactory.getProvider();
   };
 }
 
