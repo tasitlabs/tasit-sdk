@@ -191,11 +191,8 @@ class TransactionSubscription extends Subscription {
   #addConfirmationListener = (listener, once) => {
     const eventName = "confirmation";
 
-    const ethersListener = async blockNumber => {
+    const baseEthersListener = async blockNumber => {
       try {
-        // Note: There is a better location to do that?
-        if (once) this.off(eventName);
-
         if (!this.#tx) this.#tx = await this.#txPromise;
 
         const receipt = await this.#provider.getTransactionReceipt(
@@ -217,11 +214,11 @@ class TransactionSubscription extends Subscription {
           this.#txConfirmations = 0;
           return;
         }
-          
+
         this._clearEventTimerIfExists(eventName);
-          
+
         this.#lastConfirmationTime = Date.now();
-          
+
         const timer = setTimeout(() => {
           const currentTime = Date.now();
           const timedOut =
@@ -255,6 +252,17 @@ class TransactionSubscription extends Subscription {
         );
       }
     };
+
+    let ethersListener;
+
+    if (once) {
+      ethersListener = async blockNumber => {
+        await baseEthersListener(blockNumber);
+        this.off(eventName);
+      };
+    } else {
+      ethersListener = baseEthersListener;
+    }
 
     this._addEventListener(eventName, ethersListener);
   };
