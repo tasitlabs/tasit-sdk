@@ -286,14 +286,14 @@ describe("TasitAction.Contract", () => {
 
       txSubscription.on("error", errorListener);
 
-      await mineBlocks(provider, 10);
+      await mineBlocks(provider, 1);
 
       // TODO: Use fake timer when Sinon/Lolex supports it.
       // See more:
       //  https://github.com/sinonjs/sinon/issues/1739
       //  https://github.com/sinonjs/lolex/issues/114
       //  https://stackoverflow.com/a/50785284
-      await wait(200);
+      await wait(txSubscription.getEventsTimeout() * 2);
 
       expect(errorFn.called).to.be.true;
       expect(confirmationFn.called).to.be.true;
@@ -340,9 +340,11 @@ describe("TasitAction.Contract", () => {
       expect(txSubscription.subscribedEventNames()).to.be.empty;
     });
 
-    it("should emit error event when orphan/uncle block occurs", async () => {
-      txSubscription = simpleStorage.setValue("hello world");
-
+    // Note: Block reorganization is the situation where a client discovers a
+    //  new difficultywise-longest well-formed blockchain which excludes one or more blocks that
+    //  the client previously thought were part of the difficultywise-longest well-formed blockchain.
+    //  These excluded blocks become orphans.
+    it("should emit error event when block reorganization occurs - block excluded", async () => {
       const confirmationFn = sinon.fake();
       const errorFn = sinon.fake();
 
@@ -350,11 +352,8 @@ describe("TasitAction.Contract", () => {
         confirmationFn();
       };
 
-      txSubscription.on("confirmation", confirmationListener);
-
       const errorListener = message => {
         const { error, eventName } = message;
-        txSubscription.off("confirmation");
 
         // Note: This assertion will not fail the test case (UnhandledPromiseRejectionWarning)
         expect(error.message).to.equal(
@@ -365,21 +364,78 @@ describe("TasitAction.Contract", () => {
         errorFn();
       };
 
-      txSubscription.on("error", errorListener);
-
       const snapshotId = await createSnapshot(provider);
 
-      await mineBlocks(provider, 15);
+      txSubscription = simpleStorage.setValue("hello world");
+
+      txSubscription.on("confirmation", confirmationListener);
+
+      txSubscription.on("error", errorListener);
+
+      await mineBlocks(provider, 10);
 
       expect(confirmationFn.called).to.be.true;
 
       await revertFromSnapshot(provider, snapshotId);
 
-      await mineBlocks(provider, 20);
+      await mineBlocks(provider, 10);
 
-      // Broadcast same transaction again (simulate reorg)
+      // Note: Transaction no longer exists
+      // If it isn't unset, afterEach hook will execute waitForNonceToUpdate forever
+      txSubscription.off("confirmation");
+      txSubscription = undefined;
+
+      expect(errorFn.called).to.be.true;
+    });
+
+    // Note: Block reorganization is the situation where a client discovers a
+    //  new difficultywise-longest well-formed blockchain which excludes one or more blocks that
+    //  the client previously thought were part of the difficultywise-longest well-formed blockchain.
+    //  These excluded blocks become orphans.
+    it("should emit error event when block reorganization occurs - tx confirmed twice", async () => {
+      const confirmationFn = sinon.fake();
+      const errorFn = sinon.fake();
+
+      const confirmationListener = message => {
+        confirmationFn();
+      };
+
+      const errorListener = message => {
+        const { error, eventName } = message;
+
+        // Note: This assertion will not fail the test case (UnhandledPromiseRejectionWarning)
+        expect(error.message).to.equal(
+          "Your message has been included in an uncle block."
+        );
+
+        // But asserting fake function, if that throws, test case will fail.
+        errorFn();
+      };
+
       txSubscription = simpleStorage.setValue("hello world");
 
+      txSubscription.on("error", errorListener);
+
+      txSubscription.on("confirmation", confirmationListener);
+
+      await mineBlocks(provider, 5);
+
+      const snapshotId = await createSnapshot(provider);
+
+      await mineBlocks(provider, 20);
+
+      expect(confirmationFn.called).to.be.true;
+
+      await revertFromSnapshot(provider, snapshotId);
+
+      // Note: Without that, ethers.provider will keep the same
+      // receipt.confirmations as before snapshot reversion
+      txSubscription.refreshProvider();
+
+      await mineBlocks(provider, 15);
+
+      // not always on the first new block because of pollingInterval vs blockTime issue
+      // but the first poll after that 15 new blocks is emitting error event
       expect(errorFn.called).to.be.true;
     });
   });

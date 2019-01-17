@@ -43,12 +43,43 @@ class Subscription {
     if (eventName !== "error") {
       const { listener } = eventListener;
 
+      this._clearEventTimerIfExists(eventName);
+
       this.#ethersEventEmitter.removeAllListeners(
         this._toEthersEventName(eventName)
-
       );
     }
     this.#eventListeners.delete(eventName);
+  };
+
+  // TODO: Make protected
+  _setEventTimer = (eventName, timer) => {
+    const eventListener = this.#eventListeners.get(eventName);
+
+    if (!eventListener) {
+      console.warn(`A listener for event '${eventName}' isn't registered.`);
+      return;
+    }
+
+    const { listener } = eventListener;
+
+    this.#eventListeners.set(eventName, { listener, timer });
+  };
+
+  // TODO: Make protected
+  _clearEventTimerIfExists = eventName => {
+    const eventListener = this.#eventListeners.get(eventName);
+
+    if (!eventListener) {
+      console.warn(`A listener for event '${eventName}' isn't registered.`);
+      return;
+    }
+
+    const { timer } = eventListener;
+
+    if (!timer) return;
+
+    clearTimeout(timer);
   };
 
   unsubscribe = () => {
@@ -63,15 +94,15 @@ class Subscription {
 
   // TODO: Make protected
   _emitErrorEvent = (error, eventName) => {
-    const errorEvent = this.#eventListeners.get("error");
-    if (!errorEvent) {
+    const errorEventListener = this.#eventListeners.get("error");
+    if (!errorEventListener) {
       // Note: Throw error?
       console.warn(`Error emission without listener: ${error}`);
       return;
     }
 
     const message = { error, eventName };
-    errorEvent.listener(message);
+    errorEventListener.listener(message);
   };
 
   // TODO: Make protected
@@ -110,8 +141,9 @@ class TransactionSubscription extends Subscription {
   #txPromise;
   #provider;
   #tx;
-  #txConfirmed = false;
+  #txConfirmations = 0;
   #timeout = config.events.timeout;
+  #lastConfirmationTime;
 
   constructor(txPromise, provider) {
     // Provider implements EventEmitter API and it's enough
@@ -170,22 +202,48 @@ class TransactionSubscription extends Subscription {
           this.#tx.hash
         );
 
-        if (receipt !== null) {
-          this.#txConfirmed = true;
-        } else {
-          if (this.#txConfirmed)
-            this._emitErrorEvent(
-              new Error(`Your message has been included in an uncle block.`),
-              eventName
-            );
+        const blockReorgOccurred =
+          (receipt === null && this.#txConfirmations > 0) ||
+          (receipt !== null && receipt.confirmations <= this.#txConfirmations);
 
-          return;
+        if (blockReorgOccurred) {
+          this._emitErrorEvent(
+            new Error(`Your message has been included in an uncle block.`),
+            eventName
+          );
         }
 
+        if (receipt === null) {
+          this.#txConfirmations = 0;
+          return;
+        }
+          
+        this._clearEventTimerIfExists(eventName);
+          
+        this.#lastConfirmationTime = Date.now();
+          
+        const timer = setTimeout(() => {
+          const currentTime = Date.now();
+          const timedOut =
+            currentTime - this.#lastConfirmationTime >= this.getEventsTimeout();
+
+          if (timedOut) {
+            this._emitErrorEvent(
+              new Error(`Event ${eventName} reached timeout.`),
+              eventName
+            );
+          }
+        }, this.getEventsTimeout());
+
+        this._setEventTimer(eventName, timer);
+
         const { confirmations } = receipt;
+
+        this.#txConfirmations = confirmations;
+
         const message = {
           data: {
-            confirmations: confirmations,
+            confirmations,
           },
         };
 
@@ -199,15 +257,6 @@ class TransactionSubscription extends Subscription {
     };
 
     this._addEventListener(eventName, ethersListener);
-
-    // Which condition should  be true to emit an error?
-    // Timeout example: https://github.com/ethers-io/ethers.js/issues/283#issuecomment-423248566
-    setTimeout(() => {
-      this._emitErrorEvent(
-        new Error(`Event ${eventName} reached timeout.`),
-        eventName
-      );
-    }, this.getEventsTimeout());
   };
 
   // Tech debt
@@ -217,6 +266,11 @@ class TransactionSubscription extends Subscription {
   waitForNonceToUpdate = async () => {
     const tx = await this.#txPromise;
     await this.#provider.waitForTransaction(tx.hash);
+  };
+
+  // For testing purposes
+  refreshProvider = () => {
+    this.#provider = ProviderFactory.getProvider();
   };
 }
 
