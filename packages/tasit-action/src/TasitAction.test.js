@@ -286,14 +286,14 @@ describe("TasitAction.Contract", () => {
 
       txSubscription.on("error", errorListener);
 
-      await mineBlocks(provider, 10);
+      await mineBlocks(provider, 1);
 
       // TODO: Use fake timer when Sinon/Lolex supports it.
       // See more:
       //  https://github.com/sinonjs/sinon/issues/1739
       //  https://github.com/sinonjs/lolex/issues/114
       //  https://stackoverflow.com/a/50785284
-      await wait(200);
+      await wait(txSubscription.getEventsTimeout() * 2);
 
       expect(errorFn.called).to.be.true;
       expect(confirmationFn.called).to.be.true;
