@@ -400,7 +400,14 @@ describe("TasitAction.Contract", () => {
         errorFn();
       };
 
+      const anotherTxSubscription = simpleStorage.setValue("hey earth");
+      await anotherTxSubscription.waitForNonceToUpdate();
+
+      await mineBlocks(provider, 1);
+
       txSubscription = simpleStorage.setValue("hello world");
+
+      await mineBlocks(provider, 14);
 
       txSubscription.on("error", errorListener);
 
