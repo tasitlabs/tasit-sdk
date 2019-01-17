@@ -65,6 +65,8 @@ describe("TasitAction.Contract", () => {
   });
 
   afterEach("revert blockchain snapshot", async () => {
+    await mineBlocks(provider, 1);
+
     if (contractSubscription) {
       contractSubscription.unsubscribe();
 
@@ -181,8 +183,20 @@ describe("TasitAction.Contract", () => {
 
     it("should change contract state and trigger confirmation event one time", async () => {
       txSubscription = simpleStorage.setValue(rand);
+
+      // Waiting for 1st confirmation
+      // For now ganache always mine a block after transaction creation
+      // To avoid non-determinism it's recommended to wait that first confirmation if it could affect the test case result
+      // See more: https://github.com/trufflesuite/ganache-core/issues/248#issuecomment-455354557
+      await txSubscription.waitForNonceToUpdate();
+
       const confirmationFakeFn = sinon.fake();
       const errorFakeFn = sinon.fake();
+
+      const errorListener = message => {
+        const { error, eventName } = message;
+        errorFakeFn();
+      };
 
       const confirmationListener = async message => {
         const { data } = message;
@@ -194,16 +208,11 @@ describe("TasitAction.Contract", () => {
         expect(value).to.equal(rand);
       };
 
-      txSubscription.once("confirmation", confirmationListener);
-
-      const errorListener = message => {
-        const { error, eventName } = message;
-        errorFakeFn();
-      };
-
       txSubscription.on("error", errorListener);
 
-      await mineBlocks(provider, 15);
+      txSubscription.once("confirmation", confirmationListener);
+
+      await mineBlocks(provider, 2);
 
       expect(confirmationFakeFn.callCount).to.equal(1);
       expect(errorFakeFn.called).to.be.false;
@@ -215,9 +224,17 @@ describe("TasitAction.Contract", () => {
 
     it("should change contract state and trigger confirmation event", async () => {
       txSubscription = simpleStorage.setValue(rand);
-      const fakeFn = sinon.fake();
 
-      const listener = async message => {
+      await txSubscription.waitForNonceToUpdate();
+
+      const confirmationFakeFn = sinon.fake();
+      const errorFakeFn = sinon.fake();
+
+      const errorListener = message => {
+        errorFakeFn();
+      };
+
+      const confirmationListener = async message => {
         const { data } = message;
         const { confirmations } = data;
 
@@ -226,48 +243,62 @@ describe("TasitAction.Contract", () => {
 
           const value = await simpleStorage.getValue();
           expect(value).to.equal(rand);
-
-          fakeFn();
         }
+        confirmationFakeFn();
       };
 
-      txSubscription.on("confirmation", listener);
+      txSubscription.on("error", errorListener);
+      txSubscription.on("confirmation", confirmationListener);
 
-      await mineBlocks(provider, 15);
+      await mineBlocks(provider, 6);
 
-      // not exactly 7 because block mining is faster than polling
-      expect(fakeFn.callCount).to.be.at.most(7);
+      expect(confirmationFakeFn.callCount).to.equal(6);
+      expect(errorFakeFn.called).to.be.false;
     });
 
     it("should change contract state and trigger confirmation event - late subscription", async () => {
       txSubscription = simpleStorage.setValue(rand);
-      const fakeFn = sinon.fake();
 
-      const listener = async message => {
+      await txSubscription.waitForNonceToUpdate();
+
+      await mineBlocks(provider, 5);
+
+      const confirmationFakeFn = sinon.fake();
+      const errorFakeFn = sinon.fake();
+
+      const errorListener = message => {
+        errorFakeFn();
+      };
+
+      const confirmationListener = async message => {
         const { data } = message;
         const { confirmations } = data;
 
-        if (confirmations >= 7) {
+        if (confirmations == 7) {
           txSubscription.off("confirmation");
 
           const value = await simpleStorage.getValue();
           expect(value).to.equal(rand);
-          fakeFn();
+
+          confirmationFakeFn();
         }
       };
 
-      txSubscription.on("confirmation", listener);
+      txSubscription.on("error", errorListener);
+      txSubscription.on("confirmation", confirmationListener);
 
-      await mineBlocks(provider, 20);
+      await mineBlocks(provider, 2);
 
-      await txSubscription.waitForNonceToUpdate();
-
-      expect(fakeFn.called).to.be.true;
+      expect(confirmationFakeFn.called).to.be.true;
+      expect(confirmationFakeFn.callCount).to.equal(1);
+      expect(errorFakeFn.called).to.be.false;
     });
 
     it("should call error listener after timeout", async () => {
       txSubscription = simpleStorage.setValue("hello world");
       txSubscription.setEventsTimeout(100);
+
+      await txSubscription.waitForNonceToUpdate();
 
       const errorFn = sinon.fake();
       const confirmationFn = sinon.fake();
@@ -372,13 +403,13 @@ describe("TasitAction.Contract", () => {
 
       txSubscription.on("error", errorListener);
 
-      await mineBlocks(provider, 10);
+      await mineBlocks(provider, 2);
 
       expect(confirmationFn.called).to.be.true;
 
       await revertFromSnapshot(provider, snapshotId);
 
-      await mineBlocks(provider, 10);
+      await mineBlocks(provider, 2);
 
       // Note: Transaction no longer exists
       // If it isn't unset, afterEach hook will execute waitForNonceToUpdate forever
@@ -414,15 +445,17 @@ describe("TasitAction.Contract", () => {
 
       txSubscription = simpleStorage.setValue("hello world");
 
+      await txSubscription.waitForNonceToUpdate();
+
       txSubscription.on("error", errorListener);
 
       txSubscription.on("confirmation", confirmationListener);
 
-      await mineBlocks(provider, 5);
+      await mineBlocks(provider, 1);
 
       const snapshotId = await createSnapshot(provider);
 
-      await mineBlocks(provider, 20);
+      await mineBlocks(provider, 2);
 
       expect(confirmationFn.called).to.be.true;
 
@@ -432,7 +465,7 @@ describe("TasitAction.Contract", () => {
       // receipt.confirmations as before snapshot reversion
       txSubscription.refreshProvider();
 
-      await mineBlocks(provider, 15);
+      await mineBlocks(provider, 2);
 
       // not always on the first new block because of pollingInterval vs blockTime issue
       // but the first poll after that 15 new blocks is emitting error event
@@ -453,7 +486,6 @@ describe("TasitAction.Contract", () => {
       const errorFakeFn = sinon.fake();
 
       const errorListener = message => {
-        console.log(message);
         const { error, eventName } = message;
         errorFakeFn();
       };
@@ -476,7 +508,6 @@ describe("TasitAction.Contract", () => {
       });
 
       contractSubscription.off("error");
-      contractSubscription.off("ValueChanged");
 
       expect(errorFakeFn.called).to.be.false;
       expect(fakeFn.callCount).to.equal(1);
@@ -489,7 +520,6 @@ describe("TasitAction.Contract", () => {
       const errorFakeFn = sinon.fake();
 
       const errorListener = message => {
-        console.log(message);
         const { error, eventName } = message;
         errorFakeFn();
       };
@@ -527,12 +557,8 @@ describe("TasitAction.Contract", () => {
     it("subscription should have one listener per event", async () => {
       contractSubscription = simpleStorage.subscribe();
 
-      const listener1 = message => {
-        console.log("1");
-      };
-      const listener2 = message => {
-        console.log("2");
-      };
+      const listener1 = message => {};
+      const listener2 = message => {};
 
       expect(contractSubscription.subscribedEventNames()).to.be.empty;
 

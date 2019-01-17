@@ -19,6 +19,12 @@ const mineOneBlock = async provider => {
 export const mineBlocks = async (provider, n) => {
   for (let i = 0; i < n; i++) {
     await mineOneBlock(provider);
+
+    // Forcing blocktime > pollingInterval
+    // Without that some undesired behavior occurs
+    // E.g.: Same listener receiving tx confirmation several times
+    // See more: https://github.com/ethers-io/ethers.js/issues/393
+    await wait(provider.pollingInterval * 2);
   }
 };
 
