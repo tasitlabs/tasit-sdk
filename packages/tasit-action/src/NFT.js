@@ -7,38 +7,13 @@ class ABIs {
   };
 }
 
-export class NFT {
+export class NFT extends Contract {
   #contract;
-  #abi;
 
   constructor(address, wallet) {
-    this.#abi = ABIs.getERC721Full();
-    this.#contract = new Contract(address, this.#abi, wallet);
-    this.#addFunctionsToNFT();
+    const abi = ABIs.getERC721Full();
+    super(address, abi, wallet);
   }
-
-  getAddress = () => {
-    return this.#contract.getAddress();
-  };
-
-  subscribe = () => {
-    return this.#contract.subscribe();
-  };
-
-  #addFunctionsToNFT = () => {
-    this.#abi
-      .filter(json => {
-        return json.type === "function";
-      })
-      .forEach(f => {
-        this[f.name] = this.#contract[f.name];
-      });
-  };
-
-  // For testing purposes
-  getProvider = () => {
-    return this.#contract.getProvider();
-  };
 }
 
 export default NFT;

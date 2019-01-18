@@ -1,6 +1,6 @@
 import NFT from "./NFT";
 
-// Note: Under the current `tasit-contracts` setup SimpleNFT aways will deployed with this address
+// Note: Under the current `tasit-contracts` setup FullNFT aways will deployed with this address
 // See https://github.com/tasitlabs/TasitSDK/issues/138
 const fullNFTAddress = "0x0E86f209729bf54763789CDBcA9E8b94f0FD5333";
 
