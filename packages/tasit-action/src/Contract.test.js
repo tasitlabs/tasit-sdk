@@ -1,4 +1,4 @@
-import { Contract } from "./TasitAction";
+import Contract from "./Contract";
 import Account from "tasit-account";
 import chai, { expect } from "chai";
 chai.use(require("chai-as-promised"));
