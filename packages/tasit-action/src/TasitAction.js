@@ -141,16 +141,22 @@ class TransactionSubscription extends Subscription {
   #txPromise;
   #provider;
   #tx;
-  #txConfirmations = 0;
-  #timeout = config.events.timeout;
+  #txConfirmations;
+  #timeout;
   #lastConfirmationTime;
 
   constructor(txPromise, provider) {
     // Provider implements EventEmitter API and it's enough
     //  to handle with transactions events
     super(provider);
+
+    const { events } = config;
+    const { timeout } = events;
+
+    this.#timeout = timeout;
     this.#txPromise = txPromise;
     this.#provider = provider;
+    this.#txConfirmations = 0;
   }
 
   on = (eventName, listener) => {
@@ -170,10 +176,10 @@ class TransactionSubscription extends Subscription {
   };
 
   #addListener = (eventName, listener, once) => {
-    const triggers = ["confirmation", "error"];
+    const events = ["confirmation", "error"];
 
-    if (!triggers.includes(eventName))
-      throw new Error(`Invalid listener trigger, use: [${triggers}]`);
+    if (!events.includes(eventName))
+      throw new Error(`Invalid event, use: [${events}]`);
 
     if (eventName === "error" && once)
       throw new Error(`Use on() function to subscribe to an error event.`);
@@ -181,7 +187,9 @@ class TransactionSubscription extends Subscription {
     if (!listener || typeof listener !== "function")
       throw new Error(`Cannot listen without a function`);
 
-    if (eventName === "error") {
+    if (eventName !== "error" && eventName !== "confirmation") {
+      throw new Error(`Invalid event '${event}'.`);
+    } else if (eventName === "error") {
       this._addErrorListener(listener);
     } else if (eventName === "confirmation") {
       this.#addConfirmationListener(listener, once);
