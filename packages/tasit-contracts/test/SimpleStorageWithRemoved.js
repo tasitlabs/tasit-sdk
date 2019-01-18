@@ -1,4 +1,4 @@
-const SimpleStorage = artifacts.require("./SimpleStorage.sol");
+const SimpleStorage = artifacts.require("./SimpleStorageWithRemoved.sol");
 // Note: It will probably be a point of confusion for new developers
 // coming to this project that they'll have to get used to the web3.js
 // API for writing truffle tests but then use the ethers.js API and our
