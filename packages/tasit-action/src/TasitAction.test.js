@@ -388,7 +388,7 @@ describe("TasitAction.Contract", () => {
 
         // Note: This assertion will not fail the test case (UnhandledPromiseRejectionWarning)
         expect(error.message).to.equal(
-          "Your action has been included in an uncle block."
+          "Your action's position in the chain has changed in a surprising way."
         );
 
         // But asserting fake function, if that throws, test case will fail.
