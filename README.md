@@ -175,15 +175,17 @@ Have a strong opinion on which onboarding flow we should prioritize the most? Pl
 
 #### Configurable JSON-RPC client
 
-We realize that different developers have different takes on whether it's an acceptable compromise to use Infura in the way that MetaMask does in the browser or whether a local Ethereum light client is warranted more like in the original version of Status or Augur. We anticipate that in the short term, almost all developers using this SDK will use Infura. It's a centralized compromise solution for now. We leave the JSON-RPC provider configurable so that the SDK doesn't take an opinionated stance on this for now.
+We realize that different developers have different takes on whether it's an acceptable compromise to use Infura in the way that MetaMask does in the browser or whether a local Ethereum light client is warranted more like in the original version of Status or Augur. We anticipate that in the short term, almost all developers using this SDK will use Infura. It's a good stopgap solution for now.
 
-[`tasit-action` is the child package](/packages/tasit-action/) that implements these features for the Tasit SDK.
+We leave the JSON-RPC provider configurable so that the SDK doesn't take an opinionated stance on this.
 
 There are a couple projects working to make it simple to spin up your own high-availability, high-performance JSON-RPC client(s) (including Infura) or to use a decentralized and incentivized network of full nodes, so that should decentralize things a bit until we get to Serenity. See [DAppNode](https://dappnode.io/), [denode](https://github.com/ChainSafeSystems/denode), [Vipnode](https://vipnode.org/), and [Incubed](https://slock.it/incubed.html) by slock.it.
 
+[`tasit-action` is the child package](/packages/tasit-action/) that implements these features for the Tasit SDK.
+
 ##### In the future
 
-We have no plans until Serenity to make a special abstraction for running a local light geth node like Status did originally. The Tasit SDK works with whatever JSON-RPC client you point it at, but we won't be adding an abstraction for using a light client within the native mobile dapp until Serenity. People have had too many issues with this on mobile (dropped network connections, using all disk space, battery usage, etc.
+We have no plans until Serenity to make a special abstraction for running a local light geth node like Status did originally. The Tasit SDK works with whatever JSON-RPC client you point it at, but we won't be adding an abstraction for using a light client within the native mobile dapp until Serenity. People have had too many issues with this on mobile: dropped network connections, using all disk space, battery usage, etc.
 
 Looking towards the future, light and ultralight client projects we're tracking for first-class support in this SDK include:
 
