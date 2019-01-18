@@ -4,7 +4,7 @@ import NFT from "./NFT";
 // See https://github.com/tasitlabs/TasitSDK/issues/138
 const fullNFTAddress = "0x0E86f209729bf54763789CDBcA9E8b94f0FD5333";
 
-describe.only("TasitAction.NFT", () => {
+describe("TasitAction.NFT", () => {
   let fullNFT;
 
   beforeEach("should connect to an existing contract", async () => {
