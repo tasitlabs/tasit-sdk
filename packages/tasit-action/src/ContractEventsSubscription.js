@@ -1,6 +1,6 @@
 import Subscription from "./Subscription";
 
-class ContractSubscription extends Subscription {
+class ContractEventsSubscription extends Subscription {
   #contract;
 
   // Note: We're considering listening multiple events at once
@@ -71,4 +71,4 @@ class ContractSubscription extends Subscription {
   };
 }
 
-export default ContractSubscription;
+export default ContractEventsSubscription;

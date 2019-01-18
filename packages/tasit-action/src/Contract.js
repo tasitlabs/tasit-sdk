@@ -5,7 +5,7 @@ import { ethers } from "ethers";
 const config = require("config");
 import Utils from "./Utils";
 import ProviderFactory from "./ProviderFactory";
-import ContractSubscription from "./ContractSubscription";
+import ContractEventsSubscription from "./ContractEventsSubscription";
 import TransactionSubscription from "./TransactionSubscription";
 
 export class Contract {
@@ -47,7 +47,7 @@ export class Contract {
   };
 
   subscribe = () => {
-    const subscription = new ContractSubscription(this.#contract);
+    const subscription = new ContractEventsSubscription(this.#contract);
     return subscription;
   };
 
