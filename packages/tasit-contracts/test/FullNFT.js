@@ -21,6 +21,6 @@ contract("FullNFT", function(accounts) {
 
     const symbol = await fullNFT.symbol();
 
-    assert.equal(symbol, "FNFT", "FNFT! isn't the NFT symbol.");
+    assert.equal(symbol, "FNFT", "FNFT isn't the NFT symbol.");
   });
 });
