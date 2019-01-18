@@ -13,7 +13,7 @@ contract("FullNFT", function(accounts) {
 
     const name = await fullNFT.name();
 
-    assert.equal(name, "Full NFT", "Full NFT! isn't the NFT name.");
+    assert.equal(name, "Full NFT", "Full NFT isn't the NFT name.");
   });
 
   it("should get the NFT symbol", async function() {
