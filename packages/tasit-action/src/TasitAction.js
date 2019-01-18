@@ -137,6 +137,8 @@ class Subscription {
   };
 }
 
+// Note: If this class will be used to handle with meta-tx too,
+//  that's should be renamed to ActionSubscription.
 class TransactionSubscription extends Subscription {
   #txPromise;
   #provider;
@@ -213,7 +215,7 @@ class TransactionSubscription extends Subscription {
 
         if (blockReorgOccurred) {
           this._emitErrorEvent(
-            new Error(`Your message has been included in an uncle block.`),
+            new Error(`Your action's position in the chain has changed in a surprising way.`),
             eventName
           );
         }
