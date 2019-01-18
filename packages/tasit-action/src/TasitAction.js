@@ -141,16 +141,22 @@ class TransactionSubscription extends Subscription {
   #txPromise;
   #provider;
   #tx;
-  #txConfirmations = 0;
-  #timeout = config.events.timeout;
+  #txConfirmations;
+  #timeout;
   #lastConfirmationTime;
 
   constructor(txPromise, provider) {
     // Provider implements EventEmitter API and it's enough
     //  to handle with transactions events
     super(provider);
+
+    const { events } = config;
+    const { timeout } = events;
+
+    this.#timeout = timeout;
     this.#txPromise = txPromise;
     this.#provider = provider;
+    this.#txConfirmations = 0;
   }
 
   on = (eventName, listener) => {
