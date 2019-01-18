@@ -215,7 +215,7 @@ class TransactionSubscription extends Subscription {
 
         if (blockReorgOccurred) {
           this._emitErrorEvent(
-            new Error(`Your action has been included in an uncle block.`),
+            new Error(`Your action's position in the chain has changed in a surprising way.`),
             eventName
           );
         }
