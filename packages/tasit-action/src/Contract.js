@@ -138,7 +138,7 @@ class Subscription {
 }
 
 // Note: If this class will be used to handle meta-tx too,
-//  that's should be renamed to ActionSubscription.
+//  it should be renamed to ActionSubscription.
 class TransactionSubscription extends Subscription {
   #txPromise;
   #provider;
