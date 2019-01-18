@@ -102,9 +102,9 @@ describe("TasitAction.Contract", () => {
       }).to.throw();
     });
 
-    it("constructor with invalid address", async () => {
+    it("constructor without address but with ABI", async () => {
       expect(() => {
-        new Contract("invalid address");
+        new Contract(null, contractABI);
       }).to.throw();
     });
 
