@@ -1,14 +1,5 @@
 import Contract from "./Contract";
 import Account from "tasit-account";
-import chai, { expect } from "chai";
-chai.use(require("chai-as-promised"));
-import sinon from "sinon";
-import {
-  mineBlocks,
-  createSnapshot,
-  revertFromSnapshot,
-  wait,
-} from "./testHelpers/helpers";
 
 // Note:  Using dist file because babel doesn't compile node_modules files.
 // Any changes on src should be followed by compilation to avoid unexpected behaviors.
