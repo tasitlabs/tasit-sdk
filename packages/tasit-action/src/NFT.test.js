@@ -43,7 +43,6 @@ describe("TasitAction.NFT", () => {
     provider = fullNFT.getProvider();
 
     snapshotId = await createSnapshot(provider);
-    expect(snapshotId).to.equal("0x1");
   });
 
   afterEach("", async () => {
