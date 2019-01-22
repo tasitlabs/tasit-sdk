@@ -46,7 +46,7 @@ describe("TasitAction.NFT", () => {
   });
 
   afterEach("", async () => {
-    // This line avoid that a new event listener catch an existing event from last the block
+    // This line ensures that a new event listener does not catch an existing event from last the block
     await mineBlocks(provider, 1);
 
     expect(provider._events, "ethers.js should not be listening to any events.")
