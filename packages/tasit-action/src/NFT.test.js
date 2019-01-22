@@ -14,7 +14,7 @@ describe("TasitAction.NFT", () => {
     txSubscription,
     contractSubscription;
 
-  before("", () => {
+  before("", async () => {
     owner = createFromPrivateKey(
       "0x11d943d7649fbdeb146dc57bd9cfc80b086bfab2330c7b25651dbaf382392f60"
     );
@@ -29,10 +29,6 @@ describe("TasitAction.NFT", () => {
   });
 
   beforeEach("", async () => {
-    if (txSubscription) {
-      expect(txSubscription.subscribedEventNames()).to.be.empty;
-    }
-
     txSubscription = undefined;
     contractSubscription = undefined;
 
@@ -45,12 +41,22 @@ describe("TasitAction.NFT", () => {
     expect(fullNFT.getProvider()).to.exist;
 
     provider = fullNFT.getProvider();
+
     snapshotId = await createSnapshot(provider);
+    expect(snapshotId).to.equal("0x1");
   });
 
   afterEach("", async () => {
+    // This line avoid that a new event listener catch an existing event from last the block
+    await mineBlocks(provider, 1);
+
+    expect(provider._events, "ethers.js should not be listening to any events.")
+      .to.be.empty;
+
     if (contractSubscription) {
       contractSubscription.unsubscribe();
+
+      expect(contractSubscription.subscribedEventNames()).to.be.empty;
 
       expect(
         contractSubscription.getEmitter()._events,
@@ -62,13 +68,14 @@ describe("TasitAction.NFT", () => {
       await txSubscription.waitForNonceToUpdate();
       txSubscription.unsubscribe();
 
+      expect(txSubscription.subscribedEventNames()).to.be.empty;
+
       expect(
         txSubscription.getEmitter()._events,
         "ethers.js should not be listening to any events."
       ).to.be.empty;
     }
 
-    console.log(`reverting from snapshotId: ${snapshotId}`);
     await revertFromSnapshot(provider, snapshotId);
   });
 
@@ -116,6 +123,8 @@ describe("TasitAction.NFT", () => {
         }, 1000);
       });
 
+      contractSubscription.off("Transfer");
+
       expect(event.from).to.equal(zeroAddress);
       expect(event.to).to.equal(ana.address);
       expect(event.tokenId.eq(tokenId)).to.be.true;
@@ -127,13 +136,13 @@ describe("TasitAction.NFT", () => {
     it("should transfer an owned token", async () => {
       let senderBalance, receiverBalance;
 
+      fullNFT = new NFT(fullNFTAddress, ana);
+
       senderBalance = await fullNFT.balanceOf(ana.address);
       expect(senderBalance.toNumber()).to.equal(1);
 
       receiverBalance = await fullNFT.balanceOf(bob.address);
       expect(receiverBalance.toNumber()).to.equal(0);
-
-      fullNFT.setWallet(ana);
 
       contractSubscription = fullNFT.subscribe();
 
@@ -163,7 +172,7 @@ describe("TasitAction.NFT", () => {
     });
 
     it("should transfer an approved token", async () => {
-      fullNFT.setWallet(ana);
+      fullNFT = new NFT(fullNFTAddress, ana);
 
       txSubscription = fullNFT.approve(bob.address, tokenId);
 
