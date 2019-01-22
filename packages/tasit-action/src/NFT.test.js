@@ -68,6 +68,7 @@ describe("TasitAction.NFT", () => {
       ).to.be.empty;
     }
 
+    console.log(`reverting from snapshotId: ${snapshotId}`);
     await revertFromSnapshot(provider, snapshotId);
   });
 
@@ -91,31 +92,17 @@ describe("TasitAction.NFT", () => {
     expect(name).to.equal("Full NFT");
   });
 
-  describe("ERC721 functions", () => {
+  describe.only("ERC721 functions", () => {
     const tokenId = 1;
+    const zeroAddress = "0x0000000000000000000000000000000000000000";
 
-    beforeEach("should mint one token to owner", async () => {
-      const balanceBefore = await fullNFT.balanceOf(owner.address);
-      expect(toBN(balanceBefore)).to.be.bignumber.equal(toBN(0));
-
-      txSubscription = fullNFT.mint(owner.address, tokenId);
-      await txSubscription.waitForNonceToUpdate();
-
-      const balanceAfter = await fullNFT.balanceOf(owner.address);
-      expect(toBN(balanceAfter)).to.be.bignumber.equal(toBN(1));
-    });
-
-    it("should transfer an owned token", async () => {
+    beforeEach("should mint one token to ana", async () => {
       const balanceBefore = await fullNFT.balanceOf(ana.address);
-      expect(toBN(balanceBefore)).to.be.bignumber.equal(toBN(0));
+      expect(balanceBefore.toNumber()).to.equal(0);
 
       contractSubscription = fullNFT.subscribe();
 
-      txSubscription = fullNFT.transferFrom(
-        owner.address,
-        ana.address,
-        tokenId
-      );
+      txSubscription = fullNFT.mint(ana.address, tokenId);
 
       const event = await new Promise(function(resolve, reject) {
         contractSubscription.on("Transfer", message => {
@@ -123,36 +110,76 @@ describe("TasitAction.NFT", () => {
           const { args } = data;
           resolve(args);
         });
+
+        setTimeout(() => {
+          reject(new Error("timeout"));
+        }, 1000);
       });
 
-      expect(event.from).to.equal(owner.address);
+      expect(event.from).to.equal(zeroAddress);
       expect(event.to).to.equal(ana.address);
-      expect(toBN(event.tokenId)).to.be.bignumber.equal(toBN(tokenId));
+      expect(event.tokenId.eq(tokenId)).to.be.true;
 
       const balanceAfter = await fullNFT.balanceOf(ana.address);
-      expect(toBN(balanceAfter)).to.be.bignumber.equal(toBN(1));
+      expect(balanceAfter.toNumber()).to.equal(1);
     });
 
-    it("should transfer an approved token", async () => {
-      txSubscription = fullNFT.approve(ana.address, tokenId);
+    it("should transfer an owned token", async () => {
+      let senderBalance, receiverBalance;
 
-      await txSubscription.waitForNonceToUpdate();
+      senderBalance = await fullNFT.balanceOf(ana.address);
+      expect(senderBalance.toNumber()).to.equal(1);
+
+      receiverBalance = await fullNFT.balanceOf(bob.address);
+      expect(receiverBalance.toNumber()).to.equal(0);
 
       fullNFT.setWallet(ana);
 
-      const balanceBefore = await fullNFT.balanceOf(ana.address);
-      expect(toBN(balanceBefore)).to.be.bignumber.equal(toBN(0));
+      contractSubscription = fullNFT.subscribe();
 
-      txSubscription = fullNFT.transferFrom(
-        owner.address,
-        ana.address,
-        tokenId
-      );
+      txSubscription = fullNFT.transferFrom(ana.address, bob.address, tokenId);
+
+      const event = await new Promise(function(resolve, reject) {
+        contractSubscription.on("Transfer", message => {
+          const { data } = message;
+          const { args } = data;
+          resolve(args);
+        });
+
+        setTimeout(() => {
+          reject(new Error("timeout"));
+        }, 1000);
+      });
+
+      expect(event.from).to.equal(ana.address);
+      expect(event.to).to.equal(bob.address);
+      expect(event.tokenId.toNumber()).to.equal(tokenId);
+
+      senderBalance = await fullNFT.balanceOf(ana.address);
+      expect(senderBalance.toNumber()).to.equal(0);
+
+      receiverBalance = await fullNFT.balanceOf(bob.address);
+      expect(receiverBalance.toNumber()).to.equal(1);
+    });
+
+    it("should transfer an approved token", async () => {
+      fullNFT.setWallet(ana);
+
+      txSubscription = fullNFT.approve(bob.address, tokenId);
 
       await txSubscription.waitForNonceToUpdate();
 
-      const balanceAfter = await fullNFT.balanceOf(ana.address);
-      expect(toBN(balanceAfter)).to.be.bignumber.equal(toBN(1));
+      fullNFT.setWallet(bob);
+
+      const balanceBefore = await fullNFT.balanceOf(bob.address);
+      expect(balanceBefore.toNumber()).to.equal(0);
+
+      txSubscription = fullNFT.transferFrom(ana.address, bob.address, tokenId);
+
+      await txSubscription.waitForNonceToUpdate();
+
+      const balanceAfter = await fullNFT.balanceOf(bob.address);
+      expect(balanceAfter.toNumber()).to.equal(1);
     });
   });
 });
