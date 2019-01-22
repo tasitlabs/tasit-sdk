@@ -92,7 +92,7 @@ describe("TasitAction.NFT", () => {
     expect(name).to.equal("Full NFT");
   });
 
-  describe.only("ERC721 functions", () => {
+  describe("ERC721 functions", () => {
     const tokenId = 1;
     const zeroAddress = "0x0000000000000000000000000000000000000000";
 
