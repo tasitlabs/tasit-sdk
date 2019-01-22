@@ -4,6 +4,8 @@ import "ethers/dist/shims.js";
 import { ethers } from "ethers";
 const config = require("config");
 
+const MAINNET = "mainnet";
+
 export class ProviderFactory {
   static getProvider = () => {
     const { provider } = config;
@@ -13,7 +15,7 @@ export class ProviderFactory {
 
   static getDefaultConfig = () => {
     return {
-      network: "mainnet",
+      network: MAINNET,
       provider: "fallback",
       pollingInterval: 4000,
       jsonRpc: {

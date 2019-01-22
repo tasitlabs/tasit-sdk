@@ -40,10 +40,21 @@ export const wait = async ms => {
   return new Promise(resolve => setTimeout(resolve, ms));
 };
 
+// Note: ethers created their own BigNumber type that encapsulates BN.js
+// Because of that, exists the need of extra parses between user and our API (see tests)
+// Should we:
+// - Try to intercept and parse ethers.BigNumber to BN.js (and vice-versa)?
+// or
+// - Exposes ethers.utils.BigNumber / bigNumberify()?
+export const toBN = ethersBN => {
+  return new BN(ethersBN.toString());
+};
+
 export default {
   waitForEthersEvent,
   mineBlocks,
   createSnapshot,
   revertFromSnapshot,
   wait,
+  toBN,
 };
