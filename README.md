@@ -116,7 +116,7 @@ npm install --save tasit-action
 ```
 
 ```javascript
-import Contract from "tasit-action";
+import { Contract } from "tasit-action";
 // ...
 ```
 
