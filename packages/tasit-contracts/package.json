@@ -17,8 +17,10 @@
     "url": "git+https://github.com/tasitlabs/tasitsdk.git"
   },
   "scripts": {
-    "compile": "npx truffle compile",
-    "migrate": "npx truffle migrate --reset",
+    "prepare": "npm run install:decentraland",
+    "migrate": "npx truffle migrate && npm run migrate:decentraland",
+    "install:decentraland": "./decentraland/scripts/install.sh `pwd`",
+    "migrate:decentraland": "./decentraland/scripts/migrate.sh `pwd`",
     "test": "npx truffle test"
   },
   "bugs": {

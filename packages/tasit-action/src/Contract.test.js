@@ -311,7 +311,7 @@ describe("TasitAction.Contract", () => {
       //  https://github.com/sinonjs/sinon/issues/1739
       //  https://github.com/sinonjs/lolex/issues/114
       //  https://stackoverflow.com/a/50785284
-      await wait(txSubscription.getEventsTimeout() * 2);
+      await wait(txSubscription.getEventsTimeout() * 3);
 
       expect(errorFn.called).to.be.true;
       expect(confirmationFn.called).to.be.true;
