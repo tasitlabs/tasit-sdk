@@ -1,5 +1,6 @@
 #!/bin/bash
 PROJECT_DIR=$1
+echo "-> PROJECT_DIR=$1"
 DECENTRALAND_DIR="$PROJECT_DIR/decentraland"
 
 # mana
