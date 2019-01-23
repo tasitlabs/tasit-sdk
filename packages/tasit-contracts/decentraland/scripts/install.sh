@@ -9,42 +9,26 @@ fi
 
 DECENTRALAND_DIR="$PROJECT_DIR/decentraland";
 
-# mana
-# Note: mana repository has no tags and there is no branch that can be used.
-REPO="mana"
+# Use list of repository_name:commit_hash
+REPOS="\
+    mana:f817fcab2c230bc2d2144ae85dff2bdc507ed659 \
+    land:4eab49235103b124aae948eca6f678bc9d30ad09 \
+    marketplace-contracts:190ab91887496da1677c41778832ff5a0c0c2ddb"
 
-REPO_DIR="$DECENTRALAND_DIR/$REPO";
 
-if [ ! -e "$REPO_DIR/package.json" ];
-then
-    rm -rf $REPO_DIR;
-    git clone https://github.com/decentraland/$REPO.git $REPO_DIR;
+for clone in $REPOS;
+do
+    REPO=`echo $clone | awk -F ':' '{print $1}'`
+    COMMIT=`echo $clone | awk -F ':' '{print $2}'`
+    REPO_DIR="$DECENTRALAND_DIR/$REPO";
+
+    if [ ! -e "$REPO_DIR/package.json" ];
+    then
+        rm -rf $REPO_DIR;
+        git clone https://github.com/decentraland/$REPO.git $REPO_DIR;
+        cd $REPO_DIR && git fetch origin $COMMIT && git reset --hard FETCH_HEAD
+
+    fi
+
     npm i --prefix $REPO_DIR;
-fi
-
-
-# land
-REPO="land"
-TAG="deploy/2018-08-31"
-
-REPO_DIR="$DECENTRALAND_DIR/$REPO";
-
-if [ ! -e "$REPO_DIR/package.json" ];
-then
-    rm -rf $REPO_DIR;
-    git clone -b $TAG https://github.com/decentraland/$REPO.git $REPO_DIR;
-    npm i --prefix $REPO_DIR;
-fi
-
-# marketplace-contracts
-REPO="marketplace-contracts"
-TAG="1.0.0"
-
-REPO_DIR="$DECENTRALAND_DIR/$REPO";
-
-if [ ! -e "$REPO_DIR/package.json" ];
-then
-    rm -rf $REPO_DIR;
-    git clone -b $TAG https://github.com/decentraland/$REPO.git $REPO_DIR;
-    npm i --prefix $REPO_DIR;
-fi
+done
