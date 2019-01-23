@@ -8,7 +8,7 @@ then
 fi
 
 DECENTRALAND_DIR="$PROJECT_DIR/decentraland";
-REPOS="mana land";
+REPOS="mana land marketplace-contracts";
 
 for repo in $REPOS;
 do

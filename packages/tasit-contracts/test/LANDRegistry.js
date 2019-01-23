@@ -1,5 +1,5 @@
 // Note:
-// Should we use ethers instead web3?
+// Should we use ethers instead of web3js?
 contract("LANDRegistry", function(accounts) {
   const abi = require("../decentraland/land/build/contracts/LANDRegistry.json")
     .abi;

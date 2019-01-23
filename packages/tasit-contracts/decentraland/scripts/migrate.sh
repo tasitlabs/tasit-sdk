@@ -15,3 +15,7 @@ cd $DECENTRALAND_DIR/mana && npx truffle migrate
 # land
 cp $DECENTRALAND_DIR/scripts/3_land_registry.js $DECENTRALAND_DIR/land/migrations
 cd $DECENTRALAND_DIR/land && npx truffle migrate --network livenet
+
+# marketplace-contracts
+cp $DECENTRALAND_DIR/scripts/3_marketplace.js $DECENTRALAND_DIR/marketplace-contracts/migrations
+cd $DECENTRALAND_DIR/marketplace-contracts && npx truffle migrate

@@ -1,5 +1,5 @@
 // Note:
-// Should we use ethers instead web3?
+// Should we use ethers instead of web3js?
 contract("MANAToken", function(accounts) {
   const abi = require("../decentraland/mana/build/contracts/MANAToken.json")
     .abi;
