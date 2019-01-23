@@ -1,7 +1,11 @@
+import BN from "bn.js";
+global.BN = BN;
+
 // Chai
 import chai, { expect } from "chai";
 global.expect = expect;
 chai.use(require("chai-as-promised"));
+chai.use(require("chai-bn")(BN));
 
 // Sinon
 import sinon from "sinon";
@@ -14,12 +18,14 @@ import {
   revertFromSnapshot,
   wait,
   waitForEthersEvent,
+  toBN,
 } from "./helpers";
 global.mineBlocks = mineBlocks;
 global.createSnapshot = createSnapshot;
 global.revertFromSnapshot = revertFromSnapshot;
 global.wait = wait;
 global.waitForEthersEvent = waitForEthersEvent;
+global.toBN = toBN;
 
 // External helpers
 //
