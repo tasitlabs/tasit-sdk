@@ -5,9 +5,10 @@ REPOS="mana land"
 
 for repo in $REPOS;
 do
-    if [ ! -d "$DECENTRALAND_DIR/$repo" ]; then
-        git clone https://github.com/decentraland/$repo.git $DECENTRALAND_DIR/$repo
-    fi
+    #if [ ! -d "$DECENTRALAND_DIR/$repo" ]; then
+    rm -rf $DECENTRALAND_DIR/$repo
+    git clone https://github.com/decentraland/$repo.git $DECENTRALAND_DIR/$repo
+    #fi
 
     npm i --prefix $DECENTRALAND_DIR/$repo
 done
