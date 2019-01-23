@@ -18,7 +18,7 @@
   },
   "scripts": {
     "prepare": "npm run install:decentraland",
-    "migrate": "rm build/contracts -rf && npx truffle migrate && npm run migrate:decentraland",
+    "migrate": "npx truffle migrate && npm run migrate:decentraland",
     "install:decentraland": "export PROJECT_DIR=`pwd`; ./decentraland/scripts/install.sh",
     "migrate:decentraland": "export PROJECT_DIR=`pwd`; ./decentraland/scripts/migrate.sh",
     "test": "npx truffle test"

@@ -1,7 +1,8 @@
 // Note:
 // Should we use ethers instead web3?
 contract("LANDRegistry", function(accounts) {
-  const abi = require("../build/contracts/LANDRegistry.json").abi;
+  const abi = require("../decentraland/land/build/contracts/LANDRegistry.json")
+    .abi;
   const address = "0x41b598a2c618b59b74540ac3afffb32f7971b37a";
 
   it("should get the LANDRegistry owner", async function() {
