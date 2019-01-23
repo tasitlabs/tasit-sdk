@@ -3,9 +3,9 @@ PROJECT_DIR=$1
 DECENTRALAND_DIR="$PROJECT_DIR/decentraland"
 
 echo "##########"
-echo "decentraland dir = $DECENTRALAND_DIR"
-echo "ls mana"
-ls $DECENTRALAND_DIR/mana
+echo "project_dir = $PROJECT_DIR"
+echo "ls project_dir"
+ls $PROJECT_DIR
 echo "##########"
 
 # mana
