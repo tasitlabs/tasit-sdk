@@ -1,8 +1,12 @@
 #!/bin/bash
 DECENTRALAND_DIR="$PROJECT_DIR/decentraland"
+REPOS="mana land"
 
-if [ ! -d "$DECENTRALAND_DIR/mana" ]; then
-    git clone https://github.com/decentraland/mana.git $DECENTRALAND_DIR/mana
-fi
+for repo in $REPOS;
+do
+    if [ ! -d "$DECENTRALAND_DIR/$repo" ]; then
+        git clone https://github.com/decentraland/$repo.git $DECENTRALAND_DIR/$repo
+    fi
 
-npm i --prefix $DECENTRALAND_DIR/mana
+    npm i --prefix $DECENTRALAND_DIR/$repo
+done
