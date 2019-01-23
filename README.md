@@ -22,6 +22,8 @@ You might want to jump ahead to the "why" sections to start:
 
 - [Why (from a developer's / Ethereum enthusiast’s perspective)?](#why-from-a-developers--ethereum-enthusiasts-perspective)
 
+- [Why React Native?](#why-react-native)
+
 ### Table of contents
 
 [Getting started](#getting-started)
@@ -67,8 +69,8 @@ In `App.js` or the appropriate React Native component, import whichever APIs you
 
 ```javascript
 import { Account } from "tasit-sdk";
-const wallet = Account.create();
-console.log(wallet.address); // '0x...'
+const ephemeralWallet = Account.create();
+console.log(ephemeralWallet.address); // '0x...'
 // ...
 ```
 
@@ -78,13 +80,19 @@ Are you starting a project from scratch? Let the Tasit CLI (installed automatica
 
 Just run `npx tasit init` to automatically generate the scaffolding for a mobile dapp project.
 
-Alternatively, for popular ERC standards like ERC-721 for NFTs, you can even run `npx tasit init --nft` to instantly create a standalone mobile dapp for CryptoKitties, Decentraland, etc.
+Alternatively, for popular ERC standards like ERC-721 for NFTs, you can even run:
+
+```
+npx tasit init --nft
+```
+
+...to instantly create a standalone mobile dapp for CryptoKitties, Decentraland, etc.
 
 This app scaffold comes ready to submit for beta testing on iOS with Testflight and on Android with Google Play Beta track, so you can focus on the core features of your dapp like you would do on the web.
 
 #### Modular
 
-The Tasit SDK is designed with modularity in mind. Are you only planning on using the Tasit SDK for generating an Ethereum acccount in your app? That works too!
+The Tasit SDK is designed with modularity in mind. Are you only planning on using the Tasit SDK for generating an ephemeral Ethereum acccount in your app? That works too!
 
 You can install `tasit-account` directly and keep your app's dependencies leaner.
 
@@ -100,6 +108,18 @@ import Account from "tasit-account";
 ```
 
 ...with the rest of the code remaining the same.
+
+Or maybe you just want to use the simple abstraction for interacting with smart contracts. Then just install `tasit-action` directly instead.
+
+```
+npm install --save tasit-action
+```
+
+```javascript
+import Contract from "tasit-action";
+// ...
+```
+
 
 ### Features
 
@@ -223,23 +243,37 @@ Today, using a dapp from a phone is painful. Almost no dapps have standalone mob
 
 The idea is that the Tasit SDK would be used by many different mobile apps on a user's device. Once the Tasit SDK is around, more dapps will have dedicated mobile apps. This will remove a key barrier to mainstream adoption of Ethereum dapps.
 
+##### Right to exit for users
+
+A single company's financial incentives determining how a software product works is a bummer for users. See Facebook's newsfeed changing to clickbait, or see Twitter users clamoring for simple changes to the product like spambot or harassment detection to no avail.
+
 #### Why (from a developer's / Ethereum enthusiast's perspective)?
 
 The user-facing answer for "Why?" focused on the UX/product, since that's the main thing that mainstream users care about. Here we'll touch on more technical/ideological arguments for why it's important that the Ethereum community creates more mobile dapps.
 
-One major reason most dapps don’t have standalone mobile apps today is because it’s hard for developers to build mobile Ethereum dapps. There isn’t much good tooling for it. Most developers building interesting new mobile apps these days use React Native to automatically support both iOS and Android, but there is little-to-no tooling for Ethereum in the React Native ecosystem. The Tasit SDK provides that tooling.
+One major reason most dapps don’t have standalone mobile apps today is because it’s hard for developers to build mobile Ethereum dapps. There isn’t much good tooling for it. This SDK provides that tooling so that developers can focus on the "business logic" for their dapp.
 
-The web-based front ends for most dapps these days are written with React, so using React Native for the native mobile version is a natural fit.
+Developers shouldn't need to reinvent the wheel for each new dapp: account and private key generation, linking to another wallet or adding meta-transaction support, etc. Let the Tasit SDK handle those parts for you.
 
-Developers shouldn't need to reinvent the wheel for each new dapp: account and private key generation, linking to another wallet or adding meta-transaction support, etc. Let the Tasit SDK handle that bit and focus on the business logic for your dapp.
+There's no reason building an Ethereum dapp should feel much different for the front-end developer than building an app using Firebase as the back end - with the Tasit SDK, that's the case.
+
+If you want to see the Ethereum ecosystem grow, mobile is critical for making that happen, because that's where all the users are.
 
 ##### Proof of decentralization
 
-Tasit will serve as "proof of decentralization" for the dapps we support. Vitalik tweeted 'One simple litmus test for whether or not a blockchain project is truly decentralized: can a third party independently make a client for it, and do everything that the "official" client can?'. It's time for major decoupling of "back end" and front end.
+Tasit will serve as "proof of decentralization" for the dapps we support. Vitalik Buterin once tweeted 'One simple litmus test for whether or not a blockchain project is truly decentralized: can a third party independently make a client for it, and do everything that the "official" client can?'. We agree. It's time for major decoupling of "back end" and front end.
 
-##### Right to exit for users
+##### No platform risk
 
-A single company's financial incentives determining how a software product works is a bummer for users. See Facebook's newsfeed changing to clickbait, or see Twitter users clamoring for simple changes to the product like spambot or harassment detection to no avail.
+What's unique about the Ethereum ecosystem is that making a 3rd-party client is fully permissionless and interoperable, which means there's no risk that the developers of a smart contract can suddenly "throttle" users of their "API" in the way that would have been possible in web 2.0.
+
+#### Why React Native?
+
+The web-based front ends for most dapps these days are written with React, so using React Native for the native mobile version is a natural fit.
+
+It's a common misconception that React Native is good for prototyping but not production - this isn't true! It's out of scope for this README to go into that, but we'd recommend doing some research to decide for yourself (setting aside any preconceived notions you may have first).
+
+Most younger developers building interesting new mobile apps these days use React Native (and often Expo) to automatically support both iOS and Android, but there is little-to-no tooling for Ethereum in the React Native ecosystem.
 
 ### Contact us
 
