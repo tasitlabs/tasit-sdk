@@ -1,14 +1,24 @@
 #!/bin/bash
-PROJECT_DIR=$1
-DECENTRALAND_DIR="$PROJECT_DIR/decentraland"
-REPOS="mana land"
+PROJECT_DIR=$1;
+
+if [ -z "$PROJECT_DIR" ];
+then
+    echo "Error! Use: ./$0 <tasit-contract-dir>";
+    exit;
+fi
+
+DECENTRALAND_DIR="$PROJECT_DIR/decentraland";
+REPOS="mana land";
 
 for repo in $REPOS;
 do
-    #if [ ! -d "$DECENTRALAND_DIR/$repo" ]; then
-    rm -rf $DECENTRALAND_DIR/$repo
-    git clone https://github.com/decentraland/$repo.git $DECENTRALAND_DIR/$repo
-    #fi
+    REPO_DIR="$DECENTRALAND_DIR/$repo";
 
-    npm i --prefix $DECENTRALAND_DIR/$repo
+    if [ ! -e "$REPO_DIR/package.json" ];
+    then
+        rm -rf $REPO_DIR;
+        git clone https://github.com/decentraland/$repo.git $REPO_DIR;
+    fi
+
+    npm i --prefix $REPO_DIR;
 done

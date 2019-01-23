@@ -1,5 +1,11 @@
 #!/bin/bash
 PROJECT_DIR=$1
+if [ -z "$PROJECT_DIR" ];
+then
+    echo "Error! Use: ./$0 <tasit-contract-dir>";
+    exit;
+fi
+
 DECENTRALAND_DIR="$PROJECT_DIR/decentraland"
 
 # mana
