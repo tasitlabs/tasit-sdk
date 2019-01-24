@@ -7,15 +7,34 @@ import Utils from "./Utils";
 import ProviderFactory from "./ProviderFactory";
 import ContractEventsSubscription from "./ContractEventsSubscription";
 import TransactionSubscription from "./TransactionSubscription";
+import Subscription from "./Subscription";
 
-export class Contract {
+export class Contract extends Subscription {
   #provider;
   #contract;
+  #subscription;
 
   constructor(address, abi, wallet) {
-    this.#provider = ProviderFactory.getProvider();
+    const provider = ProviderFactory.getProvider();
+
+    super(provider);
+
+    this.#provider = provider;
     this.#initializeContract(address, abi, wallet);
   }
+
+  on = (eventName, listener) => {
+    const events = ["error"];
+
+    if (!events.includes(eventName))
+      throw new Error(`Invalid event, use: [${events}]`);
+
+    if (eventName !== "error") {
+      throw new Error(`Invalid event '${event}'.`);
+    } else {
+      this._addErrorListener(listener);
+    }
+  };
 
   // Note: For now, `tasit-account` creates a ethers.js wallet object
   // If that changes, maybe this method could be renamed to setAccount()
@@ -47,8 +66,9 @@ export class Contract {
   };
 
   subscribe = () => {
-    const subscription = new ContractEventsSubscription(this.#contract);
-    return subscription;
+    if (!this.#subscription)
+      this.#subscription = new ContractEventsSubscription(this.#contract);
+    return this.#subscription;
   };
 
   #initializeContract = (address, abi, wallet) => {
@@ -94,7 +114,18 @@ export class Contract {
       if (!Utils.isEthersJsSigner(this.#contract.signer))
         throw new Error(`Cannot write data to a Contract without a wallet`);
 
-      const tx = this.#contract[f.name].apply(null, args);
+      const tx = this.#contract[f.name].apply(null, args).then(
+        tx => {
+          return tx;
+        },
+        error => {
+          this._emitErrorEvent(
+            new Error(`Action with error: ${error.message}`),
+            null
+          );
+        }
+      );
+
       const subscription = new TransactionSubscription(tx, this.#provider);
       return subscription;
     };

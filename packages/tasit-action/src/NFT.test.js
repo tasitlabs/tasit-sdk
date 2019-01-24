@@ -4,6 +4,11 @@ import NFT from "./NFT";
 // See https://github.com/tasitlabs/TasitSDK/issues/138
 const fullNFTAddress = "0x0E86f209729bf54763789CDBcA9E8b94f0FD5333";
 
+// Note: Under the current `tasit-contracts` setup SimpleStorageWithRemoved aways will deployed with this address
+// See https://github.com/tasitlabs/TasitSDK/issues/138
+const simpleStorageWithRemovedAddress =
+  "0x6C4A015797DDDd87866451914eCe1e8b19261931";
+
 describe("TasitAction.NFT", () => {
   let owner,
     ana,
@@ -71,6 +76,17 @@ describe("TasitAction.NFT", () => {
 
       expect(
         txSubscription.getEmitter()._events,
+        "ethers.js should not be listening to any events."
+      ).to.be.empty;
+    }
+
+    if (fullNFT) {
+      fullNFT.unsubscribe();
+
+      expect(fullNFT.subscribedEventNames()).to.be.empty;
+
+      expect(
+        fullNFT.getEmitter()._events,
         "ethers.js should not be listening to any events."
       ).to.be.empty;
     }
@@ -188,6 +204,68 @@ describe("TasitAction.NFT", () => {
 
       const balanceAfter = await fullNFT.balanceOf(bob.address);
       expect(balanceAfter.toNumber()).to.equal(1);
+    });
+
+    it("should transfer an owned token using safeTransferFrom", async () => {
+      let senderBalance, receiverBalance;
+
+      fullNFT = new NFT(fullNFTAddress, ana);
+
+      senderBalance = await fullNFT.balanceOf(ana.address);
+      expect(senderBalance.toNumber()).to.equal(1);
+
+      receiverBalance = await fullNFT.balanceOf(bob.address);
+      expect(receiverBalance.toNumber()).to.equal(0);
+
+      txSubscription = fullNFT.safeTransferFrom(
+        ana.address,
+        bob.address,
+        tokenId
+      );
+
+      await txSubscription.waitForNonceToUpdate();
+
+      senderBalance = await fullNFT.balanceOf(ana.address);
+      expect(senderBalance.toNumber()).to.equal(0);
+
+      receiverBalance = await fullNFT.balanceOf(bob.address);
+      expect(receiverBalance.toNumber()).to.equal(1);
+    });
+
+    it("shouldn't do a safeTransferFrom to a contract that doesn't implement `onERC721Received`", async () => {
+      let senderBalance, receiverBalance;
+      const sender = ana.address;
+      const receiver = simpleStorageWithRemovedAddress;
+      const errorFakeFn = sinon.fake();
+
+      fullNFT = new NFT(fullNFTAddress, ana);
+
+      senderBalance = await fullNFT.balanceOf(sender);
+      expect(senderBalance.toNumber()).to.equal(1);
+
+      receiverBalance = await fullNFT.balanceOf(receiver);
+      expect(receiverBalance.toNumber()).to.equal(0);
+
+      const errorListener = message => {
+        const { error, eventName } = message;
+        expect(error.message).to.equal(
+          "Action with error: VM Exception while processing transaction: revert"
+        );
+        errorFakeFn();
+      };
+
+      fullNFT.on("error", errorListener);
+
+      txSubscription = fullNFT.safeTransferFrom(sender, receiver, tokenId);
+      await txSubscription.waitForNonceToUpdate();
+
+      expect(errorFakeFn.called).to.be.true;
+
+      senderBalance = await fullNFT.balanceOf(sender);
+      expect(senderBalance.toNumber()).to.equal(1);
+
+      receiverBalance = await fullNFT.balanceOf(receiver);
+      expect(receiverBalance.toNumber()).to.equal(0);
     });
   });
 });
