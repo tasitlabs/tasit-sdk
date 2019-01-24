@@ -237,7 +237,7 @@ describe("TasitAction.NFT", () => {
       expect(receiverBalance.toNumber()).to.equal(1);
     });
 
-    it("shouldn't do a safeTransferFrom to a contract that doesn't implement `onERC721Received` - Contract Subscription", async () => {
+    it("should trigger an error if the user is listening for errors from a contract and tries safeTransferFrom to a contract without onERC721Received", async () => {
       let senderBalance, receiverBalance;
       const sender = ana.address;
       const receiver = simpleStorageWithRemovedAddress;
