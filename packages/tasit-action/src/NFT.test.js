@@ -232,11 +232,11 @@ describe("TasitAction.NFT", () => {
       expect(receiverBalance.toNumber()).to.equal(1);
     });
 
-    it("shouldn't do a safeTransferFrom to a contract that doesn't implement `onERC721Received`", async () => {
+    it("shouldn't do a safeTransferFrom to a contract that doesn't implement `onERC721Received` - Contract Subscription", async () => {
       let senderBalance, receiverBalance;
       const sender = ana.address;
       const receiver = simpleStorageWithRemovedAddress;
-      const errorFakeFn = sinon.fake();
+      const contractErrorFakeFn = sinon.fake();
 
       fullNFT = new NFT(fullNFTAddress, ana);
 
@@ -246,20 +246,56 @@ describe("TasitAction.NFT", () => {
       receiverBalance = await fullNFT.balanceOf(receiver);
       expect(receiverBalance.toNumber()).to.equal(0);
 
-      const errorListener = message => {
+      const contractErrorListener = message => {
         const { error, eventName } = message;
         expect(error.message).to.equal(
           "Action with error: VM Exception while processing transaction: revert"
         );
-        errorFakeFn();
+        contractErrorFakeFn();
       };
 
-      fullNFT.on("error", errorListener);
+      fullNFT.on("error", contractErrorListener);
 
       txSubscription = fullNFT.safeTransferFrom(sender, receiver, tokenId);
       await txSubscription.waitForNonceToUpdate();
 
-      expect(errorFakeFn.called).to.be.true;
+      expect(contractErrorFakeFn.called).to.be.true;
+
+      senderBalance = await fullNFT.balanceOf(sender);
+      expect(senderBalance.toNumber()).to.equal(1);
+
+      receiverBalance = await fullNFT.balanceOf(receiver);
+      expect(receiverBalance.toNumber()).to.equal(0);
+    });
+
+    it("shouldn't do a safeTransferFrom to a contract that doesn't implement `onERC721Received` - Action Subscription", async () => {
+      let senderBalance, receiverBalance;
+      const sender = ana.address;
+      const receiver = simpleStorageWithRemovedAddress;
+      const actionErrorFakeFn = sinon.fake();
+
+      fullNFT = new NFT(fullNFTAddress, ana);
+
+      senderBalance = await fullNFT.balanceOf(sender);
+      expect(senderBalance.toNumber()).to.equal(1);
+
+      receiverBalance = await fullNFT.balanceOf(receiver);
+      expect(receiverBalance.toNumber()).to.equal(0);
+
+      const actionErrorListener = message => {
+        const { error, eventName } = message;
+        expect(error.message).to.equal(
+          "Action with error: VM Exception while processing transaction: revert"
+        );
+        actionErrorFakeFn();
+      };
+
+      txSubscription = fullNFT.safeTransferFrom(sender, receiver, tokenId);
+      txSubscription.on("error", actionErrorListener);
+
+      await txSubscription.waitForNonceToUpdate();
+
+      expect(actionErrorFakeFn.called).to.be.true;
 
       senderBalance = await fullNFT.balanceOf(sender);
       expect(senderBalance.toNumber()).to.equal(1);

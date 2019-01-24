@@ -72,7 +72,9 @@ export class Subscription {
   };
 
   // TODO: Make protected
-  _emitErrorEvent = (error, eventName) => {
+  // Arrow functions in class properties won't be in the prototype and we can't call them with super
+  // Refs: https://medium.com/@charpeni/arrow-functions-in-class-properties-might-not-be-as-great-as-we-think-3b3551c440b1
+  _emitErrorEvent(error, eventName) {
     const errorEventListener = this.#eventListeners.get("error");
     if (!errorEventListener) {
       // Note: Throw error?
@@ -82,7 +84,7 @@ export class Subscription {
 
     const message = { error, eventName };
     errorEventListener.listener(message);
-  };
+  }
 
   // TODO: Make protected
   _addErrorListener = listener => {

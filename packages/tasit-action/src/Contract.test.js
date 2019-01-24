@@ -141,7 +141,11 @@ describe("TasitAction.Contract", () => {
     });
   });
 
-  describe("TransactionSubscription - actions (tx) subscriptions tests", async () => {
+  // Should we create some revertFunction at SimpleStorageWithRemoved Contract
+  // and rename it to a short name as SampleContract ?
+  describe.skip("Contract Subscription", async () => {});
+
+  describe("Transactions (Actions) Subscription", async () => {
     let rand;
 
     beforeEach("assign a wallet to the contract", () => {
@@ -460,7 +464,7 @@ describe("TasitAction.Contract", () => {
     });
   });
 
-  describe("ContractSubscription - contract events subscription", async () => {
+  describe("Contract Events Subscription", async () => {
     beforeEach("assign a wallet to the contract", () => {
       expect(() => {
         simpleStorage.setWallet(wallet);

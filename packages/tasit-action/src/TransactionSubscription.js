@@ -11,8 +11,14 @@ export class TransactionSubscription extends Subscription {
   #txConfirmations;
   #timeout;
   #lastConfirmationTime;
+  #contract;
 
-  constructor(txPromise, provider) {
+  // Contract passing itself to here, enables
+  // TransactionSubscription calling this.#contract._emitErrorEvent
+  // to emit error to the contract catch-all error listener
+  // As that's is the only function called for now, could be better
+  // pass that function as a callback here?
+  constructor(txPromise, provider, contract) {
     // Provider implements EventEmitter API and it's enough
     //  to handle with transactions events
     super(provider);
@@ -20,10 +26,31 @@ export class TransactionSubscription extends Subscription {
     const { events } = config;
     const { timeout } = events;
 
+    this.#txPromise = txPromise.then(
+      tx => {
+        return tx;
+      },
+      error => {
+        this._emitErrorEvent(
+          new Error(`Action with error: ${error.message}`),
+          null
+        );
+      }
+    );
+
     this.#timeout = timeout;
-    this.#txPromise = txPromise;
     this.#provider = provider;
     this.#txConfirmations = 0;
+    this.#contract = contract;
+  }
+
+  // TODO: Make protected
+  // Arrow functions in class properties won't be in the prototype and we can't call them with super
+  // Refs: https://medium.com/@charpeni/arrow-functions-in-class-properties-might-not-be-as-great-as-we-think-3b3551c440b1
+  _emitErrorEvent(error, eventName) {
+    super._emitErrorEvent(error, eventName);
+    if (this.#contract.subscribedEventNames().includes("error"))
+      this.#contract._emitErrorEvent(error, eventName);
   }
 
   on = (eventName, listener) => {

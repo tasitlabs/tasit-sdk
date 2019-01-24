@@ -9,9 +9,12 @@ import ContractEventsSubscription from "./ContractEventsSubscription";
 import TransactionSubscription from "./TransactionSubscription";
 import Subscription from "./Subscription";
 
+// I'm not sure if extend Subscription is the best approach
+// I'm usually think inheritance as an IS-A relationship
+// I'm not really sure if "Contract is a Subscription" sounds good
 export class Contract extends Subscription {
   #provider;
-  #contract;
+  #ethersContract;
   #subscription;
 
   constructor(address, abi, wallet) {
@@ -43,21 +46,21 @@ export class Contract extends Subscription {
       throw new Error(`Cannot set an invalid wallet for a Contract`);
 
     this.#initializeContract(
-      this.#contract.address,
-      this.#contract.interface.abi,
+      this.#ethersContract.address,
+      this.#ethersContract.interface.abi,
       wallet
     );
   };
 
   removeWallet = () => {
     this.#initializeContract(
-      this.#contract.address,
-      this.#contract.interface.abi
+      this.#ethersContract.address,
+      this.#ethersContract.interface.abi
     );
   };
 
   getAddress = () => {
-    return this.#contract.address;
+    return this.#ethersContract.address;
   };
 
   // For testing purposes
@@ -67,7 +70,7 @@ export class Contract extends Subscription {
 
   subscribe = () => {
     if (!this.#subscription)
-      this.#subscription = new ContractEventsSubscription(this.#contract);
+      this.#subscription = new ContractEventsSubscription(this.#ethersContract);
     return this.#subscription;
   };
 
@@ -83,12 +86,12 @@ export class Contract extends Subscription {
       ? wallet.connect(this.#provider)
       : this.#provider;
 
-    this.#contract = new ethers.Contract(address, abi, signerOrProvider);
+    this.#ethersContract = new ethers.Contract(address, abi, signerOrProvider);
     this.#addFunctionsToContract();
   };
 
   #addFunctionsToContract = () => {
-    this.#contract.interface.abi
+    this.#ethersContract.interface.abi
       .filter(json => {
         return json.type === "function";
       })
@@ -104,29 +107,23 @@ export class Contract extends Subscription {
 
   #attachReadFunction = f => {
     this[f.name] = async (...args) => {
-      const value = await this.#contract[f.name].apply(null, args);
+      const value = await this.#ethersContract[f.name].apply(null, args);
       return value;
     };
   };
 
   #attachWriteFunction = f => {
     this[f.name] = (...args) => {
-      if (!Utils.isEthersJsSigner(this.#contract.signer))
+      if (!Utils.isEthersJsSigner(this.#ethersContract.signer))
         throw new Error(`Cannot write data to a Contract without a wallet`);
 
-      const tx = this.#contract[f.name].apply(null, args).then(
-        tx => {
-          return tx;
-        },
-        error => {
-          this._emitErrorEvent(
-            new Error(`Action with error: ${error.message}`),
-            null
-          );
-        }
-      );
+      const tx = this.#ethersContract[f.name].apply(null, args);
 
-      const subscription = new TransactionSubscription(tx, this.#provider);
+      const subscription = new TransactionSubscription(
+        tx,
+        this.#provider,
+        this
+      );
       return subscription;
     };
   };
