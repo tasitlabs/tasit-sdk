@@ -6,6 +6,11 @@ const fullNFTAddress = "0x0E86f209729bf54763789CDBcA9E8b94f0FD5333";
 
 // Note: Under the current `tasit-contracts` setup SimpleStorageWithRemoved aways will deployed with this address
 // See https://github.com/tasitlabs/TasitSDK/issues/138
+
+// Note: This contract is used not because of the particulars of this contract, but
+// just because we needed a contract to send an NFT to and have it fail
+// when using safeTransferFrom because this contract doesn't implement
+// onERC721Received
 const simpleStorageWithRemovedAddress =
   "0x6C4A015797DDDd87866451914eCe1e8b19261931";
 
