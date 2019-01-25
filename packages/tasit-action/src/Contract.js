@@ -8,9 +8,6 @@ import ProviderFactory from "./ProviderFactory";
 import Subscription from "./Subscription";
 import Action from "./Action";
 
-// I'm not sure if extend Subscription is the best approach
-// I'm usually think inheritance as an IS-A relationship
-// I'm not really sure if "Contract is a Subscription" sounds good
 export class Contract extends Subscription {
   #provider;
   #ethersContract;

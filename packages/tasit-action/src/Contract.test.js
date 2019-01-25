@@ -521,7 +521,8 @@ describe("TasitAction.Contract", () => {
 
       // Note: Without that, ethers.provider will keep the same
       // receipt.confirmations as before snapshot reversion
-      action.refreshProvider();
+      // See more: https://github.com/ethers-io/ethers.js/issues/385#issuecomment-455187735
+      action._refreshProvider();
 
       await mineBlocks(provider, 2);
 

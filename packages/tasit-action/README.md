@@ -211,26 +211,26 @@ So the "set" should return something that lets the user subscribe for the 1st or
 Here's one option for how it could work:
 
 ```javascript
-const subscription = contract.transferFrom(from, to, tokenId);
+const action = contract.transferFrom(from, to, tokenId);
 
-function onMessage(message) {
+const handlerFunction = message => {
   // message.data = Contents of the message.
   const { data } = message;
   const { confirmations } = data;
   if (confirmations === 7) {
     // do something
-    subscription.removeAllListeners();
+    action.unsubscribe();
   }
-}
+};
 
-subscription.on("confirmation", handlerFunction);
+action.on("confirmation", handlerFunction);
 ```
 
 You could even imagine pre-attaching a listener with a handlerFunction by default for a few pubsub topics that the user of the SDK is likely to want.
 
 Since remembering to remove the listener is a little clunky, we could also include a variant that unsubscribes after the first message for that topic. This is a pretty common pattern.
 
-`subscription.once("enough-confirmations", handlerFunction)`
+`contract.once("enough-confirmations", handlerFunction)`
 
 For more customization of how this works, during or before sending the transaction the user of the SDK could pick which types of events they want to be subscribed to.
 
@@ -275,9 +275,7 @@ But unlike for "set" operations, the subscription isn't created implicitly.
 Here, it is initiated explicitly with a subscribe function.
 
 ```javascript
-const events = ["ExampleEvent", "AnotherExampleEvent"];
-const subscription = contract.subscribe(events);
-subscription.on("ExampleEvent", handlerFunction);
+contract.on("ExampleEvent", handlerFunction);
 ```
 
 ##### Listening for events - ERC721
@@ -286,8 +284,8 @@ Note: The ERC721 level of abstraction for listening for events would already kno
 
 ```javascript
 // Subscriptions is an object where the keys are the event names from ERC721
-const subscriptions = contract.subscribeAll();
-subscriptions.remove("Transfer");
+contract.onAll(handlerFunction);
+contract.off("Transfer");
 ```
 
 In this example there's an event `Transfer` as one of the events supported by ERC721. After unsubscribing from transfer events, you're still be subscribed to other events emitted by the contract.
