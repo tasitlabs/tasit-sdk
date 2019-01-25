@@ -223,7 +223,6 @@ describe("TasitAction.Contract", () => {
       expect(eventErrorListener.callCount).to.equal(1);
     });
 
-    // Should contract read functions trigger error event instead throw error?
     it("throw error on revert read function", async () => {
       await expect(sampleContract.revertRead()).to.be.rejected;
     });
