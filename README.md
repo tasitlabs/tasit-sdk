@@ -87,7 +87,7 @@ const contract = new NFT(contractAddress)
 
 const action = contract.safeTransferfrom(/*...*/); 
 action.on("error", errorListener);
-action.on("lotsOfConfirmations", successListener);
+action.on("enough-confirmations", successListener);
 action.sendMeta(); // meta-tx broadcast
 
 // Do optimistic UI updates immediately, while making sure
