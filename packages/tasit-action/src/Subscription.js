@@ -72,7 +72,7 @@ export class Subscription {
   };
 
   // TODO: Make protected
-  _emitErrorEvent = (error, eventName) => {
+  _emitErrorEvent = error => {
     const errorEventListener = this.#eventListeners.get("error");
     if (!errorEventListener) {
       // Note: Throw error?
@@ -80,12 +80,32 @@ export class Subscription {
       return;
     }
 
-    const message = { error, eventName };
+    const message = { error };
     errorEventListener.listener(message);
   };
 
   // TODO: Make protected
-  _addErrorListener = listener => {
+  _emitErrorEventFromEventListener = (error, eventName) => {
+    error.eventName = eventName;
+    this._emitErrorEvent(error);
+  };
+
+  // TODO: Make protected
+  //
+  // Note: Since we allow only one listener per event (error included),
+  // If there is a error event already, it will be replaced by new listener function
+  // that will call both new and old functions
+  _addErrorListener = newListener => {
+    let listener = newListener;
+    const oldErrorEventListener = this.#eventListeners.get("error");
+
+    if (oldErrorEventListener) {
+      listener = error => {
+        newListener(error);
+        oldErrorEventListener.listener(error);
+      };
+    }
+
     this.#eventListeners.set("error", {
       listener,
     });

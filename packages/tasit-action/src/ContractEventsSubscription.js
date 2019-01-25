@@ -1,13 +1,13 @@
 import Subscription from "./Subscription";
 
 class ContractEventsSubscription extends Subscription {
-  #contract;
+  #ethersContract;
 
   // Note: We're considering listening multiple events at once
   //    adding eventName, listener params to constructor.
-  constructor(contract) {
-    super(contract);
-    this.#contract = contract;
+  constructor(ethersContract) {
+    super(ethersContract);
+    this.#ethersContract = ethersContract;
   }
 
   on = (eventName, listener) => {
@@ -35,10 +35,10 @@ class ContractEventsSubscription extends Subscription {
   #addContractEventListener = (eventName, listener, once) => {
     const ethersListener = async (...args) => {
       try {
-        // Note: This depends on the current ethers.js specification of contract events to work:
+        // Note: This depends on the current ethers.js specification of ethersContract events to work:
         // "All event callbacks receive the parameters specified in the ABI as well as
         // one additional Event Object"
-        // https://docs.ethers.io/ethers.js/html/api-contract.html#event-object
+        // https://docs.ethers.io/ethers.js/html/api-ethersContract.html#event-object
         // TODO: Consider checking that the event looks like what we expect and
         // erroring out if not
         const event = args.pop();
@@ -53,7 +53,7 @@ class ContractEventsSubscription extends Subscription {
 
         await listener(message);
       } catch (error) {
-        this._emitErrorEvent(
+        this._emitErrorEventFromEventListener(
           new Error(`Listener function with error: ${error.message}`),
           eventName
         );
@@ -66,7 +66,7 @@ class ContractEventsSubscription extends Subscription {
   #isEventValid = eventName => {
     return (
       eventName === "error" ||
-      this.#contract.interface.events[eventName] !== undefined
+      this.#ethersContract.interface.events[eventName] !== undefined
     );
   };
 }

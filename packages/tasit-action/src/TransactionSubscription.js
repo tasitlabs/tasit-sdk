@@ -11,6 +11,7 @@ export class TransactionSubscription extends Subscription {
   #txConfirmations;
   #timeout;
   #lastConfirmationTime;
+  #contract;
 
   constructor(txPromise, provider) {
     // Provider implements EventEmitter API and it's enough
@@ -20,8 +21,16 @@ export class TransactionSubscription extends Subscription {
     const { events } = config;
     const { timeout } = events;
 
+    this.#txPromise = txPromise.then(
+      tx => {
+        return tx;
+      },
+      error => {
+        this._emitErrorEvent(new Error(`Action with error: ${error.message}`));
+      }
+    );
+
     this.#timeout = timeout;
-    this.#txPromise = txPromise;
     this.#provider = provider;
     this.#txConfirmations = 0;
   }
@@ -79,7 +88,7 @@ export class TransactionSubscription extends Subscription {
           (receipt !== null && receipt.confirmations <= this.#txConfirmations);
 
         if (blockReorgOccurred) {
-          this._emitErrorEvent(
+          this._emitErrorEventFromEventListener(
             new Error(
               `Your action's position in the chain has changed in a surprising way.`
             ),
@@ -102,7 +111,7 @@ export class TransactionSubscription extends Subscription {
             currentTime - this.#lastConfirmationTime >= this.getEventsTimeout();
 
           if (timedOut) {
-            this._emitErrorEvent(
+            this._emitErrorEventFromEventListener(
               new Error(`Event ${eventName} reached timeout.`),
               eventName
             );
@@ -123,7 +132,7 @@ export class TransactionSubscription extends Subscription {
 
         await listener(message);
       } catch (error) {
-        this._emitErrorEvent(
+        this._emitErrorEventFromEventListener(
           new Error(`Listener function with error: ${error.message}`),
           eventName
         );
@@ -149,8 +158,8 @@ export class TransactionSubscription extends Subscription {
   // See: https://github.com/ethereumbook/ethereumbook/blob/04f66ae45cd9405cce04a088556144be11979699/06transactions.asciidoc#keeping-track-of-nonces
   // How should we keep track of nonces?
   waitForNonceToUpdate = async () => {
-    const tx = await this.#txPromise;
-    await this.#provider.waitForTransaction(tx.hash);
+    if (!this.#tx) this.#tx = await this.#txPromise;
+    if (this.#tx) await this.#provider.waitForTransaction(this.#tx.hash);
   };
 
   // For testing purposes
