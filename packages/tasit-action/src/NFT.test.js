@@ -43,9 +43,9 @@ describe("TasitAction.NFT", () => {
     expect(fullNFT.getAddress()).to.equal(fullNFTAddress);
     expect(fullNFT.name).to.exist;
     expect(fullNFT.symbol).to.exist;
-    expect(fullNFT.getProvider()).to.exist;
+    expect(fullNFT._getProvider()).to.exist;
 
-    provider = fullNFT.getProvider();
+    provider = fullNFT._getProvider();
 
     snapshotId = await createSnapshot(provider);
   });

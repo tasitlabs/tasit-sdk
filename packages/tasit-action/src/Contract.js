@@ -64,7 +64,7 @@ export class Contract extends Subscription {
   };
 
   // For testing purposes
-  getProvider = () => {
+  _getProvider = () => {
     return this.#provider;
   };
 

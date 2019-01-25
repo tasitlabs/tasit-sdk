@@ -45,9 +45,9 @@ describe("TasitAction.Contract", () => {
     expect(simpleStorage.getAddress()).to.equal(contractAddress);
     expect(simpleStorage.getValue).to.exist;
     expect(simpleStorage.setValue).to.exist;
-    expect(simpleStorage.getProvider()).to.exist;
+    expect(simpleStorage._getProvider()).to.exist;
 
-    provider = simpleStorage.getProvider();
+    provider = simpleStorage._getProvider();
     testcaseSnaphotId = await createSnapshot(provider);
   });
 
