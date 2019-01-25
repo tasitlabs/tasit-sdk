@@ -230,7 +230,7 @@ You could even imagine pre-attaching a listener with a handlerFunction by defaul
 
 Since remembering to remove the listener is a little clunky, we could also include a variant that unsubscribes after the first message for that topic. This is a pretty common pattern.
 
-`subscription.once("enough-confirmations", handlerFunction)`
+`subscription.once("enoughConfirmations", handlerFunction)`
 
 For more customization of how this works, during or before sending the transaction the user of the SDK could pick which types of events they want to be subscribed to.
 
