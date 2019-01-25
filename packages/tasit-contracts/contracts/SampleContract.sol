@@ -1,6 +1,6 @@
 pragma solidity ^0.5.0;
 
-contract SimpleStorageWithRemoved {
+contract SampleContract {
   event ValueChanged(address indexed author, string oldValue, string newValue);
   event ValueRemoved(address indexed author, string oldValue);
 
@@ -24,4 +24,15 @@ contract SimpleStorageWithRemoved {
     emit ValueRemoved(msg.sender, _value);
     _value = "";
   }
+
+  function revertRead() public pure returns(bool) {
+    require(false);
+    return false;
+  }
+
+  function revertWrite(string memory value) public {
+    require(false);
+    _value = value;
+  }
+
 }
