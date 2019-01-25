@@ -2,26 +2,12 @@ import Subscription from "./Subscription";
 
 class ContractEventsSubscription extends Subscription {
   #ethersContract;
-  #contract;
 
   // Note: We're considering listening multiple events at once
   //    adding eventName, listener params to constructor.
-  constructor(ethersContract, contract) {
+  constructor(ethersContract) {
     super(ethersContract);
     this.#ethersContract = ethersContract;
-    this.#contract = contract;
-  }
-
-  // TODO: Make protected
-  _emitErrorEvent(error, eventName) {
-    super._emitErrorEvent(error, eventName);
-    this.#contract._emitErrorEvent(error, eventName);
-  }
-
-  // TODO: Make protected
-  _emitErrorEventFromEventListener(error, eventName) {
-    super._emitErrorEventFromEventListener(error, eventName);
-    this.#contract._emitErrorEventFromEventListener(error, eventName);
   }
 
   on = (eventName, listener) => {

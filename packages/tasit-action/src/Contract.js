@@ -75,6 +75,16 @@ export class Contract extends Subscription {
         this.#ethersContract,
         this
       );
+
+    //if (!this.#subscription.subscribedEventNames().includes("error")) {
+    const errorListener = message => {
+      const { error } = message;
+      this._emitErrorEvent(new Error(`${error.message}`));
+    };
+
+    this.#subscription.on("error", errorListener);
+    //}
+
     return this.#subscription;
   };
 
@@ -123,11 +133,15 @@ export class Contract extends Subscription {
 
       const tx = this.#ethersContract[f.name].apply(null, args);
 
-      const subscription = new TransactionSubscription(
-        tx,
-        this.#provider,
-        this
-      );
+      const subscription = new TransactionSubscription(tx, this.#provider);
+
+      const errorListener = message => {
+        const { error } = message;
+        this._emitErrorEvent(new Error(`${error.message}`));
+      };
+
+      subscription.on("error", errorListener);
+
       return subscription;
     };
   };

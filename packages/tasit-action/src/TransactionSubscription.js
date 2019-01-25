@@ -13,12 +13,7 @@ export class TransactionSubscription extends Subscription {
   #lastConfirmationTime;
   #contract;
 
-  // Contract passing itself to here, enables
-  // TransactionSubscription calling this.#contract._emitErrorEvent
-  // to emit error to the contract catch-all error listener
-  // As that's is the only function called for now, could be better
-  // pass that function as a callback here?
-  constructor(txPromise, provider, contract) {
+  constructor(txPromise, provider) {
     // Provider implements EventEmitter API and it's enough
     //  to handle with transactions events
     super(provider);
@@ -38,19 +33,6 @@ export class TransactionSubscription extends Subscription {
     this.#timeout = timeout;
     this.#provider = provider;
     this.#txConfirmations = 0;
-    this.#contract = contract;
-  }
-
-  // TODO: Make protected
-  _emitErrorEvent(error, eventName) {
-    super._emitErrorEvent(error, eventName);
-    this.#contract._emitErrorEvent(error, eventName);
-  }
-
-  // TODO: Make protected
-  _emitErrorEventFromEventListener(error, eventName) {
-    super._emitErrorEventFromEventListener(error, eventName);
-    this.#contract._emitErrorEventFromEventListener(error, eventName);
   }
 
   on = (eventName, listener) => {

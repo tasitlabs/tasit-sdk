@@ -72,9 +72,7 @@ export class Subscription {
   };
 
   // TODO: Make protected
-  // Arrow functions in class properties won't be in the prototype and we can't call them with super
-  // Refs: https://medium.com/@charpeni/arrow-functions-in-class-properties-might-not-be-as-great-as-we-think-3b3551c440b1
-  _emitErrorEvent(error) {
+  _emitErrorEvent = error => {
     const errorEventListener = this.#eventListeners.get("error");
     if (!errorEventListener) {
       // Note: Throw error?
@@ -84,18 +82,28 @@ export class Subscription {
 
     const message = { error };
     errorEventListener.listener(message);
-  }
+  };
 
   // TODO: Make protected
-  // Arrow functions in class properties won't be in the prototype and we can't call them with super
-  // Refs: https://medium.com/@charpeni/arrow-functions-in-class-properties-might-not-be-as-great-as-we-think-3b3551c440b1
-  _emitErrorEventFromEventListener(error, eventName) {
+  _emitErrorEventFromEventListener = (error, eventName) => {
     error.eventName = eventName;
     this._emitErrorEvent(error);
-  }
+  };
 
   // TODO: Make protected
-  _addErrorListener = listener => {
+  _addErrorListener = newListener => {
+    let listener = newListener;
+    const errorEventListener = this.#eventListeners.get("error");
+
+    if (errorEventListener) {
+      listener = error => {
+        newListener(error);
+        errorEventListener.listener(error);
+      };
+
+      this.off("error");
+    }
+
     this.#eventListeners.set("error", {
       listener,
     });
