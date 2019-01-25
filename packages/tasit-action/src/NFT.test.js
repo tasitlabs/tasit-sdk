@@ -11,14 +11,7 @@ const fullNFTAddress = "0x0E86f209729bf54763789CDBcA9E8b94f0FD5333";
 const sampleContractAddress = "0x6C4A015797DDDd87866451914eCe1e8b19261931";
 
 describe("TasitAction.NFT", () => {
-  let owner,
-    ana,
-    bob,
-    fullNFT,
-    provider,
-    snapshotId,
-    txSubscription,
-    contractSubscription;
+  let owner, ana, bob, fullNFT, provider, snapshotId, action;
 
   const confirmBalances = async (addresses, balances) => {
     expect(addresses.length).to.equal(balances.length);
@@ -45,8 +38,7 @@ describe("TasitAction.NFT", () => {
   });
 
   beforeEach("", async () => {
-    txSubscription = undefined;
-    contractSubscription = undefined;
+    action = undefined;
 
     fullNFT = new NFT(fullNFTAddress, owner);
 
@@ -59,7 +51,8 @@ describe("TasitAction.NFT", () => {
     provider = fullNFT._getProvider();
 
     // This line ensures that a new event listener does not catch an existing event from last the block
-    await mineBlocks(provider, 1);
+    // Two blocks to minimize the risk of polling doesn't occur.
+    await mineBlocks(provider, 2);
 
     await confirmBalances([owner.address, ana.address, bob.address], [0, 0, 0]);
 
@@ -68,30 +61,31 @@ describe("TasitAction.NFT", () => {
 
   afterEach("", async () => {
     // This line ensures that a new event listener does not catch an existing event from last the block
-    await mineBlocks(provider, 1);
+    // Two blocks to minimize the risk of polling doesn't occur.
+    await mineBlocks(provider, 2);
 
     expect(provider._events, "ethers.js should not be listening to any events.")
       .to.be.empty;
 
-    if (contractSubscription) {
-      contractSubscription.unsubscribe();
+    if (fullNFT) {
+      fullNFT.unsubscribe();
 
-      expect(contractSubscription.subscribedEventNames()).to.be.empty;
+      expect(fullNFT.subscribedEventNames()).to.be.empty;
 
       expect(
-        contractSubscription.getEmitter()._events,
+        fullNFT.getEmitter()._events,
         "ethers.js should not be listening to any events."
       ).to.be.empty;
     }
 
-    if (txSubscription) {
-      await txSubscription.waitForNonceToUpdate();
-      txSubscription.unsubscribe();
+    if (action) {
+      await action.waitForNonceToUpdate();
+      action.unsubscribe();
 
-      expect(txSubscription.subscribedEventNames()).to.be.empty;
+      expect(action.subscribedEventNames()).to.be.empty;
 
       expect(
-        txSubscription.getEmitter()._events,
+        action.getEmitter()._events,
         "ethers.js should not be listening to any events."
       ).to.be.empty;
     }
@@ -135,12 +129,10 @@ describe("TasitAction.NFT", () => {
     const zeroAddress = "0x0000000000000000000000000000000000000000";
 
     beforeEach("should mint one token to ana", async () => {
-      contractSubscription = fullNFT.subscribe();
-
-      txSubscription = fullNFT.mint(ana.address, tokenId);
+      action = fullNFT.mint(ana.address, tokenId);
 
       const event = await new Promise(function(resolve, reject) {
-        contractSubscription.on("Transfer", message => {
+        fullNFT.on("Transfer", message => {
           const { data } = message;
           const { args } = data;
           resolve(args);
@@ -151,7 +143,7 @@ describe("TasitAction.NFT", () => {
         }, 1000);
       });
 
-      contractSubscription.off("Transfer");
+      fullNFT.off("Transfer");
 
       expect(event.from).to.equal(zeroAddress);
       expect(event.to).to.equal(ana.address);
@@ -163,12 +155,10 @@ describe("TasitAction.NFT", () => {
     it("should transfer an owned token", async () => {
       fullNFT = new NFT(fullNFTAddress, ana);
 
-      contractSubscription = fullNFT.subscribe();
-
-      txSubscription = fullNFT.transferFrom(ana.address, bob.address, tokenId);
+      action = fullNFT.transferFrom(ana.address, bob.address, tokenId);
 
       const event = await new Promise(function(resolve, reject) {
-        contractSubscription.on("Transfer", message => {
+        fullNFT.on("Transfer", message => {
           const { data } = message;
           const { args } = data;
           resolve(args);
@@ -188,14 +178,14 @@ describe("TasitAction.NFT", () => {
 
     it("should transfer an approved token", async () => {
       fullNFT = new NFT(fullNFTAddress, ana);
-      txSubscription = fullNFT.approve(bob.address, tokenId);
+      action = fullNFT.approve(bob.address, tokenId);
 
-      await txSubscription.waitForNonceToUpdate();
+      await action.waitForNonceToUpdate();
 
       fullNFT.setWallet(bob);
-      txSubscription = fullNFT.transferFrom(ana.address, bob.address, tokenId);
+      action = fullNFT.transferFrom(ana.address, bob.address, tokenId);
 
-      await txSubscription.waitForNonceToUpdate();
+      await action.waitForNonceToUpdate();
 
       await confirmBalances([bob.address], [1]);
     });
@@ -203,13 +193,9 @@ describe("TasitAction.NFT", () => {
     it("should transfer an owned token using safeTransferFrom", async () => {
       fullNFT = new NFT(fullNFTAddress, ana);
 
-      txSubscription = fullNFT.safeTransferFrom(
-        ana.address,
-        bob.address,
-        tokenId
-      );
+      action = fullNFT.safeTransferFrom(ana.address, bob.address, tokenId);
 
-      await txSubscription.waitForNonceToUpdate();
+      await action.waitForNonceToUpdate();
 
       await confirmBalances([ana.address, bob.address], [0, 1]);
     });
@@ -229,12 +215,12 @@ describe("TasitAction.NFT", () => {
 
       fullNFT.on("error", contractErrorListener);
 
-      txSubscription = fullNFT.safeTransferFrom(
+      action = fullNFT.safeTransferFrom(
         ana.address,
         sampleContractAddress,
         tokenId
       );
-      await txSubscription.waitForNonceToUpdate();
+      await action.waitForNonceToUpdate();
 
       expect(contractErrorFakeFn.called).to.be.true;
 
@@ -254,14 +240,14 @@ describe("TasitAction.NFT", () => {
         actionErrorFakeFn();
       };
 
-      txSubscription = fullNFT.safeTransferFrom(
+      action = fullNFT.safeTransferFrom(
         ana.address,
         sampleContractAddress,
         tokenId
       );
-      txSubscription.on("error", actionErrorListener);
+      action.on("error", actionErrorListener);
 
-      await txSubscription.waitForNonceToUpdate();
+      await action.waitForNonceToUpdate();
 
       expect(actionErrorFakeFn.called).to.be.true;
 

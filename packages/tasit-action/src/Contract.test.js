@@ -10,28 +10,18 @@ import { abi as contractABI } from "./testHelpers/SampleContract.json";
 const sampleContractAddress = "0x6C4A015797DDDd87866451914eCe1e8b19261931";
 
 describe("TasitAction.Contract", () => {
-  let sampleContract,
-    wallet,
-    testcaseSnaphotId,
-    provider,
-    txSubscription,
-    contractSubscription;
+  let sampleContract, wallet, testcaseSnaphotId, provider, action;
 
   beforeEach("should connect to an existing contract", async () => {
-    if (contractSubscription) {
-      expect(contractSubscription.subscribedEventNames()).to.be.empty;
-    }
-
-    if (txSubscription) {
-      expect(txSubscription.subscribedEventNames()).to.be.empty;
+    if (action) {
+      expect(action.subscribedEventNames()).to.be.empty;
     }
 
     sampleContract = undefined;
     wallet = undefined;
     testcaseSnaphotId = undefined;
     provider = undefined;
-    txSubscription = undefined;
-    contractSubscription = undefined;
+    action = undefined;
 
     // Account creates a wallet, should it create an account object that encapsulates the wallet?
     // TasitAcount.create()
@@ -54,21 +44,21 @@ describe("TasitAction.Contract", () => {
   afterEach("revert blockchain snapshot", async () => {
     await mineBlocks(provider, 1);
 
-    if (contractSubscription) {
-      contractSubscription.unsubscribe();
+    if (sampleContract) {
+      sampleContract.unsubscribe();
 
       expect(
-        contractSubscription.getEmitter()._events,
+        sampleContract.getEmitter()._events,
         "ethers.js should not be listening to any events."
       ).to.be.empty;
     }
 
-    if (txSubscription) {
-      await txSubscription.waitForNonceToUpdate();
-      txSubscription.unsubscribe();
+    if (action) {
+      await action.waitForNonceToUpdate();
+      action.unsubscribe();
 
       expect(
-        txSubscription.getEmitter()._events,
+        action.getEmitter()._events,
         "ethers.js should not be listening to any events."
       ).to.be.empty;
     }
@@ -153,8 +143,8 @@ describe("TasitAction.Contract", () => {
 
       sampleContract.on("error", errorListener);
 
-      txSubscription = sampleContract.revertWrite("some string");
-      await txSubscription.waitForNonceToUpdate();
+      action = sampleContract.revertWrite("some string");
+      await action.waitForNonceToUpdate();
 
       expect(errorListener.callCount).to.equal(1);
     });
@@ -165,11 +155,11 @@ describe("TasitAction.Contract", () => {
 
       sampleContract.on("error", contractErrorListener);
 
-      txSubscription = sampleContract.revertWrite("some string");
+      action = sampleContract.revertWrite("some string");
 
-      txSubscription.on("error", txErrorListener);
+      action.on("error", txErrorListener);
 
-      await txSubscription.waitForNonceToUpdate();
+      await action.waitForNonceToUpdate();
 
       expect(contractErrorListener.callCount).to.equal(1);
       expect(txErrorListener.callCount).to.equal(1);
@@ -184,14 +174,11 @@ describe("TasitAction.Contract", () => {
       };
 
       sampleContract.on("error", errorListener);
+      sampleContract.on("ValueChanged", eventListener);
 
-      contractSubscription = sampleContract.subscribe();
+      action = sampleContract.setValue("hello world");
 
-      contractSubscription.on("ValueChanged", eventListener);
-
-      txSubscription = sampleContract.setValue("hello world");
-
-      await txSubscription.waitForNonceToUpdate();
+      await action.waitForNonceToUpdate();
 
       await mineBlocks(provider, 1);
 
@@ -201,26 +188,20 @@ describe("TasitAction.Contract", () => {
 
     it("should trigger Contract and ContractEventsSubscription error events on Contract Event listener error", async () => {
       const contractErrorListener = sinon.fake();
-      const eventErrorListener = sinon.fake();
       const eventListener = () => {
         throw new Error();
       };
 
       sampleContract.on("error", contractErrorListener);
+      sampleContract.on("ValueChanged", eventListener);
 
-      contractSubscription = sampleContract.subscribe();
+      action = sampleContract.setValue("hello world");
 
-      contractSubscription.on("error", eventErrorListener);
-      contractSubscription.on("ValueChanged", eventListener);
-
-      txSubscription = sampleContract.setValue("hello world");
-
-      await txSubscription.waitForNonceToUpdate();
+      await action.waitForNonceToUpdate();
 
       await mineBlocks(provider, 1);
 
       expect(contractErrorListener.callCount).to.equal(1);
-      expect(eventErrorListener.callCount).to.equal(1);
     });
 
     it("throw error on revert read function", async () => {
@@ -240,29 +221,29 @@ describe("TasitAction.Contract", () => {
     });
 
     it("should throw when subscribing with invalid event name", async () => {
-      txSubscription = sampleContract.setValue("hello world");
+      action = sampleContract.setValue("hello world");
 
       expect(() => {
-        txSubscription.on("invalid", () => {});
+        action.on("invalid", () => {});
       }).to.throw();
     });
 
     it("should throw when subscribing without listener", async () => {
-      txSubscription = sampleContract.setValue("hello world");
+      action = sampleContract.setValue("hello world");
 
       expect(() => {
-        txSubscription.on("confirmation");
+        action.on("confirmation");
       }).to.throw();
     });
 
     it("should change contract state and trigger confirmation event one time", async () => {
-      txSubscription = sampleContract.setValue(rand);
+      action = sampleContract.setValue(rand);
 
       // Waiting for 1st confirmation
       // For now ganache always mine a block after transaction creation
       // To avoid non-determinism it's recommended to wait that first confirmation if it could affect the test case result
       // See more: https://github.com/trufflesuite/ganache-core/issues/248#issuecomment-455354557
-      await txSubscription.waitForNonceToUpdate();
+      await action.waitForNonceToUpdate();
 
       const confirmationFakeFn = sinon.fake();
       const errorFakeFn = sinon.fake();
@@ -282,24 +263,24 @@ describe("TasitAction.Contract", () => {
         expect(value).to.equal(rand);
       };
 
-      txSubscription.on("error", errorListener);
+      action.on("error", errorListener);
 
-      txSubscription.once("confirmation", confirmationListener);
+      action.once("confirmation", confirmationListener);
 
       await mineBlocks(provider, 2);
 
       expect(confirmationFakeFn.callCount).to.equal(1);
       expect(errorFakeFn.called).to.be.false;
 
-      txSubscription.off("error");
+      action.off("error");
 
-      expect(txSubscription.subscribedEventNames()).to.be.empty;
+      expect(action.subscribedEventNames()).to.be.empty;
     });
 
     it("should change contract state and trigger confirmation event", async () => {
-      txSubscription = sampleContract.setValue(rand);
+      action = sampleContract.setValue(rand);
 
-      await txSubscription.waitForNonceToUpdate();
+      await action.waitForNonceToUpdate();
 
       const confirmationFakeFn = sinon.fake();
       const errorFakeFn = sinon.fake();
@@ -313,7 +294,7 @@ describe("TasitAction.Contract", () => {
         const { confirmations } = data;
 
         if (confirmations >= 7) {
-          txSubscription.off("confirmation");
+          action.off("confirmation");
 
           const value = await sampleContract.getValue();
           expect(value).to.equal(rand);
@@ -321,8 +302,8 @@ describe("TasitAction.Contract", () => {
         confirmationFakeFn();
       };
 
-      txSubscription.on("error", errorListener);
-      txSubscription.on("confirmation", confirmationListener);
+      action.on("error", errorListener);
+      action.on("confirmation", confirmationListener);
 
       await mineBlocks(provider, 6);
 
@@ -331,9 +312,9 @@ describe("TasitAction.Contract", () => {
     });
 
     it("should change contract state and trigger confirmation event - late subscription", async () => {
-      txSubscription = sampleContract.setValue(rand);
+      action = sampleContract.setValue(rand);
 
-      await txSubscription.waitForNonceToUpdate();
+      await action.waitForNonceToUpdate();
 
       await mineBlocks(provider, 5);
 
@@ -349,7 +330,7 @@ describe("TasitAction.Contract", () => {
         const { confirmations } = data;
 
         if (confirmations == 7) {
-          txSubscription.off("confirmation");
+          action.off("confirmation");
 
           const value = await sampleContract.getValue();
           expect(value).to.equal(rand);
@@ -358,8 +339,8 @@ describe("TasitAction.Contract", () => {
         }
       };
 
-      txSubscription.on("error", errorListener);
-      txSubscription.on("confirmation", confirmationListener);
+      action.on("error", errorListener);
+      action.on("confirmation", confirmationListener);
 
       await mineBlocks(provider, 2);
 
@@ -369,10 +350,10 @@ describe("TasitAction.Contract", () => {
     });
 
     it("should call error listener after timeout", async () => {
-      txSubscription = sampleContract.setValue("hello world");
-      txSubscription.setEventsTimeout(100);
+      action = sampleContract.setValue("hello world");
+      action.setEventsTimeout(100);
 
-      await txSubscription.waitForNonceToUpdate();
+      await action.waitForNonceToUpdate();
 
       const errorFn = sinon.fake();
       const confirmationFn = sinon.fake();
@@ -381,7 +362,7 @@ describe("TasitAction.Contract", () => {
         confirmationFn();
       };
 
-      txSubscription.on("confirmation", foreverListener);
+      action.on("confirmation", foreverListener);
 
       const errorListener = message => {
         const { error } = message;
@@ -390,7 +371,7 @@ describe("TasitAction.Contract", () => {
         errorFn();
       };
 
-      txSubscription.on("error", errorListener);
+      action.on("error", errorListener);
 
       await mineBlocks(provider, 1);
 
@@ -399,53 +380,53 @@ describe("TasitAction.Contract", () => {
       //  https://github.com/sinonjs/sinon/issues/1739
       //  https://github.com/sinonjs/lolex/issues/114
       //  https://stackoverflow.com/a/50785284
-      await wait(txSubscription.getEventsTimeout() * 3);
+      await wait(action.getEventsTimeout() * 3);
 
       expect(errorFn.called).to.be.true;
       expect(confirmationFn.called).to.be.true;
-      expect(txSubscription.subscribedEventNames()).to.deep.equal([
+      expect(action.subscribedEventNames()).to.deep.equal([
         "error",
         "confirmation",
       ]);
     });
 
     it("subscription should have one listener per event", async () => {
-      txSubscription = sampleContract.setValue("hello world");
+      action = sampleContract.setValue("hello world");
 
       const listener1 = message => {};
       const listener2 = message => {};
 
-      expect(txSubscription.subscribedEventNames()).to.deep.equal(["error"]);
+      expect(action.subscribedEventNames()).to.deep.equal(["error"]);
 
-      txSubscription.on("confirmation", listener1);
+      action.on("confirmation", listener1);
 
       expect(() => {
-        txSubscription.on("confirmation", listener2);
+        action.on("confirmation", listener2);
       }).to.throw();
 
-      expect(txSubscription.subscribedEventNames()).to.deep.equal([
+      expect(action.subscribedEventNames()).to.deep.equal([
         "error",
         "confirmation",
       ]);
     });
 
     it("should remove an event", async () => {
-      txSubscription = sampleContract.setValue("hello world");
+      action = sampleContract.setValue("hello world");
 
       const listener1 = message => {};
 
-      expect(txSubscription.subscribedEventNames()).to.deep.equal(["error"]);
+      expect(action.subscribedEventNames()).to.deep.equal(["error"]);
 
-      txSubscription.on("confirmation", listener1);
+      action.on("confirmation", listener1);
 
-      expect(txSubscription.subscribedEventNames()).to.deep.equal([
+      expect(action.subscribedEventNames()).to.deep.equal([
         "error",
         "confirmation",
       ]);
 
-      txSubscription.off("confirmation");
+      action.off("confirmation");
 
-      expect(txSubscription.subscribedEventNames()).to.deep.equal(["error"]);
+      expect(action.subscribedEventNames()).to.deep.equal(["error"]);
     });
 
     // Note: Block reorganization is the situation where a client discovers a
@@ -474,11 +455,11 @@ describe("TasitAction.Contract", () => {
 
       const snapshotId = await createSnapshot(provider);
 
-      txSubscription = sampleContract.setValue("hello world");
+      action = sampleContract.setValue("hello world");
 
-      txSubscription.on("confirmation", confirmationListener);
+      action.on("confirmation", confirmationListener);
 
-      txSubscription.on("error", errorListener);
+      action.on("error", errorListener);
 
       await mineBlocks(provider, 2);
 
@@ -490,8 +471,8 @@ describe("TasitAction.Contract", () => {
 
       // Note: Transaction no longer exists
       // If it isn't unset, afterEach hook will execute waitForNonceToUpdate forever
-      txSubscription.off("confirmation");
-      txSubscription = undefined;
+      action.off("confirmation");
+      action = undefined;
 
       expect(errorFn.called).to.be.true;
     });
@@ -520,13 +501,13 @@ describe("TasitAction.Contract", () => {
         errorFn();
       };
 
-      txSubscription = sampleContract.setValue("hello world");
+      action = sampleContract.setValue("hello world");
 
-      await txSubscription.waitForNonceToUpdate();
+      await action.waitForNonceToUpdate();
 
-      txSubscription.on("error", errorListener);
+      action.on("error", errorListener);
 
-      txSubscription.on("confirmation", confirmationListener);
+      action.on("confirmation", confirmationListener);
 
       await mineBlocks(provider, 1);
 
@@ -540,7 +521,7 @@ describe("TasitAction.Contract", () => {
 
       // Note: Without that, ethers.provider will keep the same
       // receipt.confirmations as before snapshot reversion
-      txSubscription.refreshProvider();
+      action.refreshProvider();
 
       await mineBlocks(provider, 2);
 
@@ -558,7 +539,6 @@ describe("TasitAction.Contract", () => {
     });
 
     it("should trigger an event one time when you're listening to that event and the contract triggers it", async () => {
-      contractSubscription = sampleContract.subscribe();
       const fakeFn = sinon.fake();
       const errorFakeFn = sinon.fake();
 
@@ -567,14 +547,14 @@ describe("TasitAction.Contract", () => {
         errorFakeFn();
       };
 
-      contractSubscription.on("error", errorListener);
+      sampleContract.on("error", errorListener);
 
-      txSubscription = sampleContract.setValue("hello world");
+      action = sampleContract.setValue("hello world");
 
       // Is possible do that using async/await?
       // If not, TODO: Make a function
       await new Promise(function(resolve, reject) {
-        contractSubscription.once("ValueChanged", message => {
+        sampleContract.once("ValueChanged", message => {
           const { data } = message;
           const { args } = data;
 
@@ -584,15 +564,14 @@ describe("TasitAction.Contract", () => {
         });
       });
 
-      contractSubscription.off("error");
+      sampleContract.off("error");
 
       expect(errorFakeFn.called).to.be.false;
       expect(fakeFn.callCount).to.equal(1);
-      expect(contractSubscription.subscribedEventNames()).to.be.empty;
+      expect(sampleContract.subscribedEventNames()).to.be.empty;
     });
 
     it("should be able to listen to an event triggered by the contract", async () => {
-      contractSubscription = sampleContract.subscribe();
       const fakeFn = sinon.fake();
       const errorFakeFn = sinon.fake();
 
@@ -601,14 +580,14 @@ describe("TasitAction.Contract", () => {
         errorFakeFn();
       };
 
-      contractSubscription.on("error", errorListener);
+      sampleContract.on("error", errorListener);
 
-      txSubscription = sampleContract.setValue("hello world");
+      action = sampleContract.setValue("hello world");
 
       // Is possible do that using async/await?
       // If not, TODO: Make a function
       await new Promise(function(resolve, reject) {
-        contractSubscription.on("ValueChanged", message => {
+        sampleContract.on("ValueChanged", message => {
           const { data } = message;
           const { args } = data;
 
@@ -617,103 +596,82 @@ describe("TasitAction.Contract", () => {
         });
       });
 
-      contractSubscription.off("error");
+      sampleContract.off("error");
 
       expect(errorFakeFn.called).to.be.false;
       expect(fakeFn.callCount).to.equal(1);
     });
 
     it("should throw error when listening on invalid event", async () => {
-      contractSubscription = sampleContract.subscribe();
-
       expect(() => {
-        contractSubscription.on("InvalidEvent", () => {});
+        sampleContract.on("InvalidEvent", () => {});
       }).to.throw();
     });
 
     it("subscription should have one listener per event", async () => {
-      contractSubscription = sampleContract.subscribe();
-
       const listener1 = message => {};
       const listener2 = message => {};
 
-      expect(contractSubscription.subscribedEventNames()).to.deep.equal([
-        "error",
-      ]);
+      expect(sampleContract.subscribedEventNames()).to.be.empty;
 
-      contractSubscription.on("ValueChanged", listener1);
+      sampleContract.on("ValueChanged", listener1);
 
       expect(() => {
-        contractSubscription.on("ValueChanged", listener2);
+        sampleContract.on("ValueChanged", listener2);
       }).to.throw();
 
-      expect(contractSubscription.subscribedEventNames()).to.deep.equal([
-        "error",
+      expect(sampleContract.subscribedEventNames()).to.deep.equal([
         "ValueChanged",
       ]);
     });
 
     it("should remove an event", async () => {
-      contractSubscription = sampleContract.subscribe();
-
       const listener1 = message => {};
 
-      expect(contractSubscription.subscribedEventNames()).to.deep.equal([
-        "error",
-      ]);
+      expect(sampleContract.subscribedEventNames()).to.be.empty;
 
-      contractSubscription.on("ValueChanged", listener1);
+      sampleContract.on("ValueChanged", listener1);
 
-      expect(contractSubscription.subscribedEventNames()).to.deep.equal([
-        "error",
+      expect(sampleContract.subscribedEventNames()).to.deep.equal([
         "ValueChanged",
       ]);
 
-      contractSubscription.off("ValueChanged");
+      sampleContract.off("ValueChanged");
 
-      expect(contractSubscription.subscribedEventNames()).to.deep.equal([
-        "error",
-      ]);
+      expect(sampleContract.subscribedEventNames()).to.be.empty;
     });
 
     it("should manage many listeners", async () => {
-      contractSubscription = sampleContract.subscribe();
-
       const listener1 = message => {};
       const listener2 = message => {};
       const listener3 = message => {};
 
-      expect(contractSubscription.subscribedEventNames()).to.deep.equal([
-        "error",
-      ]);
+      expect(sampleContract.subscribedEventNames()).to.be.empty;
 
-      contractSubscription.on("ValueChanged", listener1);
-      contractSubscription.on("ValueRemoved", listener2);
+      sampleContract.on("ValueChanged", listener1);
+      sampleContract.on("ValueRemoved", listener2);
 
-      expect(contractSubscription.subscribedEventNames()).to.deep.equal([
-        "error",
+      expect(sampleContract.subscribedEventNames()).to.deep.equal([
         "ValueChanged",
         "ValueRemoved",
       ]);
 
-      contractSubscription.off("ValueRemoved");
+      sampleContract.off("ValueRemoved");
 
-      expect(contractSubscription.subscribedEventNames()).to.deep.equal([
-        "error",
+      expect(sampleContract.subscribedEventNames()).to.deep.equal([
         "ValueChanged",
       ]);
 
-      contractSubscription.on("ValueRemoved", listener3);
+      sampleContract.on("ValueRemoved", listener3);
 
-      expect(contractSubscription.subscribedEventNames()).to.deep.equal([
-        "error",
+      expect(sampleContract.subscribedEventNames()).to.deep.equal([
         "ValueChanged",
         "ValueRemoved",
       ]);
 
-      contractSubscription.unsubscribe();
+      sampleContract.unsubscribe();
 
-      expect(contractSubscription.subscribedEventNames()).to.be.empty;
+      expect(sampleContract.subscribedEventNames()).to.be.empty;
     });
   });
 

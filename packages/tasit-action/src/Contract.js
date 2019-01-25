@@ -12,33 +12,30 @@ import Subscription from "./Subscription";
 // I'm not sure if extend Subscription is the best approach
 // I'm usually think inheritance as an IS-A relationship
 // I'm not really sure if "Contract is a Subscription" sounds good
-export class Contract extends Subscription {
+export class Contract extends ContractEventsSubscription {
   #provider;
   #ethersContract;
-  #eventsSubscription;
 
   constructor(address, abi, wallet) {
+    if (!Utils.isAddress(address) || !Utils.isABI(abi))
+      throw new Error(`Cannot create a Contract without a address and ABI`);
+
+    if (wallet && !Utils.isEthersJsSigner(wallet))
+      throw new Error(`Cannot set an invalid wallet for a Contract`);
+
     const provider = ProviderFactory.getProvider();
 
-    super(provider);
+    // If there's a wallet, connect it with provider.
+    // Otherwise use provider directly (for read operations only).
+    const signerOrProvider = wallet ? wallet.connect(provider) : provider;
 
+    const ethersContract = new ethers.Contract(address, abi, signerOrProvider);
+
+    super(ethersContract);
     this.#provider = provider;
-    this.#initializeContract(address, abi, wallet);
+    this.#ethersContract = ethersContract;
+    this.#addFunctionsToContract();
   }
-
-  on = (eventName, listener) => {
-    const events = ["error"];
-
-    if (!events.includes(eventName))
-      throw new Error(`Invalid event, use: [${events}]`);
-
-    // Note: In the future we'll possibly support more events than just "error"
-    if (eventName !== "error") {
-      throw new Error(`Invalid event '${event}'.`);
-    } else {
-      this._addErrorListener(listener);
-    }
-  };
 
   // Note: For now, `tasit-account` creates a ethers.js wallet object
   // If that changes, maybe this method could be renamed to setAccount()
@@ -46,18 +43,22 @@ export class Contract extends Subscription {
     if (!Utils.isEthersJsSigner(wallet))
       throw new Error(`Cannot set an invalid wallet for a Contract`);
 
-    this.#initializeContract(
+    this.#ethersContract = new ethers.Contract(
       this.#ethersContract.address,
       this.#ethersContract.interface.abi,
-      wallet
+      wallet.connect(this.#provider)
     );
+
+    this.#addFunctionsToContract();
   };
 
   removeWallet = () => {
-    this.#initializeContract(
+    this.#ethersContract = new ethers.Contract(
       this.#ethersContract.address,
-      this.#ethersContract.interface.abi
+      this.#ethersContract.interface.abi,
+      this.#provider
     );
+    this.#addFunctionsToContract();
   };
 
   getAddress = () => {
@@ -67,39 +68,6 @@ export class Contract extends Subscription {
   // For testing purposes
   _getProvider = () => {
     return this.#provider;
-  };
-
-  subscribe = () => {
-    if (!this.#eventsSubscription)
-      this.#eventsSubscription = new ContractEventsSubscription(
-        this.#ethersContract,
-        this
-      );
-
-    const errorListener = message => {
-      const { error } = message;
-      this._emitErrorEvent(new Error(`${error.message}`));
-    };
-
-    this.#eventsSubscription.on("error", errorListener);
-
-    return this.#eventsSubscription;
-  };
-
-  #initializeContract = (address, abi, wallet) => {
-    if (!Utils.isAddress(address) || !Utils.isABI(abi))
-      throw new Error(`Cannot create a Contract without a address and ABI`);
-
-    if (wallet && !Utils.isEthersJsSigner(wallet))
-      throw new Error(`Cannot set an invalid wallet for a Contract`);
-
-    // If there's a wallet, connect it with provider. Otherwise use provider directly (for read operations only).
-    const signerOrProvider = wallet
-      ? wallet.connect(this.#provider)
-      : this.#provider;
-
-    this.#ethersContract = new ethers.Contract(address, abi, signerOrProvider);
-    this.#addFunctionsToContract();
   };
 
   #addFunctionsToContract = () => {
