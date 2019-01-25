@@ -26,8 +26,8 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.1.5",
-    "tasit-account": "^0.0.1",
-    "tasit-action": "^0.0.1"
+    "tasit-account": "^0.0.3",
+    "tasit-action": "^0.0.3"
   },
   "devDependencies": {
     "@babel/cli": "^7.1.5",
