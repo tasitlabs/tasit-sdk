@@ -1,6 +1,6 @@
 {
   "name": "tasit-sdk",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "A JavaScript SDK for making mobile Ethereum dapps using React Native",
   "main": "dist/index.js",
   "keywords": [
@@ -37,5 +37,5 @@
     "chai": "^4.2.0",
     "mocha": "^5.2.0"
   },
-  "gitHead": "e02f70a8c70721039e2c88d7b55d89f50c72e028"
+  "gitHead": "f83a98afbc5f17682cf6acaa8386214a7ad554c0"
 }
