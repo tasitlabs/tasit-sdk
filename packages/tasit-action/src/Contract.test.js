@@ -131,77 +131,57 @@ describe("TasitAction.Contract", () => {
     });
   });
 
-  describe("Contract Subscription", async () => {
+  describe("Contract errors behavior", async () => {
     beforeEach("assign a wallet to the contract", () => {
       expect(() => {
         sampleContract.setWallet(wallet);
       }).not.to.throw();
     });
 
-    it("should trigger Contract error event on Action error", async () => {
-      const errorListener = sinon.fake();
+    describe("should trigger Contract error event", async () => {
+      it("on action error", async () => {
+        const errorListener = sinon.fake();
 
-      sampleContract.on("error", errorListener);
+        sampleContract.on("error", errorListener);
 
-      action = sampleContract.revertWrite("some string");
-      await action.waitForNonceToUpdate();
+        action = sampleContract.revertWrite("some string");
+        await action.waitForNonceToUpdate();
 
-      expect(errorListener.callCount).to.equal(1);
-    });
+        expect(errorListener.callCount).to.equal(1);
+      });
 
-    it("should trigger Contract and TransactionSubscription error events on Action error", async () => {
-      const contractErrorListener = sinon.fake();
-      const txErrorListener = sinon.fake();
+      it("and Action error event on action error", async () => {
+        const contractErrorListener = sinon.fake();
+        const actionErrorListener = sinon.fake();
 
-      sampleContract.on("error", contractErrorListener);
+        sampleContract.on("error", contractErrorListener);
 
-      action = sampleContract.revertWrite("some string");
+        action = sampleContract.revertWrite("some string");
 
-      action.on("error", txErrorListener);
+        action.on("error", actionErrorListener);
 
-      await action.waitForNonceToUpdate();
+        await action.waitForNonceToUpdate();
 
-      expect(contractErrorListener.callCount).to.equal(1);
-      expect(txErrorListener.callCount).to.equal(1);
-    });
+        expect(contractErrorListener.callCount).to.equal(1);
+        expect(actionErrorListener.callCount).to.equal(1);
+      });
 
-    it("should trigger Contract error event on Contract Event listener error", async () => {
-      const errorListener = sinon.fake();
-      const eventFnFake = sinon.fake();
-      const eventListener = () => {
-        eventFnFake();
-        throw new Error();
-      };
+      it("on contract event listener error", async () => {
+        const errorListener = sinon.fake();
+        const eventListener = sinon.fake.throws(new Error());
 
-      sampleContract.on("error", errorListener);
-      sampleContract.on("ValueChanged", eventListener);
+        sampleContract.on("error", errorListener);
+        sampleContract.on("ValueChanged", eventListener);
 
-      action = sampleContract.setValue("hello world");
+        action = sampleContract.setValue("hello world");
 
-      await action.waitForNonceToUpdate();
+        await action.waitForNonceToUpdate();
 
-      await mineBlocks(provider, 1);
+        await mineBlocks(provider, 1);
 
-      expect(eventFnFake.callCount).to.equal(1);
-      expect(errorListener.callCount).to.equal(1);
-    });
-
-    it("should trigger Contract and ContractEventsSubscription error events on Contract Event listener error", async () => {
-      const contractErrorListener = sinon.fake();
-      const eventListener = () => {
-        throw new Error();
-      };
-
-      sampleContract.on("error", contractErrorListener);
-      sampleContract.on("ValueChanged", eventListener);
-
-      action = sampleContract.setValue("hello world");
-
-      await action.waitForNonceToUpdate();
-
-      await mineBlocks(provider, 1);
-
-      expect(contractErrorListener.callCount).to.equal(1);
+        expect(eventListener.callCount).to.equal(1);
+        expect(errorListener.callCount).to.equal(1);
+      });
     });
 
     it("throw error on revert read function", async () => {
