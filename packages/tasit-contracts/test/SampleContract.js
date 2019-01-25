@@ -11,6 +11,7 @@ const SampleContract = artifacts.require("./SampleContract.sol");
 // in tasit-contracts testing the same contract.
 // For that reason, a possible TODO is removing any truffle tests
 // other than those we directly add from 3rd-party projects
+
 contract("SampleContract", function(accounts) {
   let sampleContract;
 
