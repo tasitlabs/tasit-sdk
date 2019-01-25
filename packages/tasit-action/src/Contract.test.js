@@ -415,9 +415,7 @@ describe("TasitAction.Contract", () => {
       const listener1 = message => {};
       const listener2 = message => {};
 
-      expect(txSubscription.subscribedEventNames()).not.to.include(
-        "confirmation"
-      );
+      expect(txSubscription.subscribedEventNames()).to.deep.equal(["error"]);
 
       txSubscription.on("confirmation", listener1);
 
@@ -425,7 +423,10 @@ describe("TasitAction.Contract", () => {
         txSubscription.on("confirmation", listener2);
       }).to.throw();
 
-      expect(txSubscription.subscribedEventNames()).to.include("confirmation");
+      expect(txSubscription.subscribedEventNames()).to.deep.equal([
+        "error",
+        "confirmation",
+      ]);
     });
 
     it("should remove an event", async () => {
@@ -433,19 +434,18 @@ describe("TasitAction.Contract", () => {
 
       const listener1 = message => {};
 
-      expect(txSubscription.subscribedEventNames()).not.to.include(
-        "confirmation"
-      );
+      expect(txSubscription.subscribedEventNames()).to.deep.equal(["error"]);
 
       txSubscription.on("confirmation", listener1);
 
-      expect(txSubscription.subscribedEventNames()).to.include("confirmation");
+      expect(txSubscription.subscribedEventNames()).to.deep.equal([
+        "error",
+        "confirmation",
+      ]);
 
       txSubscription.off("confirmation");
 
-      expect(txSubscription.subscribedEventNames()).not.to.include(
-        "confirmation"
-      );
+      expect(txSubscription.subscribedEventNames()).to.deep.equal(["error"]);
     });
 
     // Note: Block reorganization is the situation where a client discovers a
@@ -637,9 +637,9 @@ describe("TasitAction.Contract", () => {
       const listener1 = message => {};
       const listener2 = message => {};
 
-      expect(contractSubscription.subscribedEventNames()).to.not.include(
-        "ValueChanged"
-      );
+      expect(contractSubscription.subscribedEventNames()).to.deep.equal([
+        "error",
+      ]);
 
       contractSubscription.on("ValueChanged", listener1);
 
@@ -647,9 +647,10 @@ describe("TasitAction.Contract", () => {
         contractSubscription.on("ValueChanged", listener2);
       }).to.throw();
 
-      expect(contractSubscription.subscribedEventNames()).to.include(
-        "ValueChanged"
-      );
+      expect(contractSubscription.subscribedEventNames()).to.deep.equal([
+        "error",
+        "ValueChanged",
+      ]);
     });
 
     it("should remove an event", async () => {
@@ -657,21 +658,22 @@ describe("TasitAction.Contract", () => {
 
       const listener1 = message => {};
 
-      expect(contractSubscription.subscribedEventNames()).to.not.include(
-        "ValueChanged"
-      );
+      expect(contractSubscription.subscribedEventNames()).to.deep.equal([
+        "error",
+      ]);
 
       contractSubscription.on("ValueChanged", listener1);
 
-      expect(contractSubscription.subscribedEventNames()).to.include(
-        "ValueChanged"
-      );
+      expect(contractSubscription.subscribedEventNames()).to.deep.equal([
+        "error",
+        "ValueChanged",
+      ]);
 
       contractSubscription.off("ValueChanged");
 
-      expect(contractSubscription.subscribedEventNames()).to.not.include(
-        "ValueChanged"
-      );
+      expect(contractSubscription.subscribedEventNames()).to.deep.equal([
+        "error",
+      ]);
     });
 
     it("should manage many listeners", async () => {
@@ -681,36 +683,37 @@ describe("TasitAction.Contract", () => {
       const listener2 = message => {};
       const listener3 = message => {};
 
-      expect(
-        contractSubscription.subscribedEventNames()
-      ).to.not.include.members(["ValueChanged", "ValueRemoved"]);
+      expect(contractSubscription.subscribedEventNames()).to.deep.equal([
+        "error",
+      ]);
 
       contractSubscription.on("ValueChanged", listener1);
       contractSubscription.on("ValueRemoved", listener2);
 
-      expect(contractSubscription.subscribedEventNames()).to.include.members([
+      expect(contractSubscription.subscribedEventNames()).to.deep.equal([
+        "error",
         "ValueChanged",
         "ValueRemoved",
       ]);
 
       contractSubscription.off("ValueRemoved");
 
-      expect(contractSubscription.subscribedEventNames()).to.include.members([
+      expect(contractSubscription.subscribedEventNames()).to.deep.equal([
+        "error",
         "ValueChanged",
       ]);
 
       contractSubscription.on("ValueRemoved", listener3);
 
-      expect(contractSubscription.subscribedEventNames()).to.include.members([
+      expect(contractSubscription.subscribedEventNames()).to.deep.equal([
+        "error",
         "ValueChanged",
         "ValueRemoved",
       ]);
 
       contractSubscription.unsubscribe();
 
-      expect(
-        contractSubscription.subscribedEventNames()
-      ).to.not.include.members(["ValueChanged", "ValueRemoved"]);
+      expect(contractSubscription.subscribedEventNames()).to.be.empty;
     });
   });
 
