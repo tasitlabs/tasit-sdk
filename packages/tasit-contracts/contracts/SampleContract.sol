@@ -24,4 +24,15 @@ contract SampleContract {
     emit ValueRemoved(msg.sender, _value);
     _value = "";
   }
+
+  function revertRead() public pure returns(bool) {
+    require(false);
+    return false;
+  }
+
+  function revertWrite(string memory value) public {
+    require(false);
+    _value = value;
+  }
+
 }
