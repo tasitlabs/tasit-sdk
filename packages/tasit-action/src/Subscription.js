@@ -93,7 +93,7 @@ export class Subscription {
   // TODO: Make protected
   _addErrorListener = newListener => {
     let listener = newListener;
-    const errorEventListener = this.#eventListeners.get("error");
+    const oldErrorEventListener = this.#eventListeners.get("error");
 
     if (errorEventListener) {
       listener = error => {
