@@ -27,7 +27,7 @@ describe("ethers.js", () => {
       contractABI,
       wallet
     );
-    expect(sampleContract.address).to.be.equals(sampleContractAddress);
+    expect(sampleContract.address).to.equal(sampleContractAddress);
 
     testcaseSnaphotId = await createSnapshot(provider);
   });
