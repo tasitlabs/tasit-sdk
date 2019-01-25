@@ -95,10 +95,10 @@ export class Subscription {
     let listener = newListener;
     const oldErrorEventListener = this.#eventListeners.get("error");
 
-    if (errorEventListener) {
+    if (oldErrorEventListener) {
       listener = error => {
         newListener(error);
-        errorEventListener.listener(error);
+        oldErrorEventListener.listener(error);
       };
 
       this.off("error");
