@@ -141,8 +141,6 @@ describe("TasitAction.Contract", () => {
     });
   });
 
-  // Should we create some revertFunction at SimpleStorageWithRemoved Contract
-  // and rename it to a short name as SampleContract ?
   describe.skip("Contract Subscription", async () => {});
 
   describe("Transactions (Actions) Subscription", async () => {

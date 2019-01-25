@@ -1,10 +1,7 @@
-var SimpleStorageWithRemoved = artifacts.require(
-  "./SimpleStorageWithRemoved.sol"
-);
-
+var SampleContract = artifacts.require("./SampleContract.sol");
 var FullNFT = artifacts.require("./FullNFT.sol");
 
 module.exports = function(deployer) {
-  deployer.deploy(SimpleStorageWithRemoved, "Hello World!");
+  deployer.deploy(SampleContract, "Hello World!");
   deployer.deploy(FullNFT);
 };

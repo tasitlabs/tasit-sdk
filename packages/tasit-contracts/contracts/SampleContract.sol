@@ -1,6 +1,6 @@
 pragma solidity ^0.5.0;
 
-contract SimpleStorageWithRemoved {
+contract SampleContract {
   event ValueChanged(address indexed author, string oldValue, string newValue);
   event ValueRemoved(address indexed author, string oldValue);
 
