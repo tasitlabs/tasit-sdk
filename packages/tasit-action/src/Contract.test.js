@@ -444,7 +444,7 @@ describe("TasitAction.Contract", () => {
 
       txSubscription.off("confirmation");
 
-      expect(txSubscription.subscribedEventNames()).to.not.include(
+      expect(txSubscription.subscribedEventNames()).not.to.include(
         "confirmation"
       );
     });
