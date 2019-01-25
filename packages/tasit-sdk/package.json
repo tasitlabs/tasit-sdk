@@ -36,5 +36,6 @@
     "@babel/register": "^7.0.0",
     "chai": "^4.2.0",
     "mocha": "^5.2.0"
-  }
+  },
+  "gitHead": "e02f70a8c70721039e2c88d7b55d89f50c72e028"
 }
