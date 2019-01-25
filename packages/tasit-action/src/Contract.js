@@ -15,7 +15,7 @@ import Subscription from "./Subscription";
 export class Contract extends Subscription {
   #provider;
   #ethersContract;
-  #subscription;
+  #eventsSubscription;
 
   constructor(address, abi, wallet) {
     const provider = ProviderFactory.getProvider();
@@ -70,22 +70,20 @@ export class Contract extends Subscription {
   };
 
   subscribe = () => {
-    if (!this.#subscription)
-      this.#subscription = new ContractEventsSubscription(
+    if (!this.#eventsSubscription)
+      this.#eventsSubscription = new ContractEventsSubscription(
         this.#ethersContract,
         this
       );
 
-    //if (!this.#subscription.subscribedEventNames().includes("error")) {
     const errorListener = message => {
       const { error } = message;
       this._emitErrorEvent(new Error(`${error.message}`));
     };
 
-    this.#subscription.on("error", errorListener);
-    //}
+    this.#eventsSubscription.on("error", errorListener);
 
-    return this.#subscription;
+    return this.#eventsSubscription;
   };
 
   #initializeContract = (address, abi, wallet) => {
@@ -133,16 +131,19 @@ export class Contract extends Subscription {
 
       const tx = this.#ethersContract[f.name].apply(null, args);
 
-      const subscription = new TransactionSubscription(tx, this.#provider);
+      const actionSubscription = new TransactionSubscription(
+        tx,
+        this.#provider
+      );
 
       const errorListener = message => {
         const { error } = message;
         this._emitErrorEvent(new Error(`${error.message}`));
       };
 
-      subscription.on("error", errorListener);
+      actionSubscription.on("error", errorListener);
 
-      return subscription;
+      return actionSubscription;
     };
   };
 }
