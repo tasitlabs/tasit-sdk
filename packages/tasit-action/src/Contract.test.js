@@ -416,7 +416,7 @@ describe("TasitAction.Contract", () => {
       const listener1 = message => {};
       const listener2 = message => {};
 
-      expect(txSubscription.subscribedEventNames()).to.not.include(
+      expect(txSubscription.subscribedEventNames()).not.to.include(
         "confirmation"
       );
 
