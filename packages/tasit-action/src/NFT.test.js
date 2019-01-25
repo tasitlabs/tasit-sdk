@@ -4,10 +4,9 @@ import NFT from "./NFT";
 // See https://github.com/tasitlabs/TasitSDK/issues/138
 const fullNFTAddress = "0x0E86f209729bf54763789CDBcA9E8b94f0FD5333";
 
-// Note: Under the current `tasit-contracts` setup SimpleStorageWithRemoved aways will deployed with this address
+// Note: Under the current `tasit-contracts` setup SampleContract aways will deployed with this address
 // See https://github.com/tasitlabs/TasitSDK/issues/138
-const simpleStorageWithRemovedAddress =
-  "0x6C4A015797DDDd87866451914eCe1e8b19261931";
+const sampleContractAddress = "0x6C4A015797DDDd87866451914eCe1e8b19261931";
 
 describe("TasitAction.NFT", () => {
   let owner,
@@ -235,7 +234,7 @@ describe("TasitAction.NFT", () => {
     it("shouldn't do a safeTransferFrom to a contract that doesn't implement `onERC721Received` - Contract Subscription", async () => {
       let senderBalance, receiverBalance;
       const sender = ana.address;
-      const receiver = simpleStorageWithRemovedAddress;
+      const receiver = sampleContractAddress;
       const contractErrorFakeFn = sinon.fake();
 
       fullNFT = new NFT(fullNFTAddress, ana);
@@ -271,7 +270,7 @@ describe("TasitAction.NFT", () => {
     it("shouldn't do a safeTransferFrom to a contract that doesn't implement `onERC721Received` - Action Subscription", async () => {
       let senderBalance, receiverBalance;
       const sender = ana.address;
-      const receiver = simpleStorageWithRemovedAddress;
+      const receiver = sampleContractAddress;
       const actionErrorFakeFn = sinon.fake();
 
       fullNFT = new NFT(fullNFTAddress, ana);

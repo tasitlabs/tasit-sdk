@@ -1,16 +1,16 @@
 import Contract from "./Contract";
 import Account from "tasit-account";
 
-// Note: SimpleStorage.json is originally genarated by `tasit-contracts` and was pasted here manually
+// Note: sampleContract.json is originally genarated by `tasit-contracts` and was pasted here manually
 // See https://github.com/tasitlabs/TasitSDK/issues/45
-import { abi as contractABI } from "./testHelpers/SimpleStorageWithRemoved.json";
+import { abi as contractABI } from "./testHelpers/SampleContract.json";
 
-// Note: Under the current `tasit-contracts` setup SimpleStorageWithRemoved aways will deployed with this address
+// Note: Under the current `tasit-contracts` setup SampleContract aways will deployed with this address
 // See https://github.com/tasitlabs/TasitSDK/issues/138
-const contractAddress = "0x6C4A015797DDDd87866451914eCe1e8b19261931";
+const sampleContractAddress = "0x6C4A015797DDDd87866451914eCe1e8b19261931";
 
 describe("TasitAction.Contract", () => {
-  let simpleStorage,
+  let sampleContract,
     wallet,
     testcaseSnaphotId,
     provider,
@@ -26,7 +26,7 @@ describe("TasitAction.Contract", () => {
       expect(txSubscription.subscribedEventNames()).to.be.empty;
     }
 
-    simpleStorage = undefined;
+    sampleContract = undefined;
     wallet = undefined;
     testcaseSnaphotId = undefined;
     provider = undefined;
@@ -40,14 +40,14 @@ describe("TasitAction.Contract", () => {
       "0x11d943d7649fbdeb146dc57bd9cfc80b086bfab2330c7b25651dbaf382392f60"
     );
 
-    simpleStorage = new Contract(contractAddress, contractABI);
-    expect(simpleStorage).to.exist;
-    expect(simpleStorage.getAddress()).to.equal(contractAddress);
-    expect(simpleStorage.getValue).to.exist;
-    expect(simpleStorage.setValue).to.exist;
-    expect(simpleStorage._getProvider()).to.exist;
+    sampleContract = new Contract(sampleContractAddress, contractABI);
+    expect(sampleContract).to.exist;
+    expect(sampleContract.getAddress()).to.equal(sampleContractAddress);
+    expect(sampleContract.getValue).to.exist;
+    expect(sampleContract.setValue).to.exist;
+    expect(sampleContract._getProvider()).to.exist;
 
-    provider = simpleStorage._getProvider();
+    provider = sampleContract._getProvider();
     testcaseSnaphotId = await createSnapshot(provider);
   });
 
@@ -85,7 +85,7 @@ describe("TasitAction.Contract", () => {
 
     it("constructor without ABI", async () => {
       expect(() => {
-        new Contract(contractAddress);
+        new Contract(sampleContractAddress);
       }).to.throw();
     });
 
@@ -103,40 +103,40 @@ describe("TasitAction.Contract", () => {
 
     it("constructor with valid address and invalid ABI", async () => {
       expect(() => {
-        new Contract(contractAddress, "invalid abi");
+        new Contract(sampleContractAddress, "invalid abi");
       }).to.throw();
     });
   });
 
   it("should call a read-only contract method", async () => {
-    const value = await simpleStorage.getValue();
+    const value = await sampleContract.getValue();
     expect(value).to.exist;
   });
 
   describe("wallet/account setup tests", async () => {
     it("should throw error when setting a wallet with no wallet argument", async () => {
       expect(() => {
-        simpleStorage.setWallet();
+        sampleContract.setWallet();
       }).to.throw();
     });
 
     it("should throw error when setting invalid wallet", async () => {
       expect(() => {
-        simpleStorage.setWallet("invalid wallet");
+        sampleContract.setWallet("invalid wallet");
       }).to.throw();
     });
 
     it("should throw error when calling write method without account/wallet", async () => {
       expect(() => {
-        simpleStorage.setValue("hello world");
+        sampleContract.setValue("hello world");
       }).to.throw();
     });
 
     it("should throw error when calling write method after account/wallet removal", async () => {
-      simpleStorage.setWallet(wallet);
-      simpleStorage.removeWallet();
+      sampleContract.setWallet(wallet);
+      sampleContract.removeWallet();
       expect(() => {
-        simpleStorage.setValue("hello world");
+        sampleContract.setValue("hello world");
       }).to.throw();
     });
   });
@@ -148,14 +148,14 @@ describe("TasitAction.Contract", () => {
 
     beforeEach("assign a wallet to the contract", () => {
       expect(() => {
-        simpleStorage.setWallet(wallet);
+        sampleContract.setWallet(wallet);
       }).not.to.throw();
 
       rand = Math.floor(Math.random() * Math.floor(1000)).toString();
     });
 
     it("should throw when subscribing with invalid event name", async () => {
-      txSubscription = simpleStorage.setValue("hello world");
+      txSubscription = sampleContract.setValue("hello world");
 
       expect(() => {
         txSubscription.on("invalid", () => {});
@@ -163,7 +163,7 @@ describe("TasitAction.Contract", () => {
     });
 
     it("should throw when subscribing without listener", async () => {
-      txSubscription = simpleStorage.setValue("hello world");
+      txSubscription = sampleContract.setValue("hello world");
 
       expect(() => {
         txSubscription.on("confirmation");
@@ -171,7 +171,7 @@ describe("TasitAction.Contract", () => {
     });
 
     it("should change contract state and trigger confirmation event one time", async () => {
-      txSubscription = simpleStorage.setValue(rand);
+      txSubscription = sampleContract.setValue(rand);
 
       // Waiting for 1st confirmation
       // For now ganache always mine a block after transaction creation
@@ -193,7 +193,7 @@ describe("TasitAction.Contract", () => {
 
         confirmationFakeFn();
 
-        const value = await simpleStorage.getValue();
+        const value = await sampleContract.getValue();
         expect(value).to.equal(rand);
       };
 
@@ -212,7 +212,7 @@ describe("TasitAction.Contract", () => {
     });
 
     it("should change contract state and trigger confirmation event", async () => {
-      txSubscription = simpleStorage.setValue(rand);
+      txSubscription = sampleContract.setValue(rand);
 
       await txSubscription.waitForNonceToUpdate();
 
@@ -230,7 +230,7 @@ describe("TasitAction.Contract", () => {
         if (confirmations >= 7) {
           txSubscription.off("confirmation");
 
-          const value = await simpleStorage.getValue();
+          const value = await sampleContract.getValue();
           expect(value).to.equal(rand);
         }
         confirmationFakeFn();
@@ -246,7 +246,7 @@ describe("TasitAction.Contract", () => {
     });
 
     it("should change contract state and trigger confirmation event - late subscription", async () => {
-      txSubscription = simpleStorage.setValue(rand);
+      txSubscription = sampleContract.setValue(rand);
 
       await txSubscription.waitForNonceToUpdate();
 
@@ -266,7 +266,7 @@ describe("TasitAction.Contract", () => {
         if (confirmations == 7) {
           txSubscription.off("confirmation");
 
-          const value = await simpleStorage.getValue();
+          const value = await sampleContract.getValue();
           expect(value).to.equal(rand);
 
           confirmationFakeFn();
@@ -284,7 +284,7 @@ describe("TasitAction.Contract", () => {
     });
 
     it("should call error listener after timeout", async () => {
-      txSubscription = simpleStorage.setValue("hello world");
+      txSubscription = sampleContract.setValue("hello world");
       txSubscription.setEventsTimeout(100);
 
       await txSubscription.waitForNonceToUpdate();
@@ -324,7 +324,7 @@ describe("TasitAction.Contract", () => {
     });
 
     it("subscription should have one listener per event", async () => {
-      txSubscription = simpleStorage.setValue("hello world");
+      txSubscription = sampleContract.setValue("hello world");
 
       const listener1 = message => {};
       const listener2 = message => {};
@@ -343,7 +343,7 @@ describe("TasitAction.Contract", () => {
     });
 
     it("should remove an event", async () => {
-      txSubscription = simpleStorage.setValue("hello world");
+      txSubscription = sampleContract.setValue("hello world");
 
       const listener1 = message => {};
 
@@ -386,7 +386,7 @@ describe("TasitAction.Contract", () => {
 
       const snapshotId = await createSnapshot(provider);
 
-      txSubscription = simpleStorage.setValue("hello world");
+      txSubscription = sampleContract.setValue("hello world");
 
       txSubscription.on("confirmation", confirmationListener);
 
@@ -432,7 +432,7 @@ describe("TasitAction.Contract", () => {
         errorFn();
       };
 
-      txSubscription = simpleStorage.setValue("hello world");
+      txSubscription = sampleContract.setValue("hello world");
 
       await txSubscription.waitForNonceToUpdate();
 
@@ -465,12 +465,12 @@ describe("TasitAction.Contract", () => {
   describe("Contract Events Subscription", async () => {
     beforeEach("assign a wallet to the contract", () => {
       expect(() => {
-        simpleStorage.setWallet(wallet);
+        sampleContract.setWallet(wallet);
       }).not.to.throw();
     });
 
     it("should trigger an event one time when you're listening to that event and the contract triggers it", async () => {
-      contractSubscription = simpleStorage.subscribe();
+      contractSubscription = sampleContract.subscribe();
       const fakeFn = sinon.fake();
       const errorFakeFn = sinon.fake();
 
@@ -481,7 +481,7 @@ describe("TasitAction.Contract", () => {
 
       contractSubscription.on("error", errorListener);
 
-      txSubscription = simpleStorage.setValue("hello world");
+      txSubscription = sampleContract.setValue("hello world");
 
       // Is possible do that using async/await?
       // If not, TODO: Make a function
@@ -504,7 +504,7 @@ describe("TasitAction.Contract", () => {
     });
 
     it("should be able to listen to an event triggered by the contract", async () => {
-      contractSubscription = simpleStorage.subscribe();
+      contractSubscription = sampleContract.subscribe();
       const fakeFn = sinon.fake();
       const errorFakeFn = sinon.fake();
 
@@ -515,7 +515,7 @@ describe("TasitAction.Contract", () => {
 
       contractSubscription.on("error", errorListener);
 
-      txSubscription = simpleStorage.setValue("hello world");
+      txSubscription = sampleContract.setValue("hello world");
 
       // Is possible do that using async/await?
       // If not, TODO: Make a function
@@ -536,7 +536,7 @@ describe("TasitAction.Contract", () => {
     });
 
     it("should throw error when listening on invalid event", async () => {
-      contractSubscription = simpleStorage.subscribe();
+      contractSubscription = sampleContract.subscribe();
 
       expect(() => {
         contractSubscription.on("InvalidEvent", () => {});
@@ -544,7 +544,7 @@ describe("TasitAction.Contract", () => {
     });
 
     it("subscription should have one listener per event", async () => {
-      contractSubscription = simpleStorage.subscribe();
+      contractSubscription = sampleContract.subscribe();
 
       const listener1 = message => {};
       const listener2 = message => {};
@@ -563,7 +563,7 @@ describe("TasitAction.Contract", () => {
     });
 
     it("should remove an event", async () => {
-      contractSubscription = simpleStorage.subscribe();
+      contractSubscription = sampleContract.subscribe();
 
       const listener1 = message => {};
 
@@ -581,7 +581,7 @@ describe("TasitAction.Contract", () => {
     });
 
     it("should manage many listeners", async () => {
-      contractSubscription = simpleStorage.subscribe();
+      contractSubscription = sampleContract.subscribe();
 
       const listener1 = message => {};
       const listener2 = message => {};
