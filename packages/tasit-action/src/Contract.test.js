@@ -183,7 +183,7 @@ describe("TasitAction.Contract", () => {
       const errorFakeFn = sinon.fake();
 
       const errorListener = message => {
-        const { error, eventName } = message;
+        const { error } = message;
         errorFakeFn();
       };
 
@@ -299,7 +299,8 @@ describe("TasitAction.Contract", () => {
       txSubscription.on("confirmation", foreverListener);
 
       const errorListener = message => {
-        const { error, eventName } = message;
+        const { error } = message;
+        expect(error.eventName).to.equal("confirmation");
         expect(error.message).to.equal("Event confirmation reached timeout.");
         errorFn();
       };
@@ -373,7 +374,7 @@ describe("TasitAction.Contract", () => {
       };
 
       const errorListener = message => {
-        const { error, eventName } = message;
+        const { error } = message;
 
         // Note: This assertion will not fail the test case (UnhandledPromiseRejectionWarning)
         expect(error.message).to.equal(
@@ -421,7 +422,7 @@ describe("TasitAction.Contract", () => {
       };
 
       const errorListener = message => {
-        const { error, eventName } = message;
+        const { error } = message;
 
         // Note: This assertion will not fail the test case (UnhandledPromiseRejectionWarning)
         expect(error.message).to.equal(
@@ -475,7 +476,7 @@ describe("TasitAction.Contract", () => {
       const errorFakeFn = sinon.fake();
 
       const errorListener = message => {
-        const { error, eventName } = message;
+        const { error } = message;
         errorFakeFn();
       };
 
@@ -509,7 +510,7 @@ describe("TasitAction.Contract", () => {
       const errorFakeFn = sinon.fake();
 
       const errorListener = message => {
-        const { error, eventName } = message;
+        const { error } = message;
         errorFakeFn();
       };
 

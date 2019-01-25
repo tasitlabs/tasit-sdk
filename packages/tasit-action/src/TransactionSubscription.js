@@ -31,10 +31,7 @@ export class TransactionSubscription extends Subscription {
         return tx;
       },
       error => {
-        this._emitErrorEvent(
-          new Error(`Action with error: ${error.message}`),
-          null
-        );
+        this._emitErrorEvent(new Error(`Action with error: ${error.message}`));
       }
     );
 
@@ -49,8 +46,15 @@ export class TransactionSubscription extends Subscription {
   // Refs: https://medium.com/@charpeni/arrow-functions-in-class-properties-might-not-be-as-great-as-we-think-3b3551c440b1
   _emitErrorEvent(error, eventName) {
     super._emitErrorEvent(error, eventName);
-    if (this.#contract.subscribedEventNames().includes("error"))
-      this.#contract._emitErrorEvent(error, eventName);
+    this.#contract._emitErrorEvent(error, eventName);
+  }
+
+  // TODO: Make protected
+  // Arrow functions in class properties won't be in the prototype and we can't call them with super
+  // Refs: https://medium.com/@charpeni/arrow-functions-in-class-properties-might-not-be-as-great-as-we-think-3b3551c440b1
+  _emitErrorEventFromEventListener(error, eventName) {
+    super._emitErrorEventFromEventListener(error, eventName);
+    this.#contract._emitErrorEventFromEventListener(error, eventName);
   }
 
   on = (eventName, listener) => {
@@ -106,7 +110,7 @@ export class TransactionSubscription extends Subscription {
           (receipt !== null && receipt.confirmations <= this.#txConfirmations);
 
         if (blockReorgOccurred) {
-          this._emitErrorEvent(
+          this._emitErrorEventFromEventListener(
             new Error(
               `Your action's position in the chain has changed in a surprising way.`
             ),
@@ -129,7 +133,7 @@ export class TransactionSubscription extends Subscription {
             currentTime - this.#lastConfirmationTime >= this.getEventsTimeout();
 
           if (timedOut) {
-            this._emitErrorEvent(
+            this._emitErrorEventFromEventListener(
               new Error(`Event ${eventName} reached timeout.`),
               eventName
             );
@@ -150,7 +154,7 @@ export class TransactionSubscription extends Subscription {
 
         await listener(message);
       } catch (error) {
-        this._emitErrorEvent(
+        this._emitErrorEventFromEventListener(
           new Error(`Listener function with error: ${error.message}`),
           eventName
         );

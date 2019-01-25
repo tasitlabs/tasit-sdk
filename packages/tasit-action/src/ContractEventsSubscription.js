@@ -53,7 +53,7 @@ class ContractEventsSubscription extends Subscription {
 
         await listener(message);
       } catch (error) {
-        this._emitErrorEvent(
+        this._emitErrorEventFromEventListener(
           new Error(`Listener function with error: ${error.message}`),
           eventName
         );

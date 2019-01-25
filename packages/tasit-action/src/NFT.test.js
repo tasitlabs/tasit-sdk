@@ -246,7 +246,7 @@ describe("TasitAction.NFT", () => {
       expect(receiverBalance.toNumber()).to.equal(0);
 
       const contractErrorListener = message => {
-        const { error, eventName } = message;
+        const { error } = message;
         expect(error.message).to.equal(
           "Action with error: VM Exception while processing transaction: revert"
         );
@@ -282,7 +282,7 @@ describe("TasitAction.NFT", () => {
       expect(receiverBalance.toNumber()).to.equal(0);
 
       const actionErrorListener = message => {
-        const { error, eventName } = message;
+        const { error } = message;
         expect(error.message).to.equal(
           "Action with error: VM Exception while processing transaction: revert"
         );
