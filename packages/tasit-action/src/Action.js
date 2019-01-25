@@ -4,7 +4,7 @@ const config = require("config");
 
 // Note: If this class will be used to handle meta-tx too,
 //  it should be renamed to ActionSubscription.
-export class TransactionSubscription extends Subscription {
+export class Action extends Subscription {
   #txPromise;
   #provider;
   #tx;
@@ -168,4 +168,4 @@ export class TransactionSubscription extends Subscription {
   };
 }
 
-export default TransactionSubscription;
+export default Action;

@@ -6,8 +6,7 @@ const config = require("config");
 import Utils from "./Utils";
 import ProviderFactory from "./ProviderFactory";
 import ContractEventsSubscription from "./ContractEventsSubscription";
-import TransactionSubscription from "./TransactionSubscription";
-import Subscription from "./Subscription";
+import Action from "./Action";
 
 // I'm not sure if extend Subscription is the best approach
 // I'm usually think inheritance as an IS-A relationship
@@ -99,19 +98,16 @@ export class Contract extends ContractEventsSubscription {
 
       const tx = this.#ethersContract[f.name].apply(null, args);
 
-      const actionSubscription = new TransactionSubscription(
-        tx,
-        this.#provider
-      );
+      const action = new Action(tx, this.#provider);
 
       const errorListener = message => {
         const { error } = message;
         this._emitErrorEvent(new Error(`${error.message}`));
       };
 
-      actionSubscription.on("error", errorListener);
+      action.on("error", errorListener);
 
-      return actionSubscription;
+      return action;
     };
   };
 }
