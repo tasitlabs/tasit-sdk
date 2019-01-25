@@ -74,6 +74,28 @@ console.log(ephemeralWallet.address); // '0x...'
 // ...
 ```
 
+Or maybe you want to interact with a contract:
+
+```javascript
+import { Contract } from "tasit-sdk";
+
+const { NFT } = Contract
+
+// const contractAddress = '0x0E86...333'
+
+const contract = new NFT(contractAddress)
+
+const action = contract.safeTransferfrom(/*...*/); 
+action.on("error", errorListener);
+action.on("lotsOfConfirmations", successListener);
+action.sendMeta(); // meta-tx broadcast
+
+// Do optimistic UI updates immediately, while making sure
+// to update the UI again when there are enough
+// confirmations for your use case
+// ...
+```
+
 #### Automatic scaffolding using the Tasit CLI
 
 Are you starting a project from scratch? Let the Tasit CLI (installed automatically with the Tasit SDK) scaffold out your project for you.
