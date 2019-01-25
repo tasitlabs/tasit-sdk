@@ -91,6 +91,10 @@ export class Subscription {
   };
 
   // TODO: Make protected
+  //
+  // Note: Since we allow only one listener per event (error included),
+  // If there is a error event already, it will be replaced by new listener function
+  // that will call both new and old functions
   _addErrorListener = newListener => {
     let listener = newListener;
     const oldErrorEventListener = this.#eventListeners.get("error");
