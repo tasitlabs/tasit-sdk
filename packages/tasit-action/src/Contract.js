@@ -32,6 +32,7 @@ export class Contract extends Subscription {
     if (!events.includes(eventName))
       throw new Error(`Invalid event, use: [${events}]`);
 
+    // Note: In the future we'll possibly support more events than just "error"
     if (eventName !== "error") {
       throw new Error(`Invalid event '${event}'.`);
     } else {
