@@ -405,8 +405,8 @@ describe("TasitAction.Contract", () => {
       expect(errorFn.called).to.be.true;
       expect(confirmationFn.called).to.be.true;
       expect(txSubscription.subscribedEventNames()).to.deep.equal([
-        "confirmation",
         "error",
+        "confirmation",
       ]);
     });
 

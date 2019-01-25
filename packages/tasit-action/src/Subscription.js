@@ -100,8 +100,6 @@ export class Subscription {
         newListener(error);
         oldErrorEventListener.listener(error);
       };
-
-      this.off("error");
     }
 
     this.#eventListeners.set("error", {
