@@ -141,7 +141,94 @@ describe("TasitAction.Contract", () => {
     });
   });
 
-  describe.skip("Contract Subscription", async () => {});
+  describe("Contract Subscription", async () => {
+    beforeEach("assign a wallet to the contract", () => {
+      expect(() => {
+        sampleContract.setWallet(wallet);
+      }).not.to.throw();
+    });
+
+    it("should trigger Contract error event on Action error", async () => {
+      const errorListener = sinon.fake();
+
+      sampleContract.on("error", errorListener);
+
+      txSubscription = sampleContract.revertWrite("some string");
+      await txSubscription.waitForNonceToUpdate();
+
+      expect(errorListener.callCount).to.equal(1);
+    });
+
+    it("should trigger Contract and TransactionSubscription error events on Action error", async () => {
+      const contractErrorListener = sinon.fake();
+      const txErrorListener = sinon.fake();
+
+      sampleContract.on("error", contractErrorListener);
+
+      txSubscription = sampleContract.revertWrite("some string");
+
+      txSubscription.on("error", txErrorListener);
+
+      await txSubscription.waitForNonceToUpdate();
+
+      expect(contractErrorListener.callCount).to.equal(1);
+      expect(txErrorListener.callCount).to.equal(1);
+    });
+
+    it("should trigger Contract error event on Event error", async () => {
+      const errorListener = sinon.fake();
+      const eventFnFake = sinon.fake();
+      const eventListener = () => {
+        eventFnFake();
+        throw new Error();
+      };
+
+      sampleContract.on("error", errorListener);
+
+      contractSubscription = sampleContract.subscribe();
+
+      // Tech debt: Know why changing to .once() eventListener stills be called twice
+      contractSubscription.on("ValueChanged", eventListener);
+
+      txSubscription = sampleContract.setValue("hello world");
+
+      await txSubscription.waitForNonceToUpdate();
+
+      await mineBlocks(provider, 1);
+
+      expect(eventFnFake.callCount).to.equal(1);
+      expect(errorListener.callCount).to.equal(2);
+    });
+
+    it("should trigger Contract and ContractEventsSubscription error events on Event error", async () => {
+      const contractErrorListener = sinon.fake();
+      const eventErrorListener = sinon.fake();
+      const eventListener = () => {
+        throw new Error();
+      };
+
+      sampleContract.on("error", contractErrorListener);
+
+      contractSubscription = sampleContract.subscribe();
+
+      contractSubscription.on("error", eventErrorListener);
+      contractSubscription.on("ValueChanged", eventListener);
+
+      txSubscription = sampleContract.setValue("hello world");
+
+      await txSubscription.waitForNonceToUpdate();
+
+      await mineBlocks(provider, 1);
+
+      expect(contractErrorListener.callCount).to.equal(2);
+      expect(eventErrorListener.callCount).to.equal(1);
+    });
+
+    // Should contract read functions trigger error event instead throw error?
+    it("throw error on revert read function", async () => {
+      await expect(sampleContract.revertRead()).to.be.rejected;
+    });
+  });
 
   describe("Transactions (Actions) Subscription", async () => {
     let rand;

@@ -71,7 +71,10 @@ export class Contract extends Subscription {
 
   subscribe = () => {
     if (!this.#subscription)
-      this.#subscription = new ContractEventsSubscription(this.#ethersContract);
+      this.#subscription = new ContractEventsSubscription(
+        this.#ethersContract,
+        this
+      );
     return this.#subscription;
   };
 

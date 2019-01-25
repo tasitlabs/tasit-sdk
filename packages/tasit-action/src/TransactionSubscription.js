@@ -42,17 +42,12 @@ export class TransactionSubscription extends Subscription {
   }
 
   // TODO: Make protected
-
-  // Arrow functions in class properties won't be in the prototype and we can't call them with super
-  // Refs: https://medium.com/@charpeni/arrow-functions-in-class-properties-might-not-be-as-great-as-we-think-3b3551c440b1
   _emitErrorEvent(error, eventName) {
     super._emitErrorEvent(error, eventName);
     this.#contract._emitErrorEvent(error, eventName);
   }
 
   // TODO: Make protected
-  // Arrow functions in class properties won't be in the prototype and we can't call them with super
-  // Refs: https://medium.com/@charpeni/arrow-functions-in-class-properties-might-not-be-as-great-as-we-think-3b3551c440b1
   _emitErrorEventFromEventListener(error, eventName) {
     super._emitErrorEventFromEventListener(error, eventName);
     this.#contract._emitErrorEventFromEventListener(error, eventName);
