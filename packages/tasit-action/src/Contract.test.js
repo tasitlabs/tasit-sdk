@@ -175,7 +175,7 @@ describe("TasitAction.Contract", () => {
       expect(txErrorListener.callCount).to.equal(1);
     });
 
-    it("should trigger Contract error event on Event error", async () => {
+    it("should trigger Contract error event on Contract Event listener error", async () => {
       const errorListener = sinon.fake();
       const eventFnFake = sinon.fake();
       const eventListener = () => {
