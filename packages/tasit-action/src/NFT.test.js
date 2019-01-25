@@ -46,6 +46,15 @@ describe("TasitAction.NFT", () => {
 
     provider = fullNFT._getProvider();
 
+    const ownerBalance = await fullNFT.balanceOf(owner.address);
+    expect(ownerBalance.toNumber()).to.equal(0);
+
+    const anaBalance = await fullNFT.balanceOf(ana.address);
+    expect(anaBalance.toNumber()).to.equal(0);
+
+    const bobBalance = await fullNFT.balanceOf(bob.address);
+    expect(bobBalance.toNumber()).to.equal(0);
+
     snapshotId = await createSnapshot(provider);
   });
 
@@ -118,9 +127,6 @@ describe("TasitAction.NFT", () => {
     const zeroAddress = "0x0000000000000000000000000000000000000000";
 
     beforeEach("should mint one token to ana", async () => {
-      const balanceBefore = await fullNFT.balanceOf(ana.address);
-      expect(balanceBefore.toNumber()).to.equal(0);
-
       contractSubscription = fullNFT.subscribe();
 
       txSubscription = fullNFT.mint(ana.address, tokenId);
@@ -152,12 +158,6 @@ describe("TasitAction.NFT", () => {
 
       fullNFT = new NFT(fullNFTAddress, ana);
 
-      senderBalance = await fullNFT.balanceOf(ana.address);
-      expect(senderBalance.toNumber()).to.equal(1);
-
-      receiverBalance = await fullNFT.balanceOf(bob.address);
-      expect(receiverBalance.toNumber()).to.equal(0);
-
       contractSubscription = fullNFT.subscribe();
 
       txSubscription = fullNFT.transferFrom(ana.address, bob.address, tokenId);
@@ -179,24 +179,21 @@ describe("TasitAction.NFT", () => {
       expect(event.tokenId.toNumber()).to.equal(tokenId);
 
       senderBalance = await fullNFT.balanceOf(ana.address);
-      expect(senderBalance.toNumber()).to.equal(0);
-
       receiverBalance = await fullNFT.balanceOf(bob.address);
-      expect(receiverBalance.toNumber()).to.equal(1);
+
+      expect([
+        senderBalance.toNumber(),
+        receiverBalance.toNumber(),
+      ]).to.deep.equal([0, 1]);
     });
 
     it("should transfer an approved token", async () => {
       fullNFT = new NFT(fullNFTAddress, ana);
-
       txSubscription = fullNFT.approve(bob.address, tokenId);
 
       await txSubscription.waitForNonceToUpdate();
 
       fullNFT.setWallet(bob);
-
-      const balanceBefore = await fullNFT.balanceOf(bob.address);
-      expect(balanceBefore.toNumber()).to.equal(0);
-
       txSubscription = fullNFT.transferFrom(ana.address, bob.address, tokenId);
 
       await txSubscription.waitForNonceToUpdate();
@@ -210,12 +207,6 @@ describe("TasitAction.NFT", () => {
 
       fullNFT = new NFT(fullNFTAddress, ana);
 
-      senderBalance = await fullNFT.balanceOf(ana.address);
-      expect(senderBalance.toNumber()).to.equal(1);
-
-      receiverBalance = await fullNFT.balanceOf(bob.address);
-      expect(receiverBalance.toNumber()).to.equal(0);
-
       txSubscription = fullNFT.safeTransferFrom(
         ana.address,
         bob.address,
@@ -225,10 +216,12 @@ describe("TasitAction.NFT", () => {
       await txSubscription.waitForNonceToUpdate();
 
       senderBalance = await fullNFT.balanceOf(ana.address);
-      expect(senderBalance.toNumber()).to.equal(0);
-
       receiverBalance = await fullNFT.balanceOf(bob.address);
-      expect(receiverBalance.toNumber()).to.equal(1);
+
+      expect([
+        senderBalance.toNumber(),
+        receiverBalance.toNumber(),
+      ]).to.deep.equal([0, 1]);
     });
 
     it("shouldn't do a safeTransferFrom to a contract that doesn't implement `onERC721Received` - Contract Subscription", async () => {
@@ -238,12 +231,6 @@ describe("TasitAction.NFT", () => {
       const contractErrorFakeFn = sinon.fake();
 
       fullNFT = new NFT(fullNFTAddress, ana);
-
-      senderBalance = await fullNFT.balanceOf(sender);
-      expect(senderBalance.toNumber()).to.equal(1);
-
-      receiverBalance = await fullNFT.balanceOf(receiver);
-      expect(receiverBalance.toNumber()).to.equal(0);
 
       const contractErrorListener = message => {
         const { error } = message;
@@ -261,10 +248,12 @@ describe("TasitAction.NFT", () => {
       expect(contractErrorFakeFn.called).to.be.true;
 
       senderBalance = await fullNFT.balanceOf(sender);
-      expect(senderBalance.toNumber()).to.equal(1);
-
       receiverBalance = await fullNFT.balanceOf(receiver);
-      expect(receiverBalance.toNumber()).to.equal(0);
+
+      expect([
+        senderBalance.toNumber(),
+        receiverBalance.toNumber(),
+      ]).to.deep.equal([1, 0]);
     });
 
     it("shouldn't do a safeTransferFrom to a contract that doesn't implement `onERC721Received` - Action Subscription", async () => {
@@ -274,12 +263,6 @@ describe("TasitAction.NFT", () => {
       const actionErrorFakeFn = sinon.fake();
 
       fullNFT = new NFT(fullNFTAddress, ana);
-
-      senderBalance = await fullNFT.balanceOf(sender);
-      expect(senderBalance.toNumber()).to.equal(1);
-
-      receiverBalance = await fullNFT.balanceOf(receiver);
-      expect(receiverBalance.toNumber()).to.equal(0);
 
       const actionErrorListener = message => {
         const { error } = message;
@@ -297,10 +280,12 @@ describe("TasitAction.NFT", () => {
       expect(actionErrorFakeFn.called).to.be.true;
 
       senderBalance = await fullNFT.balanceOf(sender);
-      expect(senderBalance.toNumber()).to.equal(1);
-
       receiverBalance = await fullNFT.balanceOf(receiver);
-      expect(receiverBalance.toNumber()).to.equal(0);
+
+      expect([
+        senderBalance.toNumber(),
+        receiverBalance.toNumber(),
+      ]).to.deep.equal([1, 0]);
     });
   });
 });
