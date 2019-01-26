@@ -11,7 +11,13 @@ const fullNFTAddress = "0x0E86f209729bf54763789CDBcA9E8b94f0FD5333";
 const sampleContractAddress = "0x6C4A015797DDDd87866451914eCe1e8b19261931";
 
 describe("TasitAction.NFT", () => {
-  let owner, ana, bob, fullNFT, provider, snapshotId, action;
+  let owner;
+  let ana;
+  let bob;
+  let fullNFT;
+  let provider;
+  let snapshotId;
+  let action;
 
   const confirmBalances = async (addresses, balances) => {
     expect(addresses.length).to.equal(balances.length);
@@ -51,7 +57,7 @@ describe("TasitAction.NFT", () => {
     provider = fullNFT._getProvider();
 
     // This line ensures that a new event listener does not catch an existing event from last the block
-    // Two blocks to minimize the risk of polling doesn't occur.
+    // Two blocks to minimize the risk that polling doesn't occur.
     await mineBlocks(provider, 2);
 
     await confirmBalances([owner.address, ana.address, bob.address], [0, 0, 0]);
@@ -61,7 +67,7 @@ describe("TasitAction.NFT", () => {
 
   afterEach("", async () => {
     // This line ensures that a new event listener does not catch an existing event from last the block
-    // Two blocks to minimize the risk of polling doesn't occur.
+    // Two blocks to minimize the risk that polling doesn't occur.
     await mineBlocks(provider, 2);
 
     expect(provider._events, "ethers.js should not be listening to any events.")

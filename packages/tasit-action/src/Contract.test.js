@@ -10,7 +10,11 @@ import { abi as contractABI } from "./testHelpers/SampleContract.json";
 const sampleContractAddress = "0x6C4A015797DDDd87866451914eCe1e8b19261931";
 
 describe("TasitAction.Contract", () => {
-  let sampleContract, wallet, testcaseSnaphotId, provider, action;
+  let sampleContract;
+  let wallet;
+  let testcaseSnaphotId;
+  let provider;
+  let action;
 
   beforeEach("should connect to an existing contract", async () => {
     if (action) {
