@@ -5,40 +5,33 @@ import { ethers } from "ethers";
 const config = require("config");
 import Utils from "./Utils";
 import ProviderFactory from "./ProviderFactory";
-import ContractEventsSubscription from "./ContractEventsSubscription";
-import TransactionSubscription from "./TransactionSubscription";
 import Subscription from "./Subscription";
+import Action from "./Action";
 
-// I'm not sure if extend Subscription is the best approach
-// I'm usually think inheritance as an IS-A relationship
-// I'm not really sure if "Contract is a Subscription" sounds good
 export class Contract extends Subscription {
   #provider;
   #ethersContract;
-  #eventsSubscription;
 
   constructor(address, abi, wallet) {
+    if (!Utils.isAddress(address) || !Utils.isABI(abi))
+      throw new Error(`Cannot create a Contract without a address and ABI`);
+
+    if (wallet && !Utils.isEthersJsSigner(wallet))
+      throw new Error(`Cannot set an invalid wallet for a Contract`);
+
     const provider = ProviderFactory.getProvider();
 
-    super(provider);
+    // If there's a wallet, connect it with provider.
+    // Otherwise use provider directly (for read operations only).
+    const signerOrProvider = wallet ? wallet.connect(provider) : provider;
 
+    const ethersContract = new ethers.Contract(address, abi, signerOrProvider);
+
+    super(ethersContract);
     this.#provider = provider;
-    this.#initializeContract(address, abi, wallet);
+    this.#ethersContract = ethersContract;
+    this.#addFunctionsToContract();
   }
-
-  on = (eventName, listener) => {
-    const events = ["error"];
-
-    if (!events.includes(eventName))
-      throw new Error(`Invalid event, use: [${events}]`);
-
-    // Note: In the future we'll possibly support more events than just "error"
-    if (eventName !== "error") {
-      throw new Error(`Invalid event '${event}'.`);
-    } else {
-      this._addErrorListener(listener);
-    }
-  };
 
   // Note: For now, `tasit-account` creates a ethers.js wallet object
   // If that changes, maybe this method could be renamed to setAccount()
@@ -46,18 +39,22 @@ export class Contract extends Subscription {
     if (!Utils.isEthersJsSigner(wallet))
       throw new Error(`Cannot set an invalid wallet for a Contract`);
 
-    this.#initializeContract(
+    this.#ethersContract = new ethers.Contract(
       this.#ethersContract.address,
       this.#ethersContract.interface.abi,
-      wallet
+      wallet.connect(this.#provider)
     );
+
+    this.#addFunctionsToContract();
   };
 
   removeWallet = () => {
-    this.#initializeContract(
+    this.#ethersContract = new ethers.Contract(
       this.#ethersContract.address,
-      this.#ethersContract.interface.abi
+      this.#ethersContract.interface.abi,
+      this.#provider
     );
+    this.#addFunctionsToContract();
   };
 
   getAddress = () => {
@@ -69,37 +66,64 @@ export class Contract extends Subscription {
     return this.#provider;
   };
 
-  subscribe = () => {
-    if (!this.#eventsSubscription)
-      this.#eventsSubscription = new ContractEventsSubscription(
-        this.#ethersContract,
-        this
-      );
-
-    const errorListener = message => {
-      const { error } = message;
-      this._emitErrorEvent(new Error(`${error.message}`));
-    };
-
-    this.#eventsSubscription.on("error", errorListener);
-
-    return this.#eventsSubscription;
+  on = (eventName, listener) => {
+    this.#addListener(eventName, listener, false);
   };
 
-  #initializeContract = (address, abi, wallet) => {
-    if (!Utils.isAddress(address) || !Utils.isABI(abi))
-      throw new Error(`Cannot create a Contract without a address and ABI`);
+  once = (eventName, listener) => {
+    this.#addListener(eventName, listener, true);
+  };
 
-    if (wallet && !Utils.isEthersJsSigner(wallet))
-      throw new Error(`Cannot set an invalid wallet for a Contract`);
+  #addListener = (eventName, listener, once) => {
+    if (!this.#isEventValid(eventName))
+      throw new Error(`Event '${eventName}' not found.`);
 
-    // If there's a wallet, connect it with provider. Otherwise use provider directly (for read operations only).
-    const signerOrProvider = wallet
-      ? wallet.connect(this.#provider)
-      : this.#provider;
+    if (eventName === "error" && once)
+      throw new Error(`Use on() function to subscribe to an error event.`);
 
-    this.#ethersContract = new ethers.Contract(address, abi, signerOrProvider);
-    this.#addFunctionsToContract();
+    if (eventName === "error") {
+      this._addErrorListener(listener);
+    } else {
+      this.#addContractEventListener(eventName, listener, once);
+    }
+  };
+
+  #addContractEventListener = (eventName, listener, once) => {
+    const ethersListener = async (...args) => {
+      try {
+        // Note: This depends on the current ethers.js specification of ethersContract events to work:
+        // "All event callbacks receive the parameters specified in the ABI as well as
+        // one additional Event Object"
+        // https://docs.ethers.io/ethers.js/html/api-ethersContract.html#event-object
+        // TODO: Consider checking that the event looks like what we expect and
+        // erroring out if not
+        const event = args.pop();
+
+        const message = {
+          data: {
+            args: event.args,
+          },
+        };
+
+        if (once) this.off(eventName);
+
+        await listener(message);
+      } catch (error) {
+        this._emitErrorEventFromEventListener(
+          new Error(`Listener function with error: ${error.message}`),
+          eventName
+        );
+      }
+    };
+
+    this._addEventListener(eventName, ethersListener);
+  };
+
+  #isEventValid = eventName => {
+    return (
+      eventName === "error" ||
+      this.#ethersContract.interface.events[eventName] !== undefined
+    );
   };
 
   #addFunctionsToContract = () => {
@@ -131,19 +155,16 @@ export class Contract extends Subscription {
 
       const tx = this.#ethersContract[f.name].apply(null, args);
 
-      const actionSubscription = new TransactionSubscription(
-        tx,
-        this.#provider
-      );
+      const action = new Action(tx, this.#provider);
 
       const errorListener = message => {
         const { error } = message;
         this._emitErrorEvent(new Error(`${error.message}`));
       };
 
-      actionSubscription.on("error", errorListener);
+      action.on("error", errorListener);
 
-      return actionSubscription;
+      return action;
     };
   };
 }

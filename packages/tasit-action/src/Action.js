@@ -2,16 +2,15 @@ import Subscription from "./Subscription";
 import ProviderFactory from "./ProviderFactory";
 const config = require("config");
 
-// Note: If this class will be used to handle meta-tx too,
-//  it should be renamed to ActionSubscription.
-export class TransactionSubscription extends Subscription {
+// If necessary, we can create TransactionAction
+//  and/or MetaTxAction subclasses
+export class Action extends Subscription {
   #txPromise;
   #provider;
   #tx;
   #txConfirmations;
   #timeout;
   #lastConfirmationTime;
-  #contract;
 
   constructor(txPromise, provider) {
     // Provider implements EventEmitter API and it's enough
@@ -163,9 +162,9 @@ export class TransactionSubscription extends Subscription {
   };
 
   // For testing purposes
-  refreshProvider = () => {
+  _refreshProvider = () => {
     this.#provider = ProviderFactory.getProvider();
   };
 }
 
-export default TransactionSubscription;
+export default Action;
