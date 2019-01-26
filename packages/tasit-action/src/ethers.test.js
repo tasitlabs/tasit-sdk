@@ -8,7 +8,9 @@ import { abi as contractABI } from "./testHelpers/SampleContract.json";
 // See https://github.com/tasitlabs/TasitSDK/issues/138
 const sampleContractAddress = "0x6C4A015797DDDd87866451914eCe1e8b19261931";
 
-let wallet, sampleContract, testcaseSnaphotId;
+let wallet;
+let sampleContract;
+let testcaseSnaphotId;
 
 describe("ethers.js", () => {
   const provider = new ethers.providers.JsonRpcProvider();
@@ -129,7 +131,8 @@ describe("ethers.js", () => {
 
   describe("message signing", () => {
     const rand = Math.floor(Math.random() * Math.floor(1000)).toString();
-    let rawTx, signedTx;
+    let rawTx;
+    let signedTx;
 
     beforeEach("", async () => {
       const data = sampleContract.interface.functions.setValue.encode([rand]);
