@@ -33,6 +33,5 @@
   },
   "dependencies": {
     "openzeppelin-solidity": "^2.1.1"
-  },
-  "gitHead": "f83a98afbc5f17682cf6acaa8386214a7ad554c0"
+  }
 }

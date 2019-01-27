@@ -42,6 +42,5 @@
     "mocha": "^5.2.0",
     "sinon": "^7.2.2",
     "tasit-account": "^0.0.3"
-  },
-  "gitHead": "f83a98afbc5f17682cf6acaa8386214a7ad554c0"
+  }
 }
