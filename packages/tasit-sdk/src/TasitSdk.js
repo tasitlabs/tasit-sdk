@@ -1,4 +1,4 @@
 import Account from "tasit-account";
-import { Contract } from "tasit-action";
+import Action from "tasit-action";
 
-export { Account, Contract };
+export { Account, Action };
