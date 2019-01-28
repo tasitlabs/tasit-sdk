@@ -1,6 +1,6 @@
 {
   "name": "tasit-account",
-  "version": "0.0.1",
+  "version": "0.0.6",
   "description": "Library for using Ethereum accounts",
   "main": "dist/index.js",
   "keywords": [
@@ -25,8 +25,8 @@
     "url": "https://github.com/tasitlabs/tasitsdk/issues"
   },
   "dependencies": {
-    "ethers": "^4.0.21",
-    "@babel/runtime": "^7.1.5"
+    "@babel/runtime": "^7.1.5",
+    "ethers": "^4.0.21"
   },
   "devDependencies": {
     "@babel/cli": "^7.1.5",
