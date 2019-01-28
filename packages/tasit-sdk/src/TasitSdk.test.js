@@ -1,7 +1,6 @@
 import { Account, Contract, NFT } from "./TasitSdk";
 import { expect, assert } from "chai";
 import { createFromPrivateKey } from "tasit-account/dist/testHelpers/helpers";
-
 import {
   mineBlocks,
   createSnapshot,
@@ -9,9 +8,9 @@ import {
   wait,
   waitForEthersEvent,
 } from "tasit-action/dist/testHelpers/helpers";
-
 import { abi as manaABI } from "./testHelpers/MANAToken.json";
 import { abi as landABI } from "./testHelpers/LANDRegistry.json";
+import { abi as estateABI } from "./testHelpers/EstateRegistry.json";
 import { abi as markplaceABI } from "./testHelpers/Marketplace.json";
 
 const ownerPrivKey =
@@ -33,6 +32,7 @@ describe("Decentraland", () => {
   let ephemeral;
   let mana;
   let land;
+  let estate;
   let marketplace;
 
   before("", async () => {
@@ -48,11 +48,15 @@ describe("Decentraland", () => {
 
     mana = new Contract(manaAddress, manaABI);
     land = new Contract(landAddress, landABI);
+    estate = new Contract(estateAddress, estateABI);
     marketplace = new Contract(marketplaceAddress, markplaceABI);
   });
 
   it("mint lands", async () => {
     // TODO: Fill out this test more
-    land.setWallet(owner);
+    estate.setWallet(owner);
+    //console.log(land.getAddress());
+    //estate.initialize("Estate", "EST", land.getAddress());
+    //land.createEstate([0], [0], owner.address);
   });
 });
