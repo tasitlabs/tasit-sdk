@@ -52,6 +52,7 @@ describe("Decentraland", () => {
   });
 
   it("mint lands", async () => {
+    // TODO: Fill out this test more
     land.setWallet(owner);
   });
 });
