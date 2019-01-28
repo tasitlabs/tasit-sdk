@@ -1,4 +1,5 @@
-import { Account, Contract, NFT } from "./TasitSdk";
+import { Account, Action } from "./TasitSdk";
+const { Contract, NFT } = Action;
 import { expect, assert } from "chai";
 import { createFromPrivateKey } from "tasit-account/dist/testHelpers/helpers";
 import {

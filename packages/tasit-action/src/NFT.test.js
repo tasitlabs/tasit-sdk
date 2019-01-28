@@ -152,7 +152,7 @@ describe("TasitAction.NFT", () => {
       await confirmBalances([ana.address], [1]);
     });
 
-    // Non-determinisct
+    // Non-deterministic
     // Note: This test failed recently on CI
     it.skip("should transfer an owned token", async () => {
       fullNFT = new NFT(fullNFTAddress, ana);
