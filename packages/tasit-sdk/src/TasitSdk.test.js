@@ -47,6 +47,8 @@ describe("Decentraland", () => {
     expect(bob.address).to.have.lengthOf(42);
     expect(ephemeral.address).to.have.lengthOf(42);
 
+    // Note: It would be cooler to use NFT here if
+    // Decentraland Land contract followed ERC721 exactly
     mana = new Contract(manaAddress, manaABI);
     land = new Contract(landAddress, landABI);
     estate = new Contract(estateAddress, estateABI);
