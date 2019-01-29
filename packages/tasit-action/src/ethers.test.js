@@ -2,11 +2,21 @@ import { ethers } from "ethers";
 
 // Note: This file is originally genarated by `tasit-contracts` and was pasted here manually
 // See https://github.com/tasitlabs/TasitSDK/issues/45
-import { abi as contractABI } from "./testHelpers/SampleContract.json";
+//  and https://github.com/tasitlabs/TasitSDK/issues/144
+import { abi as sampleContractABI } from "./testHelpers/SampleContract.json";
+import fullNFTABI from "./abi/ERC721Full.json";
 
 // Note: Under the current `tasit-contracts` setup SampleContract aways will deployed with this address
 // See https://github.com/tasitlabs/TasitSDK/issues/138
 const sampleContractAddress = "0x6C4A015797DDDd87866451914eCe1e8b19261931";
+const fullNFTAddress = "0x0E86f209729bf54763789CDBcA9E8b94f0FD5333";
+
+const humanReadableABI = [
+  "event ValueChanged(address indexed author, string oldValue, string newValue)",
+  "constructor(string memory) public",
+  "function getValue() public view returns (string memory)",
+  "function setValue(string memory) public",
+];
 
 let wallet;
 let sampleContract;
@@ -26,7 +36,7 @@ describe("ethers.js", () => {
 
     sampleContract = new ethers.Contract(
       sampleContractAddress,
-      contractABI,
+      sampleContractABI,
       wallet
     );
     expect(sampleContract.address).to.equal(sampleContractAddress);
@@ -43,13 +53,6 @@ describe("ethers.js", () => {
   });
 
   it("should instatiate contract object using human-readable ABI", async () => {
-    const humanReadableABI = [
-      "event ValueChanged(address indexed author, string oldValue, string newValue)",
-      "constructor(string memory) public",
-      "function getValue() public view returns (string memory)",
-      "function setValue(string memory) public",
-    ];
-
     sampleContract = undefined;
     sampleContract = new ethers.Contract(
       sampleContractAddress,
@@ -157,6 +160,22 @@ describe("ethers.js", () => {
 
       const value = await sampleContract.getValue();
       expect(value).to.equal(rand);
+    });
+  });
+
+  describe("keeping track of nonce", () => {
+    let fullNFT;
+
+    beforeEach("", () => {
+      fullNFT = new ethers.Contract(fullNFTAddress, fullNFTABI, wallet);
+    });
+
+    it("interacting with two contracts from same wallet", async () => {
+      const sentTx1 = await sampleContract.setValue("one");
+      await provider.waitForTransaction(sentTx1.hash);
+
+      const sentTx2 = await fullNFT.mint(wallet.address, 1);
+      await provider.waitForTransaction(sentTx2.hash);
     });
   });
 });

@@ -1,5 +1,6 @@
 // Note:
-// Should we use ethers instead of web3js?
+// This test suite is using web3js directly because the contract deployment
+// is made by a 3rd part epository
 contract("LANDRegistry", function(accounts) {
   const abi = require("../decentraland/land/build/contracts/LANDRegistry.json")
     .abi;
