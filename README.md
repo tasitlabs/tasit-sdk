@@ -98,19 +98,9 @@ action.sendMeta(); // meta-tx broadcast
 
 #### Automatic scaffolding using the Tasit CLI
 
-Are you starting a project from scratch? Let the Tasit CLI (installed automatically with the Tasit SDK) scaffold out your project for you.
+Are you starting a project from scratch? Let the Tasit CLI scaffold out your project for you. More details on this [here](https://github.com/tasitlabs/tasit#automatic-scaffolding-using-the-tasit-cli).
 
-Just run `npx tasit init` to automatically generate the scaffolding for a mobile dapp project.
-
-Alternatively, for popular ERC standards like ERC-721 for NFTs, you can even run:
-
-```
-npx tasit init --nft
-```
-
-...to instantly create a standalone mobile dapp for CryptoKitties, Decentraland, etc.
-
-This app scaffold comes ready to submit for beta testing on iOS with Testflight and on Android with Google Play Beta track, so you can focus on the core features of your dapp like you would do on the web.
+The code for the CLI lives over in the [`tasit` repo](https://github.com/tasitlabs/tasit) with the code for the mobile apps, because it heavily uses the React Native components there when generating the scaffolding.
 
 #### Modular
 
