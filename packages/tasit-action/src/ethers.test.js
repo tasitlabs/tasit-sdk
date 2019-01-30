@@ -2,8 +2,7 @@ import { ethers } from "ethers";
 
 // Note: This file is originally genarated by `tasit-contracts` and was pasted here manually
 // See https://github.com/tasitlabs/TasitSDK/issues/45
-
-import { abi as sampleContractABI } from "./testHelpers/SampleContract.json";
+import { abi as contractABI } from "./testHelpers/SampleContract.json";
 
 // Note: Under the current `tasit-contracts` setup SampleContract aways will deployed with this address
 // See https://github.com/tasitlabs/TasitSDK/issues/138
@@ -27,7 +26,7 @@ describe("ethers.js", () => {
 
     sampleContract = new ethers.Contract(
       sampleContractAddress,
-      sampleContractABI,
+      contractABI,
       wallet
     );
     expect(sampleContract.address).to.equal(sampleContractAddress);
