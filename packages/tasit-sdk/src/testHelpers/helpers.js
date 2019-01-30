@@ -71,43 +71,57 @@ const setupContracts = async owner => {
   };
 };
 
-const prepareTokens = async (mana, land, estate, owner, seller, buyer) => {
-  const land1 = { x: 0, y: 1 };
-  const land2 = { x: 0, y: 2 };
+const createParcels = async (landContract, lands, beneficiary) => {
+  let xArray = [];
+  let yArray = [];
+  lands.forEach(land => {
+    xArray.push(land.x);
+    yArray.push(land.y);
+  });
 
-  const parcelsAssignment = land.assignMultipleParcels(
-    [land1.x, land2.x],
-    [land1.y, land2.y],
-    seller.address,
+  const parcelsAssignment = landContract.assignMultipleParcels(
+    xArray,
+    yArray,
+    beneficiary.address,
     gasParams
   );
   await parcelsAssignment.waitForNonceToUpdate();
+};
 
-  land.setWallet(seller);
-  const updateParcel1 = land.updateLandData(
-    land1.x,
-    land1.y,
-    "parcel one",
-    gasParams
-  );
-  await updateParcel1.waitForNonceToUpdate();
+const createEstate = async (landContract, estateName, parcels, owner) => {
+  landContract.setWallet(owner);
 
-  const updateParcel2 = land.updateLandData(
-    land2.x,
-    land2.y,
-    "parcel two",
-    gasParams
-  );
-  await updateParcel2.waitForNonceToUpdate();
+  let xArray = [];
+  let yArray = [];
+  parcels.forEach(land => {
+    xArray.push(land.x);
+    yArray.push(land.y);
+  });
 
-  const createEstate = land.createEstateWithMetadata(
-    [land1.x, land2.x],
-    [land1.y, land2.y],
-    seller.address,
-    "cool estate",
+  const createEstate = landContract.createEstateWithMetadata(
+    xArray,
+    yArray,
+    owner.address,
+    estateName,
     gasParams
   );
   await createEstate.waitForNonceToUpdate();
+};
+
+const createEstatesFromParcels = async (landContract, parcels, beneficiary) => {
+  const estateIds = [];
+  await createParcels(landContract, parcels, beneficiary);
+
+  for (let parcel of parcels) {
+    await createEstate(
+      landContract,
+      `cool estate ${parcel.x}x${parcel.y}`,
+      [parcel],
+      beneficiary
+    );
+    estateIds.push(estateIds.length + 1);
+  }
+  return estateIds;
 };
 
 const duration = {
@@ -131,4 +145,10 @@ const duration = {
   },
 };
 
-export { gasParams, setupContracts, prepareTokens, duration };
+export {
+  gasParams,
+  setupContracts,
+  duration,
+  createParcels,
+  createEstatesFromParcels,
+};

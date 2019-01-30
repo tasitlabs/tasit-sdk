@@ -17,8 +17,9 @@ import {
 import {
   gasParams,
   setupContracts,
-  prepareTokens,
   duration,
+  createParcels,
+  createEstatesFromParcels,
 } from "./testHelpers/helpers";
 
 const ownerPrivKey =
@@ -46,6 +47,27 @@ describe("Decentraland", () => {
   let marketplace;
   let snapshotId;
   let provider;
+  let estateIds;
+
+  const manaFaucetTo = async (beneficiary, amountInWei) => {
+    mana.setWallet(owner);
+    const mintManaToBuyer = mana.mint(
+      beneficiary.address,
+      amountInWei.toString()
+    );
+    await mintManaToBuyer.waitForNonceToUpdate();
+    await confirmBalances(mana, [beneficiary.address], [amountInWei]);
+  };
+
+  const etherFaucetTo = async (beneficiary, amountInWei) => {
+    const connectedOwner = owner.connect(provider);
+    const tx = await connectedOwner.sendTransaction({
+      // ethers. utils.parseEther("1.0")
+      value: "0x0de0b6b3a7640000",
+      to: beneficiary.address,
+    });
+    await provider.waitForTransaction(tx.hash);
+  };
 
   before("", async () => {
     provider = ProviderFactory.getProvider();
@@ -67,23 +89,25 @@ describe("Decentraland", () => {
     // Note: In future we can have other ERC20 than Mana to test the Marketplace orders
     ({ mana, land, estate, marketplace } = await setupContracts(owner));
 
-    await prepareTokens(mana, land, estate, owner, seller, buyer);
+    const parcels = [
+      { x: 0, y: 1 },
+      { x: 0, y: 2 },
+      { x: 0, y: 3 },
+      { x: 0, y: 4 },
+      { x: 0, y: 5 },
+    ];
+    estateIds = await createEstatesFromParcels(land, parcels, seller);
 
-    const land1 = { x: 0, y: 1 };
-    const land2 = { x: 0, y: 2 };
-
-    const land1Data = await land.landData(land1.x, land1.y);
-    expect(land1Data).to.equal("parcel one");
-
-    const estateData = await estate.getMetadata(1);
-    expect(estateData).to.equal("cool estate");
+    const estateData = await estate.getMetadata(estateIds[0]);
+    expect(estateData).to.equal(`cool estate ${parcels[0].x}x${parcels[0].y}`);
 
     const totalSupply = await land.totalSupply();
-    expect(totalSupply.toNumber()).to.equal(2);
+    expect(totalSupply.toNumber()).to.equal(parcels.length);
 
+    // After became part of an estate, parcels are no more accounted as LAND balance
     await confirmBalances(land, [seller.address], [0]);
 
-    await confirmBalances(estate, [seller.address], [1]);
+    await confirmBalances(estate, [seller.address], [estateIds.length]);
 
     await mineBlocks(provider, 1);
   });
@@ -97,10 +121,7 @@ describe("Decentraland", () => {
     beforeEach(
       "buyer and seller approve marketplace contract to transfer tokens on their behalf",
       async () => {
-        mana.setWallet(owner);
-        const mintManaToBuyer = mana.mint(buyer.address, TEN.toString());
-        await mintManaToBuyer.waitForNonceToUpdate();
-        await confirmBalances(mana, [buyer.address], [TEN]);
+        manaFaucetTo(buyer, TEN);
 
         mana.setWallet(buyer);
         const marketplaceApprovalByBuyer = mana.approve(
@@ -120,7 +141,11 @@ describe("Decentraland", () => {
     );
 
     it("should execute an order", async () => {
-      await confirmBalances(estate, [buyer.address, seller.address], [0, 1]);
+      await confirmBalances(
+        estate,
+        [buyer.address, seller.address],
+        [0, estateIds.length]
+      );
 
       const assetId = 1;
       const priceInWei = ONE.toString();
@@ -145,7 +170,81 @@ describe("Decentraland", () => {
       );
       await executeOrder.waitForNonceToUpdate();
 
-      await confirmBalances(estate, [buyer.address, seller.address], [1, 0]);
+      await confirmBalances(
+        estate,
+        [buyer.address, seller.address],
+        [1, estateIds.length - 1]
+      );
+    });
+
+    describe("Decentraland tasit app test cases", () => {
+      beforeEach(
+        "create sell orders and remove wallets from contracts",
+        async () => {
+          marketplace.setWallet(seller);
+          for (let assetId of estateIds) {
+            const priceInWei = ONE.toString();
+            const expireAt = Date.now() + duration.years(1);
+            const createOrder = marketplace.createOrder(
+              estate.getAddress(),
+              assetId,
+              priceInWei,
+              expireAt,
+              gasParams
+            );
+            await createOrder.waitForNonceToUpdate();
+          }
+
+          mana.removeWallet();
+          land.removeWallet();
+          estate.removeWallet();
+          marketplace.removeWallet();
+        }
+      );
+
+      it("should list marketplace estates sell orders (without wallet)", async () => {
+        const estates = [];
+        for (let id of estateIds) {
+          estates.push({
+            id,
+            name: await estate.getMetadata(id),
+          });
+        }
+
+        expect(estates[0].name).to.equal("cool estate 0x1");
+      });
+
+      it("should get an estate info (without wallet)", async () => {
+        const estateId = 5;
+        const name = await estate.getMetadata(estateId);
+        expect(name).to.equal("cool estate 0x5");
+      });
+
+      it("should buy an estate", async () => {
+        await manaFaucetTo(ephemeral, TEN);
+        await etherFaucetTo(ephemeral, ONE);
+
+        mana.setWallet(ephemeral);
+        const marketplaceApproval = mana.approve(
+          marketplace.getAddress(),
+          ONE.toString()
+        );
+        await marketplaceApproval.waitForNonceToUpdate();
+
+        const assetId = 1;
+        const priceInWei = ONE.toString();
+
+        marketplace.setWallet(ephemeral);
+        const executeOrder = marketplace.executeOrder(
+          estate.getAddress(),
+          assetId,
+          priceInWei,
+          gasParams
+        );
+        await executeOrder.waitForNonceToUpdate();
+
+        await confirmBalances(estate, [ephemeral.address], [1]);
+      });
     });
   });
 });
