@@ -1,11 +1,11 @@
 import { Account, Action } from "../TasitSdk";
 const { Contract, NFT } = Action;
 
-import { abi as manaABI } from "./MANAToken.json";
-import { abi as landABI } from "./LANDRegistry.json";
-import { abi as landProxyABI } from "./LANDProxy.json";
-import { abi as estateABI } from "./EstateRegistry.json";
-import { abi as markplaceABI } from "./Marketplace.json";
+import { abi as manaABI } from "./abi/MANAToken.json";
+import { abi as landABI } from "./abi/LANDRegistry.json";
+import { abi as landProxyABI } from "./abi/LANDProxy.json";
+import { abi as estateABI } from "./abi/EstateRegistry.json";
+import { abi as markplaceABI } from "./abi/Marketplace.json";
 
 const manaAddress = "0xb32939da0c44bf255b9810421a55be095f9bb3f4";
 const landAddress = "0x6191bc768c2339da9eab9e589fc8bf0b3ab80975";
