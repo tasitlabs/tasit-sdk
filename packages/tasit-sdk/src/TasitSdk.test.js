@@ -87,6 +87,7 @@ describe("Decentraland", () => {
   });
 
   describe("Marketplace", () => {
+    // TODO: Assign different contract objects for each wallet (avoiding setWallet)
     beforeEach(
       "buyer and seller approve marketplace contract to transfer tokens on their behalf",
       async () => {
