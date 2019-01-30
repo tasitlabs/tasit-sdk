@@ -59,35 +59,5 @@ contract("SampleContract", function(accounts) {
       expect(f2).to.equal("2");
       expect(f3).to.equal("3");
     });
-
-    it("should call overloading functions - ethers", async function() {
-      const provider = new ethers.providers.JsonRpcProvider();
-      const sampleContractEthers = new ethers.Contract(address, abi, provider);
-
-      const f1 = await sampleContractEthers["overloading()"]();
-      const f2 = await sampleContractEthers["overloading(string)"]("a");
-      const f3 = await sampleContractEthers["overloading(string,string)"](
-        "a",
-        "b"
-      );
-
-      expect(f1.toNumber()).to.equal(1);
-      expect(f2.toNumber()).to.equal(2);
-      expect(f3.toNumber()).to.equal(3);
-    });
-
-    it.skip("should call overloading functions - ethers", async function() {
-      const provider = new ethers.providers.JsonRpcProvider();
-      const sampleContractEthers = new ethers.Contract(address, abi, provider);
-
-      // Error: incorrect number of arguments
-      const f1 = await sampleContractEthers.overloading();
-      const f2 = await sampleContractEthers.overloading("a");
-      const f3 = await sampleContractEthers.overloading("a", "b");
-
-      expect(f1.toNumber()).to.equal(1);
-      expect(f2.toNumber()).to.equal(2);
-      expect(f3.toNumber()).to.equal(3);
-    });
   });
 });

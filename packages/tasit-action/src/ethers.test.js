@@ -2,7 +2,7 @@ import { ethers } from "ethers";
 
 // Note: This file is originally genarated by `tasit-contracts` and was pasted here manually
 // See https://github.com/tasitlabs/TasitSDK/issues/45
-import { abi as contractABI } from "./testHelpers/SampleContract.json";
+import { abi as contractABI } from "../../tasit-contracts/build/contracts/SampleContract.json";
 
 // Note: Under the current `tasit-contracts` setup SampleContract aways will deployed with this address
 // See https://github.com/tasitlabs/TasitSDK/issues/138
@@ -158,5 +158,17 @@ describe("ethers.js", () => {
       const value = await sampleContract.getValue();
       expect(value).to.equal(rand);
     });
+  });
+
+  // Note: The ethers doesn't support function overloading and it only exposes
+  // one of the same name functions (first of ABI), the others functions should be called as bellow.
+  it("should call overloading functions - ethers", async function() {
+    const f1 = await sampleContract["overloading()"]();
+    const f2 = await sampleContract["overloading(string)"]("a");
+    const f3 = await sampleContract["overloading(string,string)"]("a", "b");
+
+    expect(f1.toNumber()).to.equal(1);
+    expect(f2.toNumber()).to.equal(2);
+    expect(f3.toNumber()).to.equal(3);
   });
 });
