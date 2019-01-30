@@ -62,7 +62,7 @@ describe("Decentraland", () => {
     await prepareTokens(mana, land, estate, owner, seller, buyer);
 
     const landData = await land.landData(0, 1);
-    expect(landData).to.equals("parcel one");
+    expect(landData).to.equal("parcel one");
 
     const estateData = await estate.getMetadata(1);
     expect(estateData).to.equals("cool estate");
