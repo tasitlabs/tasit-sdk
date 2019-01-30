@@ -47,17 +47,18 @@ contract("SampleContract", function(accounts) {
     await expect(sampleContract.revertWrite("some string")).to.be.rejected;
   });
 
-  describe("Contract functions overloading - web3js vs ethers.js", () => {
-    it("should call overloading functions - web3js", async function() {
-      const sampleContractWeb3 = new web3.eth.Contract(abi, address);
+  // Note that this is different behavior from ethers.js
+  // See more: packages/tasit-action/test/ethers.test.js
+  // and https://github.com/ethers-io/ethers.js/issues/407
+  it("should call overloading functions - web3.js", async function() {
+    const sampleContractWeb3 = new web3.eth.Contract(abi, address);
 
-      const f1 = await sampleContractWeb3.methods.overloading().call();
-      const f2 = await sampleContractWeb3.methods.overloading("a").call();
-      const f3 = await sampleContractWeb3.methods.overloading("a", "b").call();
+    const f1 = await sampleContractWeb3.methods.overloading().call();
+    const f2 = await sampleContractWeb3.methods.overloading("a").call();
+    const f3 = await sampleContractWeb3.methods.overloading("a", "b").call();
 
-      expect(f1).to.equal("1");
-      expect(f2).to.equal("2");
-      expect(f3).to.equal("3");
-    });
+    expect(f1).to.equal("1");
+    expect(f2).to.equal("2");
+    expect(f3).to.equal("3");
   });
 });
