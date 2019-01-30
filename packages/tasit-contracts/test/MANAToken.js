@@ -1,6 +1,5 @@
 // Note:
-// This test suite is using web3js directly because the contract deployment
-// is made by a 3rd part epository
+// This test suite is using web3js because contract deployment is made by a 3rd party repository
 contract("MANAToken", function(accounts) {
   const abi = require("../decentraland/mana/build/contracts/MANAToken.json")
     .abi;

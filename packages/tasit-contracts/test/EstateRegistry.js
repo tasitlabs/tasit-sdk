@@ -1,5 +1,5 @@
 // Note:
-// Should we use ethers instead of web3js?
+// This test suite is using web3js because contract deployment is made by a 3rd party repository
 contract("EstateRegistry", function(accounts) {
   const [owner] = accounts;
 
