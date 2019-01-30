@@ -25,13 +25,6 @@ describe("ethers.js", () => {
     expect(wallet.address).to.have.lengthOf(42);
     expect(wallet.provider).to.be.not.undefined;
 
-    const humanReadableABI = [
-      "event ValueChanged(address indexed author, string oldValue, string newValue)",
-      "constructor(string memory) public",
-      "function getValue() public view returns (string memory)",
-      "function setValue(string memory) public",
-    ];
-
     sampleContract = new ethers.Contract(
       sampleContractAddress,
       sampleContractABI,
@@ -51,6 +44,13 @@ describe("ethers.js", () => {
   });
 
   it("should instatiate contract object using human-readable ABI", async () => {
+    const humanReadableABI = [
+      "event ValueChanged(address indexed author, string oldValue, string newValue)",
+      "constructor(string memory) public",
+      "function getValue() public view returns (string memory)",
+      "function setValue(string memory) public",
+    ];
+
     sampleContract = undefined;
     sampleContract = new ethers.Contract(
       sampleContractAddress,

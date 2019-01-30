@@ -11,7 +11,8 @@ const manaAddress = "0xb32939da0c44bf255b9810421a55be095f9bb3f4";
 const landAddress = "0x6191bc768c2339da9eab9e589fc8bf0b3ab80975";
 const landProxyAddress = "0x773f11ed472aa43e4ebaa963bcfbbea5a10c1bbd";
 const estateAddress = "0x41b598a2c618b59b74540ac3afffb32f7971b37a";
-const marketplaceAddress = "0x289c42facf691946b64b4370361b1303f0a463ef";
+const marketplaceAddress = "0x07c0e972064e5c05f7b3596d81de1afd35457eae";
+const fullNFTAddress = "0x0E86f209729bf54763789CDBcA9E8b94f0FD5333";
 
 // TODO: Go deep on gas handling.
 // Without that, VM returns a revert error instead of out of gas error.
@@ -25,10 +26,14 @@ const setupContracts = async owner => {
   // Note: It would be cooler to use NFT here if
   // Decentraland Land contract followed ERC721 exactly
   const mana = new Contract(manaAddress, manaABI, owner);
-  let land = new Contract(landAddress, landABI, owner);
+  const land = new Contract(landAddress, landABI, owner);
   const landProxy = new Contract(landProxyAddress, landProxyABI, owner);
   const estate = new Contract(estateAddress, estateABI, owner);
   const marketplace = new Contract(marketplaceAddress, markplaceABI, owner);
+  const proxyWithLandABI = new Contract(landProxy.getAddress(), landABI, owner);
+
+  // Note: Used on Marktplace initialization
+  const fullErc721 = new NFT(fullNFTAddress);
 
   const landProxyUpgrade = landProxy.upgrade(
     land.getAddress(),
@@ -44,38 +49,47 @@ const setupContracts = async owner => {
   );
   await estateInitialize.waitForNonceToUpdate();
 
-  land = new Contract(landProxy.getAddress(), landABI, owner);
-
-  const landInitialize = land.initialize(owner.address, gasParams);
+  const landInitialize = proxyWithLandABI.initialize(owner.address, gasParams);
   await landInitialize.waitForNonceToUpdate();
 
-  const landEstateSetup = land.setEstateRegistry(
+  const landEstateSetup = proxyWithLandABI.setEstateRegistry(
     estate.getAddress(),
     gasParams
   );
   await landEstateSetup.waitForNonceToUpdate();
 
+  // Note: Since marketplace demands as inititalize 2nd arg an full NFT implementation
+  // and LANDRegistry doesn't implement burn() function, I'm following their test code
+  // where is used an empty ERC721 contract (called OLDLAND).
+  // TODO: Figure out why this is needed and if it's used some how on the marketplace contract.
+  const marketplaceInitialize = marketplace.initialize(
+    mana.getAddress(),
+    fullErc721.getAddress(),
+    owner.address
+  );
+  await marketplaceInitialize.waitForNonceToUpdate();
+
   return {
     mana,
-    land,
+    land: proxyWithLandABI,
     estate,
     marketplace,
   };
 };
 
-const populateLands = async (land, estate, owner, beneficiary) => {
+const prepareTokens = async (mana, land, estate, owner, seller, buyer) => {
   const auth = land.authorizeDeploy(owner.address, gasParams);
   await auth.waitForNonceToUpdate();
 
   const parcelsAssignment = land.assignMultipleParcels(
     [0, 0],
     [1, 2],
-    beneficiary.address,
+    seller.address,
     gasParams
   );
   await parcelsAssignment.waitForNonceToUpdate();
 
-  land.setWallet(beneficiary);
+  land.setWallet(seller);
   const updateParcel1 = land.updateLandData(0, 1, "parcel one", gasParams);
   await updateParcel1.waitForNonceToUpdate();
 
@@ -85,11 +99,32 @@ const populateLands = async (land, estate, owner, beneficiary) => {
   const createEstate = land.createEstateWithMetadata(
     [0, 0],
     [1, 2],
-    beneficiary.address,
+    seller.address,
     "cool estate",
     gasParams
   );
   await createEstate.waitForNonceToUpdate();
 };
 
-export { gasParams, setupContracts, populateLands };
+const duration = {
+  seconds: function(val) {
+    return val;
+  },
+  minutes: function(val) {
+    return val * this.seconds(60);
+  },
+  hours: function(val) {
+    return val * this.minutes(60);
+  },
+  days: function(val) {
+    return val * this.hours(24);
+  },
+  weeks: function(val) {
+    return val * this.days(7);
+  },
+  years: function(val) {
+    return val * this.days(365);
+  },
+};
+
+export { gasParams, setupContracts, prepareTokens, duration };

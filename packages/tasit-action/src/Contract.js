@@ -133,7 +133,10 @@ export class Contract extends Subscription {
       })
       .forEach(f => {
         var isWrite =
-          f.stateMutability !== "view" && f.stateMutability !== "pure";
+          (f.constant === undefined &&
+            f.stateMutability !== "view" &&
+            f.stateMutability !== "pure") ||
+          (f.constant !== undefined && f.constant === false);
         if (isWrite) this.#attachWriteFunction(f);
         else {
           this.#attachReadFunction(f);

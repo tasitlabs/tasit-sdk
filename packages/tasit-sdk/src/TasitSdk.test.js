@@ -11,7 +11,8 @@ import {
 import {
   gasParams,
   setupContracts,
-  populateLands,
+  prepareTokens,
+  duration,
 } from "./testHelpers/helpers";
 
 const ownerPrivKey =
@@ -48,12 +49,13 @@ describe("Decentraland", () => {
     expect(ephemeral.address).to.have.lengthOf(42);
   });
 
+  // TODO: extract setWallet to here and split beforeEach
   beforeEach("", async () => {
     snapshotId = await createSnapshot(provider);
 
     ({ mana, land, estate, marketplace } = await setupContracts(owner));
 
-    await populateLands(land, estate, owner, ana);
+    await prepareTokens(mana, land, estate, owner, ana, bob);
 
     const landData = await land.landData(0, 1);
     expect(landData).to.equals("parcel one");
@@ -77,8 +79,40 @@ describe("Decentraland", () => {
     await revertFromSnapshot(provider, snapshotId);
   });
 
-  it("create parcels", async () => {
-    const estateBalance = await estate.balanceOf(ana.address);
-    expect(estateBalance.toNumber()).to.equal(1);
+  // in weis
+  const ONE = 1e18;
+  const TEN = 10e18;
+
+  it("", async () => {
+    land.setWallet(ana);
+    const marketplaceApproval = land.setApprovalForAll(
+      marketplace.getAddress(),
+      true,
+      gasParams
+    );
+    await marketplaceApproval.waitForNonceToUpdate();
+
+    const manaMint = mana.mint(bob.address, TEN.toString());
+    await manaMint.waitForNonceToUpdate();
+
+    const bobBalance = await mana.balanceOf(bob.address);
+    expect(bobBalance.toString()).to.equal(TEN.toString());
+
+    // mana.setWallet(bob);
+    // const manaApprove = mana.approve(marketplace.getAddress(), ONE.toString());
+    // await manaApprove.waitForNonceToUpdate();
+
+    // marketplace.setWallet(ana);
+    // const assetId = 1;
+    // const priceInWei = TEN.toString();
+    // const expireAt = duration.hours(1);
+    // const createOrder = marketplace.createOrder(
+    //   land.getAddress(),
+    //   assetId,
+    //   priceInWei,
+    //   expireAt,
+    //   gasParams
+    // );
+    // await createOrder.waitForNonceToUpdate();
   });
 });
