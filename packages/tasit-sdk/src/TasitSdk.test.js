@@ -59,6 +59,7 @@ describe("Decentraland", () => {
   beforeEach("", async () => {
     snapshotId = await createSnapshot(provider);
 
+    // Note: In future we can have other ERC20 than Mana to test the Marketplace orders
     ({ mana, land, estate, marketplace } = await setupContracts(owner));
 
     await prepareTokens(mana, land, estate, owner, seller, buyer);
