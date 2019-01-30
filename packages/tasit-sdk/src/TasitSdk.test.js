@@ -29,6 +29,8 @@ const buyerPrivKey =
 const ONE = 1e18;
 const TEN = 10e18;
 
+// Note: Extract Decentraland test cases to a specific test suite when other
+// use case will be tested.
 describe("Decentraland", () => {
   let owner;
   let seller;
