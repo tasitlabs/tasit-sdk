@@ -14,7 +14,9 @@ const SampleContract = artifacts.require("./SampleContract.sol");
 // other than those we directly add from 3rd-party projects
 
 contract("SampleContract", function(accounts) {
-  let sampleContract, abi, address;
+  let sampleContract;
+  let abi;
+  let address;
 
   beforeEach(async () => {
     sampleContract = await SampleContract.deployed();
