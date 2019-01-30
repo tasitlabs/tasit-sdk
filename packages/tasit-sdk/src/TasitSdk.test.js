@@ -65,7 +65,7 @@ describe("Decentraland", () => {
     expect(landData).to.equal("parcel one");
 
     const estateData = await estate.getMetadata(1);
-    expect(estateData).to.equals("cool estate");
+    expect(estateData).to.equal("cool estate");
 
     const totalSupply = await land.totalSupply();
     expect(totalSupply.toNumber()).to.equal(2);
