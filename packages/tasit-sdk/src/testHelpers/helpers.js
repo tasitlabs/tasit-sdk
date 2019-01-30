@@ -32,9 +32,6 @@ const setupContracts = async owner => {
   const marketplace = new Contract(marketplaceAddress, markplaceABI, owner);
   const proxyWithLandABI = new Contract(landProxy.getAddress(), landABI, owner);
 
-  // Note: Used on Marktplace initialization
-  const fullErc721 = new NFT(fullNFTAddress);
-
   const landProxyUpgrade = landProxy.upgrade(
     land.getAddress(),
     owner.address,
@@ -57,14 +54,6 @@ const setupContracts = async owner => {
     gasParams
   );
   await landEstateSetup.waitForNonceToUpdate();
-
-  // Note: Marketplace demands as inititalize 2nd arg a contract that implements ERC165 correctly: 'supportsInterface(0x80ac58cd) == true' and LANDRegistry doesn't
-  // I'm following their test case where is used an empty ERC721 contract (named OLDLAND).
-  // TODO: Figure out how it's working on Decentraland deployed contracts since the code are the same.
-  //console.log(await fullErc721.supportsInterface("0x80ac58cd")); => true
-  // console.log(await land.supportsInterface("0x80ac58cd")); => false
-  // console.log(await proxyWithLandABI.supportsInterface("0x80ac58cd")); => false
-  // console.log(await estate.supportsInterface("0x80ac58cd")); => true
 
   const marketplaceInitialize = marketplace.initialize(
     mana.getAddress(),

@@ -7,6 +7,7 @@ import {
   mineBlocks,
   createSnapshot,
   revertFromSnapshot,
+  confirmBalances,
 } from "tasit-action/dist/testHelpers/helpers";
 import {
   gasParams,
@@ -21,6 +22,10 @@ const sellerPrivKey =
   "0xc181b6b02c9757f13f5aa15d1342a58970a8a489722dc0608a1d09fea717c181";
 const buyerPrivKey =
   "0x4f09311114f0ff4dfad0edaa932a3e01a4ee9f34da2cbd087aa0e6ffcb9eb322";
+
+// in weis
+const ONE = 1e18;
+const TEN = 10e18;
 
 describe("Decentraland", () => {
   let owner;
@@ -49,7 +54,6 @@ describe("Decentraland", () => {
     expect(ephemeral.address).to.have.lengthOf(42);
   });
 
-  // TODO: extract setWallet to here and split beforeEach
   beforeEach("", async () => {
     snapshotId = await createSnapshot(provider);
 
@@ -66,11 +70,9 @@ describe("Decentraland", () => {
     const totalSupply = await land.totalSupply();
     expect(totalSupply.toNumber()).to.equal(2);
 
-    const parcelsBalance = await land.balanceOf(seller.address);
-    expect(parcelsBalance.toNumber()).to.equal(0);
+    await confirmBalances(land, [seller.address], [0]);
 
-    const estateBalance = await estate.balanceOf(seller.address);
-    expect(estateBalance.toNumber()).to.equal(1);
+    await confirmBalances(estate, [seller.address], [1]);
 
     await mineBlocks(provider, 1);
   });
@@ -79,66 +81,59 @@ describe("Decentraland", () => {
     await revertFromSnapshot(provider, snapshotId);
   });
 
-  // in weis
-  const ONE = 1e18;
-  const TEN = 10e18;
+  describe("Marketplace", () => {
+    beforeEach(
+      "buyer and seller approve marketplace contract to transfer tokens on their behalf",
+      async () => {
+        mana.setWallet(owner);
+        const mintManaToBuyer = mana.mint(buyer.address, TEN.toString());
+        await mintManaToBuyer.waitForNonceToUpdate();
+        await confirmBalances(mana, [buyer.address], [TEN]);
 
-  it("", async () => {
-    let sellerManaBalance;
-    let sellerEstateBalance;
-    let buyerManaBalance;
-    let buyerEstateBalance;
+        mana.setWallet(buyer);
+        const marketplaceApprovalByBuyer = mana.approve(
+          marketplace.getAddress(),
+          ONE.toString()
+        );
+        await marketplaceApprovalByBuyer.waitForNonceToUpdate();
 
-    estate.setWallet(seller);
-    const marketplaceApproval = estate.setApprovalForAll(
-      marketplace.getAddress(),
-      true,
-      gasParams
+        estate.setWallet(seller);
+        const marketplaceApprovalBySeller = estate.setApprovalForAll(
+          marketplace.getAddress(),
+          true,
+          gasParams
+        );
+        await marketplaceApprovalBySeller.waitForNonceToUpdate();
+      }
     );
-    await marketplaceApproval.waitForNonceToUpdate();
 
-    const manaMint = mana.mint(buyer.address, TEN.toString());
-    await manaMint.waitForNonceToUpdate();
+    it("should execute an order", async () => {
+      await confirmBalances(estate, [buyer.address, seller.address], [0, 1]);
 
-    const buyerBalance = await mana.balanceOf(buyer.address);
-    expect(buyerBalance.toString()).to.equal(TEN.toString());
+      const assetId = 1;
+      const priceInWei = ONE.toString();
+      const expireAt = Date.now() + duration.hours(1);
 
-    mana.setWallet(buyer);
-    const manaApprove = mana.approve(marketplace.getAddress(), ONE.toString());
-    await manaApprove.waitForNonceToUpdate();
+      marketplace.setWallet(seller);
+      const createOrder = marketplace.createOrder(
+        estate.getAddress(),
+        assetId,
+        priceInWei,
+        expireAt,
+        gasParams
+      );
+      await createOrder.waitForNonceToUpdate();
 
-    buyerEstateBalance = await estate.balanceOf(buyer.address);
-    expect(buyerEstateBalance.toNumber()).to.equal(0);
+      marketplace.setWallet(buyer);
+      const executeOrder = marketplace.executeOrder(
+        estate.getAddress(),
+        assetId,
+        priceInWei,
+        gasParams
+      );
+      await executeOrder.waitForNonceToUpdate();
 
-    sellerEstateBalance = await estate.balanceOf(seller.address);
-    expect(sellerEstateBalance.toNumber()).to.equal(1);
-
-    marketplace.setWallet(seller);
-    const assetId = 1;
-    const priceInWei = ONE.toString();
-    const expireAt = Date.now() + duration.hours(1);
-    const createOrder = marketplace.createOrder(
-      estate.getAddress(),
-      assetId,
-      priceInWei,
-      expireAt,
-      gasParams
-    );
-    await createOrder.waitForNonceToUpdate();
-
-    marketplace.setWallet(buyer);
-    const executeOrder = marketplace.executeOrder(
-      estate.getAddress(),
-      assetId,
-      priceInWei,
-      gasParams
-    );
-    await executeOrder.waitForNonceToUpdate();
-
-    buyerEstateBalance = await estate.balanceOf(buyer.address);
-    expect(buyerEstateBalance.toNumber()).to.equal(1);
-
-    sellerEstateBalance = await estate.balanceOf(seller.address);
-    expect(sellerEstateBalance.toNumber()).to.equal(0);
+      await confirmBalances(estate, [buyer.address, seller.address], [1, 0]);
+    });
   });
 });
