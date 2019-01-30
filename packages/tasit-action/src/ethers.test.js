@@ -160,7 +160,7 @@ describe("ethers.js", () => {
     });
   });
 
-  // Note: The ethers doesn't support function overloading and it only exposes
+  // Note: ethers.js doesn't support function overloading and it only exposes
   // one of the same name functions (first of ABI), the others functions should be called as bellow.
   it("should call overloading functions - ethers", async function() {
     const f1 = await sampleContract["overloading()"]();
