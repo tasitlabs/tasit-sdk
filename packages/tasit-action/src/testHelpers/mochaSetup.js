@@ -19,6 +19,7 @@ import {
   wait,
   waitForEthersEvent,
   toBN,
+  confirmBalances,
 } from "./helpers";
 global.mineBlocks = mineBlocks;
 global.createSnapshot = createSnapshot;
@@ -26,6 +27,7 @@ global.revertFromSnapshot = revertFromSnapshot;
 global.wait = wait;
 global.waitForEthersEvent = waitForEthersEvent;
 global.toBN = toBN;
+global.confirmBalances = confirmBalances;
 
 // External helpers
 //

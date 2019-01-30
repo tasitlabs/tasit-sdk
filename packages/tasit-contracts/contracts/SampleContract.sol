@@ -35,4 +35,18 @@ contract SampleContract {
     _value = value;
   }
 
+  function overloading() public pure returns(uint) {
+    return 1;
+  }
+
+  function overloading(string memory a) public pure returns(uint) {
+    return 2;
+  }
+
+  function overloading(string memory a, string memory b) public pure returns(
+    uint
+  ) {
+    return 3;
+  }
+
 }
