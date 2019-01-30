@@ -3,7 +3,10 @@ const { Contract, NFT } = Action;
 import { expect, assert } from "chai";
 import { createFromPrivateKey } from "tasit-account/dist/testHelpers/helpers";
 // The goal of this integration test suite is to use only exposed classes
-// from TasitSdk, ProviderFactory has been used here for a clearer code.
+// from TasitSdk. ProviderFactory is used here as an exception
+// as the clearest way to get a provider
+// in this test suite. Eventually, maybe ProviderFactory may move to
+// some shared helper dir.
 import ProviderFactory from "tasit-action/dist/ProviderFactory";
 import {
   mineBlocks,
@@ -30,7 +33,7 @@ const ONE = 1e18;
 const TEN = 10e18;
 
 // Note: Extract Decentraland test cases to a specific test suite when other
-// use case will be tested.
+// use cases will be tested.
 describe("Decentraland", () => {
   let owner;
   let seller;
