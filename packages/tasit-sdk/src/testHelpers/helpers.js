@@ -72,9 +72,6 @@ const setupContracts = async owner => {
 };
 
 const prepareTokens = async (mana, land, estate, owner, seller, buyer) => {
-  const auth = land.authorizeDeploy(owner.address, gasParams);
-  await auth.waitForNonceToUpdate();
-
   const parcelsAssignment = land.assignMultipleParcels(
     [0, 0],
     [1, 2],
