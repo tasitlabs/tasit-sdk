@@ -40,6 +40,16 @@ export const wait = async ms => {
   return new Promise(resolve => setTimeout(resolve, ms));
 };
 
+export const confirmBalances = async (token, addresses, balances) => {
+  expect(addresses.length).to.equal(balances.length);
+
+  addresses.forEach(async (address, index) => {
+    const balance = await token.balanceOf(address);
+    const expectedBalance = balances[index];
+    expect(balance.toString()).to.equal(expectedBalance.toString());
+  });
+};
+
 // Note: ethers created their own BigNumber type that encapsulates BN.js
 // Because of that, exists the need of extra parses between user and our API (see tests)
 // Should we:
@@ -57,4 +67,5 @@ export default {
   revertFromSnapshot,
   wait,
   toBN,
+  confirmBalances,
 };

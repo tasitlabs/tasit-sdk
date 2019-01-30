@@ -19,16 +19,6 @@ describe("TasitAction.NFT", () => {
   let snapshotId;
   let action;
 
-  const confirmBalances = async (addresses, balances) => {
-    expect(addresses.length).to.equal(balances.length);
-
-    addresses.forEach(async (address, index) => {
-      const balance = await fullNFT.balanceOf(address);
-      const expectedBalance = balances[index];
-      expect(balance.toNumber()).to.equal(expectedBalance);
-    });
-  };
-
   before("", async () => {
     owner = createFromPrivateKey(
       "0x11d943d7649fbdeb146dc57bd9cfc80b086bfab2330c7b25651dbaf382392f60"
@@ -60,7 +50,11 @@ describe("TasitAction.NFT", () => {
     // Two blocks to minimize the risk that polling doesn't occur.
     await mineBlocks(provider, 2);
 
-    await confirmBalances([owner.address, ana.address, bob.address], [0, 0, 0]);
+    await confirmBalances(
+      fullNFT,
+      [owner.address, ana.address, bob.address],
+      [0, 0, 0]
+    );
 
     snapshotId = await createSnapshot(provider);
   });
@@ -155,7 +149,7 @@ describe("TasitAction.NFT", () => {
       expect(event.to).to.equal(ana.address);
       expect(event.tokenId.eq(tokenId)).to.be.true;
 
-      await confirmBalances([ana.address], [1]);
+      await confirmBalances(fullNFT, [ana.address], [1]);
     });
 
     // Non-deterministic
@@ -181,7 +175,7 @@ describe("TasitAction.NFT", () => {
       expect(event.to).to.equal(bob.address);
       expect(event.tokenId.toNumber()).to.equal(tokenId);
 
-      await confirmBalances([ana.address, bob.address], [0, 1]);
+      await confirmBalances(fullNFT, [ana.address, bob.address], [0, 1]);
     });
 
     it("should transfer an approved token", async () => {
@@ -195,7 +189,7 @@ describe("TasitAction.NFT", () => {
 
       await action.waitForNonceToUpdate();
 
-      await confirmBalances([bob.address], [1]);
+      await confirmBalances(fullNFT, [bob.address], [1]);
     });
 
     it("should transfer an owned token using safeTransferFrom", async () => {
@@ -205,7 +199,7 @@ describe("TasitAction.NFT", () => {
 
       await action.waitForNonceToUpdate();
 
-      await confirmBalances([ana.address, bob.address], [0, 1]);
+      await confirmBalances(fullNFT, [ana.address, bob.address], [0, 1]);
     });
 
     it("should trigger an error if the user is listening for errors from a contract and tries safeTransferFrom to a contract without onERC721Received", async () => {
@@ -232,7 +226,11 @@ describe("TasitAction.NFT", () => {
 
       expect(contractErrorFakeFn.called).to.be.true;
 
-      await confirmBalances([ana.address, sampleContractAddress], [1, 0]);
+      await confirmBalances(
+        fullNFT,
+        [ana.address, sampleContractAddress],
+        [1, 0]
+      );
     });
 
     it("should trigger an error if the user is listening for errors for an action and tries safeTransferFrom to a contract without onERC721Received", async () => {
@@ -259,7 +257,11 @@ describe("TasitAction.NFT", () => {
 
       expect(actionErrorFakeFn.called).to.be.true;
 
-      await confirmBalances([ana.address, sampleContractAddress], [1, 0]);
+      await confirmBalances(
+        fullNFT,
+        [ana.address, sampleContractAddress],
+        [1, 0]
+      );
     });
   });
 });

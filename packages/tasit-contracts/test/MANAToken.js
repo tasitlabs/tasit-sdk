@@ -1,5 +1,6 @@
 // Note:
-// Should we use ethers instead of web3js?
+// This test suite is using web3.js because contract deployment is made by a 3rd-party repository
+// (and most existing 3rd-party contracts tend to use Truffle which uses web3.js)
 contract("MANAToken", function(accounts) {
   const abi = require("../decentraland/mana/build/contracts/MANAToken.json")
     .abi;
