@@ -2,6 +2,8 @@ import { Account, Action } from "./TasitSdk";
 const { Contract, NFT } = Action;
 import { expect, assert } from "chai";
 import { createFromPrivateKey } from "tasit-account/dist/testHelpers/helpers";
+// The goal of this integration test suite is to use only exposed class
+// from TasitSdk, ProviderFactory has been used here for a clearer code.
 import ProviderFactory from "tasit-action/dist/ProviderFactory";
 import {
   mineBlocks,
