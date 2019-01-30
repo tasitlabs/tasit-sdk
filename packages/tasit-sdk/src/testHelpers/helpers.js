@@ -72,24 +72,37 @@ const setupContracts = async owner => {
 };
 
 const prepareTokens = async (mana, land, estate, owner, seller, buyer) => {
+  const land1 = { x: 0, y: 1 };
+  const land2 = { x: 0, y: 2 };
+
   const parcelsAssignment = land.assignMultipleParcels(
-    [0, 0],
-    [1, 2],
+    [land1.x, land2.x],
+    [land1.y, land2.y],
     seller.address,
     gasParams
   );
   await parcelsAssignment.waitForNonceToUpdate();
 
   land.setWallet(seller);
-  const updateParcel1 = land.updateLandData(0, 1, "parcel one", gasParams);
+  const updateParcel1 = land.updateLandData(
+    land1.x,
+    land1.y,
+    "parcel one",
+    gasParams
+  );
   await updateParcel1.waitForNonceToUpdate();
 
-  const updateParcel2 = land.updateLandData(0, 2, "parcel two", gasParams);
+  const updateParcel2 = land.updateLandData(
+    land2.x,
+    land2.y,
+    "parcel two",
+    gasParams
+  );
   await updateParcel2.waitForNonceToUpdate();
 
   const createEstate = land.createEstateWithMetadata(
-    [0, 0],
-    [1, 2],
+    [land1.x, land2.x],
+    [land1.y, land2.y],
     seller.address,
     "cool estate",
     gasParams
