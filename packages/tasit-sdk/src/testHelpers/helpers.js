@@ -25,10 +25,11 @@ const gasParams = {
 const setupContracts = async owner => {
   // Note: It would be cooler to use NFT here if
   // Decentraland Land contract followed ERC721 exactly
-  const mana = new Contract(manaAddress, manaABI, owner);
   const land = new Contract(landAddress, landABI, owner);
   const landProxy = new Contract(landProxyAddress, landProxyABI, owner);
   const estate = new Contract(estateAddress, estateABI, owner);
+
+  const mana = new Contract(manaAddress, manaABI, owner);
   const marketplace = new Contract(marketplaceAddress, markplaceABI, owner);
   const proxyWithLandABI = new Contract(landProxy.getAddress(), landABI, owner);
 
