@@ -210,25 +210,31 @@ describe("Decentraland", () => {
         const orders = [];
         const totalSupply = await estate.totalSupply();
 
-        const allEstatesIds = Array.from(
-          { length: totalSupply.toNumber() },
-          (v, k) => k + 1
+        // create an array 1..N, where N = total estates
+        const allEstatesIds = [...Array(totalSupply.toNumber())].map(
+          (val, key) => key + 1
         );
+        // const allEstatesIds = Array.from(
+        //   { length: totalSupply.toNumber() },
+        //   (val, key) => key + 1
+        // );
 
         for (let id of allEstatesIds) {
           const order = await getEstateSellOrder(marketplace, estate, id);
           orders.push(order);
         }
 
-        expect(orders[0].price.toString()).to.equal(ONE.toString());
-        expect(orders[0].estateName).to.equal("cool estate 0x1");
+        expect(orders).to.not.deep.include(null);
       });
 
+      // Note: If Decentraland were leveraging ERC721Metadata token URI's more,
+      // we would have done expectations on them in this test
       it("should get an estate info (without wallet)", async () => {
         const estateId = 5;
         const order = await getEstateSellOrder(marketplace, estate, estateId);
 
         expect(order.estateName).to.equal("cool estate 0x5");
+        expect(order.price.toString()).to.equal(ONE.toString());
       });
 
       it("should buy an estate", async () => {
