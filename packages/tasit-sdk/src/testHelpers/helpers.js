@@ -88,7 +88,13 @@ const createParcels = async (landContract, lands, beneficiary) => {
   await parcelsAssignment.waitForNonceToUpdate();
 };
 
-const createEstate = async (landContract, estateName, parcels, owner) => {
+const createEstate = async (
+  estateContract,
+  landContract,
+  estateName,
+  parcels,
+  owner
+) => {
   landContract.setWallet(owner);
 
   let xArray = [];
@@ -98,30 +104,74 @@ const createEstate = async (landContract, estateName, parcels, owner) => {
     yArray.push(land.y);
   });
 
-  const createEstate = landContract.createEstateWithMetadata(
+  const estateCreation = landContract.createEstateWithMetadata(
     xArray,
     yArray,
     owner.address,
     estateName,
     gasParams
   );
-  await createEstate.waitForNonceToUpdate();
+
+  const estateId = await new Promise(function(resolve, reject) {
+    estateContract.once("CreateEstate", message => {
+      const { data } = message;
+      const { args } = data;
+      resolve(args._estateId);
+    });
+  });
+
+  await estateCreation.waitForNonceToUpdate();
+
+  return estateId;
 };
 
-const createEstatesFromParcels = async (landContract, parcels, beneficiary) => {
+const createEstatesFromParcels = async (
+  estateContract,
+  landContract,
+  parcels,
+  beneficiary
+) => {
   const estateIds = [];
   await createParcels(landContract, parcels, beneficiary);
 
   for (let parcel of parcels) {
-    await createEstate(
+    const id = await createEstate(
+      estateContract,
       landContract,
       `cool estate ${parcel.x}x${parcel.y}`,
       [parcel],
       beneficiary
     );
-    estateIds.push(estateIds.length + 1);
+    estateIds.push(id);
   }
   return estateIds;
+};
+
+const getEstateSellOrder = async (
+  marketplaceContract,
+  esteteContract,
+  estateId
+) => {
+  const [
+    orderId,
+    seller,
+    price,
+    expiresAt,
+  ] = await marketplaceContract.auctionByAssetId(estateId);
+
+  const hasOrder = parseInt(orderId, 16) !== 0;
+  if (!hasOrder) return null;
+
+  const estateName = await esteteContract.getMetadata(estateId);
+
+  return {
+    estateId,
+    estateName,
+    orderId,
+    seller,
+    price,
+    expiresAt,
+  };
 };
 
 const duration = {
@@ -151,4 +201,5 @@ export {
   duration,
   createParcels,
   createEstatesFromParcels,
+  getEstateSellOrder,
 };

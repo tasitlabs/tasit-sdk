@@ -20,6 +20,7 @@ import {
   duration,
   createParcels,
   createEstatesFromParcels,
+  getEstateSellOrder,
 } from "./testHelpers/helpers";
 
 const ownerPrivKey =
@@ -96,7 +97,10 @@ describe("Decentraland", () => {
       { x: 0, y: 4 },
       { x: 0, y: 5 },
     ];
-    estateIds = await createEstatesFromParcels(land, parcels, seller);
+
+    // Note: Often estates have more than one parcel of land in them
+    // but here we just have one parcel of land in each to keep this test short
+    estateIds = await createEstatesFromParcels(estate, land, parcels, seller);
 
     const estateData = await estate.getMetadata(estateIds[0]);
     expect(estateData).to.equal(`cool estate ${parcels[0].x}x${parcels[0].y}`);
@@ -203,21 +207,28 @@ describe("Decentraland", () => {
       );
 
       it("should list marketplace estates sell orders (without wallet)", async () => {
-        const estates = [];
-        for (let id of estateIds) {
-          estates.push({
-            id,
-            name: await estate.getMetadata(id),
-          });
+        const orders = [];
+        const totalSupply = await estate.totalSupply();
+
+        const allEstatesIds = Array.from(
+          { length: totalSupply.toNumber() },
+          (v, k) => k + 1
+        );
+
+        for (let id of allEstatesIds) {
+          const order = await getEstateSellOrder(marketplace, estate, id);
+          orders.push(order);
         }
 
-        expect(estates[0].name).to.equal("cool estate 0x1");
+        expect(orders[0].price.toString()).to.equal(ONE.toString());
+        expect(orders[0].estateName).to.equal("cool estate 0x1");
       });
 
       it("should get an estate info (without wallet)", async () => {
         const estateId = 5;
-        const name = await estate.getMetadata(estateId);
-        expect(name).to.equal("cool estate 0x5");
+        const order = await getEstateSellOrder(marketplace, estate, estateId);
+
+        expect(order.estateName).to.equal("cool estate 0x5");
       });
 
       it("should buy an estate", async () => {
