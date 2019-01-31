@@ -21,6 +21,8 @@
     "migrate": "npx truffle migrate && npm run migrate:decentraland",
     "install:decentraland": "./decentraland/scripts/install.sh `pwd`",
     "migrate:decentraland": "./decentraland/scripts/migrate.sh `pwd`",
+    "clean:decentraland": "./decentraland/scripts/clean.sh `pwd`",
+    "clean:3rd-parties": "npm run clean:decentraland",
     "test": "npx truffle test"
   },
   "bugs": {
