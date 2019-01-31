@@ -210,14 +210,10 @@ describe("Decentraland", () => {
         const orders = [];
         const totalSupply = await estate.totalSupply();
 
-        // create an array 1..N, where N = total estates
+        // create an array 1..N, where N = total of estates
         const allEstatesIds = [...Array(totalSupply.toNumber())].map(
           (val, key) => key + 1
         );
-        // const allEstatesIds = Array.from(
-        //   { length: totalSupply.toNumber() },
-        //   (val, key) => key + 1
-        // );
 
         for (let id of allEstatesIds) {
           const order = await getEstateSellOrder(marketplace, estate, id);
