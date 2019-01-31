@@ -42,12 +42,12 @@ export const wait = async ms => {
 
 export const confirmBalances = async (token, addresses, balances) => {
   expect(addresses.length).to.equal(balances.length);
-
-  addresses.forEach(async (address, index) => {
+  let index = 0;
+  for (let address of addresses) {
     const balance = await token.balanceOf(address);
-    const expectedBalance = balances[index];
+    const expectedBalance = balances[index++];
     expect(balance.toString()).to.equal(expectedBalance.toString());
-  });
+  }
 };
 
 // Note: ethers created their own BigNumber type that encapsulates BN.js
