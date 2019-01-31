@@ -1,6 +1,6 @@
 {
   "name": "tasit-sdk",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "A JavaScript SDK for making mobile Ethereum dapps using React Native",
   "main": "dist/index.js",
   "keywords": [
@@ -26,8 +26,8 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.1.5",
-    "tasit-account": "^0.0.6",
-    "tasit-action": "^0.0.6"
+    "tasit-account": "^0.0.7",
+    "tasit-action": "^0.0.7"
   },
   "devDependencies": {
     "@babel/cli": "^7.1.5",
