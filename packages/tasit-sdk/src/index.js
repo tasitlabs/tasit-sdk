@@ -1,1 +1,1 @@
-export * from "./tasitSdk";
+export * from "./TasitSdk";
