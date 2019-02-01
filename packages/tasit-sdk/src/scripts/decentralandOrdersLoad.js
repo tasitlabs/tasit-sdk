@@ -1,3 +1,5 @@
+// This is script will add lands, estates and sell order to Decentraland marketplace
+// Those data is been used to test Decentraland demo app using ganache-cli local blockchain
 import { createFromPrivateKey } from "tasit-account/dist/testHelpers/helpers";
 import {
   setupWallets,
