@@ -1,5 +1,7 @@
+const MAINNET = "mainnet";
+
 // All config properties
-const config = {
+const sampleConfig = {
   // Blockchain connection provider properties
   provider: {
     // Networks: mainnet, rinkeby, ropsten, kovan, other (default: other)
@@ -33,34 +35,29 @@ const config = {
   },
 };
 
-// Development using ganache-cli
-const development = {
-  provider: {
-    network: "other",
-    provider: "jsonrpc",
-    pollingInterval: 50,
-    jsonRpc: {
-      url: "http://localhost",
-      port: 8545,
-    },
-  },
-  events: {
-    timeout: 2000,
-  },
-};
+export class ConfigLoader {
+  config;
 
-// Testnet using Infura
-const testnet = {
-  network: "ropsten",
-  provider: "infura",
-  pollingInterval: 4000,
-};
+  static setConfig(config) {
+    this.config = config;
+  }
 
-// Default config
-const mainnet = {
-  network: "mainnet",
-  provider: "fallback",
-  pollingInterval: 4000,
-};
+  static getConfig() {
+    return this.config;
+  }
 
-module.exports = development;
+  static getDefaultConfig() {
+    return {
+      network: MAINNET,
+      provider: "fallback",
+      pollingInterval: 4000,
+      jsonRpc: {
+        url: "http://localhost",
+        port: 8545,
+        allowInsecure: false,
+      },
+    };
+  }
+}
+
+export default ConfigLoader;

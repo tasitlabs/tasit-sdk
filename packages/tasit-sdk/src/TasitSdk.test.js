@@ -1,5 +1,5 @@
 import { Account, Action } from "./TasitSdk";
-const { Contract, NFT } = Action;
+const { Contract, NFT, ConfigLoader } = Action;
 import { expect, assert } from "chai";
 import { createFromPrivateKey } from "tasit-account/dist/testHelpers/helpers";
 // The goal of this integration test suite is to use only exposed classes
@@ -71,6 +71,22 @@ describe("Decentraland", () => {
   };
 
   before("", async () => {
+    const config = {
+      provider: {
+        network: "other",
+        provider: "jsonrpc",
+        pollingInterval: 50,
+        jsonRpc: {
+          url: "http://localhost",
+          port: 8545,
+        },
+      },
+      events: {
+        timeout: 2000,
+      },
+    };
+    ConfigLoader.setConfig(config);
+
     provider = ProviderFactory.getProvider();
 
     owner = createFromPrivateKey(ownerPrivKey);
