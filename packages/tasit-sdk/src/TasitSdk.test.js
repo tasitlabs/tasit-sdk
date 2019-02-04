@@ -225,11 +225,11 @@ describe("Decentraland", () => {
           (val, key) => key + 1
         );
 
-        for (let id of allEstatesIds) {
+        for (let estateId of allEstatesIds) {
           const order = await getEstateSellOrder(
             marketplaceContract,
             estateContract,
-            id
+            estateId
           );
           orders.push(order);
         }
