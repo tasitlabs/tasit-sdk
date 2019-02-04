@@ -1,5 +1,6 @@
 import { Account, Action } from "../TasitSdk";
 const { Contract, NFT } = Action;
+import { createFromPrivateKey } from "tasit-account/dist/testHelpers/helpers";
 
 import { abi as manaABI } from "./abi/MANAToken.json";
 import { abi as landABI } from "./abi/LANDRegistry.json";
@@ -14,12 +15,28 @@ const estateAddress = "0x41b598a2c618b59b74540ac3afffb32f7971b37a";
 const marketplaceAddress = "0x07c0e972064e5c05f7b3596d81de1afd35457eae";
 const fullNFTAddress = "0x0E86f209729bf54763789CDBcA9E8b94f0FD5333";
 
+const ownerPrivKey =
+  "0x11d943d7649fbdeb146dc57bd9cfc80b086bfab2330c7b25651dbaf382392f60";
+const sellerPrivKey =
+  "0xc181b6b02c9757f13f5aa15d1342a58970a8a489722dc0608a1d09fea717c181";
+const buyerPrivKey =
+  "0x4f09311114f0ff4dfad0edaa932a3e01a4ee9f34da2cbd087aa0e6ffcb9eb322";
+
 // TODO: Go deep on gas handling.
 // Without that, VM returns a revert error instead of out of gas error.
 // See: https://github.com/tasitlabs/TasitSDK/issues/173
 const gasParams = {
   gasLimit: 7e6,
   gasPrice: 1e9,
+};
+
+const setupWallets = () => {
+  const owner = createFromPrivateKey(ownerPrivKey);
+  const seller = createFromPrivateKey(sellerPrivKey);
+  const buyer = createFromPrivateKey(buyerPrivKey);
+  const ephemeral = Account.create();
+
+  return { owner, seller, buyer, ephemeral };
 };
 
 const setupContracts = async owner => {
@@ -197,6 +214,7 @@ const duration = {
 
 export {
   gasParams,
+  setupWallets,
   setupContracts,
   duration,
   createParcels,

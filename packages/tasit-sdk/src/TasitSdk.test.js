@@ -1,7 +1,7 @@
 import { Account, Action } from "./TasitSdk";
 const { Contract, NFT } = Action;
 import { expect, assert } from "chai";
-import { createFromPrivateKey } from "tasit-account/dist/testHelpers/helpers";
+
 // The goal of this integration test suite is to use only exposed classes
 // from TasitSdk. ProviderFactory is used here as an exception
 // as the clearest way to get a provider
@@ -17,18 +17,11 @@ import {
 import {
   gasParams,
   setupContracts,
+  setupWallets,
   duration,
-  createParcels,
   createEstatesFromParcels,
   getEstateSellOrder,
 } from "./testHelpers/helpers";
-
-const ownerPrivKey =
-  "0x11d943d7649fbdeb146dc57bd9cfc80b086bfab2330c7b25651dbaf382392f60";
-const sellerPrivKey =
-  "0xc181b6b02c9757f13f5aa15d1342a58970a8a489722dc0608a1d09fea717c181";
-const buyerPrivKey =
-  "0x4f09311114f0ff4dfad0edaa932a3e01a4ee9f34da2cbd087aa0e6ffcb9eb322";
 
 // in weis
 const ONE = 1e18;
@@ -73,10 +66,7 @@ describe("Decentraland", () => {
   before("", async () => {
     provider = ProviderFactory.getProvider();
 
-    owner = createFromPrivateKey(ownerPrivKey);
-    seller = createFromPrivateKey(sellerPrivKey);
-    buyer = createFromPrivateKey(buyerPrivKey);
-    ephemeral = Account.create();
+    ({ owner, seller, buyer, ephemeral } = setupWallets());
 
     expect(owner.address).to.have.lengthOf(42);
     expect(seller.address).to.have.lengthOf(42);
