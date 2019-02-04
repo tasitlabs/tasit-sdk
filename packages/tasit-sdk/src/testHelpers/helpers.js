@@ -31,69 +31,84 @@ const gasParams = {
 };
 
 const setupWallets = () => {
-  const owner = createFromPrivateKey(ownerPrivKey);
-  const seller = createFromPrivateKey(sellerPrivKey);
-  const buyer = createFromPrivateKey(buyerPrivKey);
-  const ephemeral = Account.create();
+  const ownerWallet = createFromPrivateKey(ownerPrivKey);
+  const sellerWallet = createFromPrivateKey(sellerPrivKey);
+  const buyerWallet = createFromPrivateKey(buyerPrivKey);
+  const ephemeralWallet = Account.create();
 
-  return { owner, seller, buyer, ephemeral };
+  return { ownerWallet, sellerWallet, buyerWallet, ephemeralWallet };
 };
 
-const setupContracts = async owner => {
+const setupContracts = async ownerWallet => {
   // Note: It would be cooler to use NFT here if
   // Decentraland Land contract followed ERC721 exactly
-  const land = new Contract(landAddress, landABI, owner);
-  const landProxy = new Contract(landProxyAddress, landProxyABI, owner);
-  const estate = new Contract(estateAddress, estateABI, owner);
+  const landContract = new Contract(landAddress, landABI, ownerWallet);
+  const landProxyContract = new Contract(
+    landProxyAddress,
+    landProxyABI,
+    ownerWallet
+  );
+  const estateContract = new Contract(estateAddress, estateABI, ownerWallet);
 
-  const mana = new Contract(manaAddress, manaABI, owner);
-  const marketplace = new Contract(marketplaceAddress, markplaceABI, owner);
-  const proxyWithLandABI = new Contract(landProxy.getAddress(), landABI, owner);
+  const manaContract = new Contract(manaAddress, manaABI, ownerWallet);
+  const marketplaceContract = new Contract(
+    marketplaceAddress,
+    markplaceABI,
+    ownerWallet
+  );
+  const landProxyContractWithLandABI = new Contract(
+    landProxyContract.getAddress(),
+    landABI,
+    ownerWallet
+  );
 
-  const landProxyUpgrade = landProxy.upgrade(
-    land.getAddress(),
-    owner.address,
+  const landProxyUpgrade = landProxyContract.upgrade(
+    landContract.getAddress(),
+    ownerWallet.address,
     gasParams
   );
   await landProxyUpgrade.waitForNonceToUpdate();
 
-  const estateInitialize = estate.initialize(
+  const estateInitialize = estateContract.initialize(
     "Estate",
     "EST",
-    landProxy.getAddress()
+    landProxyContract.getAddress()
   );
   await estateInitialize.waitForNonceToUpdate();
 
-  const landInitialize = proxyWithLandABI.initialize(owner.address, gasParams);
+  const landInitialize = landProxyContractWithLandABI.initialize(
+    ownerWallet.address,
+    gasParams
+  );
   await landInitialize.waitForNonceToUpdate();
 
-  const landEstateSetup = proxyWithLandABI.setEstateRegistry(
-    estate.getAddress(),
+  const landEstateSetup = landProxyContractWithLandABI.setEstateRegistry(
+    estateContract.getAddress(),
     gasParams
   );
   await landEstateSetup.waitForNonceToUpdate();
 
-  const marketplaceInitialize = marketplace.initialize(
-    mana.getAddress(),
-    estate.getAddress(),
-    owner.address
+  const marketplaceInitialize = marketplaceContract.initialize(
+    manaContract.getAddress(),
+    estateContract.getAddress(),
+    ownerWallet.address
   );
   await marketplaceInitialize.waitForNonceToUpdate();
 
   return {
-    mana,
-    land: proxyWithLandABI,
-    estate,
-    marketplace,
+    manaContract,
+    landContract: landProxyContractWithLandABI,
+    estateContract,
+    marketplaceContract,
   };
 };
 
-const createParcels = async (landContract, lands, beneficiary) => {
+const createParcels = async (landContract, parcels, beneficiary) => {
   let xArray = [];
   let yArray = [];
-  lands.forEach(land => {
-    xArray.push(land.x);
-    yArray.push(land.y);
+  parcels.forEach(parcel => {
+    xArray.push(parcel.x);
+    yArray.push(parcel.y);
   });
 
   const parcelsAssignment = landContract.assignMultipleParcels(
@@ -110,21 +125,21 @@ const createEstate = async (
   landContract,
   estateName,
   parcels,
-  owner
+  ownerWallet
 ) => {
-  landContract.setWallet(owner);
+  landContract.setWallet(ownerWallet);
 
   let xArray = [];
   let yArray = [];
-  parcels.forEach(land => {
-    xArray.push(land.x);
-    yArray.push(land.y);
+  parcels.forEach(parcel => {
+    xArray.push(parcel.x);
+    yArray.push(parcel.y);
   });
 
   const estateCreation = landContract.createEstateWithMetadata(
     xArray,
     yArray,
-    owner.address,
+    ownerWallet.address,
     estateName,
     gasParams
   );

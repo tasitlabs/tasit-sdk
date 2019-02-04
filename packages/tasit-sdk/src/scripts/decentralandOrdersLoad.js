@@ -1,5 +1,5 @@
-// This is script will add lands, estates and sell order to Decentraland marketplace
-// Those data is been used to test Decentraland demo app using ganache-cli local blockchain
+// This script will add land parcels, estates and sell orders to the Decentraland marketplace
+// This data is being used to test the Decentraland demo app using the ganache-cli local blockchain
 import { createFromPrivateKey } from "tasit-account/dist/testHelpers/helpers";
 import {
   setupWallets,
@@ -13,8 +13,12 @@ import {
 // It's likely that script won't be necessary after 0.1.0 version of tasit demo app
 // Use npx babel-node to run this
 (async () => {
-  const { owner, seller } = setupWallets();
-  const { mana, land, estate, marketplace } = await setupContracts(owner);
+  const { ownerWallet, sellerWallet } = setupWallets();
+  const {
+    landContract,
+    estateContract,
+    marketplaceContract,
+  } = await setupContracts(ownerWallet);
 
   const ONE = 1e18;
 
@@ -29,26 +33,26 @@ import {
   // Note: Often estates have more than one parcel of land in them
   // but here we just have one parcel of land in each to keep this test short
   const estateIds = await createEstatesFromParcels(
-    estate,
-    land,
+    estateContract,
+    landContract,
     parcels,
-    seller
+    sellerWallet
   );
 
-  estate.setWallet(seller);
-  const marketplaceApprovalBySeller = estate.setApprovalForAll(
-    marketplace.getAddress(),
+  estateContract.setWallet(sellerWallet);
+  const marketplaceApprovalBySeller = estateContract.setApprovalForAll(
+    marketplaceContract.getAddress(),
     true,
     gasParams
   );
   await marketplaceApprovalBySeller.waitForNonceToUpdate();
 
-  marketplace.setWallet(seller);
+  marketplaceContract.setWallet(sellerWallet);
   for (let assetId of estateIds) {
     const priceInWei = ONE.toString();
     const expireAt = Date.now() + duration.years(1);
-    const createOrder = marketplace.createOrder(
-      estate.getAddress(),
+    const createOrder = marketplaceContract.createOrder(
+      estateContract.getAddress(),
       assetId,
       priceInWei,
       expireAt,
@@ -59,7 +63,11 @@ import {
 
   const orders = [];
   for (let id of estateIds) {
-    const order = await getEstateSellOrder(marketplace, estate, id);
+    const order = await getEstateSellOrder(
+      marketplaceContract,
+      estateContract,
+      id
+    );
     orders.push(order);
   }
 
