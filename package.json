@@ -10,7 +10,9 @@
     "prettier-plugin-solidity": "^1.0.0-alpha.12"
   },
   "scripts": {
-    "publish": "npx lerna run clean:3rd-parties --scope tasit-contracts && npx lerna publish",
+    "clean:3rd-parties": "npx lerna run clean:3rd-parties --scope tasit-contracts",
+    "clean:all": "npm run clean:3rd-parties && npx lerna clean --yes && rm -rf ./node_modules",
+    "publish": "npm run clean:all && npm run bootstrap && npm test && npm run clean:3rd-parties && npx lerna publish",
     "bootstrap": "npx lerna bootstrap --hoist",
     "ganache:start": "npx ganache-cli -m 'beach swap combine paper music cook electric bullet trust actress liquid asthma' --gasLimit 1000000000 --host 0.0.0.0 > /dev/null 2>&1 &",
     "ganache:stop": "kill `ps ax|grep ganache-cli|grep -v grep| awk '{print $1}'` 2> /dev/null; exit 0",

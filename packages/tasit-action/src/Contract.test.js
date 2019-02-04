@@ -333,7 +333,8 @@ describe("TasitAction.Contract", () => {
       expect(errorFakeFn.called).to.be.false;
     });
 
-    it("should call error listener after timeout", async () => {
+    // Non-deterministic test case
+    it.skip("should call error listener after timeout", async () => {
       action = sampleContract.setValue("hello world");
       action.setEventsTimeout(100);
 
