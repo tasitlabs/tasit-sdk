@@ -12,7 +12,7 @@ DECENTRALAND_DIR="$PROJECT_DIR/decentraland";
 # Use list of repository_name:commit_hash
 REPOS="\
     mana:f817fcab2c230bc2d2144ae85dff2bdc507ed659 \
-    land:4eab49235103b124aae948eca6f678bc9d30ad09 \
+    land:f6795c4e47564b08d39d04f2f2d0f60fa97b69ac \
     marketplace-contracts:190ab91887496da1677c41778832ff5a0c0c2ddb"
 
 

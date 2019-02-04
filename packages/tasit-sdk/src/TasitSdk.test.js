@@ -174,10 +174,12 @@ describe("Decentraland", () => {
       await createOrder.waitForNonceToUpdate();
 
       marketplaceContract.setWallet(buyerWallet);
-      const executeOrder = marketplaceContract.executeOrder(
+      const fingerprint = await estateContract.getFingerprint(assetId);
+      const executeOrder = marketplaceContract.safeExecuteOrder(
         estateContract.getAddress(),
         assetId,
         priceInWei,
+        fingerprint.toString(),
         gasParams
       );
       await executeOrder.waitForNonceToUpdate();
@@ -264,10 +266,12 @@ describe("Decentraland", () => {
         const priceInWei = ONE.toString();
 
         marketplaceContract.setWallet(ephemeralWallet);
-        const executeOrder = marketplaceContract.executeOrder(
+        const fingerprint = await estateContract.getFingerprint(assetId);
+        const executeOrder = marketplaceContract.safeExecuteOrder(
           estateContract.getAddress(),
           assetId,
           priceInWei,
+          fingerprint.toString(),
           gasParams
         );
         await executeOrder.waitForNonceToUpdate();
