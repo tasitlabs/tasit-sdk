@@ -40,19 +40,5 @@ import { createFromPrivateKey } from "tasit-account/dist/testHelpers/helpers";
 global.createFromPrivateKey = createFromPrivateKey;
 
 import ConfigLoader from "../ConfigLoader";
-const config = {
-  provider: {
-    network: "other",
-    provider: "jsonrpc",
-    pollingInterval: 50,
-    jsonRpc: {
-      url: "http://localhost",
-      port: 8545,
-    },
-  },
-  events: {
-    timeout: 2000,
-  },
-};
-
+import config from "../config/default.js";
 ConfigLoader.setConfig(config);
