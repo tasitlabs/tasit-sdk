@@ -2,7 +2,6 @@ import "ethers/dist/shims.js";
 // Note: ethers SHOULD be imported from their main object
 // shims aren't injected with package import
 import { ethers } from "ethers";
-const config = require("config");
 import Utils from "./Utils";
 import ProviderFactory from "./ProviderFactory";
 import Subscription from "./Subscription";

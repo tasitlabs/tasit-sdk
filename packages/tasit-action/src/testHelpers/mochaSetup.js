@@ -38,3 +38,7 @@ global.confirmBalances = confirmBalances;
 // Refs: https://github.com/lerna/lerna/tree/master/commands/bootstrap
 import { createFromPrivateKey } from "tasit-account/dist/testHelpers/helpers";
 global.createFromPrivateKey = createFromPrivateKey;
+
+import ConfigLoader from "../ConfigLoader";
+import config from "../config/default.js";
+ConfigLoader.setConfig(config);

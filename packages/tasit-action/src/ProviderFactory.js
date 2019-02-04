@@ -2,28 +2,12 @@ import "ethers/dist/shims.js";
 // Note: ethers SHOULD be imported from their main object
 // shims aren't injected with package import
 import { ethers } from "ethers";
-const config = require("config");
-
-const MAINNET = "mainnet";
+import { ConfigLoader } from "./ConfigLoader";
 
 export class ProviderFactory {
   static getProvider = () => {
-    const { provider } = config;
-    const json = provider;
-    return ProviderFactory.createProvider(json);
-  };
-
-  static getDefaultConfig = () => {
-    return {
-      network: MAINNET,
-      provider: "fallback",
-      pollingInterval: 4000,
-      jsonRpc: {
-        url: "http://localhost",
-        port: 8545,
-        allowInsecure: false,
-      },
-    };
+    const { provider: providerConfig } = ConfigLoader.getConfig();
+    return ProviderFactory.createProvider(providerConfig);
   };
 
   static createProvider = ({
@@ -49,7 +33,7 @@ export class ProviderFactory {
     if (network === "mainnet") network = "homestead";
     else if (network === "other") network = undefined;
 
-    const defaultConfig = ProviderFactory.getDefaultConfig();
+    const defaultConfig = ConfigLoader.getDefaultConfig();
 
     let ethersProvider;
 

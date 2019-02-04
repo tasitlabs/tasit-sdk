@@ -26,7 +26,6 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.1.5",
-    "config": "^3.0.1",
     "ethers": "^4.0.21"
   },
   "devDependencies": {
