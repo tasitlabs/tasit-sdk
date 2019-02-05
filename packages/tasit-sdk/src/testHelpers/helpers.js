@@ -8,11 +8,15 @@ import { abi as landProxyABI } from "./abi/LANDProxy.json";
 import { abi as estateABI } from "./abi/EstateRegistry.json";
 import { abi as markplaceABI } from "./abi/Marketplace.json";
 
-const manaAddress = "0xb32939da0c44bf255b9810421a55be095f9bb3f4";
-const landAddress = "0x6191bc768c2339da9eab9e589fc8bf0b3ab80975";
-const landProxyAddress = "0x773f11ed472aa43e4ebaa963bcfbbea5a10c1bbd";
-const estateAddress = "0x41b598a2c618b59b74540ac3afffb32f7971b37a";
-const marketplaceAddress = "0x07c0e972064e5c05f7b3596d81de1afd35457eae";
+import { local as localAddresses } from "../../../tasit-contracts/decentraland/addresses";
+const {
+  MANAToken: manaAddress,
+  LANDRegistry: landAddress,
+  LANDProxy: landProxyAddress,
+  EstateRegistry: estateAddress,
+  Marketplace: marketplaceAddress,
+} = localAddresses;
+
 const fullNFTAddress = "0x0E86f209729bf54763789CDBcA9E8b94f0FD5333";
 
 const ownerPrivKey =
