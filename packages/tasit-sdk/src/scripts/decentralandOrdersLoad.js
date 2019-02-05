@@ -9,10 +9,15 @@ import {
   getEstateSellOrder,
   gasParams,
 } from "../testHelpers/helpers";
+import { Action } from "../TasitSdk";
+import config from "../config/default";
+const { ConfigLoader } = Action;
 
 // It's likely that script won't be necessary after 0.1.0 version of tasit demo app
 // Use npx babel-node to run this
 (async () => {
+  ConfigLoader.setConfig(config);
+
   const { ownerWallet, sellerWallet } = setupWallets();
   const {
     landContract,
