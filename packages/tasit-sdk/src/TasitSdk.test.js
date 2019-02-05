@@ -1,6 +1,7 @@
 import { Account, Action } from "./TasitSdk";
 const { Contract, NFT, ConfigLoader } = Action;
 import { expect, assert } from "chai";
+import config from "./config/default";
 
 // The goal of this integration test suite is to use only exposed classes
 // from TasitSdk. ProviderFactory is used here as an exception
@@ -63,20 +64,6 @@ describe("Decentraland", () => {
   };
 
   before("", async () => {
-    const config = {
-      provider: {
-        network: "other",
-        provider: "jsonrpc",
-        pollingInterval: 50,
-        jsonRpc: {
-          url: "http://localhost",
-          port: 8545,
-        },
-      },
-      events: {
-        timeout: 2000,
-      },
-    };
     ConfigLoader.setConfig(config);
 
     provider = ProviderFactory.getProvider();
