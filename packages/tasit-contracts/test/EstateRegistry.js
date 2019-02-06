@@ -1,14 +1,13 @@
+const abi = require("../decentraland/land/build/contracts/EstateRegistry.json")
+  .abi;
+const localAddresses = require("../decentraland/addresses").local;
+const { LANDRegistry: landAddress, EstateRegistry: address } = localAddresses;
+
 // Note:
 // This test suite is using web3.js because contract deployment is made by a 3rd-party repository
 // (and most existing 3rd-party contracts tend to use Truffle which uses web3.js)
 contract("EstateRegistry", function(accounts) {
   const [owner] = accounts;
-
-  const abi = require("../decentraland/land/build/contracts/EstateRegistry.json")
-    .abi;
-  const address = "0x41b598a2c618b59b74540ac3afffb32f7971b37a";
-
-  const landAddress = "0x6191bc768c2339da9eab9e589fc8bf0b3ab80975";
 
   const gasParams = { gas: 7e6, gasPrice: 1e9 };
 

@@ -8,12 +8,16 @@ import { abi as landProxyABI } from "./abi/LANDProxy.json";
 import { abi as estateABI } from "./abi/EstateRegistry.json";
 import { abi as markplaceABI } from "./abi/Marketplace.json";
 
-const manaAddress = "0xb32939da0c44bf255b9810421a55be095f9bb3f4";
-const landAddress = "0x6191bc768c2339da9eab9e589fc8bf0b3ab80975";
-const landProxyAddress = "0x773f11ed472aa43e4ebaa963bcfbbea5a10c1bbd";
-const estateAddress = "0x41b598a2c618b59b74540ac3afffb32f7971b37a";
-const marketplaceAddress = "0x07c0e972064e5c05f7b3596d81de1afd35457eae";
-const fullNFTAddress = "0x0E86f209729bf54763789CDBcA9E8b94f0FD5333";
+import { local as localAddresses } from "../../../tasit-contracts/decentraland/addresses";
+const {
+  MANAToken: MANA_ADDRESS,
+  LANDRegistry: LAND_ADDRESS,
+  LANDProxy: LAND_PROXY_ADDRESS,
+  EstateRegistry: ESTATE_ADDRESS,
+  Marketplace: MARKETPLACE_ADDRESS,
+} = localAddresses;
+
+const FULLNFT_ADDRESS = "0x0E86f209729bf54763789CDBcA9E8b94f0FD5333";
 
 const ownerPrivKey =
   "0x11d943d7649fbdeb146dc57bd9cfc80b086bfab2330c7b25651dbaf382392f60";
@@ -42,17 +46,17 @@ const setupWallets = () => {
 const setupContracts = async ownerWallet => {
   // Note: It would be cooler to use NFT here if
   // Decentraland Land contract followed ERC721 exactly
-  const landContract = new Contract(landAddress, landABI, ownerWallet);
+  const landContract = new Contract(LAND_ADDRESS, landABI, ownerWallet);
   const landProxyContract = new Contract(
-    landProxyAddress,
+    LAND_PROXY_ADDRESS,
     landProxyABI,
     ownerWallet
   );
-  const estateContract = new Contract(estateAddress, estateABI, ownerWallet);
+  const estateContract = new Contract(ESTATE_ADDRESS, estateABI, ownerWallet);
 
-  const manaContract = new Contract(manaAddress, manaABI, ownerWallet);
+  const manaContract = new Contract(MANA_ADDRESS, manaABI, ownerWallet);
   const marketplaceContract = new Contract(
-    marketplaceAddress,
+    MARKETPLACE_ADDRESS,
     markplaceABI,
     ownerWallet
   );
