@@ -7,6 +7,10 @@ import ProviderFactory from "./ProviderFactory";
 import Subscription from "./Subscription";
 import Action from "./Action";
 
+// Log levels: debug, default, info, warn, error, off
+// See more: https://github.com/ethers-io/ethers.js/blob/527de7ba5e1d31bd7c166a78d0fa62b58bf50a54/src.ts/errors.ts
+ethers.errors.setLogLevel("error");
+
 export class Contract extends Subscription {
   #provider;
   #ethersContract;
