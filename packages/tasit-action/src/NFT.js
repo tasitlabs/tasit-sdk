@@ -1,19 +1,11 @@
 import Contract from "./Contract";
+import erc721FullABI from "./abi/ERC721Full.json";
 
-class ABIs {
-  static getERC721Full = () => {
-    // TODO: Is there a better way to do that for now?
-    return require("./abi/ERC721Full.json");
-  };
-}
-
-export class NFT extends Contract {
+export default class NFT extends Contract {
   #contract;
 
   constructor(address, wallet) {
-    const abi = ABIs.getERC721Full();
+    const abi = erc721FullABI;
     super(address, abi, wallet);
   }
 }
-
-export default NFT;
