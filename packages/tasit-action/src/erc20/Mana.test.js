@@ -1,6 +1,6 @@
 import Mana from "./Mana";
 
-import { local as localAddresses } from "../../tasit-contracts/decentraland/addresses";
+import { local as localAddresses } from "../../../tasit-contracts/decentraland/addresses";
 const { MANAToken: MANA_ADDRESS } = localAddresses;
 
 describe("TasitAction.Decentraland.Mana", () => {

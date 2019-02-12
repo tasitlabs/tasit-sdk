@@ -1,5 +1,5 @@
-import Contract from "./Contract";
-import landRegistryABI from "./abi/LANDRegistry.json";
+import Contract from "../contract/Contract";
+import landRegistryABI from "../abi/LANDRegistry.json";
 
 export default class Land extends Contract {
   constructor(address, wallet) {

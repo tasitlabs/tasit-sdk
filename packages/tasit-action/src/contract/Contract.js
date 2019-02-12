@@ -3,7 +3,7 @@ import "ethers/dist/shims.js";
 // shims aren't injected with package import
 import { ethers } from "ethers";
 import Utils from "./Utils";
-import ProviderFactory from "./ProviderFactory";
+import ProviderFactory from "../ProviderFactory";
 import Subscription from "./Subscription";
 import Action from "./Action";
 

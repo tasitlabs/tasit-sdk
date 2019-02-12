@@ -1,6 +1,6 @@
 import Land from "./Land";
 
-import { local as localAddresses } from "../../tasit-contracts/decentraland/addresses";
+import { local as localAddresses } from "../../../tasit-contracts/decentraland/addresses";
 const { LANDProxy: LAND_PROXY_ADDRESS } = localAddresses;
 
 describe("TasitAction.ERC721.Land", () => {

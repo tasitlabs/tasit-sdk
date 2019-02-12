@@ -1,6 +1,6 @@
 import Subscription from "./Subscription";
-import ProviderFactory from "./ProviderFactory";
-import ConfigLoader from "./ConfigLoader";
+import ProviderFactory from "../ProviderFactory";
+import ConfigLoader from "../ConfigLoader";
 
 // If necessary, we can create TransactionAction
 //  and/or MetaTxAction subclasses

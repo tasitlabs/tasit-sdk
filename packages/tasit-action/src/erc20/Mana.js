@@ -1,5 +1,5 @@
-import Contract from "./Contract";
-import manaTokenABI from "./abi/MANAToken.json";
+import Contract from "../contract/Contract";
+import manaTokenABI from "../abi/MANAToken.json";
 
 export default class Mana extends Contract {
   constructor(address, wallet) {
