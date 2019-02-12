@@ -1,12 +1,12 @@
 import { Account, Action } from "../TasitSdk";
-const { Contract, NFT } = Action;
+const { Contract, NFT, ERC20, ERC721, Marketplace } = Action;
+const { Mana } = ERC20;
+const { Estate, Land } = ERC721;
+const { Decentraland } = Marketplace;
 import { createFromPrivateKey } from "tasit-account/dist/testHelpers/helpers";
 
-import { abi as manaABI } from "./abi/MANAToken.json";
-import { abi as landABI } from "./abi/LANDRegistry.json";
+// Note: Should LandProxy exists as TasitAction contract object also?
 import { abi as landProxyABI } from "./abi/LANDProxy.json";
-import { abi as estateABI } from "./abi/EstateRegistry.json";
-import { abi as markplaceABI } from "./abi/Marketplace.json";
 
 import { local as localAddresses } from "../../../tasit-contracts/decentraland/addresses";
 const {
@@ -46,28 +46,26 @@ const setupWallets = () => {
 const setupContracts = async ownerWallet => {
   // Note: It would be cooler to use NFT here if
   // Decentraland Land contract followed ERC721 exactly
-  const landContract = new Contract(LAND_ADDRESS, landABI, ownerWallet);
+  const landContract = new Land(LAND_ADDRESS, ownerWallet);
   const landProxyContract = new Contract(
     LAND_PROXY_ADDRESS,
     landProxyABI,
     ownerWallet
   );
-  const estateContract = new Contract(ESTATE_ADDRESS, estateABI, ownerWallet);
+  const estateContract = new Estate(ESTATE_ADDRESS, ownerWallet);
 
-  const manaContract = new Contract(MANA_ADDRESS, manaABI, ownerWallet);
-  const marketplaceContract = new Contract(
+  const manaContract = new Mana(MANA_ADDRESS, ownerWallet);
+  const marketplaceContract = new Decentraland(
     MARKETPLACE_ADDRESS,
-    markplaceABI,
     ownerWallet
   );
-  const landProxyContractWithLandABI = new Contract(
-    landProxyContract.getAddress(),
-    landABI,
+  const landProxyContractWithLandABI = new Land(
+    LAND_PROXY_ADDRESS,
     ownerWallet
   );
 
   const landProxyUpgrade = landProxyContract.upgrade(
-    landContract.getAddress(),
+    LAND_ADDRESS,
     ownerWallet.address,
     gasParams
   );

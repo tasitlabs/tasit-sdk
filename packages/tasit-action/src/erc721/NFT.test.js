@@ -10,7 +10,7 @@ const fullNFTAddress = "0x0E86f209729bf54763789CDBcA9E8b94f0FD5333";
 // onERC721Received
 const sampleContractAddress = "0x6C4A015797DDDd87866451914eCe1e8b19261931";
 
-describe("TasitAction.NFT", () => {
+describe("TasitAction.ERC721.NFT", () => {
   let owner;
   let ana;
   let bob;

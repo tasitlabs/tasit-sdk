@@ -1,5 +1,6 @@
 import { Account, Action } from "./TasitSdk";
-const { Contract, NFT, ConfigLoader } = Action;
+const { Contract, ERC721, ConfigLoader } = Action;
+const { NFT } = ERC721;
 import { expect, assert } from "chai";
 import config from "./config/default";
 
