@@ -4,7 +4,7 @@ import { local as localAddresses } from "../../../tasit-contracts/decentraland/a
 const { EstateRegistry: ESTATE_ADDRESS } = localAddresses;
 
 describe("TasitAction.ERC721.Estate", () => {
-  // Note: This test runs against an unitialized contract.
+  // Note: This test runs against an uninitialized contract.
   // TODO: Improve that test case when we move to forked from testnet blockchain.
   it("should get the Estate owner", async function() {
     const estate = new Estate(ESTATE_ADDRESS);
