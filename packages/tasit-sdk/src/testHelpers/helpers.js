@@ -22,8 +22,7 @@ import {
   confirmBalances,
 } from "tasit-action/dist/testHelpers/helpers";
 
-// Note: Should LandProxy exists as TasitAction contract object also?
-import { abi as landProxyABI } from "./abi/LANDProxy.json";
+import { abi as landProxyABI } from "../../../tasit-contracts/abi/LANDProxy.json";
 
 import {
   local as localAddresses,

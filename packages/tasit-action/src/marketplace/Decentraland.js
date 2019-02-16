@@ -1,5 +1,5 @@
 import Contract from "../contract/Contract";
-import marketplaceABI from "../abi/Marketplace.json";
+import marketplaceABI from "../../../tasit-contracts/abi/Marketplace.json";
 
 export default class Decentraland extends Contract {
   constructor(address, wallet) {
