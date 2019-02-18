@@ -27,7 +27,7 @@ import { abi as landProxyABI } from "../../../tasit-contracts/abi/LANDProxy.json
 import {
   local as localAddresses,
   ropsten as ropstenAddresses,
-} from "../../../tasit-contracts/decentraland/addresses";
+} from "../../../tasit-contracts/3rd-parties/decentraland/addresses";
 
 const {
   utils: ethersUtils,

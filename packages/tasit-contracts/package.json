@@ -20,15 +20,9 @@
     "prepare": "npm run install:3rd-parties",
     "migrate": "npx truffle migrate && npm run migrate:3rd-parties",
     "test": "npx truffle test",
-    "install:3rd-parties": "npm run install:decentraland && npm run install:gnosis",
-    "migrate:3rd-parties": "npm run migrate:decentraland && npm run migrate:gnosis",
-    "clean:3rd-parties": "npm run clean:decentraland && npm run clean:gnosis",
-    "install:decentraland": "./3rd-parties/decentraland/scripts/install.sh `pwd`",
-    "migrate:decentraland": "./3rd-parties/decentraland/scripts/migrate.sh `pwd`",
-    "clean:decentraland": "./3rd-parties/decentraland/scripts/clean.sh `pwd`",
-    "install:gnosis": "./3rd-parties/gnosis/scripts/install.sh `pwd`",
-    "migrate:gnosis": "./3rd-parties/gnosis/scripts/migrate.sh `pwd`",
-    "clean:gnosis": "./3rd-parties/gnosis/scripts/clean.sh `pwd`"
+    "install:3rd-parties": "./3rd-parties/run_on_all.sh install `pwd`",
+    "migrate:3rd-parties": "./3rd-parties/run_on_all.sh migrate `pwd`",
+    "clean:3rd-parties": "./3rd-parties/run_on_all.sh clean `pwd`"
   },
   "bugs": {
     "url": "https://github.com/tasitlabs/tasitsdk/issues"

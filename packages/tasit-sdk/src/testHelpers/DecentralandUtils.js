@@ -1,7 +1,7 @@
 import { ethers } from "ethers";
 
 import marketplaceABI from "../../../tasit-contracts/abi/Marketplace.json";
-import { ropsten as ropstenAddresses } from "../../../tasit-contracts/decentraland/addresses";
+import { ropsten as ropstenAddresses } from "../../../tasit-contracts/3rd-parties/decentraland/addresses";
 const { MarketplaceProxy: MARKETPLACE_ADDRESS } = ropstenAddresses;
 
 // That util class is been used to fetch data from Decentraland Marketplace contract

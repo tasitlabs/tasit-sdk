@@ -1,6 +1,6 @@
 import Estate from "./Estate";
 
-import { local as localAddresses } from "../../../tasit-contracts/decentraland/addresses";
+import { local as localAddresses } from "../../../tasit-contracts/3rd-parties/decentraland/addresses";
 const { EstateRegistry: ESTATE_ADDRESS } = localAddresses;
 
 describe("TasitAction.ERC721.Estate", () => {

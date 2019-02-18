@@ -1,5 +1,6 @@
-const abi = require("../decentraland/mana/build/contracts/MANAToken.json").abi;
-const localAddresses = require("../decentraland/addresses").local;
+const abi = require("../3rd-parties/decentraland/mana/build/contracts/MANAToken.json")
+  .abi;
+const localAddresses = require("../3rd-parties/decentraland/addresses").local;
 const { MANAToken: address } = localAddresses;
 
 // Note:

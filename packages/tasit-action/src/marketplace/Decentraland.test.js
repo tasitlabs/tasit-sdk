@@ -1,6 +1,6 @@
 import Decentraland from "./Decentraland";
 
-import { local as localAddresses } from "../../../tasit-contracts/decentraland/addresses";
+import { local as localAddresses } from "../../../tasit-contracts/3rd-parties/decentraland/addresses";
 const { Marketplace: MARKETPLACE_ADDRESS } = localAddresses;
 
 describe("TasitAction.Marketplace.Decentraland", () => {
