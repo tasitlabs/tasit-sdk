@@ -17,13 +17,18 @@
     "url": "git+https://github.com/tasitlabs/tasitsdk.git"
   },
   "scripts": {
-    "prepare": "npm run install:decentraland",
-    "migrate": "npx truffle migrate && npm run migrate:decentraland",
+    "prepare": "npm run install:3rd-parties",
+    "migrate": "npx truffle migrate && npm run migrate:3rd-parties",
+    "test": "npx truffle test",
+    "install:3rd-parties": "npm run install:decentraland && npm run install:gnosis",
+    "migrate:3rd-parties": "npm run migrate:decentraland && npm run migrate:gnosis",
+    "clean:3rd-parties": "npm run clean:decentraland && npm run clean:gnosis",
     "install:decentraland": "./decentraland/scripts/install.sh `pwd`",
     "migrate:decentraland": "./decentraland/scripts/migrate.sh `pwd`",
     "clean:decentraland": "./decentraland/scripts/clean.sh `pwd`",
-    "clean:3rd-parties": "npm run clean:decentraland",
-    "test": "npx truffle test"
+    "install:gnosis": "./gnosis/scripts/install.sh `pwd`",
+    "migrate:gnosis": "./gnosis/scripts/migrate.sh `pwd`",
+    "clean:gnosis": "./gnosis/scripts/clean.sh `pwd`"
   },
   "bugs": {
     "url": "https://github.com/tasitlabs/tasitsdk/issues"
