@@ -7,7 +7,7 @@ then
     exit;
 fi
 
-DECENTRALAND_DIR="$PROJECT_DIR/decentraland";
+DECENTRALAND_DIR="$PROJECT_DIR/3rd-parties/decentraland";
 
 # Use list of repository_name:commit_hash:is_npm
 REPOS="\

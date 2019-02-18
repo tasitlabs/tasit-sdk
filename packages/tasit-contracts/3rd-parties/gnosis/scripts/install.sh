@@ -7,7 +7,7 @@ then
     exit;
 fi
 
-GNOSIS_DIR="$PROJECT_DIR/gnosis";
+GNOSIS_DIR="$PROJECT_DIR/3rd-parties/gnosis";
 
 # Use list of repository_name:commit_hash:is_npm
 REPOS="safe-contracts:427d6f7e779431333c54bcb4d4cde31e4d57ce96:true";

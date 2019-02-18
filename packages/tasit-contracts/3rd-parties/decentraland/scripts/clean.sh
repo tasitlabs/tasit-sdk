@@ -8,11 +8,11 @@ then
 fi
 
 
-GNOSIS_DIR="$PROJECT_DIR/gnosis";
-REPOS="safe-contracts"
+DECENTRALAND_DIR="$PROJECT_DIR/3rd-parties/decentraland";
+REPOS="mana land marketplace-contracts"
 
 for repo in $REPOS;
 do
-    REPO_DIR="$GNOSIS_DIR/$repo";
+    REPO_DIR="$DECENTRALAND_DIR/$repo";
     cd $REPO_DIR && git reset --hard && git clean -f
 done

@@ -6,7 +6,7 @@ then
     exit;
 fi
 
-GNOSIS_DIR="$PROJECT_DIR/gnosis"
+GNOSIS_DIR="$PROJECT_DIR/3rd-parties/gnosis"
 
 # safe-contracts
 cd $GNOSIS_DIR/safe-contracts && npx truffle migrate
