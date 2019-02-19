@@ -23,18 +23,4 @@ contract("GnosisSafe", function(accounts) {
     const [owner] = await GnosisSafe.methods.getOwners().call();
     assert.equal(owner, ana, "Ana isn't the GnosisSafe owner.");
   });
-
-  it.only("should deposit and withdraw 1 ETH", async function() {
-    const balanceBeforeDeposit = await web3.eth.getBalance(contractAddress);
-    assert.equal(balanceBeforeDeposit, 0);
-
-    await web3.eth.sendTransaction({
-      from: ana,
-      to: contractAddress,
-      value: web3.utils.toWei("1", "ether"),
-    });
-
-    const balanceAfterDeposit = await web3.eth.getBalance(contractAddress);
-    assert.equal(balanceAfterDeposit, web3.utils.toWei("1", "ether"));
-  });
 });
