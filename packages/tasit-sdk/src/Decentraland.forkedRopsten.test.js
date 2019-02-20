@@ -152,7 +152,7 @@ describe("Decentraland tasit app test cases (ropsten)", () => {
     expect(y.toNumber()).to.be.a("number");
   });
 
-  it("should get estate for sale info (without wallet)", async () => {
+  it("should get info about the estate for sale (without wallet)", async () => {
     const { assetId } = estateForSale;
 
     const metadataPromise = estateContract.getMetadata(assetId);
