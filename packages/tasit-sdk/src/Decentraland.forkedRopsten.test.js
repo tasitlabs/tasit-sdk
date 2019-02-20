@@ -93,7 +93,7 @@ describe("Decentraland tasit app test cases (ropsten)", () => {
         ).to.equal(true);
     }
 
-    expect(estateForSale).to.not.be.an("undefined");
+    expect(estateForSale).not.to.be("undefined");
     expect(landForSale).to.not.be.an("undefined");
   });
 
