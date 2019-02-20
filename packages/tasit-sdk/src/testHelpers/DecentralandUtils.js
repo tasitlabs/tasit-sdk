@@ -4,7 +4,7 @@ import marketplaceABI from "../../../tasit-action/src/abi/Marketplace.json";
 import { ropsten as ropstenAddresses } from "../../../tasit-contracts/decentraland/addresses";
 const { MarketplaceProxy: MARKETPLACE_ADDRESS } = ropstenAddresses;
 
-// That util class is been used to fetch data from Decentraland Marketplace contract
+// This util class is being used to fetch data from Decentraland Marketplace contract
 // Fetching data likely will be replace to subgraph queries
 export default class DecentralandUtils {
   #marketplace;
