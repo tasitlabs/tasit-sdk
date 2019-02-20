@@ -217,5 +217,5 @@ describe("Decentraland tasit app test cases (ropsten)", () => {
   });
 
   // All land sell orders are expired
-  it.skip("should buy a land", async () => {});
+  it.skip("should buy a parcel of land", async () => {});
 });
