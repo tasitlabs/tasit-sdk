@@ -256,12 +256,17 @@ const duration = {
   },
 };
 
-const etherFaucet = async (provider, fromWallet, beneficiary, amountInWei) => {
+const etherFaucet = async (
+  provider,
+  fromWallet,
+  beneficiaryAddress,
+  amountInWei
+) => {
   const connectedFromWallet = fromWallet.connect(provider);
   const tx = await connectedFromWallet.sendTransaction({
     // ethers.utils.parseEther("1.0")
     value: "0x0de0b6b3a7640000",
-    to: beneficiary.address,
+    to: beneficiaryAddress,
   });
   await provider.waitForTransaction(tx.hash);
 };

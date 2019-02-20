@@ -106,7 +106,7 @@ describe("Decentraland tasit app test cases (ropsten)", () => {
       expect(ownerWallet.address).to.have.lengthOf(42);
       expect(ephemeralWallet.address).to.have.lengthOf(42);
 
-      await etherFaucet(provider, ownerWallet, ephemeralWallet, ONE);
+      await etherFaucet(provider, ownerWallet, ephemeralWallet.address, ONE);
 
       const { priceInWei: landPrice } = landForSale;
       const { priceInWei: estatePrice } = estateForSale;

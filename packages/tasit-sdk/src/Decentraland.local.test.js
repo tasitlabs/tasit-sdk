@@ -228,7 +228,7 @@ describe("Decentraland", () => {
 
       it("should buy an estate", async () => {
         await ownedManaFaucet(manaContract, ownerWallet, ephemeralWallet, TEN);
-        await etherFaucet(provider, ownerWallet, ephemeralWallet, ONE);
+        await etherFaucet(provider, ownerWallet, ephemeralWallet.address, ONE);
 
         manaContract.setWallet(ephemeralWallet);
         const marketplaceApproval = manaContract.approve(
