@@ -9,7 +9,7 @@ import { createFromPrivateKey } from "tasit-account/dist/testHelpers/helpers";
 // The goal of this integration test suite is to use only exposed classes
 // from TasitSdk. ProviderFactory is used here as an exception
 // as the clearest way to get a provider
-// in this test suite. Eventually, maybe ProviderFactory may move to
+// in this test suite. Eventually, maybe ProviderFactory will move to
 // some shared helper dir.
 import ProviderFactory from "tasit-action/dist/ProviderFactory";
 
