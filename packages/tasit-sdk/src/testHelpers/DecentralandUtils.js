@@ -5,7 +5,7 @@ import { ropsten as ropstenAddresses } from "../../../tasit-contracts/decentrala
 const { MarketplaceProxy: MARKETPLACE_ADDRESS } = ropstenAddresses;
 
 // This util class is being used to fetch data from Decentraland Marketplace contract
-// Fetching data likely will be replace to subgraph queries
+// Fetching data likely will be replaced with subgraph queries
 export default class DecentralandUtils {
   #marketplace;
   #mana;
