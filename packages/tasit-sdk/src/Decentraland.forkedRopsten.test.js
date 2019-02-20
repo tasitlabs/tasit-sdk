@@ -89,7 +89,7 @@ describe("Decentraland tasit app test cases (ropsten)", () => {
       if (!isLand && !isEstate)
         expect(
           false,
-          "All land for sale should be a land or an estate NFT"
+          "All land for sale should be an NFT that is either a parcel of land or an estate"
         ).to.equal(true);
     }
 
