@@ -98,7 +98,7 @@ describe("Decentraland tasit app test cases (ropsten)", () => {
   });
 
   beforeEach(
-    "buyer approve marketplace contract to transfer tokens on their behalf",
+    "buyer approves marketplace contract to transfer tokens on their behalf",
     async () => {
       snapshotId = await createSnapshot(provider);
 
