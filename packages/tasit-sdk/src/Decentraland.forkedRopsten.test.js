@@ -30,7 +30,7 @@ import {
   DecentralandUtils,
 } from "./testHelpers/helpers";
 
-const { ONE, TEN, BILLION } = constants;
+const { ONE, TEN } = constants;
 
 const ROPSTEN_NETWORK_ID = 3;
 
@@ -108,14 +108,30 @@ describe("Decentraland tasit app test cases (ropsten)", () => {
 
       await etherFaucet(provider, ownerWallet, ephemeralWallet, ONE);
 
+      const { priceInWei: landPrice } = landForSale;
+      const { priceInWei: estatePrice } = estateForSale;
+
+      const manaAmountToShopping = bigNumberify(landPrice).add(
+        bigNumberify(estatePrice)
+      );
+
       await confirmBalances(manaContract, [ephemeralWallet.address], [0]);
-      await ropstenManaFaucet(provider, ownerWallet, ephemeralWallet, BILLION);
-      await confirmBalances(manaContract, [ephemeralWallet.address], [BILLION]);
+      await ropstenManaFaucet(
+        provider,
+        ownerWallet,
+        ephemeralWallet,
+        manaAmountToShopping
+      );
+      await confirmBalances(
+        manaContract,
+        [ephemeralWallet.address],
+        [manaAmountToShopping]
+      );
 
       manaContract.setWallet(ephemeralWallet);
       const approvalAction = manaContract.approve(
         MARKETPLACE_ADDRESS,
-        BILLION,
+        manaAmountToShopping,
         gasParams
       );
       await approvalAction.waitForNonceToUpdate();
@@ -125,7 +141,7 @@ describe("Decentraland tasit app test cases (ropsten)", () => {
         MARKETPLACE_ADDRESS
       );
 
-      expect(`${allowance}`).to.equal(`${BILLION}`);
+      expect(`${allowance}`).to.equal(`${manaAmountToShopping}`);
     }
   );
 
