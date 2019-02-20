@@ -166,7 +166,7 @@ describe("Decentraland tasit app test cases (ropsten)", () => {
     expect(size.toNumber()).to.be.at.least(0);
   });
 
-  // Note: This test case isn't working. The transaction is been revert and the reason isn't know yet
+  // Note: This test case isn't working. The transaction is being reverted and the reason isn't known yet
   it.skip("should buy an estate", async () => {
     const {
       assetId,
