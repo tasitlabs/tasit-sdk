@@ -162,6 +162,8 @@ describe("Decentraland tasit app test cases (ropsten)", () => {
 
       // Note: Metadata could be an empty string
       expect(metadata).to.not.be.null;
+      if (metadata === "")
+        console.log(`Land parcel id ${assetId} with empty metadata.`);
 
       const [x, y] = coords;
       expect(coords).to.not.include(null);
@@ -181,6 +183,8 @@ describe("Decentraland tasit app test cases (ropsten)", () => {
 
       // Note: Metadata could be an empty string
       expect(metadata).to.not.be.null;
+      if (metadata === "")
+        console.log(`Estate id ${assetId} with empty metadata.`);
 
       expect(size.toNumber()).to.be.a("number");
       expect(size.toNumber()).to.be.at.least(0);
