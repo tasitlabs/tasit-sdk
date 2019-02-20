@@ -82,9 +82,9 @@ describe("Decentraland tasit app test cases (ropsten)", () => {
       const isEstate = addressesAreEqual(nftAddress, ESTATE_ADDRESS);
       const expired = Number(expiresAt) < Date.now();
 
-      // All parcels of land for sale are expired - otherwise we would select one that isn't expired
+      // All parcels of land and estates for sale are expired (block 5058416) - otherwise we would select one that isn't expired
       if (isLand) landForSale = order;
-      if (isEstate && !expired) estateForSale = order;
+      if (isEstate) estateForSale = order;
 
       if (!isLand && !isEstate)
         expect(
@@ -93,8 +93,8 @@ describe("Decentraland tasit app test cases (ropsten)", () => {
         ).to.equal(true);
     }
 
-    expect(estateForSale).not.to.be("undefined");
-    expect(landForSale).not.to.be("undefined");
+    expect(estateForSale).not.to.be.an("undefined");
+    expect(landForSale).not.to.be.an("undefined");
   });
 
   beforeEach(

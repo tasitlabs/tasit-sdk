@@ -49,32 +49,36 @@ export default class DecentralandUtils {
   };
 
   #getCreatedSellOrders = async fromBlock => {
-    const { filters } = this.#marketplace;
-    const { OrderCreated } = filters;
-    const filter = OrderCreated();
-    const eventABI = [
-      "event OrderCreated(bytes32 id,uint256 indexed assetId,address indexed seller,address nftAddress,uint256 priceInWei,uint256 expiresAt)",
-    ];
-    return this.#listEventLogs(fromBlock, eventABI, filter);
+    return this.#getOrders(fromBlock, "OrderCreated");
   };
 
   #getCancelledSellOrders = async fromBlock => {
-    const { filters } = this.#marketplace;
-    const { OrderCancelled } = filters;
-    const filter = OrderCancelled();
-    const eventABI = [
-      "event OrderCancelled(bytes32 id,uint256 indexed assetId,address indexed seller,address nftAddress)",
-    ];
-    return this.#listEventLogs(fromBlock, eventABI, filter);
+    return this.#getOrders(fromBlock, "OrderCancelled");
   };
 
   #getExecutedSellOrders = async fromBlock => {
+    return this.#getOrders(fromBlock, "OrderSuccessful");
+  };
+
+  #getOrders = async (fromBlock, eventName) => {
+    let eventABI;
+
+    if (eventName === "OrderCreated") {
+      eventABI = [
+        "event OrderCreated(bytes32 id,uint256 indexed assetId,address indexed seller,address nftAddress,uint256 priceInWei,uint256 expiresAt)",
+      ];
+    } else if (eventName === "OrderCancelled") {
+      eventABI = [
+        "event OrderCancelled(bytes32 id,uint256 indexed assetId,address indexed seller,address nftAddress)",
+      ];
+    } else if (eventName === "OrderSuccessful") {
+      eventABI = [
+        "event OrderSuccessful(bytes32 id,uint256 indexed assetId,address indexed seller,address nftAddress,uint256 totalPrice,address indexed buyer)",
+      ];
+    }
     const { filters } = this.#marketplace;
-    const { OrderSuccessful } = filters;
-    const filter = OrderSuccessful();
-    const eventABI = [
-      "event OrderSuccessful(bytes32 id,uint256 indexed assetId,address indexed seller,address nftAddress,uint256 totalPrice,address indexed buyer)",
-    ];
+    const orderEvent = filters[eventName];
+    const filter = orderEvent();
     return this.#listEventLogs(fromBlock, eventABI, filter);
   };
 
