@@ -6,7 +6,7 @@ const { Estate, Land } = ERC721;
 const { Decentraland } = Marketplace;
 import { createFromPrivateKey } from "tasit-account/dist/testHelpers/helpers";
 
-// The goal of this integration test suite is to use only exposed classes
+// The goal of the integration test suite is to use only exposed classes
 // from TasitSdk. ProviderFactory is used here as an exception
 // as the clearest way to get a provider
 // in this test suite. Eventually, maybe ProviderFactory will move to
