@@ -71,7 +71,7 @@ describe("Decentraland tasit app test cases (ropsten)", () => {
     // Note: The exact amount of land isn't predictable since we are forking from the latest block
     expect(openSellOrders).to.not.be.empty;
 
-    // Pick a land and an estate open sell orders
+    // Pick two open sell orders: one for a parcel of land and one for an estate
     for (let sellOrder of openSellOrders) {
       const { values: order } = sellOrder;
       const { nftAddress, expiresAt } = order;
