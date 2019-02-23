@@ -38,7 +38,7 @@ Some other projects keep all their tests in one big test directory, but we find 
 
 ### Making some changes
 
-We recommend using VS Code as your code editor. We use a tool called prettier to automatically format your code. We recommend configuring VS Code to format your code using prettier on save of a file.
+We recommend using VS Code as your code editor. We use a tool called prettier to automatically format your code. We recommend configuring VS Code to format your code using prettier every time you save changes to a file.
 
 If you don't want to use VS Code or use format on save, you can also run the linting script for one of the packages in the `packages` directory by `cd`'ing into that subdirectory and running `npm run lint`
 
