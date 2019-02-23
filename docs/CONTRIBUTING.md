@@ -19,8 +19,7 @@ There are multiple npm packages within this repo. It's a "monorepo" (feel free g
 ### How to set up the local environment
 You'll need to install the npm packages for this project before you can test it out. The code for those packages isn't in this repo - just the name and version of the packages that we use. Those are specified in the `package.json` file.
 
-From within the `TasitSDK` folder, run `npm run bootstrap`. You can see what that script does by looking at the `bootstrap` script in the `scripts` section of `package.json`.
-The best way to do npm install using lerna
+From within the `TasitSDK` folder, run `npm run bootstrap`. You can see what that script does by looking at the `bootstrap` script in the `scripts` section of `package.json`. It uses a `lerna` command, using a tool called `npx` to run the locally installed version of lerna.
 
 Note: If you've already used node and npm before and plan to work on multiple projects, we recommend using [nvm](https://github.com/creationix/nvm) to keep multiple versions on your machine. If you're just getting started with node and npm, that is probably overkill.
 
@@ -35,13 +34,13 @@ This will run the tests for all of the packages in this repo.
 
 For each file in this repo - let's say it's named `file.js` - we have a separate file named `file.test.js` where we test the code in that file.
 
-Some other project keep all their tests in one big test directory, but we find taht it's harder to visually confirm if all files are tested that way.
+Some other projects keep all their tests in one big test directory, but we find that it's harder to visually confirm if all files are tested that way.
 
 ### Making some changes
 
-We recommend using VS Code as your code editor. We use a tool called prettier to automatically format your code. We recommend configuring VS Code to format your code using prettier on save of a file.
+We recommend using VS Code as your code editor. We use a tool called prettier to automatically format your code. We recommend configuring VS Code to format your code using prettier every time you save changes to a file.
 
-If you don't want to use VS Code or use format on save, you can also run the linting script for one of the packages in the `packages` directory by `cd`'ing into that subdirectory and running `npm run lint`
+If you don't want to use VS Code or use format on save, you can also run the linting script for one of the packages in the `packages` directory by `cd`'ing into that subdirectory and running `npm run lint`.
 
 To make a change, first create a new feature branched named `feature/name-of-my-branch`. You can google how to do this using git if you're not familiar with this yet.
 
