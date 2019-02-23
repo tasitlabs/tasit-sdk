@@ -34,7 +34,7 @@ This will run the tests for all of the packages in this repo.
 
 For each file in this repo - let's say it's named `file.js` - we have a separate file named `file.test.js` where we test the code in that file.
 
-Some other project keep all their tests in one big test directory, but we find taht it's harder to visually confirm if all files are tested that way.
+Some other projects keep all their tests in one big test directory, but we find that it's harder to visually confirm if all files are tested that way.
 
 ### Making some changes
 
