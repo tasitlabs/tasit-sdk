@@ -19,8 +19,7 @@ There are multiple npm packages within this repo. It's a "monorepo" (feel free g
 ### How to set up the local environment
 You'll need to install the npm packages for this project before you can test it out. The code for those packages isn't in this repo - just the name and version of the packages that we use. Those are specified in the `package.json` file.
 
-From within the `TasitSDK` folder, run `npm run bootstrap`. You can see what that script does by looking at the `bootstrap` script in the `scripts` section of `package.json`.
-The best way to do npm install using lerna
+From within the `TasitSDK` folder, run `npm run bootstrap`. You can see what that script does by looking at the `bootstrap` script in the `scripts` section of `package.json`. It uses a `lerna` command, using a tool called `npx` to run the locally installed version of lerna.
 
 Note: If you've already used node and npm before and plan to work on multiple projects, we recommend using [nvm](https://github.com/creationix/nvm) to keep multiple versions on your machine. If you're just getting started with node and npm, that is probably overkill.
 
