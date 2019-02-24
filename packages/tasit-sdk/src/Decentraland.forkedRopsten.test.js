@@ -80,7 +80,8 @@ describe("Decentraland tasit app test cases (ropsten)", () => {
       const isEstate = addressesAreEqual(nftAddress, ESTATE_ADDRESS);
       const expired = Number(expiresAt) < Date.now();
 
-      // All parcels of land and estates for sale are expired (block 5058416) - otherwise we would select one that isn't expired
+      // All parcels of land and estates for sale are expired (block 5058416) -
+      // otherwise we would select one that isn't expired
       if (isLand) landForSale = order;
       if (isEstate) estateForSale = order;
 
