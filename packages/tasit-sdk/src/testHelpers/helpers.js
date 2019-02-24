@@ -1,23 +1,42 @@
+import { ethers } from "ethers";
 import { Account, Action } from "../TasitSdk";
-const { Contract, NFT, ERC20, ERC721, Marketplace } = Action;
+const { Contract, ERC20, ERC721, Marketplace } = Action;
 const { Mana } = ERC20;
 const { Estate, Land } = ERC721;
 const { Decentraland } = Marketplace;
 import { createFromPrivateKey } from "tasit-account/dist/testHelpers/helpers";
 
+// The goal of the integration test suite is to use only exposed classes
+// from TasitSdk. ProviderFactory is used here as an exception
+// as the clearest way to get a provider
+// in this test suite. Eventually, maybe ProviderFactory will move to
+// some shared helper dir.
+import ProviderFactory from "tasit-action/dist/ProviderFactory";
+
+import DecentralandUtils from "./DecentralandUtils";
+
+import {
+  mineBlocks,
+  createSnapshot,
+  revertFromSnapshot,
+  confirmBalances,
+} from "tasit-action/dist/testHelpers/helpers";
+
 // Note: Should LandProxy exists as TasitAction contract object also?
 import { abi as landProxyABI } from "./abi/LANDProxy.json";
 
-import { local as localAddresses } from "../../../tasit-contracts/decentraland/addresses";
-const {
-  MANAToken: MANA_ADDRESS,
-  LANDRegistry: LAND_ADDRESS,
-  LANDProxy: LAND_PROXY_ADDRESS,
-  EstateRegistry: ESTATE_ADDRESS,
-  Marketplace: MARKETPLACE_ADDRESS,
-} = localAddresses;
+import {
+  local as localAddresses,
+  ropsten as ropstenAddresses,
+} from "../../../tasit-contracts/decentraland/addresses";
 
-const FULLNFT_ADDRESS = "0x0E86f209729bf54763789CDBcA9E8b94f0FD5333";
+const {
+  utils: ethersUtils,
+  constants: ethersConstants,
+  Contract: ethersContract,
+} = ethers;
+const { WeiPerEther } = ethersConstants;
+const { bigNumberify } = ethersUtils;
 
 const ownerPrivKey =
   "0x11d943d7649fbdeb146dc57bd9cfc80b086bfab2330c7b25651dbaf382392f60";
@@ -44,6 +63,14 @@ const setupWallets = () => {
 };
 
 const setupContracts = async ownerWallet => {
+  const {
+    MANAToken: MANA_ADDRESS,
+    LANDRegistry: LAND_ADDRESS,
+    LANDProxy: LAND_PROXY_ADDRESS,
+    EstateRegistry: ESTATE_ADDRESS,
+    Marketplace: MARKETPLACE_ADDRESS,
+  } = localAddresses;
+
   // Note: It would be cooler to use NFT here if
   // Decentraland Land contract followed ERC721 exactly
   const landContract = new Land(LAND_ADDRESS, ownerWallet);
@@ -229,7 +256,71 @@ const duration = {
   },
 };
 
+const etherFaucet = async (
+  provider,
+  fromWallet,
+  beneficiaryAddress,
+  amountInWei
+) => {
+  const connectedFromWallet = fromWallet.connect(provider);
+  const tx = await connectedFromWallet.sendTransaction({
+    // ethers.utils.parseEther("1.0")
+    value: "0x0de0b6b3a7640000",
+    to: beneficiaryAddress,
+  });
+  await provider.waitForTransaction(tx.hash);
+};
+
+const ownedManaFaucet = async (
+  manaContract,
+  ownerWallet,
+  beneficiary,
+  amountInWei
+) => {
+  manaContract.setWallet(ownerWallet);
+  const mintManaToBuyer = manaContract.mint(
+    beneficiary.address,
+    amountInWei.toString()
+  );
+  await mintManaToBuyer.waitForNonceToUpdate();
+  await confirmBalances(manaContract, [beneficiary.address], [amountInWei]);
+};
+
+const addressesAreEqual = (address1, address2) => {
+  return address1.toUpperCase() === address2.toUpperCase();
+};
+
+// The Mana contract deployed on ropsten network has a setBalance function
+const ropstenManaFaucet = async (provider, walletWithGas, to, amountInWei) => {
+  const { MANAToken: MANA_ADDRESS } = ropstenAddresses;
+  const connectedWallet = walletWithGas.connect(provider);
+  const manaABI = ["function setBalance(address to, uint256 amount)"];
+  const mana = new ethersContract(MANA_ADDRESS, manaABI, connectedWallet);
+  const tx = await mana.setBalance(to.address, amountInWei);
+  await provider.waitForTransaction(tx.hash);
+};
+
+// In weis
+// Note: ethers.js uses BigNumber internally
+// That accepts decimal strings (Ref: https://docs.ethers.io/ethers.js/html/api-utils.html#creating-instances)
+// Scientific notation works if the number is small enough (< 1e21) to be converted to string properly
+// See more: https://github.com/ethers-io/ethers.js/issues/228
+const ONE = bigNumberify(1).mul(WeiPerEther);
+const TEN = bigNumberify(10).mul(WeiPerEther);
+const BILLION = bigNumberify(`${1e9}`).mul(WeiPerEther);
+
+const constants = {
+  ONE,
+  TEN,
+  BILLION,
+  WeiPerEther,
+};
+
 export {
+  mineBlocks,
+  createSnapshot,
+  revertFromSnapshot,
+  confirmBalances,
   gasParams,
   setupWallets,
   setupContracts,
@@ -237,4 +328,12 @@ export {
   createParcels,
   createEstatesFromParcels,
   getEstateSellOrder,
+  etherFaucet,
+  ownedManaFaucet,
+  ropstenManaFaucet,
+  addressesAreEqual,
+  bigNumberify,
+  constants,
+  ProviderFactory,
+  DecentralandUtils,
 };
