@@ -192,7 +192,7 @@ describe("Decentraland tasit app test cases (ropsten)", () => {
     });
   });
 
-  describe("write opetaions / with wallet test cases", async () => {
+  describe("write operations / with wallet test cases", async () => {
     // Note: This test case isn't working. The transaction is being reverted and the reason isn't known yet
     it.skip("should buy an estate", async () => {
       const {
