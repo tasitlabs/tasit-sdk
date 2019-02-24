@@ -19,7 +19,7 @@
   "scripts": {
     "prepare": "npx babel src --out-dir dist --ignore **/*.test.js",
     "test": "npm run test:local",
-    "test:local": "npm run lint && npx mocha src/*local.test.js --require @babel/register --no-timeouts",
+    "test:local": "npm run lint && npx mocha src/*.test.js --exclude src/*forkedRopsten.test.js --require @babel/register --no-timeouts",
     "test:forkedRopsten": "npm run lint && npx mocha src/*forkedRopsten.test.js --require @babel/register --no-timeouts",
     "lint": "npx prettier src/* --write"
   },
