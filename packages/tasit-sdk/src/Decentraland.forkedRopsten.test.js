@@ -112,7 +112,7 @@ describe("Decentraland tasit app test cases (ropsten)", () => {
       const { priceInWei: landPrice } = landForSale;
       const { priceInWei: estatePrice } = estateForSale;
 
-      const manaAmountToShopping = bigNumberify(landPrice).add(
+      const manaAmountForShopping = bigNumberify(landPrice).add(
         bigNumberify(estatePrice)
       );
 
