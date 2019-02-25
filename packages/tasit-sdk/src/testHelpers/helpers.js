@@ -6,10 +6,10 @@ const { Estate, Land } = ERC721;
 const { Decentraland } = Marketplace;
 import { createFromPrivateKey } from "tasit-account/dist/testHelpers/helpers";
 
-// The goal of this integration test suite is to use only exposed classes
+// The goal of the integration test suite is to use only exposed classes
 // from TasitSdk. ProviderFactory is used here as an exception
 // as the clearest way to get a provider
-// in this test suite. Eventually, maybe ProviderFactory may move to
+// in this test suite. Eventually, maybe ProviderFactory will move to
 // some shared helper dir.
 import ProviderFactory from "tasit-action/dist/ProviderFactory";
 
@@ -255,12 +255,17 @@ const duration = {
   },
 };
 
-const etherFaucet = async (provider, fromWallet, beneficiary, amountInWei) => {
+const etherFaucet = async (
+  provider,
+  fromWallet,
+  beneficiaryAddress,
+  amountInWei
+) => {
   const connectedFromWallet = fromWallet.connect(provider);
   const tx = await connectedFromWallet.sendTransaction({
     // ethers.utils.parseEther("1.0")
     value: "0x0de0b6b3a7640000",
-    to: beneficiary.address,
+    to: beneficiaryAddress,
   });
   await provider.waitForTransaction(tx.hash);
 };

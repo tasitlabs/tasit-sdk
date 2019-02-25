@@ -30,7 +30,7 @@ import {
   DecentralandUtils,
 } from "./testHelpers/helpers";
 
-const { ONE, TEN, BILLION } = constants;
+const { ONE, TEN } = constants;
 
 const ROPSTEN_NETWORK_ID = 3;
 
@@ -71,34 +71,35 @@ describe("Decentraland tasit app test cases (ropsten)", () => {
     // Note: The exact amount of land isn't predictable since we are forking from the latest block
     expect(openSellOrders).to.not.be.empty;
 
-    // Pick a land and an estate open sell orders
+    // Pick two open sell orders: one for a parcel of land and one for an estate
     for (let sellOrder of openSellOrders) {
       const { values: order } = sellOrder;
       const { nftAddress, expiresAt } = order;
-
-      if (landForSale && estateForSale) break;
 
       const isLand = addressesAreEqual(nftAddress, LAND_ADDRESS);
       const isEstate = addressesAreEqual(nftAddress, ESTATE_ADDRESS);
       const expired = Number(expiresAt) < Date.now();
 
-      // All lands are expired
+      // All parcels of land and estates for sale are expired (block 5058416) -
+      // otherwise we would select one that isn't expired
       if (isLand) landForSale = order;
-      if (isEstate && !expired) estateForSale = order;
+      if (isEstate) estateForSale = order;
+
+      if (landForSale && estateForSale) break;
 
       if (!isLand && !isEstate)
         expect(
           false,
-          "All land for sale should be a land or an estate NFT"
+          "All land for sale should be an NFT that is either a parcel of land or an estate"
         ).to.equal(true);
     }
 
-    expect(estateForSale).to.not.be.an("undefined");
-    expect(landForSale).to.not.be.an("undefined");
+    expect(estateForSale).not.to.be.an("undefined");
+    expect(landForSale).not.to.be.an("undefined");
   });
 
   beforeEach(
-    "buyer approve marketplace contract to transfer tokens on their behalf",
+    "buyer approves marketplace contract to transfer tokens on their behalf",
     async () => {
       snapshotId = await createSnapshot(provider);
 
@@ -106,16 +107,32 @@ describe("Decentraland tasit app test cases (ropsten)", () => {
       expect(ownerWallet.address).to.have.lengthOf(42);
       expect(ephemeralWallet.address).to.have.lengthOf(42);
 
-      await etherFaucet(provider, ownerWallet, ephemeralWallet, ONE);
+      await etherFaucet(provider, ownerWallet, ephemeralWallet.address, ONE);
+
+      const { priceInWei: landPrice } = landForSale;
+      const { priceInWei: estatePrice } = estateForSale;
+
+      const manaAmountForShopping = bigNumberify(landPrice).add(
+        bigNumberify(estatePrice)
+      );
 
       await confirmBalances(manaContract, [ephemeralWallet.address], [0]);
-      await ropstenManaFaucet(provider, ownerWallet, ephemeralWallet, BILLION);
-      await confirmBalances(manaContract, [ephemeralWallet.address], [BILLION]);
+      await ropstenManaFaucet(
+        provider,
+        ownerWallet,
+        ephemeralWallet,
+        manaAmountForShopping
+      );
+      await confirmBalances(
+        manaContract,
+        [ephemeralWallet.address],
+        [manaAmountForShopping]
+      );
 
       manaContract.setWallet(ephemeralWallet);
       const approvalAction = manaContract.approve(
         MARKETPLACE_ADDRESS,
-        BILLION,
+        manaAmountForShopping,
         gasParams
       );
       await approvalAction.waitForNonceToUpdate();
@@ -125,7 +142,7 @@ describe("Decentraland tasit app test cases (ropsten)", () => {
         MARKETPLACE_ADDRESS
       );
 
-      expect(`${allowance}`).to.equal(`${BILLION}`);
+      expect(`${allowance}`).to.equal(`${manaAmountForShopping}`);
     }
   );
 
@@ -133,89 +150,102 @@ describe("Decentraland tasit app test cases (ropsten)", () => {
     await revertFromSnapshot(provider, snapshotId);
   });
 
-  it("should get land for sale info (without wallet)", async () => {
-    const { assetId } = landForSale;
+  describe("read-only / without wallet test cases", async () => {
+    it("should get land for sale info", async () => {
+      const { assetId } = landForSale;
 
-    const metadataPromise = landContract.tokenMetadata(assetId);
-    const coordsPromise = landContract.decodeTokenId(assetId);
-    const [metadata, coords] = await Promise.all([
-      metadataPromise,
-      coordsPromise,
-    ]);
+      const metadataPromise = landContract.tokenMetadata(assetId);
+      const coordsPromise = landContract.decodeTokenId(assetId);
+      const [metadata, coords] = await Promise.all([
+        metadataPromise,
+        coordsPromise,
+      ]);
 
-    // Note: Metadata could be an empty string
-    expect(metadata).to.not.be.null;
+      // Note: Metadata could be an empty string
+      expect(metadata).to.not.be.null;
+      if (metadata === "")
+        console.log(`Land parcel id ${assetId} with empty metadata.`);
 
-    const [x, y] = coords;
-    expect(coords).to.not.include(null);
-    expect(x.toNumber()).to.be.a("number");
-    expect(y.toNumber()).to.be.a("number");
+      const [x, y] = coords;
+      expect(coords).to.not.include(null);
+      expect(x.toNumber()).to.be.a("number");
+      expect(y.toNumber()).to.be.a("number");
+    });
+
+    it("should get info about the estate for sale", async () => {
+      const { assetId } = estateForSale;
+
+      const metadataPromise = estateContract.getMetadata(assetId);
+      const sizePromise = estateContract.getEstateSize(assetId);
+      const [metadata, size] = await Promise.all([
+        metadataPromise,
+        sizePromise,
+      ]);
+
+      // Note: Metadata could be an empty string
+      expect(metadata).to.not.be.null;
+      if (metadata === "")
+        console.log(`Estate id ${assetId} with empty metadata.`);
+
+      expect(size.toNumber()).to.be.a("number");
+      expect(size.toNumber()).to.be.at.least(0);
+    });
   });
 
-  it("should get estate for sale info (without wallet)", async () => {
-    const { assetId } = estateForSale;
+  describe("write operations / with wallet test cases", async () => {
+    // Note: This test case isn't working. The transaction is being reverted and the reason isn't known yet
+    it.skip("should buy an estate", async () => {
+      const {
+        assetId,
+        nftAddress,
+        seller,
+        priceInWei,
+        expiresAt,
+      } = estateForSale;
 
-    const metadataPromise = estateContract.getMetadata(assetId);
-    const sizePromise = estateContract.getEstateSize(assetId);
-    const [metadata, size] = await Promise.all([metadataPromise, sizePromise]);
+      const { address: ephemeralAddress } = ephemeralWallet;
 
-    // Note: Metadata could be an empty string
-    expect(metadata).to.not.be.null;
+      const expiresTime = Number(expiresAt);
+      expect(Date.now()).to.be.below(expiresTime);
 
-    expect(size.toNumber()).to.be.a("number");
-    expect(size.toNumber()).to.be.at.least(0);
+      const priceInWeiBN = bigNumberify(priceInWei);
+
+      // Buyer (ephemeral wallet) has enough MANA
+      const manaBalance = await manaContract.balanceOf(ephemeralAddress);
+      const manaBalanceBN = bigNumberify(manaBalance);
+      expect(manaBalanceBN.gt(priceInWeiBN)).to.be.true;
+
+      // Marketplace is approved to transfer Estate asset owned by the seller
+      const approvedForAsset = await estateContract.getApproved(assetId);
+      const approvedForAll = await estateContract.isApprovedForAll(
+        seller,
+        MARKETPLACE_ADDRESS
+      );
+      const approved =
+        addressesAreEqual(approvedForAsset, MARKETPLACE_ADDRESS) ||
+        approvedForAll;
+      expect(approved).to.be.true;
+
+      await confirmBalances(estateContract, [ephemeralWallet.address], [0]);
+
+      const fingerprint = await estateContract.getFingerprint(
+        assetId.toString()
+      );
+      marketplaceContract.setWallet(ephemeralWallet);
+      const executeOrderAction = marketplaceContract.safeExecuteOrder(
+        nftAddress,
+        `${assetId}`,
+        `${priceInWei}`,
+        `${fingerprint}`,
+        gasParams
+      );
+
+      await executeOrderAction.waitForNonceToUpdate();
+
+      await confirmBalances(estateContract, [ephemeralWallet.address], [1]);
+    });
+
+    // All land sell orders are expired
+    it.skip("should buy a parcel of land", async () => {});
   });
-
-  // Note: This test case isn't working. The transaction is been revert and the reason isn't know yet
-  it.skip("should buy an estate", async () => {
-    const {
-      assetId,
-      nftAddress,
-      seller,
-      priceInWei,
-      expiresAt,
-    } = estateForSale;
-
-    const { address: ephemeralAddress } = ephemeralWallet;
-
-    const expiresTime = Number(expiresAt);
-    expect(Date.now()).to.be.below(expiresTime);
-
-    const priceInWeiBN = bigNumberify(priceInWei);
-
-    // Buyer (ephemeral wallet) has enough MANA
-    const manaBalance = await manaContract.balanceOf(ephemeralAddress);
-    const manaBalanceBN = bigNumberify(manaBalance);
-    expect(manaBalanceBN.gt(priceInWeiBN)).to.be.true;
-
-    // Marketplace is approved to transfer Estate asset owned by the seller
-    const approvedForAsset = await estateContract.getApproved(assetId);
-    const approvedForAll = await estateContract.isApprovedForAll(
-      seller,
-      MARKETPLACE_ADDRESS
-    );
-    const approved =
-      addressesAreEqual(approvedForAsset, MARKETPLACE_ADDRESS) ||
-      approvedForAll;
-    expect(approved).to.be.true;
-
-    await confirmBalances(estateContract, [ephemeralWallet.address], [0]);
-
-    const fingerprint = await estateContract.getFingerprint(assetId.toString());
-    marketplaceContract.setWallet(ephemeralWallet);
-    const executeOrderAction = marketplaceContract.safeExecuteOrder(
-      nftAddress,
-      `${assetId}`,
-      `${priceInWei}`,
-      `${fingerprint}`,
-      gasParams
-    );
-
-    await executeOrderAction.waitForNonceToUpdate();
-
-    await confirmBalances(estateContract, [ephemeralWallet.address], [1]);
-  });
-
-  // All land sell orders are expired
-  it.skip("should buy a land", async () => {});
 });
