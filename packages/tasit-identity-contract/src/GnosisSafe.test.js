@@ -1,15 +1,10 @@
 import Action from "tasit-action";
 const { ConfigLoader, ERC20 } = Action;
-const { Mana } = ERC20;
+const { DetailedERC20 } = ERC20;
 import { ethers } from "ethers";
 import { expect } from "chai";
 import GnosisSafe from "./GnosisSafe";
-import { local as gnosisAddresses } from "../../tasit-contracts/3rd-parties/gnosis/addresses";
-import { local as decentralandAddresses } from "../../tasit-contracts/3rd-parties/decentraland/addresses";
-const localAddresses = {
-  ...gnosisAddresses,
-  ...decentralandAddresses,
-};
+import { local as localAddresses } from "../../tasit-contracts/3rd-parties/gnosis/addresses";
 import { createFromPrivateKey } from "../../tasit-account/dist/testHelpers/helpers";
 import {
   mineBlocks,
@@ -25,10 +20,8 @@ import {
 // some shared helper dir.
 import ProviderFactory from "tasit-action/dist/ProviderFactory";
 
-const {
-  GnosisSafe: GNOSIS_SAFE_ADDRESS,
-  MANAToken: MANA_ADDRESS,
-} = localAddresses;
+const { GnosisSafe: GNOSIS_SAFE_ADDRESS } = localAddresses;
+const ERC20_ADDRESS = "0x37E1A58dD465D33263D00185D065Ee36DD34CDb4";
 
 const { utils: ethersUtils } = ethers;
 const { bigNumberify } = ethersUtils;
@@ -75,7 +68,7 @@ describe("GnosisSafe", () => {
     // To change that, edit the file "tasit-contract/3rd-parties/gnosis/scripts/2_deploy_contracts.js"
     gnosisSafeContract = new GnosisSafe(GNOSIS_SAFE_ADDRESS);
 
-    erc20 = new Mana(MANA_ADDRESS);
+    erc20 = new DetailedERC20(ERC20_ADDRESS);
   });
 
   beforeEach("", async () => {
@@ -87,12 +80,8 @@ describe("GnosisSafe", () => {
     const erc20Balance = await erc20.balanceOf(GNOSIS_SAFE_ADDRESS);
     expect(`${erc20Balance}`).to.equal(`${ZERO}`);
 
-    erc20.setWallet(anaWallet);
-    const mintAction = erc20.mint(anaWallet.address, ONE);
-    await mintAction.waitForNonceToUpdate();
-
-    gnosisSafeContract.removeWallet();
-    erc20.removeWallet();
+    //gnosisSafeContract.removeWallet();
+    //erc20.removeWallet();
   });
 
   afterEach("", async () => {
@@ -101,20 +90,20 @@ describe("GnosisSafe", () => {
 
   it("wallet owner should deposit and withdraw some ethers", async () => {
     anaWallet = anaWallet.connect(provider);
-    await anaWallet.sendTransaction({
+    const tx = await anaWallet.sendTransaction({
       to: GNOSIS_SAFE_ADDRESS,
       value: ONE,
     });
+    await provider.waitForTransaction(tx.hash);
 
     const balanceAfterDeposit = await provider.getBalance(GNOSIS_SAFE_ADDRESS);
     expect(`${balanceAfterDeposit}`).to.equal(`${ONE}`);
 
     const signers = [anaWallet];
-    const senderWallet = anaWallet;
     const toAddress = anaWallet.address;
     const value = ONE;
 
-    gnosisSafeContract.setWallet(senderWallet);
+    gnosisSafeContract.setWallet(anaWallet);
     const execTxAction = await gnosisSafeContract.sendEtherTransaction(
       signers,
       toAddress,
@@ -128,6 +117,9 @@ describe("GnosisSafe", () => {
 
   it("wallet owner should deposit and withdraw some ERC20 tokens", async () => {
     erc20.setWallet(anaWallet);
+    const mintAction = erc20.mint(anaWallet.address, ONE);
+    await mintAction.waitForNonceToUpdate();
+
     const transferAction = erc20.transfer(GNOSIS_SAFE_ADDRESS, ONE);
     await transferAction.waitForNonceToUpdate();
 
@@ -135,24 +127,24 @@ describe("GnosisSafe", () => {
     expect(`${balanceAfterDeposit}`).to.equal(`${ONE}`);
 
     const signers = [anaWallet];
+    const tokenAddress = erc20.getAddress();
     const toAddress = anaWallet.address;
     const value = ONE;
 
     gnosisSafeContract.setWallet(anaWallet);
-    const execTxAction = await gnosisSafeContract.sendTokenTransaction(
+    const execTxAction = await gnosisSafeContract.sendERC20Transaction(
       signers,
-      erc20,
+      tokenAddress,
       toAddress,
       value
     );
-
     await execTxAction.waitForNonceToUpdate();
 
     const balanceAfterWithdraw = await erc20.balanceOf(GNOSIS_SAFE_ADDRESS);
     expect(`${balanceAfterWithdraw}`).to.equal(`${ZERO}`);
   });
 
-  it("wallet owner should deposit and withdraw some ERC721 tokens", async () => {});
+  it.skip("wallet owner should deposit and withdraw some ERC721 tokens", async () => {});
 
   it.skip("wallet owner should add an account as signer", async () => {});
 

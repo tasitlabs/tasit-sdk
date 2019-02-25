@@ -1,5 +1,6 @@
 import Action from "tasit-action";
-const { Contract } = Action;
+const { Contract, ERC20 } = Action;
+const { DetailedERC20 } = ERC20;
 import GnosisSafeUtils from "./GnosisSafeUtils";
 
 import gnosisSafeABI from "../../tasit-contracts/abi/GnosisSafe.json";
@@ -31,18 +32,14 @@ export default class GnosisSafe extends Contract {
     this.#utils = new GnosisSafeUtils(this);
   }
 
-  sendTokenTransaction = async (signers, tokenContract, toAddress, value) => {
-    const data = this.#utils.encodeFunctionCall(tokenContract, "transfer", [
+  sendERC20Transaction = async (signers, tokenAddress, toAddress, value) => {
+    const erc20 = new DetailedERC20(tokenAddress);
+    const data = this.#utils.encodeFunctionCall(erc20, "transfer", [
       toAddress,
       value,
     ]);
     const etherValue = "0";
-    return this.#executeTransaction(
-      signers,
-      data,
-      tokenContract.getAddress(),
-      etherValue
-    );
+    return this.#executeTransaction(signers, data, tokenAddress, etherValue);
   };
 
   sendEtherTransaction = async (signers, toAddress, value) => {
@@ -51,6 +48,8 @@ export default class GnosisSafe extends Contract {
     return this.#executeTransaction(signers, data, toAddress, etherValue);
   };
 
+  // Note: Should we move this function to sync to keep same behavior as
+  // contract's write functions that returns an Action object?
   #executeTransaction = async (signers, data, toAddress, etherValue) => {
     const to = toAddress;
 
@@ -103,7 +102,7 @@ export default class GnosisSafe extends Contract {
     );
     const signatures = this.#utils.multiSign(signers, transactionHash);
 
-    const execTxAction = await this.execTransaction(
+    const execTxAction = this.execTransaction(
       to,
       etherValue,
       data,
