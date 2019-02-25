@@ -37,7 +37,12 @@ export default class GnosisSafe extends Contract {
       value,
     ]);
     const etherValue = "0";
-    return this.#executeTransaction(signers, data, toAddress, etherValue);
+    return this.#executeTransaction(
+      signers,
+      data,
+      tokenContract.getAddress(),
+      etherValue
+    );
   };
 
   sendEtherTransaction = async (signers, toAddress, value) => {
@@ -50,7 +55,6 @@ export default class GnosisSafe extends Contract {
     const to = toAddress;
 
     const operation = CALL;
-    const signatureCount = signers.length;
 
     // Gas that should be used for the Safe transaction.
     const safeTxGas = await this.#utils.estimateFromSafeTxGas(
@@ -71,6 +75,7 @@ export default class GnosisSafe extends Contract {
     const refundReceiver = "0x0000000000000000000000000000000000000000";
 
     // Gas costs for data used to trigger the safe transaction and to pay the payment transfer
+    const { length: signersCount } = signers;
     const dataGas = this.#utils.estimateDataGas(
       this,
       to,
@@ -80,10 +85,10 @@ export default class GnosisSafe extends Contract {
       safeTxGas,
       gasToken,
       refundReceiver,
-      signatureCount
+      signersCount
     );
-    const nonce = await this.nonce();
 
+    const nonce = await this.nonce();
     const transactionHash = await this.getTransactionHash(
       to,
       etherValue,

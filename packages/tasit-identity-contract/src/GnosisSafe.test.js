@@ -126,16 +126,7 @@ describe("GnosisSafe", () => {
     expect(`${balanceAfterWithdraw}`).to.equal(`${ZERO}`);
   });
 
-  // WIP
-  it.skip("wallet owner should deposit and withdraw some ERC20 tokens", async () => {
-    // Transfer ethers to contract pay for gas
-    // TODO: Move from here
-    anaWallet = anaWallet.connect(provider);
-    await anaWallet.sendTransaction({
-      to: GNOSIS_SAFE_ADDRESS,
-      value: ONE,
-    });
-
+  it("wallet owner should deposit and withdraw some ERC20 tokens", async () => {
     erc20.setWallet(anaWallet);
     const transferAction = erc20.transfer(GNOSIS_SAFE_ADDRESS, ONE);
     await transferAction.waitForNonceToUpdate();
@@ -160,6 +151,8 @@ describe("GnosisSafe", () => {
     const balanceAfterWithdraw = await erc20.balanceOf(GNOSIS_SAFE_ADDRESS);
     expect(`${balanceAfterWithdraw}`).to.equal(`${ZERO}`);
   });
+
+  it("wallet owner should deposit and withdraw some ERC721 tokens", async () => {});
 
   it.skip("wallet owner should add an account as signer", async () => {});
 
