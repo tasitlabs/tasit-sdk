@@ -12,11 +12,13 @@ Next you'll "clone" the code from GitHub.
 
 For this project, `develop` is the name of the default branch for the project. That branch contains the latest code under development, and new changes should be contributed by making a pull request against the develop branch.
 
-###  Overview of architecture of the Tasit project
+### Overview of architecture of the Tasit project
+
 The `TasitSDK` repo (the one you're looking at now) is the "middleware" code for interacting with the blockchain that you can use from within a React Native app. The code for our React Native mobile apps themselves is over in a different GitHub repo called `tasit`.
 There are multiple npm packages within this repo. It's a "monorepo" (feel free google this term for more info). We use [lerna](https://lernajs.io/) to manage the packages. That's a popular technique.
 
 ### How to set up the local environment
+
 You'll need to install the npm packages for this project before you can test it out. The code for those packages isn't in this repo - just the name and version of the packages that we use. Those are specified in the `package.json` file.
 
 From within the `TasitSDK` folder, run `npm run bootstrap`. You can see what that script does by looking at the `bootstrap` script in the `scripts` section of `package.json`. It uses a `lerna` command, using a tool called `npx` to run the locally installed version of lerna.
@@ -24,6 +26,7 @@ From within the `TasitSDK` folder, run `npm run bootstrap`. You can see what tha
 Note: If you've already used node and npm before and plan to work on multiple projects, we recommend using [nvm](https://github.com/creationix/nvm) to keep multiple versions on your machine. If you're just getting started with node and npm, that is probably overkill.
 
 ### Testing the current version of the code
+
 We use test-driven development (TDD), so to make sure everything is set up right on your machine, the best way is to run the test suite. To do this, run:
 
 `npm test`
@@ -35,6 +38,10 @@ This will run the tests for all of the packages in this repo.
 For each file in this repo - let's say it's named `file.js` - we have a separate file named `file.test.js` where we test the code in that file.
 
 Some other projects keep all their tests in one big test directory, but we find that it's harder to visually confirm if all files are tested that way.
+
+If you want to test only the package that you are working on, run `npm pretest` from `TasitSDK` folder and then run `npm test` from the package's folder.
+
+The `pretest` script will starts `ganache-cli` and deploys contracts from `tasit-contract`.
 
 ### Making some changes
 
