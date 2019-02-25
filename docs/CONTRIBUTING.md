@@ -41,7 +41,7 @@ Some other projects keep all their tests in one big test directory, but we find 
 
 If you want to test only the package that you are working on, run `npm pretest` from `TasitSDK` folder and then run `npm test` from the package's folder.
 
-The `pretest` script will starts `ganache-cli` and deploys contracts from `tasit-contract`.
+The `pretest` script will start `ganache-cli` and deploy contracts from `tasit-contract`.
 
 ### Making some changes
 
