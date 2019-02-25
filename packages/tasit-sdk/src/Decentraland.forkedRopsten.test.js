@@ -121,18 +121,18 @@ describe("Decentraland tasit app test cases (ropsten)", () => {
         provider,
         ownerWallet,
         ephemeralWallet,
-        manaAmountToShopping
+        manaAmountForShopping
       );
       await confirmBalances(
         manaContract,
         [ephemeralWallet.address],
-        [manaAmountToShopping]
+        [manaAmountForShopping]
       );
 
       manaContract.setWallet(ephemeralWallet);
       const approvalAction = manaContract.approve(
         MARKETPLACE_ADDRESS,
-        manaAmountToShopping,
+        manaAmountForShopping,
         gasParams
       );
       await approvalAction.waitForNonceToUpdate();
@@ -142,7 +142,7 @@ describe("Decentraland tasit app test cases (ropsten)", () => {
         MARKETPLACE_ADDRESS
       );
 
-      expect(`${allowance}`).to.equal(`${manaAmountToShopping}`);
+      expect(`${allowance}`).to.equal(`${manaAmountForShopping}`);
     }
   );
 

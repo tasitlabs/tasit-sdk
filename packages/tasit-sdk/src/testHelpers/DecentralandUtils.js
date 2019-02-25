@@ -1,6 +1,6 @@
 import { ethers } from "ethers";
 
-import marketplaceABI from "../../../tasit-action/src/abi/Marketplace.json";
+import marketplaceABI from "../../../tasit-contracts/abi/Marketplace.json";
 import { ropsten as ropstenAddresses } from "../../../tasit-contracts/decentraland/addresses";
 const { MarketplaceProxy: MARKETPLACE_ADDRESS } = ropstenAddresses;
 
