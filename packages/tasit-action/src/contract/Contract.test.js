@@ -40,6 +40,7 @@ describe("TasitAction.Contract", () => {
     expect(sampleContract.getValue).to.exist;
     expect(sampleContract.setValue).to.exist;
     expect(sampleContract._getProvider()).to.exist;
+    expect(sampleContract.getABI()).to.deep.equal(contractABI);
 
     provider = sampleContract._getProvider();
     testcaseSnaphotId = await createSnapshot(provider);

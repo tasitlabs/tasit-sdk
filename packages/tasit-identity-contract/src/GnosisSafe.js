@@ -31,16 +31,31 @@ export default class GnosisSafe extends Contract {
     this.#utils = new GnosisSafeUtils(this);
   }
 
-  sendEtherTransaction = async (signers, senderWallet, toAddress, value) => {
-    const to = toAddress;
+  sendTokenTransaction = async (signers, tokenContract, toAddress, value) => {
+    const data = this.#utils.encodeFunctionCall(tokenContract, "transfer", [
+      toAddress,
+      value,
+    ]);
+    const etherValue = "0";
+    return this.#executeTransaction(signers, data, toAddress, etherValue);
+  };
+
+  sendEtherTransaction = async (signers, toAddress, value) => {
     const data = "0x";
+    const etherValue = value;
+    return this.#executeTransaction(signers, data, toAddress, etherValue);
+  };
+
+  #executeTransaction = async (signers, data, toAddress, etherValue) => {
+    const to = toAddress;
+
     const operation = CALL;
     const signatureCount = signers.length;
 
     // Gas that should be used for the Safe transaction.
     const safeTxGas = await this.#utils.estimateFromSafeTxGas(
       to,
-      value,
+      etherValue,
       data,
       operation
     );
@@ -59,7 +74,7 @@ export default class GnosisSafe extends Contract {
     const dataGas = this.#utils.estimateDataGas(
       this,
       to,
-      value,
+      etherValue,
       data,
       operation,
       safeTxGas,
@@ -71,7 +86,7 @@ export default class GnosisSafe extends Contract {
 
     const transactionHash = await this.getTransactionHash(
       to,
-      value,
+      etherValue,
       data,
       operation,
       safeTxGas,
@@ -83,10 +98,9 @@ export default class GnosisSafe extends Contract {
     );
     const signatures = this.#utils.multiSign(signers, transactionHash);
 
-    this.setWallet(senderWallet);
     const execTxAction = await this.execTransaction(
       to,
-      value,
+      etherValue,
       data,
       operation,
       safeTxGas,

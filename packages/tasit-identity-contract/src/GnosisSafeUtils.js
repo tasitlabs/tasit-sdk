@@ -5,24 +5,14 @@ import { ethers } from "ethers";
 const { utils: ethersUtils } = ethers;
 const { bigNumberify } = ethersUtils;
 
-// Note: That impost is necessary only because we have no way to get the ABI from a Action.Contract
-// Should we expose Contract.getABI() function?
-import gnosisSafeABI from "../../tasit-contracts/abi/GnosisSafe.json";
-
 // 100 gwei
 const GAS_PRICE = bigNumberify(`${1e11}`);
 
 export default class GnosisSafeUtils {
   #contract;
-  #ethersContract;
 
   constructor(contract) {
     this.#contract = contract;
-    this.#ethersContract = new ethers.Contract(
-      contract.getAddress(),
-      gnosisSafeABI,
-      contract._getProvider()
-    );
   }
 
   // Sign a hash using N signers
@@ -45,12 +35,11 @@ export default class GnosisSafeUtils {
     const safeContractAddress = this.#contract.getAddress();
 
     // Encode call to the contract's estimate gas function
-    const callToEstimate = this.#encodeFunctionCall("requiredTxGas", [
-      to,
-      value,
-      data,
-      operation,
-    ]);
+    const callToEstimate = this.encodeFunctionCall(
+      this.#contract,
+      "requiredTxGas",
+      [to, value, data, operation]
+    );
 
     // The response will be return via error message
     const estimateResponse = await provider.call({
@@ -94,18 +83,22 @@ export default class GnosisSafeUtils {
     // Signatures cost will add later
     const signatures = "0x";
 
-    const callToEstimate = this.#encodeFunctionCall("execTransaction", [
-      to,
-      value,
-      data,
-      operation,
-      txGasEstimate,
-      dataGas,
-      gasPrice,
-      gasToken,
-      refundReceiver,
-      signatures,
-    ]);
+    const callToEstimate = this.encodeFunctionCall(
+      this.#contract,
+      "execTransaction",
+      [
+        to,
+        value,
+        data,
+        operation,
+        txGasEstimate,
+        dataGas,
+        gasPrice,
+        gasToken,
+        refundReceiver,
+        signatures,
+      ]
+    );
 
     let estimatedGas =
       this.#estimateDataGasCosts(callToEstimate) + signatureCost;
@@ -144,7 +137,13 @@ export default class GnosisSafeUtils {
     }
   };
 
-  #encodeFunctionCall = (functionName, args) => {
-    return this.#ethersContract.interface.functions[functionName].encode(args);
+  encodeFunctionCall = (contract, functionName, args) => {
+    const { getAddress, getABI, _getProvider } = contract;
+    const ethersContract = new ethers.Contract(
+      getAddress(),
+      getABI(),
+      _getProvider()
+    );
+    return ethersContract.interface.functions[functionName].encode(args);
   };
 }
