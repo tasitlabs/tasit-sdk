@@ -32,7 +32,7 @@ export default class GnosisSafe extends Contract {
     this.#utils = new GnosisSafeUtils(this);
   }
 
-  sendERC20Transaction = async (signers, tokenAddress, toAddress, value) => {
+  transferERC20 = async (signers, tokenAddress, toAddress, value) => {
     const erc20 = new DetailedERC20(tokenAddress);
     const data = this.#utils.encodeFunctionCall(erc20, "transfer", [
       toAddress,
@@ -48,7 +48,7 @@ export default class GnosisSafe extends Contract {
     return action;
   };
 
-  sendEtherTransaction = async (signers, toAddress, value) => {
+  transferEther = async (signers, toAddress, value) => {
     const data = "0x";
     const etherValue = value;
     const action = await this.#executeTransaction(

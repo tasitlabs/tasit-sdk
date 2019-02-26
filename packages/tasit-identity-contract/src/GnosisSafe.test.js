@@ -84,63 +84,124 @@ describe("GnosisSafe", () => {
   });
 
   afterEach("", async () => {
+    expect(erc20.subscribedEventNames()).to.be.empty;
+    expect(gnosisSafe.subscribedEventNames()).to.be.empty;
+    expect(provider._events).to.be.empty;
+
     await revertFromSnapshot(provider, snapshotId);
   });
 
-  it("wallet owner should deposit and withdraw some ethers", async () => {
-    anaWallet = anaWallet.connect(provider);
-    const tx = await anaWallet.sendTransaction({
-      to: GNOSIS_SAFE_ADDRESS,
-      value: ONE,
+  describe("test cases that needs ETH deposit to the wallet", async () => {
+    beforeEach("", async () => {
+      anaWallet = anaWallet.connect(provider);
+      const tx = await anaWallet.sendTransaction({
+        to: GNOSIS_SAFE_ADDRESS,
+        value: ONE,
+      });
+      await provider.waitForTransaction(tx.hash);
+
+      const balanceAfterDeposit = await provider.getBalance(
+        GNOSIS_SAFE_ADDRESS
+      );
+      expect(`${balanceAfterDeposit}`).to.equal(`${ONE}`);
     });
-    await provider.waitForTransaction(tx.hash);
 
-    const balanceAfterDeposit = await provider.getBalance(GNOSIS_SAFE_ADDRESS);
-    expect(`${balanceAfterDeposit}`).to.equal(`${ONE}`);
+    it("wallet owner should withdraw some ethers", async () => {
+      const signers = [anaWallet];
+      const { address: toAddress } = anaWallet;
+      const value = ONE;
 
-    const signers = [anaWallet];
-    const toAddress = anaWallet.address;
-    const value = ONE;
+      gnosisSafe.setWallet(anaWallet);
+      const execTxAction = await gnosisSafe.transferEther(
+        signers,
+        toAddress,
+        value
+      );
+      await execTxAction.waitForNonceToUpdate();
 
-    gnosisSafe.setWallet(anaWallet);
-    const execTxAction = await gnosisSafe.sendEtherTransaction(
-      signers,
-      toAddress,
-      value
-    );
-    await execTxAction.waitForNonceToUpdate();
+      const balanceAfterWithdraw = await provider.getBalance(
+        GNOSIS_SAFE_ADDRESS
+      );
+      expect(`${balanceAfterWithdraw}`).to.equal(`${ZERO}`);
+    });
 
-    const balanceAfterWithdraw = await provider.getBalance(GNOSIS_SAFE_ADDRESS);
-    expect(`${balanceAfterWithdraw}`).to.equal(`${ZERO}`);
+    it("wallet owner should withdraw some ethers", async () => {
+      const signers = [anaWallet];
+      const { address: toAddress } = anaWallet;
+      const value = ONE;
+
+      gnosisSafe.setWallet(anaWallet);
+      const action = await gnosisSafe.transferEther(signers, toAddress, value);
+
+      const onConfirmation = async message => {
+        const { data } = message;
+        const { args } = data;
+
+        action.unsubscribe();
+
+        const balance = await provider.getBalance(GNOSIS_SAFE_ADDRESS);
+        expect(`${balance}`).to.equal(`${ZERO}`);
+      };
+
+      const onError = message => {
+        const { error } = message;
+        console.log(error);
+      };
+
+      await dispatch(action, onConfirmation, onError);
+    });
+
+    const dispatch = async (action, onConfirmation, onError) => {
+      return new Promise((resolve, reject) => {
+        action.on("confirmation", async message => {
+          try {
+            await onConfirmation(message);
+            resolve();
+          } catch (error) {
+            reject(error);
+          }
+        });
+
+        action.on("error", message => {
+          const { error } = message;
+          onError(message);
+          reject(error);
+        });
+      });
+    };
   });
 
-  it("wallet owner should deposit and withdraw some ERC20 tokens", async () => {
-    erc20.setWallet(anaWallet);
-    const mintAction = erc20.mint(anaWallet.address, ONE);
-    await mintAction.waitForNonceToUpdate();
+  describe("test cases that needs ERC20 deposit to the wallet", async () => {
+    beforeEach("", async () => {
+      erc20.setWallet(anaWallet);
+      const mintAction = erc20.mint(anaWallet.address, ONE);
+      await mintAction.waitForNonceToUpdate();
 
-    const transferAction = erc20.transfer(GNOSIS_SAFE_ADDRESS, ONE);
-    await transferAction.waitForNonceToUpdate();
+      const transferAction = erc20.transfer(GNOSIS_SAFE_ADDRESS, ONE);
+      await transferAction.waitForNonceToUpdate();
 
-    const balanceAfterDeposit = await erc20.balanceOf(GNOSIS_SAFE_ADDRESS);
-    expect(`${balanceAfterDeposit}`).to.equal(`${ONE}`);
+      const balanceAfterDeposit = await erc20.balanceOf(GNOSIS_SAFE_ADDRESS);
+      expect(`${balanceAfterDeposit}`).to.equal(`${ONE}`);
+    });
 
-    const signers = [anaWallet];
-    const tokenAddress = erc20.getAddress();
-    const toAddress = anaWallet.address;
-    const value = ONE;
+    it("wallet owner should withdraw some ERC20 tokens", async () => {
+      const signers = [anaWallet];
+      const tokenAddress = erc20.getAddress();
+      const toAddress = anaWallet.address;
+      const value = ONE;
 
-    gnosisSafe.setWallet(anaWallet);
-    const execTxAction = await gnosisSafe.sendERC20Transaction(
-      signers,
-      tokenAddress,
-      toAddress,
-      value
-    );
-    await execTxAction.waitForNonceToUpdate();
+      gnosisSafe.setWallet(anaWallet);
+      const execTxAction = await gnosisSafe.transferERC20(
+        signers,
+        tokenAddress,
+        toAddress,
+        value
+      );
+      await execTxAction.waitForNonceToUpdate();
 
-    const balanceAfterWithdraw = await erc20.balanceOf(GNOSIS_SAFE_ADDRESS);
-    expect(`${balanceAfterWithdraw}`).to.equal(`${ZERO}`);
+      const balanceAfterWithdraw = await erc20.balanceOf(GNOSIS_SAFE_ADDRESS);
+      expect(`${balanceAfterWithdraw}`).to.equal(`${ZERO}`);
+    });
   });
 
   it.skip("wallet owner should deposit and withdraw some ERC721 tokens", async () => {});
