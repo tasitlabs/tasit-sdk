@@ -39,13 +39,25 @@ export default class GnosisSafe extends Contract {
       value,
     ]);
     const etherValue = "0";
-    return this.#executeTransaction(signers, data, tokenAddress, etherValue);
+    const action = await this.#executeTransaction(
+      signers,
+      data,
+      tokenAddress,
+      etherValue
+    );
+    return action;
   };
 
   sendEtherTransaction = async (signers, toAddress, value) => {
     const data = "0x";
     const etherValue = value;
-    return this.#executeTransaction(signers, data, toAddress, etherValue);
+    const action = await this.#executeTransaction(
+      signers,
+      data,
+      toAddress,
+      etherValue
+    );
+    return action;
   };
 
   // Note: Should we move this function to sync to keep same behavior as
@@ -88,6 +100,7 @@ export default class GnosisSafe extends Contract {
     );
 
     const nonce = await this.nonce();
+
     const transactionHash = await this.getTransactionHash(
       to,
       etherValue,
@@ -100,6 +113,7 @@ export default class GnosisSafe extends Contract {
       refundReceiver,
       nonce
     );
+
     const signatures = this.#utils.multiSign(signers, transactionHash);
 
     const execTxAction = this.execTransaction(

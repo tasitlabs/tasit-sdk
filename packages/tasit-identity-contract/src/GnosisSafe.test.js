@@ -47,8 +47,7 @@ describe("GnosisSafe", () => {
       timeout: 2000,
     },
   };
-  let gnosisSafeContract;
-  let gnosisSafeUtils;
+  let gnosisSafe;
   let anaWallet;
   let snapshotId;
   let provider;
@@ -66,7 +65,7 @@ describe("GnosisSafe", () => {
 
     // Contract deployment setup with ana (accounts[0]) as the only owner
     // To change that, edit the file "tasit-contract/3rd-parties/gnosis/scripts/2_deploy_contracts.js"
-    gnosisSafeContract = new GnosisSafe(GNOSIS_SAFE_ADDRESS);
+    gnosisSafe = new GnosisSafe(GNOSIS_SAFE_ADDRESS);
 
     erc20 = new DetailedERC20(ERC20_ADDRESS);
   });
@@ -80,8 +79,8 @@ describe("GnosisSafe", () => {
     const erc20Balance = await erc20.balanceOf(GNOSIS_SAFE_ADDRESS);
     expect(`${erc20Balance}`).to.equal(`${ZERO}`);
 
-    //gnosisSafeContract.removeWallet();
-    //erc20.removeWallet();
+    gnosisSafe.removeWallet();
+    erc20.removeWallet();
   });
 
   afterEach("", async () => {
@@ -103,8 +102,8 @@ describe("GnosisSafe", () => {
     const toAddress = anaWallet.address;
     const value = ONE;
 
-    gnosisSafeContract.setWallet(anaWallet);
-    const execTxAction = await gnosisSafeContract.sendEtherTransaction(
+    gnosisSafe.setWallet(anaWallet);
+    const execTxAction = await gnosisSafe.sendEtherTransaction(
       signers,
       toAddress,
       value
@@ -131,8 +130,8 @@ describe("GnosisSafe", () => {
     const toAddress = anaWallet.address;
     const value = ONE;
 
-    gnosisSafeContract.setWallet(anaWallet);
-    const execTxAction = await gnosisSafeContract.sendERC20Transaction(
+    gnosisSafe.setWallet(anaWallet);
+    const execTxAction = await gnosisSafe.sendERC20Transaction(
       signers,
       tokenAddress,
       toAddress,
