@@ -52,9 +52,9 @@ export default class GnosisSafeUtils {
     const estimatedGasHex = "0x" + estimateResponse.substring(138);
     let estimatedGas = bigNumberify(estimatedGasHex);
 
-    // Extracted from Gnosis Safe test case (Why it's necessary?)
+    // Extracted from Gnosis Safe test case (Why is it necessary?)
     // Add 10k else we will fail in case of nested calls
-    estimatedGas = estimatedGas.add(10000);
+    //estimatedGas = estimatedGas.add(10000);
 
     return estimatedGas;
   };
@@ -109,9 +109,9 @@ export default class GnosisSafeUtils {
       estimatedGas += 128;
     }
 
-    // Extracted from Gnosis Safe test case (Why it's necessary?)
+    // Extracted from Gnosis Safe test case (Why is it necessary?)
     // Add aditional gas costs (e.g. base tx costs, transfer costs)
-    estimatedGas += 32000;
+    //estimatedGas += 32000;
 
     return estimatedGas;
   };
