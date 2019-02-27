@@ -1,6 +1,7 @@
 import Action from "tasit-action";
-const { Contract, ERC20 } = Action;
+const { Contract, ERC20, ERC721 } = Action;
 const { DetailedERC20 } = ERC20;
+const { NFT } = ERC721;
 import GnosisSafeUtils from "./GnosisSafeUtils";
 
 import gnosisSafeABI from "../../tasit-contracts/abi/GnosisSafe.json";
@@ -48,6 +49,24 @@ export default class GnosisSafe extends Contract {
     return action;
   };
 
+  transferNFT = async (signers, tokenAddress, toAddress, tokenId) => {
+    const nft = new NFT(tokenAddress);
+    const fromAddress = this.getAddress();
+    const data = this.#utils.encodeFunctionCall(nft, "safeTransferFrom", [
+      fromAddress,
+      toAddress,
+      tokenId,
+    ]);
+    const etherValue = "0";
+    const action = await this.#executeTransaction(
+      signers,
+      data,
+      tokenAddress,
+      etherValue
+    );
+    return action;
+  };
+
   transferEther = async (signers, toAddress, value) => {
     const data = "0x";
     const etherValue = value;
@@ -55,6 +74,22 @@ export default class GnosisSafe extends Contract {
       signers,
       data,
       toAddress,
+      etherValue
+    );
+    return action;
+  };
+
+  addSignerWithThreshold = async (signers, newSignerAddress, newThreshold) => {
+    const data = this.#utils.encodeFunctionCall(this, "addOwnerWithThreshold", [
+      newSignerAddress,
+      newThreshold,
+    ]);
+    const to = this.getAddress();
+    const etherValue = "0";
+    const action = await this.#executeTransaction(
+      signers,
+      data,
+      to,
       etherValue
     );
     return action;

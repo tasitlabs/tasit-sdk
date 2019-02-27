@@ -10,6 +10,8 @@ var MultiSend = artifacts.require("./MultiSend.sol");
 const anaAddress = "0xd68649157A061454e2c63c175236b07e98Bd9512";
 const bobAddress = "0x8a5D5298dcceA526754064b8094e663162E1dBEa";
 
+// Note: If you want to change this file, make sure that you are editing
+// the original file inside of the `tasit-contracts/3rd-parties/gnosis/scripts`
 module.exports = function(deployer) {
   deployer.deploy(ProxyFactory);
   deployer.deploy(GnosisSafe).then(function(safe) {
