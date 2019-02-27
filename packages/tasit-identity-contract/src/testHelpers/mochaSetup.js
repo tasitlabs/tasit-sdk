@@ -33,3 +33,21 @@ const config = {
   },
 };
 ConfigLoader.setConfig(config);
+
+// Global hooks
+let snaphotId;
+
+beforeEach("global beforeEach() hook", async () => {
+  const provider = ProviderFactory.getProvider();
+  global.provider = provider;
+  snaphotId = await createSnapshot(provider);
+  expect(`${snaphotId}`).to.equal(`0x1`);
+});
+
+afterEach("global afterEach() hook", async () => {
+  await revertFromSnapshot(provider, snaphotId);
+
+  // Note: Without this the test suite is breaking.
+  // It is still unclear why
+  await mineBlocks(provider, 1);
+});

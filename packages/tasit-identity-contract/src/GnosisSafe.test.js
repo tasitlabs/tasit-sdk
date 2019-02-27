@@ -19,13 +19,10 @@ describe("GnosisSafe", () => {
   let anaWallet;
   let ephemeralWallet;
   let snapshotId;
-  let provider;
   let erc20;
   let nft;
 
   before("", async () => {
-    provider = ProviderFactory.getProvider();
-
     const anaPrivateKey =
       "0x11d943d7649fbdeb146dc57bd9cfc80b086bfab2330c7b25651dbaf382392f60";
 
@@ -46,8 +43,6 @@ describe("GnosisSafe", () => {
   });
 
   beforeEach("", async () => {
-    snapshotId = await createSnapshot(provider);
-
     const etherBalance = await provider.getBalance(GNOSIS_SAFE_ADDRESS);
     expect(`${etherBalance}`).to.equal(`${ZERO}`);
 
@@ -62,8 +57,6 @@ describe("GnosisSafe", () => {
     expect(erc20.subscribedEventNames()).to.be.empty;
     expect(gnosisSafe.subscribedEventNames()).to.be.empty;
     expect(provider._events).to.be.empty;
-
-    await revertFromSnapshot(provider, snapshotId);
   });
 
   describe("test cases that needs ETH deposit to the wallet", async () => {
