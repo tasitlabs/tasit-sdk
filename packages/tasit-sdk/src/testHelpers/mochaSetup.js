@@ -24,9 +24,13 @@ ConfigLoader.setConfig(config);
 // Global hooks
 let snapshotId;
 
-beforeEach("global beforeEach() hook", async () => {
+before("global before() hook", async () => {
   const provider = ProviderFactory.getProvider();
   global.provider = provider;
+});
+
+beforeEach("global beforeEach() hook", async () => {
+  provider = ProviderFactory.getProvider();
   snapshotId = await createSnapshot(provider);
 
   while (snapshotId > 1) {
