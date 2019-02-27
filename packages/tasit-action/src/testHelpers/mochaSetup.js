@@ -1,5 +1,3 @@
-import { ethers } from "ethers";
-
 // Chai
 import chai, { expect } from "chai";
 global.expect = expect;
@@ -34,6 +32,7 @@ beforeEach("global beforeEach() hook", async () => {
   const provider = ProviderFactory.getProvider();
   global.provider = provider;
   snaphotId = await createSnapshot(provider);
+  expect(`${snaphotId}`).to.equal(`0x1`);
 });
 
 afterEach("global afterEach() hook", async () => {
