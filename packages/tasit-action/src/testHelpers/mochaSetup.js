@@ -1,33 +1,17 @@
-import BN from "bn.js";
-global.BN = BN;
+import { ethers } from "ethers";
 
 // Chai
 import chai, { expect } from "chai";
 global.expect = expect;
 chai.use(require("chai-as-promised"));
-chai.use(require("chai-bn")(BN));
 
 // Sinon
 import sinon from "sinon";
 global.sinon = sinon;
 
 // Helpers
-import {
-  mineBlocks,
-  createSnapshot,
-  revertFromSnapshot,
-  wait,
-  waitForEthersEvent,
-  toBN,
-  confirmBalances,
-} from "./helpers";
-global.mineBlocks = mineBlocks;
-global.createSnapshot = createSnapshot;
-global.revertFromSnapshot = revertFromSnapshot;
-global.wait = wait;
-global.waitForEthersEvent = waitForEthersEvent;
-global.toBN = toBN;
-global.confirmBalances = confirmBalances;
+import actionHelpers from "./helpers";
+global = Object.assign(global, actionHelpers);
 
 // External helpers
 //
@@ -42,3 +26,20 @@ global.createFromPrivateKey = createFromPrivateKey;
 import ConfigLoader from "../ConfigLoader";
 import config from "../config/default.js";
 ConfigLoader.setConfig(config);
+
+// Global hooks
+let snaphotId;
+
+beforeEach("global beforeEach() hook", async () => {
+  const provider = ProviderFactory.getProvider();
+  global.provider = provider;
+  snaphotId = await createSnapshot(provider);
+});
+
+afterEach("global afterEach() hook", async () => {
+  await revertFromSnapshot(provider, snaphotId);
+
+  // Note: Without this the test suite is breaking.
+  // It is still unclear why
+  await mineBlocks(provider, 1);
+});

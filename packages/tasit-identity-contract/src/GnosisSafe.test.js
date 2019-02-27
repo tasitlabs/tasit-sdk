@@ -1,23 +1,9 @@
 import Action from "tasit-action";
-const { ConfigLoader, ERC20, ERC721 } = Action;
+const { ERC20, ERC721 } = Action;
 const { DetailedERC20 } = ERC20;
 const { NFT } = ERC721;
-import { ethers } from "ethers";
-import { expect } from "chai";
 import GnosisSafe from "./GnosisSafe";
 import { local as localAddresses } from "../../tasit-contracts/3rd-parties/gnosis/addresses";
-import { createFromPrivateKey } from "../../tasit-account/dist/testHelpers/helpers";
-import {
-  mineBlocks,
-  createSnapshot,
-  revertFromSnapshot,
-  confirmBalances,
-  etherFaucet,
-  erc20Faucet,
-  erc721Faucet,
-  bigNumberify,
-  ProviderFactory,
-} from "tasit-action/dist/testHelpers/helpers";
 
 const { GnosisSafe: GNOSIS_SAFE_ADDRESS } = localAddresses;
 const ERC20_ADDRESS = "0x37E1A58dD465D33263D00185D065Ee36DD34CDb4";
@@ -26,21 +12,9 @@ const NFT_ADDRESS = "0x0E86f209729bf54763789CDBcA9E8b94f0FD5333";
 // 100 gwei
 const GAS_PRICE = bigNumberify(`${1e11}`);
 
-describe.skip("GnosisSafe", () => {
-  const config = {
-    provider: {
-      network: "other",
-      provider: "jsonrpc",
-      pollingInterval: 50,
-      jsonRpc: {
-        url: "http://localhost",
-        port: 8545,
-      },
-    },
-    events: {
-      timeout: 2000,
-    },
-  };
+const { ZERO, ONE } = constants;
+
+describe("GnosisSafe", () => {
   let gnosisSafe;
   let anaWallet;
   let ephemeralWallet;
@@ -50,8 +24,6 @@ describe.skip("GnosisSafe", () => {
   let nft;
 
   before("", async () => {
-    ConfigLoader.setConfig(config);
-
     provider = ProviderFactory.getProvider();
 
     const anaPrivateKey =

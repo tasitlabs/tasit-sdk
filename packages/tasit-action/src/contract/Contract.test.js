@@ -10,8 +10,6 @@ const sampleContractAddress = "0x6C4A015797DDDd87866451914eCe1e8b19261931";
 describe("TasitAction.Contract", () => {
   let sampleContract;
   let wallet;
-  let testcaseSnaphotId;
-  let provider;
   let action;
 
   beforeEach("should connect to an existing contract", async () => {
@@ -21,8 +19,6 @@ describe("TasitAction.Contract", () => {
 
     sampleContract = undefined;
     wallet = undefined;
-    testcaseSnaphotId = undefined;
-    provider = undefined;
     action = undefined;
 
     // Account creates a wallet, should it create an account object that encapsulates the wallet?
@@ -39,14 +35,9 @@ describe("TasitAction.Contract", () => {
     expect(sampleContract.setValue).to.exist;
     expect(sampleContract._getProvider()).to.exist;
     expect(sampleContract.getABI()).to.deep.equal(contractABI);
-
-    provider = sampleContract._getProvider();
-    testcaseSnaphotId = await createSnapshot(provider);
   });
 
   afterEach("revert blockchain snapshot", async () => {
-    await mineBlocks(provider, 1);
-
     if (sampleContract) {
       sampleContract.unsubscribe();
 
@@ -65,8 +56,6 @@ describe("TasitAction.Contract", () => {
         "ethers.js should not be listening to any events."
       ).to.be.empty;
     }
-
-    await revertFromSnapshot(provider, testcaseSnaphotId);
   });
 
   describe("should throw error when instantiated with invalid args", () => {

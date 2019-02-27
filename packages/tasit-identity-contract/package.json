@@ -18,7 +18,7 @@
   },
   "scripts": {
     "prepare": "npx babel src --out-dir dist --ignore **/*.test.js",
-    "test": "npm run lint && npx mocha src/*.test.js --require @babel/register",
+    "test": "npm run lint && npx mocha src/*.test.js --require @babel/register --require src/testHelpers/mochaSetup.js",
     "lint": "npx prettier src/* --write"
   },
   "bugs": {

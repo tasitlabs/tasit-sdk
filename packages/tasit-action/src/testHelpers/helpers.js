@@ -133,7 +133,7 @@ const gasParams = {
   gasPrice: 1e9,
 };
 
-export {
+export const helpers = {
   waitForEthersEvent,
   mineBlocks,
   createSnapshot,
@@ -150,3 +150,5 @@ export {
   gasParams,
   ProviderFactory,
 };
+
+export default helpers;
