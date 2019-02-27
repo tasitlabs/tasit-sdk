@@ -12,10 +12,8 @@ let sampleContract;
 
 describe("ethers.js", () => {
   beforeEach("instantiate provider, wallet and contract objects", async () => {
-    const privateKey =
-      "0x11d943d7649fbdeb146dc57bd9cfc80b086bfab2330c7b25651dbaf382392f60";
-
-    wallet = new ethers.Wallet(privateKey, provider);
+    [wallet] = accounts;
+    wallet = wallet.connect(provider);
     expect(wallet.address).to.have.lengthOf(42);
     expect(wallet.provider).to.be.not.undefined;
 

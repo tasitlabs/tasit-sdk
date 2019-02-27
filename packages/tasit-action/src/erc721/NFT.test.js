@@ -19,17 +19,7 @@ describe("TasitAction.ERC721.NFT", () => {
   let action;
 
   before("", async () => {
-    owner = createFromPrivateKey(
-      "0x11d943d7649fbdeb146dc57bd9cfc80b086bfab2330c7b25651dbaf382392f60"
-    );
-
-    ana = createFromPrivateKey(
-      "0xc181b6b02c9757f13f5aa15d1342a58970a8a489722dc0608a1d09fea717c181"
-    );
-
-    bob = createFromPrivateKey(
-      "0x4f09311114f0ff4dfad0edaa932a3e01a4ee9f34da2cbd087aa0e6ffcb9eb322"
-    );
+    [owner, ana, bob] = accounts;
   });
 
   beforeEach("", async () => {

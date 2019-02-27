@@ -1,4 +1,4 @@
-import { Action } from "./TasitSdk";
+import { Account, Action } from "./TasitSdk";
 const { Contract, ERC721 } = Action;
 
 const { ONE, TEN } = constants;
@@ -15,12 +15,8 @@ describe("Decentraland", () => {
   let estateIds;
 
   before("", async () => {
-    ({
-      ownerWallet,
-      sellerWallet,
-      buyerWallet,
-      ephemeralWallet,
-    } = setupWallets());
+    [ownerWallet, sellerWallet, buyerWallet] = accounts;
+    ephemeralWallet = Account.create();
 
     expect(ownerWallet.address).to.have.lengthOf(42);
     expect(sellerWallet.address).to.have.lengthOf(42);

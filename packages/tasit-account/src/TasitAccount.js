@@ -3,6 +3,10 @@ import "ethers/dist/shims.js";
 // shims aren't injected with package import
 import { ethers } from "ethers";
 
+// Account creates an ethres.js Wallet, should it create an Account object that encapsulates the wallet?
+// TasitAcount.create()
+// > Acount { wallet: ..., metaTxInfos..., etc }
+// Related to: https://github.com/tasitlabs/TasitSDK/issues/220
 const create = () => {
   try {
     const wallet = ethers.Wallet.createRandom();

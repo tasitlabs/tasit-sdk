@@ -1,10 +1,9 @@
 import { ethers } from "ethers";
-import { Account, Action } from "../TasitSdk";
+import { Action } from "../TasitSdk";
 const { Contract, ERC20, ERC721, Marketplace } = Action;
 const { Mana } = ERC20;
 const { Estate, Land } = ERC721;
 const { Decentraland } = Marketplace;
-import { createFromPrivateKey } from "tasit-account/dist/testHelpers/helpers";
 
 import DecentralandUtils from "./DecentralandUtils";
 
@@ -24,22 +23,6 @@ import {
   local as localAddresses,
   ropsten as ropstenAddresses,
 } from "../../../tasit-contracts/3rd-parties/decentraland/addresses";
-
-const ownerPrivKey =
-  "0x11d943d7649fbdeb146dc57bd9cfc80b086bfab2330c7b25651dbaf382392f60";
-const sellerPrivKey =
-  "0xc181b6b02c9757f13f5aa15d1342a58970a8a489722dc0608a1d09fea717c181";
-const buyerPrivKey =
-  "0x4f09311114f0ff4dfad0edaa932a3e01a4ee9f34da2cbd087aa0e6ffcb9eb322";
-
-const setupWallets = () => {
-  const ownerWallet = createFromPrivateKey(ownerPrivKey);
-  const sellerWallet = createFromPrivateKey(sellerPrivKey);
-  const buyerWallet = createFromPrivateKey(buyerPrivKey);
-  const ephemeralWallet = Account.create();
-
-  return { ownerWallet, sellerWallet, buyerWallet, ephemeralWallet };
-};
 
 const setupContracts = async ownerWallet => {
   const {
@@ -251,7 +234,6 @@ export const helpers = {
   revertFromSnapshot,
   confirmBalances,
   gasParams,
-  setupWallets,
   setupContracts,
   duration,
   createParcels,

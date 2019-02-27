@@ -5,6 +5,8 @@ const { NFT } = ERC721;
 import GnosisSafe from "./GnosisSafe";
 import { local as localAddresses } from "../../tasit-contracts/3rd-parties/gnosis/addresses";
 
+import Account from "../../tasit-account/dist/index";
+
 const { GnosisSafe: GNOSIS_SAFE_ADDRESS } = localAddresses;
 const ERC20_ADDRESS = "0x37E1A58dD465D33263D00185D065Ee36DD34CDb4";
 const NFT_ADDRESS = "0x0E86f209729bf54763789CDBcA9E8b94f0FD5333";
@@ -22,15 +24,13 @@ describe("GnosisSafe", () => {
   let nft;
 
   before("", async () => {
-    const anaPrivateKey =
-      "0x11d943d7649fbdeb146dc57bd9cfc80b086bfab2330c7b25651dbaf382392f60";
-
-    anaWallet = createFromPrivateKey(anaPrivateKey);
+    [anaWallet] = accounts;
 
     // Not using Account.create() because tasit-account isn't a dependency of that package
-    const noFundsPrivateKey =
-      "0x01234567890ABCDEF01234567890ABCDEF01234567890ABCDEF01234567890AB";
-    ephemeralWallet = createFromPrivateKey(noFundsPrivateKey);
+    //const noFundsPrivateKey =
+    //"0x01234567890ABCDEF01234567890ABCDEF01234567890ABCDEF01234567890AB";
+    //ephemeralWallet = createFromPrivateKey(noFundsPrivateKey);
+    ephemeralWallet = Account.create();
 
     // Contract deployment setup with ana (accounts[0]) as the only owner
     // To change that, edit the file "tasit-contract/3rd-parties/gnosis/scripts/2_deploy_contracts.js"

@@ -21,12 +21,7 @@ describe("TasitAction.Contract", () => {
     wallet = undefined;
     action = undefined;
 
-    // Account creates a wallet, should it create an account object that encapsulates the wallet?
-    // TasitAcount.create()
-    // > Acount { wallet: ..., metaTxInfos..., etc }
-    wallet = createFromPrivateKey(
-      "0x11d943d7649fbdeb146dc57bd9cfc80b086bfab2330c7b25651dbaf382392f60"
-    );
+    [wallet] = accounts;
 
     sampleContract = new Contract(sampleContractAddress, contractABI);
     expect(sampleContract).to.exist;

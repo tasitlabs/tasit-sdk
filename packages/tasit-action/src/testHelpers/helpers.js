@@ -2,6 +2,13 @@ import { expect } from "chai";
 import { ethers } from "ethers";
 import ProviderFactory from "../ProviderFactory";
 
+// Note:  Using dist file because babel doesn't compile node_modules files.
+// Any changes on src should be followed by compilation to avoid unexpected behaviors.
+// Note that lerna bootstrap does this for you since it
+// runs prepare in all bootstrapped packages.
+// Refs: https://github.com/lerna/lerna/tree/master/commands/bootstrap
+import { createFromPrivateKey } from "tasit-account/dist/testHelpers/helpers";
+
 const waitForEthersEvent = async (eventEmitter, eventName, callback) => {
   return new Promise(function(resolve, reject) {
     eventEmitter.on(eventName, (...args) => {
@@ -50,16 +57,6 @@ const confirmBalances = async (token, addresses, balances) => {
     const expectedBalance = balances[index++];
     expect(balance.toString()).to.equal(expectedBalance.toString());
   }
-};
-
-// Note: ethers created their own BigNumber type that encapsulates BN.js
-// Because of that, exists the need of extra parses between user and our API (see tests)
-// Should we:
-// - Try to intercept and parse ethers.BigNumber to BN.js (and vice-versa)?
-// or
-// - Exposes ethers.utils.BigNumber / bigNumberify()?
-const toBN = ethersBN => {
-  return new BN(ethersBN.toString());
 };
 
 const etherFaucet = async (
@@ -134,13 +131,45 @@ const gasParams = {
   gasPrice: 1e9,
 };
 
+const accounts = [
+  createFromPrivateKey(
+    "0x11d943d7649fbdeb146dc57bd9cfc80b086bfab2330c7b25651dbaf382392f60"
+  ),
+  createFromPrivateKey(
+    "0xc181b6b02c9757f13f5aa15d1342a58970a8a489722dc0608a1d09fea717c181"
+  ),
+  createFromPrivateKey(
+    "0x4f09311114f0ff4dfad0edaa932a3e01a4ee9f34da2cbd087aa0e6ffcb9eb322"
+  ),
+  createFromPrivateKey(
+    "0xb52de6b5c3b38277edc6a30db517c719af6c7f0d3743a254cb2e0b54408ecbd8"
+  ),
+  createFromPrivateKey(
+    "0x65a6dacaed00c004c4739a121c2c4908d5da41e4015f9f7cf75f8686a019d419"
+  ),
+  createFromPrivateKey(
+    "0x17f6836e922fde89ca95883631f02ff89787ec0ac593106527f9bd2635080fb6"
+  ),
+  createFromPrivateKey(
+    "0xe28dec48b18fb80369ea651cf703a053b2a5cce868e3450b4e532ca0fb8149b4"
+  ),
+  createFromPrivateKey(
+    "0xd79a1249c9ec1b468a71971fe551358ca4d1f9167f085b87f33c1783839c4d9d"
+  ),
+  createFromPrivateKey(
+    "0x8fb382c5caa48ed928e6f6324e3b8112e43e2aaa9a761b12501321630a512b49"
+  ),
+  createFromPrivateKey(
+    "0xee0c6b1a7adea9f87b1a422eb06b245fc714b8eca4c8c0578d6cf946beba86f1"
+  ),
+];
+
 export const helpers = {
   waitForEthersEvent,
   mineBlocks,
   createSnapshot,
   revertFromSnapshot,
   wait,
-  toBN,
   confirmBalances,
   etherFaucet,
   erc20Faucet,
@@ -150,6 +179,7 @@ export const helpers = {
   bigNumberify,
   gasParams,
   ProviderFactory,
+  accounts,
 };
 
 export default helpers;

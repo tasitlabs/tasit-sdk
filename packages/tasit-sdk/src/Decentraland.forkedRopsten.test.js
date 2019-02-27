@@ -78,7 +78,9 @@ describe("Decentraland tasit app test cases (ropsten)", () => {
   beforeEach(
     "buyer approves marketplace contract to transfer tokens on their behalf",
     async () => {
-      ({ ownerWallet, ephemeralWallet } = setupWallets());
+      [ownerWallet] = accounts;
+      ephemeralWallet = Account.create();
+
       expect(ownerWallet.address).to.have.lengthOf(42);
       expect(ephemeralWallet.address).to.have.lengthOf(42);
 
