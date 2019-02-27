@@ -1,15 +1,10 @@
 // Chai
-import chai, { expect } from "chai";
+import { expect } from "chai";
 global.expect = expect;
-chai.use(require("chai-as-promised"));
-
-// Sinon
-import sinon from "sinon";
-global.sinon = sinon;
 
 // Helpers
-import actionHelpers from "./helpers";
-global = Object.assign(global, actionHelpers);
+import helpers from "./helpers";
+global = Object.assign(global, helpers);
 
 // External helpers
 //
@@ -21,7 +16,8 @@ global = Object.assign(global, actionHelpers);
 import { createFromPrivateKey } from "tasit-account/dist/testHelpers/helpers";
 global.createFromPrivateKey = createFromPrivateKey;
 
-import ConfigLoader from "../ConfigLoader";
+import { Action } from "../TasitSdk";
+const { ConfigLoader } = Action;
 import config from "../config/default.js";
 ConfigLoader.setConfig(config);
 

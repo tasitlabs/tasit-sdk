@@ -1,24 +1,5 @@
-import { Account, Action } from "./TasitSdk";
-const { Contract, ERC721, ConfigLoader } = Action;
-import { expect, assert } from "chai";
-import config from "./config/default";
-
-import {
-  mineBlocks,
-  createSnapshot,
-  revertFromSnapshot,
-  confirmBalances,
-  gasParams,
-  setupContracts,
-  setupWallets,
-  duration,
-  createEstatesFromParcels,
-  getEstateSellOrder,
-  etherFaucet,
-  erc20Faucet,
-  constants,
-  ProviderFactory,
-} from "./testHelpers/helpers";
+import { Action } from "./TasitSdk";
+const { Contract, ERC721 } = Action;
 
 const { ONE, TEN } = constants;
 
@@ -31,15 +12,9 @@ describe("Decentraland", () => {
   let landContract;
   let estateContract;
   let marketplaceContract;
-  let snapshotId;
-  let provider;
   let estateIds;
 
   before("", async () => {
-    ConfigLoader.setConfig(config);
-
-    provider = ProviderFactory.getProvider();
-
     ({
       ownerWallet,
       sellerWallet,
@@ -54,8 +29,6 @@ describe("Decentraland", () => {
   });
 
   beforeEach("", async () => {
-    snapshotId = await createSnapshot(provider);
-
     // Note: In future we can have other ERC20 than Mana to test the Marketplace orders
     ({
       manaContract,
@@ -97,10 +70,6 @@ describe("Decentraland", () => {
     );
 
     await mineBlocks(provider, 1);
-  });
-
-  afterEach("", async () => {
-    await revertFromSnapshot(provider, snapshotId);
   });
 
   describe("Marketplace", () => {

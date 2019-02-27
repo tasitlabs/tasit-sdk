@@ -1,5 +1,3 @@
-import { expect, assert } from "chai";
-
 import { Account, Action } from "./TasitSdk";
 const { ERC20, ERC721, Marketplace, ConfigLoader } = Action;
 const { Mana } = ERC20;
@@ -7,28 +5,13 @@ const { Estate, Land } = ERC721;
 const { Decentraland: DecentralandMarketplace } = Marketplace;
 import config from "./config/default";
 
-import { ropsten as ropstenAddresses } from "../../tasit-contracts/decentraland/addresses";
+import { ropsten as ropstenAddresses } from "../../tasit-contracts/3rd-parties/decentraland/addresses";
 const {
   MarketplaceProxy: MARKETPLACE_ADDRESS,
   LANDProxy: LAND_ADDRESS,
   MANAToken: MANA_ADDRESS,
   EstateProxy: ESTATE_ADDRESS,
 } = ropstenAddresses;
-
-import {
-  createSnapshot,
-  revertFromSnapshot,
-  confirmBalances,
-  gasParams,
-  setupWallets,
-  addressesAreEqual,
-  bigNumberify,
-  etherFaucet,
-  ropstenManaFaucet,
-  constants,
-  ProviderFactory,
-  DecentralandUtils,
-} from "./testHelpers/helpers";
 
 const { ONE, TEN } = constants;
 

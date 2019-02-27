@@ -8,19 +8,15 @@ import { createFromPrivateKey } from "tasit-account/dist/testHelpers/helpers";
 
 import DecentralandUtils from "./DecentralandUtils";
 
-import {
-  mineBlocks,
-  createSnapshot,
-  revertFromSnapshot,
-  confirmBalances,
-  etherFaucet,
-  erc20Faucet,
-  addressesAreEqual,
-  constants,
-  bigNumberify,
-  gasParams,
-  ProviderFactory,
-} from "tasit-action/dist/testHelpers/helpers";
+// Helpers
+import actionHelpers from "tasit-action/dist/testHelpers/helpers";
+global = Object.assign(global, actionHelpers);
+
+const {
+  utils: ethersUtils,
+  constants: ethersConstants,
+  Contract: ethersContract,
+} = ethers;
 
 import { abi as landProxyABI } from "../../../tasit-contracts/abi/LANDProxy.json";
 
@@ -249,7 +245,7 @@ const ropstenManaFaucet = async (provider, walletWithGas, to, amountInWei) => {
   await provider.waitForTransaction(tx.hash);
 };
 
-export {
+export const helpers = {
   mineBlocks,
   createSnapshot,
   revertFromSnapshot,
@@ -270,3 +266,5 @@ export {
   ProviderFactory,
   DecentralandUtils,
 };
+
+export default helpers;

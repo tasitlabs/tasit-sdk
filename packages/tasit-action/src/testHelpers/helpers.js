@@ -30,11 +30,12 @@ const mineBlocks = async (provider, n) => {
 };
 
 const createSnapshot = async provider => {
-  return await provider.send("evm_snapshot", []);
+  const id = await provider.send("evm_snapshot", []);
+  return Number(id);
 };
 
 const revertFromSnapshot = async (provider, snapshotId) => {
-  await provider.send("evm_revert", [snapshotId]);
+  return await provider.send("evm_revert", [snapshotId]);
 };
 
 const wait = async ms => {

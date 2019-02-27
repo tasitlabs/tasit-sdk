@@ -10,18 +10,24 @@ import actionHelpers from "../../../tasit-action/dist/testHelpers/helpers";
 global = Object.assign(global, actionHelpers);
 
 // Global hooks
-let snaphotId;
+let snapshotId;
 
 beforeEach("global beforeEach() hook", async () => {
   const provider = new ethers.providers.JsonRpcProvider();
   provider.pollingInterval = 50;
   global.provider = provider;
-  snaphotId = await createSnapshot(provider);
-  expect(`${snaphotId}`).to.equal(`0x1`);
+  snapshotId = await createSnapshot(provider);
+
+  while (snapshotId > 1) {
+    await revertFromSnapshot(provider, snapshotId--);
+  }
+
+  expect(snapshotId).to.equal(1);
 });
 
 afterEach("global afterEach() hook", async () => {
-  await revertFromSnapshot(provider, snaphotId);
+  expect(snapshotId).to.equal(1);
+  await revertFromSnapshot(provider, snapshotId);
 
   // Note: Without this the test suite is breaking.
   // It is still unclear why

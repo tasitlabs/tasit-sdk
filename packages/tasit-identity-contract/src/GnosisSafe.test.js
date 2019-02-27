@@ -18,7 +18,6 @@ describe("GnosisSafe", () => {
   let gnosisSafe;
   let anaWallet;
   let ephemeralWallet;
-  let snapshotId;
   let erc20;
   let nft;
 

@@ -15,8 +15,7 @@ describe("TasitAction.ERC721.NFT", () => {
   let ana;
   let bob;
   let fullNFT;
-  let provider;
-  let snapshotId;
+
   let action;
 
   before("", async () => {
@@ -44,8 +43,6 @@ describe("TasitAction.ERC721.NFT", () => {
     expect(fullNFT.symbol).to.exist;
     expect(fullNFT._getProvider()).to.exist;
 
-    provider = fullNFT._getProvider();
-
     // This line ensures that a new event listener does not catch an existing event from last the block
     // Two blocks to minimize the risk that polling doesn't occur.
     await mineBlocks(provider, 2);
@@ -55,8 +52,6 @@ describe("TasitAction.ERC721.NFT", () => {
       [owner.address, ana.address, bob.address],
       [0, 0, 0]
     );
-
-    snapshotId = await createSnapshot(provider);
   });
 
   afterEach("", async () => {
@@ -100,8 +95,6 @@ describe("TasitAction.ERC721.NFT", () => {
         "ethers.js should not be listening to any events."
       ).to.be.empty;
     }
-
-    await revertFromSnapshot(provider, snapshotId);
   });
 
   describe("should throw error when instantiated with invalid args", () => {
