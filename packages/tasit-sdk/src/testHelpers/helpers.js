@@ -6,13 +6,6 @@ const { Estate, Land } = ERC721;
 const { Decentraland } = Marketplace;
 import { createFromPrivateKey } from "tasit-account/dist/testHelpers/helpers";
 
-// The goal of the integration test suite is to use only exposed classes
-// from TasitSdk. ProviderFactory is used here as an exception
-// as the clearest way to get a provider
-// in this test suite. Eventually, maybe ProviderFactory will move to
-// some shared helper dir.
-import ProviderFactory from "tasit-action/dist/ProviderFactory";
-
 import DecentralandUtils from "./DecentralandUtils";
 
 import {
@@ -20,6 +13,13 @@ import {
   createSnapshot,
   revertFromSnapshot,
   confirmBalances,
+  etherFaucet,
+  erc20Faucet,
+  addressesAreEqual,
+  constants,
+  bigNumberify,
+  gasParams,
+  ProviderFactory,
 } from "tasit-action/dist/testHelpers/helpers";
 
 import { abi as landProxyABI } from "../../../tasit-contracts/abi/LANDProxy.json";
@@ -29,28 +29,12 @@ import {
   ropsten as ropstenAddresses,
 } from "../../../tasit-contracts/3rd-parties/decentraland/addresses";
 
-const {
-  utils: ethersUtils,
-  constants: ethersConstants,
-  Contract: ethersContract,
-} = ethers;
-const { WeiPerEther } = ethersConstants;
-const { bigNumberify } = ethersUtils;
-
 const ownerPrivKey =
   "0x11d943d7649fbdeb146dc57bd9cfc80b086bfab2330c7b25651dbaf382392f60";
 const sellerPrivKey =
   "0xc181b6b02c9757f13f5aa15d1342a58970a8a489722dc0608a1d09fea717c181";
 const buyerPrivKey =
   "0x4f09311114f0ff4dfad0edaa932a3e01a4ee9f34da2cbd087aa0e6ffcb9eb322";
-
-// TODO: Go deep on gas handling.
-// Without that, VM returns a revert error instead of out of gas error.
-// See: https://github.com/tasitlabs/TasitSDK/issues/173
-const gasParams = {
-  gasLimit: 7e6,
-  gasPrice: 1e9,
-};
 
 const setupWallets = () => {
   const ownerWallet = createFromPrivateKey(ownerPrivKey);
@@ -255,40 +239,6 @@ const duration = {
   },
 };
 
-const etherFaucet = async (
-  provider,
-  fromWallet,
-  beneficiaryAddress,
-  amountInWei
-) => {
-  const connectedFromWallet = fromWallet.connect(provider);
-  const tx = await connectedFromWallet.sendTransaction({
-    // ethers.utils.parseEther("1.0")
-    value: "0x0de0b6b3a7640000",
-    to: beneficiaryAddress,
-  });
-  await provider.waitForTransaction(tx.hash);
-};
-
-const ownedManaFaucet = async (
-  manaContract,
-  ownerWallet,
-  beneficiary,
-  amountInWei
-) => {
-  manaContract.setWallet(ownerWallet);
-  const mintManaToBuyer = manaContract.mint(
-    beneficiary.address,
-    amountInWei.toString()
-  );
-  await mintManaToBuyer.waitForNonceToUpdate();
-  await confirmBalances(manaContract, [beneficiary.address], [amountInWei]);
-};
-
-const addressesAreEqual = (address1, address2) => {
-  return address1.toUpperCase() === address2.toUpperCase();
-};
-
 // The Mana contract deployed on ropsten network has a setBalance function
 const ropstenManaFaucet = async (provider, walletWithGas, to, amountInWei) => {
   const { MANAToken: MANA_ADDRESS } = ropstenAddresses;
@@ -297,22 +247,6 @@ const ropstenManaFaucet = async (provider, walletWithGas, to, amountInWei) => {
   const mana = new ethersContract(MANA_ADDRESS, manaABI, connectedWallet);
   const tx = await mana.setBalance(to.address, amountInWei);
   await provider.waitForTransaction(tx.hash);
-};
-
-// In weis
-// Note: ethers.js uses BigNumber internally
-// That accepts decimal strings (Ref: https://docs.ethers.io/ethers.js/html/api-utils.html#creating-instances)
-// Scientific notation works if the number is small enough (< 1e21) to be converted to string properly
-// See more: https://github.com/ethers-io/ethers.js/issues/228
-const ONE = bigNumberify(1).mul(WeiPerEther);
-const TEN = bigNumberify(10).mul(WeiPerEther);
-const BILLION = bigNumberify(`${1e9}`).mul(WeiPerEther);
-
-const constants = {
-  ONE,
-  TEN,
-  BILLION,
-  WeiPerEther,
 };
 
 export {
@@ -328,7 +262,7 @@ export {
   createEstatesFromParcels,
   getEstateSellOrder,
   etherFaucet,
-  ownedManaFaucet,
+  erc20Faucet,
   ropstenManaFaucet,
   addressesAreEqual,
   bigNumberify,

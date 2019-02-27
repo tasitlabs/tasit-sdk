@@ -12,24 +12,16 @@ import {
   createSnapshot,
   revertFromSnapshot,
   confirmBalances,
+  etherFaucet,
+  erc20Faucet,
+  erc721Faucet,
+  bigNumberify,
+  ProviderFactory,
 } from "tasit-action/dist/testHelpers/helpers";
-
-// The goal of this integration test suite is to use only exposed classes
-// from TasitSdk. ProviderFactory is used here as an exception
-// as the clearest way to get a provider
-// in this test suite. Eventually, maybe ProviderFactory may move to
-// some shared helper dir.
-import ProviderFactory from "tasit-action/dist/ProviderFactory";
 
 const { GnosisSafe: GNOSIS_SAFE_ADDRESS } = localAddresses;
 const ERC20_ADDRESS = "0x37E1A58dD465D33263D00185D065Ee36DD34CDb4";
 const NFT_ADDRESS = "0x0E86f209729bf54763789CDBcA9E8b94f0FD5333";
-
-const { utils: ethersUtils } = ethers;
-const { bigNumberify } = ethersUtils;
-
-const ZERO = 0;
-const ONE = bigNumberify(`${1e18}`);
 
 // 100 gwei
 const GAS_PRICE = bigNumberify(`${1e11}`);
@@ -67,7 +59,7 @@ describe.skip("GnosisSafe", () => {
 
     anaWallet = createFromPrivateKey(anaPrivateKey);
 
-    // Not using Account.create() because tasit-action isn't a dependency of that package
+    // Not using Account.create() because tasit-account isn't a dependency of that package
     const noFundsPrivateKey =
       "0x01234567890ABCDEF01234567890ABCDEF01234567890ABCDEF01234567890AB";
     ephemeralWallet = createFromPrivateKey(noFundsPrivateKey);
@@ -104,13 +96,7 @@ describe.skip("GnosisSafe", () => {
 
   describe("test cases that needs ETH deposit to the wallet", async () => {
     beforeEach("faucet", async () => {
-      anaWallet = anaWallet.connect(provider);
-      const tx = await anaWallet.sendTransaction({
-        to: GNOSIS_SAFE_ADDRESS,
-        value: ONE,
-      });
-      await provider.waitForTransaction(tx.hash);
-
+      await etherFaucet(provider, anaWallet, GNOSIS_SAFE_ADDRESS, ONE);
       const balance = await provider.getBalance(GNOSIS_SAFE_ADDRESS);
       expect(`${balance}`).to.equal(`${ONE}`);
     });
@@ -135,12 +121,7 @@ describe.skip("GnosisSafe", () => {
 
   describe("test cases that needs ERC20 deposit to the wallet", async () => {
     beforeEach("faucet", async () => {
-      const { address: anaAddress } = anaWallet;
-
-      erc20.setWallet(anaWallet);
-      const mintAction = erc20.mint(GNOSIS_SAFE_ADDRESS, ONE);
-      await mintAction.waitForNonceToUpdate();
-
+      await erc20Faucet(erc20, anaWallet, GNOSIS_SAFE_ADDRESS, ONE);
       const balance = await erc20.balanceOf(GNOSIS_SAFE_ADDRESS);
       expect(`${balance}`).to.equal(`${ONE}`);
     });
@@ -169,11 +150,7 @@ describe.skip("GnosisSafe", () => {
     const tokenId = 1;
 
     beforeEach("faucet", async () => {
-      const { address: anaAddress } = anaWallet;
-
-      nft.setWallet(anaWallet);
-      const mintAction = nft.mint(GNOSIS_SAFE_ADDRESS, tokenId);
-      await mintAction.waitForNonceToUpdate();
+      await erc721Faucet(nft, anaWallet, GNOSIS_SAFE_ADDRESS, tokenId);
 
       const balance = await nft.balanceOf(GNOSIS_SAFE_ADDRESS);
       expect(`${balance}`).to.equal(`1`);

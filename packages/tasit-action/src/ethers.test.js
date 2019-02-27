@@ -1,8 +1,6 @@
 import { ethers } from "ethers";
 ethers.errors.setLogLevel("error");
 
-// Note: This file is originally genarated by `tasit-contracts` and was pasted here manually
-// See https://github.com/tasitlabs/TasitSDK/issues/45
 import { abi as contractABI } from "../../tasit-contracts/build/contracts/SampleContract.json";
 
 // Note: Under the current `tasit-contracts` setup SampleContract aways will deployed with this address

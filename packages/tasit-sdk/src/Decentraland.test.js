@@ -15,7 +15,7 @@ import {
   createEstatesFromParcels,
   getEstateSellOrder,
   etherFaucet,
-  ownedManaFaucet,
+  erc20Faucet,
   constants,
   ProviderFactory,
 } from "./testHelpers/helpers";
@@ -108,7 +108,8 @@ describe("Decentraland", () => {
     beforeEach(
       "buyer and seller approve marketplace contract to transfer tokens on their behalf",
       async () => {
-        ownedManaFaucet(manaContract, ownerWallet, buyerWallet, TEN);
+        const { address: buyerAddress } = buyerWallet;
+        erc20Faucet(manaContract, ownerWallet, buyerAddress, TEN);
 
         manaContract.setWallet(buyerWallet);
         const marketplaceApprovalByBuyer = manaContract.approve(
@@ -128,9 +129,12 @@ describe("Decentraland", () => {
     );
 
     it("should execute an order", async () => {
+      const { address: buyerAddress } = buyerWallet;
+      const { address: sellerAddress } = sellerWallet;
+
       await confirmBalances(
         estateContract,
-        [buyerWallet.address, sellerWallet.address],
+        [buyerAddress, sellerAddress],
         [0, estateIds.length]
       );
 
@@ -161,7 +165,7 @@ describe("Decentraland", () => {
 
       await confirmBalances(
         estateContract,
-        [buyerWallet.address, sellerWallet.address],
+        [buyerAddress, sellerAddress],
         [1, estateIds.length - 1]
       );
     });
@@ -227,7 +231,8 @@ describe("Decentraland", () => {
       });
 
       it("should buy an estate", async () => {
-        await ownedManaFaucet(manaContract, ownerWallet, ephemeralWallet, TEN);
+        const { address: ephemeralAddress } = ephemeralWallet;
+        await erc20Faucet(manaContract, ownerWallet, ephemeralAddress, TEN);
         await etherFaucet(provider, ownerWallet, ephemeralWallet.address, ONE);
 
         manaContract.setWallet(ephemeralWallet);
@@ -251,7 +256,7 @@ describe("Decentraland", () => {
         );
         await executeOrder.waitForNonceToUpdate();
 
-        await confirmBalances(estateContract, [ephemeralWallet.address], [1]);
+        await confirmBalances(estateContract, [ephemeralAddress], [1]);
       });
     });
   });
