@@ -1,0 +1,13 @@
+{
+  "groups": {
+    "default": {
+      "packages": [
+        "package.json",
+        "packages/tasit-account/package.json",
+        "packages/tasit-action/package.json",
+        "packages/tasit-contracts/package.json",
+        "packages/tasit-sdk/package.json"
+      ]
+    }
+  }
+}

@@ -40,6 +40,6 @@
     "@babel/plugin-proposal-class-properties": "^7.2.3",
     "ethers": "^4.0.21",
     "chai": "^4.2.0",
-    "mocha": "^5.2.0"
+    "mocha": "^6.0.1"
   }
 }
