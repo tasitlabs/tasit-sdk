@@ -1,5 +1,4 @@
-import { Account, Action } from "./TasitSdk";
-const { Contract, ERC721 } = Action;
+import { Account } from "./TasitSdk";
 
 const { ONE, TEN } = constants;
 
