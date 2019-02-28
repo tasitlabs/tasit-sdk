@@ -4,6 +4,7 @@ import { ethers } from "ethers";
 
 const { utils: ethersUtils } = ethers;
 const { bigNumberify } = ethersUtils;
+const { Interface } = ethersUtils;
 
 // 100 gwei
 const GAS_PRICE = bigNumberify(`${1e11}`);
@@ -36,7 +37,7 @@ export default class GnosisSafeUtils {
 
     // Encode call to the contract's estimate gas function
     const callToEstimate = this.encodeFunctionCall(
-      this.#contract,
+      this.#contract.getABI(),
       "requiredTxGas",
       [to, value, data, operation]
     );
@@ -84,7 +85,7 @@ export default class GnosisSafeUtils {
     const signatures = "0x";
 
     const callToEstimate = this.encodeFunctionCall(
-      this.#contract,
+      this.#contract.getABI(),
       "execTransaction",
       [
         to,
@@ -137,13 +138,8 @@ export default class GnosisSafeUtils {
     }
   };
 
-  encodeFunctionCall = (contract, functionName, args) => {
-    const { getAddress, getABI, _getProvider } = contract;
-    const ethersContract = new ethers.Contract(
-      getAddress(),
-      getABI(),
-      _getProvider()
-    );
-    return ethersContract.interface.functions[functionName].encode(args);
+  encodeFunctionCall = (abi, functionName, args) => {
+    const contractInterface = new Interface(abi);
+    return contractInterface.functions[functionName].encode(args);
   };
 }

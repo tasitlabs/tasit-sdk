@@ -5,6 +5,8 @@ const { ERC721Full } = ERC721;
 import GnosisSafeUtils from "./GnosisSafeUtils";
 
 import gnosisSafeABI from "../../tasit-contracts/abi/GnosisSafe.json";
+import erc20ABI from "../../tasit-contracts/abi/ERC20Detailed.json";
+import erc721ABI from "../../tasit-contracts/abi/ERC721Full.json";
 
 // TODO: Go deep on gas handling.
 // Without that, VM returns a revert error instead of out of gas error.
@@ -34,8 +36,7 @@ export default class GnosisSafe extends Contract {
   }
 
   transferERC20 = async (signers, tokenAddress, toAddress, value) => {
-    const erc20 = new ERC20Detailed(tokenAddress);
-    const data = this.#utils.encodeFunctionCall(erc20, "transfer", [
+    const data = this.#utils.encodeFunctionCall(erc20ABI, "transfer", [
       toAddress,
       value,
     ]);
@@ -50,9 +51,8 @@ export default class GnosisSafe extends Contract {
   };
 
   transferNFT = async (signers, tokenAddress, toAddress, tokenId) => {
-    const nft = new ERC721Full(tokenAddress);
     const fromAddress = this.getAddress();
-    const data = this.#utils.encodeFunctionCall(nft, "safeTransferFrom", [
+    const data = this.#utils.encodeFunctionCall(erc721ABI, "safeTransferFrom", [
       fromAddress,
       toAddress,
       tokenId,
@@ -80,10 +80,11 @@ export default class GnosisSafe extends Contract {
   };
 
   addSignerWithThreshold = async (signers, newSignerAddress, newThreshold) => {
-    const data = this.#utils.encodeFunctionCall(this, "addOwnerWithThreshold", [
-      newSignerAddress,
-      newThreshold,
-    ]);
+    const data = this.#utils.encodeFunctionCall(
+      this.getABI(),
+      "addOwnerWithThreshold",
+      [newSignerAddress, newThreshold]
+    );
     const to = this.getAddress();
     const etherValue = "0";
     const action = await this.#executeTransaction(
