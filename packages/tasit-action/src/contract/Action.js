@@ -77,7 +77,10 @@ export class Action extends Subscription {
     const baseEthersListener = async blockNumber => {
       try {
         if (!this.#tx) this.#tx = await this.#txPromise;
-
+        
+        if (this.#tx.status == 0) {
+          throw new Error(`Transaction has failed and it's status is 0`);
+        }
         const receipt = await this.#provider.getTransactionReceipt(
           this.#tx.hash
         );
