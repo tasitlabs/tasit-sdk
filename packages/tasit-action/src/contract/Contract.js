@@ -64,6 +64,10 @@ export class Contract extends Subscription {
     return this.#ethersContract.address;
   };
 
+  getABI = () => {
+    return this.#ethersContract.interface.abi;
+  };
+
   // For testing purposes
   _getProvider = () => {
     return this.#provider;

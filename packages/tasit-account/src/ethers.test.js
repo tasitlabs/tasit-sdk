@@ -1,23 +1,18 @@
-import { expect, assert } from "chai";
 import { ethers } from "ethers";
 
-const zero = ethers.utils.bigNumberify(0);
+const { ZERO } = constants;
 
-let wallet, provider;
+let wallet;
 
 // Note: We're intentionally not testing the `fromEncryptedJson` or `encrypt` functions
 // from `ethers.js` because we don't plan to expose that functionality in the Tasit SDK.
 // For a detailed explanation of why, see this GitHub issue:
 // https://github.com/tasitlabs/TasitSDK/issues/24#issuecomment-443576993
 describe("ethers.js", () => {
-  beforeEach("instantiate wallet and provider objects", async function() {
-    provider = new ethers.providers.JsonRpcProvider();
-    provider.pollingInterval = 50;
+  beforeEach("instantiate wallet and provider objects", async () => {
+    [wallet] = accounts;
+    wallet = wallet.connect(provider);
 
-    const privateKey =
-      "0x11d943d7649fbdeb146dc57bd9cfc80b086bfab2330c7b25651dbaf382392f60";
-
-    wallet = new ethers.Wallet(privateKey, provider);
     expect(wallet.address).to.have.lengthOf(42);
     expect(wallet.provider).to.be.not.undefined;
   });
@@ -39,7 +34,7 @@ describe("ethers.js", () => {
     );
 
     expect(fundedWalletBalance).not.to.be.undefined;
-    assert(emptyWalletBalance.eq(zero));
+    expect(`${emptyWalletBalance}`).to.equal(`${ZERO}`);
   });
 
   it("should sign a message", async () => {

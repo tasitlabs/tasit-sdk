@@ -1,24 +1,4 @@
-import { Account, Action } from "./TasitSdk";
-const { Contract, ERC721, ConfigLoader } = Action;
-import { expect, assert } from "chai";
-import config from "./config/default";
-
-import {
-  mineBlocks,
-  createSnapshot,
-  revertFromSnapshot,
-  confirmBalances,
-  gasParams,
-  setupContracts,
-  setupWallets,
-  duration,
-  createEstatesFromParcels,
-  getEstateSellOrder,
-  etherFaucet,
-  ownedManaFaucet,
-  constants,
-  ProviderFactory,
-} from "./testHelpers/helpers";
+import { Account } from "./TasitSdk";
 
 const { ONE, TEN } = constants;
 
@@ -31,21 +11,11 @@ describe("Decentraland", () => {
   let landContract;
   let estateContract;
   let marketplaceContract;
-  let snapshotId;
-  let provider;
   let estateIds;
 
   before("", async () => {
-    ConfigLoader.setConfig(config);
-
-    provider = ProviderFactory.getProvider();
-
-    ({
-      ownerWallet,
-      sellerWallet,
-      buyerWallet,
-      ephemeralWallet,
-    } = setupWallets());
+    [ownerWallet, sellerWallet, buyerWallet] = accounts;
+    ephemeralWallet = Account.create();
 
     expect(ownerWallet.address).to.have.lengthOf(42);
     expect(sellerWallet.address).to.have.lengthOf(42);
@@ -54,8 +24,6 @@ describe("Decentraland", () => {
   });
 
   beforeEach("", async () => {
-    snapshotId = await createSnapshot(provider);
-
     // Note: In future we can have other ERC20 than Mana to test the Marketplace orders
     ({
       manaContract,
@@ -99,16 +67,13 @@ describe("Decentraland", () => {
     await mineBlocks(provider, 1);
   });
 
-  afterEach("", async () => {
-    await revertFromSnapshot(provider, snapshotId);
-  });
-
   describe("Marketplace", () => {
     // TODO: Assign different contract objects for each wallet (avoiding setWallet)
     beforeEach(
       "buyer and seller approve marketplace contract to transfer tokens on their behalf",
       async () => {
-        ownedManaFaucet(manaContract, ownerWallet, buyerWallet, TEN);
+        const { address: buyerAddress } = buyerWallet;
+        erc20Faucet(manaContract, ownerWallet, buyerAddress, TEN);
 
         manaContract.setWallet(buyerWallet);
         const marketplaceApprovalByBuyer = manaContract.approve(
@@ -128,9 +93,12 @@ describe("Decentraland", () => {
     );
 
     it("should execute an order", async () => {
+      const { address: buyerAddress } = buyerWallet;
+      const { address: sellerAddress } = sellerWallet;
+
       await confirmBalances(
         estateContract,
-        [buyerWallet.address, sellerWallet.address],
+        [buyerAddress, sellerAddress],
         [0, estateIds.length]
       );
 
@@ -161,7 +129,7 @@ describe("Decentraland", () => {
 
       await confirmBalances(
         estateContract,
-        [buyerWallet.address, sellerWallet.address],
+        [buyerAddress, sellerAddress],
         [1, estateIds.length - 1]
       );
     });
@@ -227,7 +195,8 @@ describe("Decentraland", () => {
       });
 
       it("should buy an estate", async () => {
-        await ownedManaFaucet(manaContract, ownerWallet, ephemeralWallet, TEN);
+        const { address: ephemeralAddress } = ephemeralWallet;
+        await erc20Faucet(manaContract, ownerWallet, ephemeralAddress, TEN);
         await etherFaucet(provider, ownerWallet, ephemeralWallet.address, ONE);
 
         manaContract.setWallet(ephemeralWallet);
@@ -251,7 +220,7 @@ describe("Decentraland", () => {
         );
         await executeOrder.waitForNonceToUpdate();
 
-        await confirmBalances(estateContract, [ephemeralWallet.address], [1]);
+        await confirmBalances(estateContract, [ephemeralAddress], [1]);
       });
     });
   });

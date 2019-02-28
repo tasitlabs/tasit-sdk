@@ -1,8 +1,6 @@
 import { ethers } from "ethers";
 ethers.errors.setLogLevel("error");
 
-// Note: This file is originally genarated by `tasit-contracts` and was pasted here manually
-// See https://github.com/tasitlabs/TasitSDK/issues/45
 import { abi as contractABI } from "../../tasit-contracts/build/contracts/SampleContract.json";
 
 // Note: Under the current `tasit-contracts` setup SampleContract aways will deployed with this address
@@ -11,17 +9,11 @@ const sampleContractAddress = "0x6C4A015797DDDd87866451914eCe1e8b19261931";
 
 let wallet;
 let sampleContract;
-let testcaseSnaphotId;
 
 describe("ethers.js", () => {
-  const provider = new ethers.providers.JsonRpcProvider();
-  provider.pollingInterval = 50;
-
   beforeEach("instantiate provider, wallet and contract objects", async () => {
-    const privateKey =
-      "0x11d943d7649fbdeb146dc57bd9cfc80b086bfab2330c7b25651dbaf382392f60";
-
-    wallet = new ethers.Wallet(privateKey, provider);
+    [wallet] = accounts;
+    wallet = wallet.connect(provider);
     expect(wallet.address).to.have.lengthOf(42);
     expect(wallet.provider).to.be.not.undefined;
 
@@ -31,16 +23,6 @@ describe("ethers.js", () => {
       wallet
     );
     expect(sampleContract.address).to.equal(sampleContractAddress);
-
-    testcaseSnaphotId = await createSnapshot(provider);
-  });
-
-  afterEach("revert blockchain snapshot", async () => {
-    await revertFromSnapshot(provider, testcaseSnaphotId);
-
-    // Note: Without this the test suite is breaking.
-    // It is still unclear why
-    await mineBlocks(provider, 1);
   });
 
   it("should instatiate contract object using human-readable ABI", async () => {

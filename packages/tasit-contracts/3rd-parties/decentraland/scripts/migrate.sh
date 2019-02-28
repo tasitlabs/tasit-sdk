@@ -6,7 +6,7 @@ then
     exit;
 fi
 
-DECENTRALAND_DIR="$PROJECT_DIR/decentraland"
+DECENTRALAND_DIR="$PROJECT_DIR/3rd-parties/decentraland"
 
 # mana
 cp $DECENTRALAND_DIR/scripts/3_mana_migrations.js $DECENTRALAND_DIR/mana/migrations

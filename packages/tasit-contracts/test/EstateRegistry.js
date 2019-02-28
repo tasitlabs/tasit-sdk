@@ -1,6 +1,6 @@
-const abi = require("../decentraland/land/build/contracts/EstateRegistry.json")
+const abi = require("../3rd-parties/decentraland/land/build/contracts/EstateRegistry.json")
   .abi;
-const localAddresses = require("../decentraland/addresses").local;
+const localAddresses = require("../3rd-parties/decentraland/addresses").local;
 const { LANDRegistry: landAddress, EstateRegistry: address } = localAddresses;
 
 // Note:

@@ -1,34 +1,17 @@
-import { expect, assert } from "chai";
-
 import { Account, Action } from "./TasitSdk";
-const { ERC20, ERC721, Marketplace, ConfigLoader } = Action;
+const { ERC20, ERC721, Marketplace } = Action;
 const { Mana } = ERC20;
 const { Estate, Land } = ERC721;
 const { Decentraland: DecentralandMarketplace } = Marketplace;
 import config from "./config/default";
 
-import { ropsten as ropstenAddresses } from "../../tasit-contracts/decentraland/addresses";
+import { ropsten as ropstenAddresses } from "../../tasit-contracts/3rd-parties/decentraland/addresses";
 const {
   MarketplaceProxy: MARKETPLACE_ADDRESS,
   LANDProxy: LAND_ADDRESS,
   MANAToken: MANA_ADDRESS,
   EstateProxy: ESTATE_ADDRESS,
 } = ropstenAddresses;
-
-import {
-  createSnapshot,
-  revertFromSnapshot,
-  confirmBalances,
-  gasParams,
-  setupWallets,
-  addressesAreEqual,
-  bigNumberify,
-  etherFaucet,
-  ropstenManaFaucet,
-  constants,
-  ProviderFactory,
-  DecentralandUtils,
-} from "./testHelpers/helpers";
 
 const { ONE, TEN } = constants;
 
@@ -43,14 +26,8 @@ describe("Decentraland tasit app test cases (ropsten)", () => {
   let marketplaceContract;
   let landForSale;
   let estateForSale;
-  let snapshotId;
-  let provider;
 
   before("", async () => {
-    ConfigLoader.setConfig(config);
-
-    provider = ProviderFactory.getProvider();
-
     const network = await provider.getNetwork();
     const { chainId } = network;
     expect(chainId, "The target network isn't ropsten.").to.equal(
@@ -101,9 +78,9 @@ describe("Decentraland tasit app test cases (ropsten)", () => {
   beforeEach(
     "buyer approves marketplace contract to transfer tokens on their behalf",
     async () => {
-      snapshotId = await createSnapshot(provider);
+      [ownerWallet] = accounts;
+      ephemeralWallet = Account.create();
 
-      ({ ownerWallet, ephemeralWallet } = setupWallets());
       expect(ownerWallet.address).to.have.lengthOf(42);
       expect(ephemeralWallet.address).to.have.lengthOf(42);
 
@@ -145,10 +122,6 @@ describe("Decentraland tasit app test cases (ropsten)", () => {
       expect(`${allowance}`).to.equal(`${manaAmountForShopping}`);
     }
   );
-
-  afterEach("", async () => {
-    await revertFromSnapshot(provider, snapshotId);
-  });
 
   describe("read-only / without wallet test cases", async () => {
     it("should get land for sale info", async () => {

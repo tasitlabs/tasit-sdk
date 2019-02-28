@@ -1,5 +1,6 @@
-const abi = require("../decentraland/land/build/contracts/LANDProxy.json").abi;
-const localAddresses = require("../decentraland/addresses").local;
+const abi = require("../3rd-parties/decentraland/land/build/contracts/LANDProxy.json")
+  .abi;
+const localAddresses = require("../3rd-parties/decentraland/addresses").local;
 const { LANDProxy: address } = localAddresses;
 
 // Note:

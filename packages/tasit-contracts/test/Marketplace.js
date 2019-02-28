@@ -1,6 +1,6 @@
-const abi = require("../decentraland/marketplace-contracts/build/contracts/Marketplace.json")
+const abi = require("../3rd-parties/decentraland/marketplace-contracts/build/contracts/Marketplace.json")
   .abi;
-const localAddresses = require("../decentraland/addresses").local;
+const localAddresses = require("../3rd-parties/decentraland/addresses").local;
 const { Marketplace: address } = localAddresses;
 
 // Note:
