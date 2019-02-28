@@ -1,7 +1,7 @@
 import Action from "tasit-action";
 const { ERC20, ERC721 } = Action;
-const { DetailedERC20 } = ERC20;
-const { NFT } = ERC721;
+const { ERC20Detailed } = ERC20;
+const { ERC721Full } = ERC721;
 import GnosisSafe from "./GnosisSafe";
 import { local as localAddresses } from "../../tasit-contracts/3rd-parties/gnosis/addresses";
 
@@ -34,9 +34,9 @@ describe("GnosisSafe", () => {
     // To change that, edit the file "tasit-contract/3rd-parties/gnosis/scripts/2_deploy_contracts.js"
     gnosisSafe = new GnosisSafe(GNOSIS_SAFE_ADDRESS);
 
-    erc20 = new DetailedERC20(ERC20_ADDRESS);
+    erc20 = new ERC20Detailed(ERC20_ADDRESS);
 
-    nft = new NFT(NFT_ADDRESS);
+    nft = new ERC721Full(NFT_ADDRESS);
   });
 
   beforeEach("", async () => {

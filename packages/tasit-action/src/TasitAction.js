@@ -1,16 +1,16 @@
 import ConfigLoader from "./ConfigLoader";
 import Contract from "./contract/Contract";
-import NFT from "./erc721/NFT";
+import ERC721Full from "./erc721/ERC721Full";
 import Land from "./erc721/Land";
 import Decentraland from "./marketplace/Decentraland";
 import Estate from "./erc721/Estate";
 import Mana from "./erc20/Mana";
-import DetailedERC20 from "./erc20/DetailedERC20";
+import ERC20Detailed from "./erc20/ERC20Detailed";
 
-export { Contract, NFT, Land, Decentraland, Estate, Mana };
+export { Contract, ERC721Full, Land, Decentraland, Estate, Mana };
 
-export const ERC20 = { Mana, DetailedERC20 };
-export const ERC721 = { Land, Estate, NFT };
+export const ERC20 = { Mana, ERC20Detailed };
+export const ERC721 = { Land, Estate, ERC721Full };
 export const Marketplace = { Decentraland };
 
 export const TasitAction = {

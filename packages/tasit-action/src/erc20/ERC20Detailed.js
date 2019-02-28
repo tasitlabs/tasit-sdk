@@ -1,9 +1,8 @@
 import Contract from "../contract/Contract";
-import detailedERC20ABI from "../../../tasit-contracts/abi/DetailedERC20.json";
+import abi from "../../../tasit-contracts/abi/ERC20Detailed.json";
 
-export default class DetailedERC20 extends Contract {
+export default class ERC20Detailed extends Contract {
   constructor(address, wallet) {
-    const abi = detailedERC20ABI;
     super(address, abi, wallet);
   }
 }

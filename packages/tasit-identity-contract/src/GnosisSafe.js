@@ -1,7 +1,7 @@
 import Action from "tasit-action";
 const { Contract, ERC20, ERC721 } = Action;
-const { DetailedERC20 } = ERC20;
-const { NFT } = ERC721;
+const { ERC20Detailed } = ERC20;
+const { ERC721Full } = ERC721;
 import GnosisSafeUtils from "./GnosisSafeUtils";
 
 import gnosisSafeABI from "../../tasit-contracts/abi/GnosisSafe.json";
@@ -34,7 +34,7 @@ export default class GnosisSafe extends Contract {
   }
 
   transferERC20 = async (signers, tokenAddress, toAddress, value) => {
-    const erc20 = new DetailedERC20(tokenAddress);
+    const erc20 = new ERC20Detailed(tokenAddress);
     const data = this.#utils.encodeFunctionCall(erc20, "transfer", [
       toAddress,
       value,
@@ -50,7 +50,7 @@ export default class GnosisSafe extends Contract {
   };
 
   transferNFT = async (signers, tokenAddress, toAddress, tokenId) => {
-    const nft = new NFT(tokenAddress);
+    const nft = new ERC721Full(tokenAddress);
     const fromAddress = this.getAddress();
     const data = this.#utils.encodeFunctionCall(nft, "safeTransferFrom", [
       fromAddress,
