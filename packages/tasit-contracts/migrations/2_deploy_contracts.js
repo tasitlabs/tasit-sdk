@@ -1,9 +1,9 @@
 var SampleContract = artifacts.require("./SampleContract.sol");
-var ERC721Full = artifacts.require("./ERC721Full.sol");
-var ERC20Detailed = artifacts.require("./ERC20Detailed.sol");
+var MyERC721Full = artifacts.require("./MyERC721Full.sol");
+var MyERC20Full = artifacts.require("./MyERC20Full.sol");
 
 module.exports = function(deployer) {
   deployer.deploy(SampleContract, "Hello World!");
-  deployer.deploy(ERC721Full);
-  deployer.deploy(ERC20Detailed);
+  deployer.deploy(MyERC721Full);
+  deployer.deploy(MyERC20Full);
 };

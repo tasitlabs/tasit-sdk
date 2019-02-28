@@ -1,4 +1,4 @@
-const ERC721Full = artifacts.require("./ERC721Full.sol");
+const MyERC721Full = artifacts.require("./MyERC721Full.sol");
 // Note: It will probably be a point of confusion for new developers
 // coming to this project that they'll have to get used to the web3.js
 // API for writing truffle tests but then use the ethers.js API and our
@@ -7,8 +7,8 @@ const ERC721Full = artifacts.require("./ERC721Full.sol");
 // in tasit-contracts testing the same contract.
 // For that reason, a possible TODO is removing any truffle tests
 // other than those we directly add from 3rd-party projects
-contract("ERC721Full", async accounts => {
-  const erc721 = await ERC721Full.deployed();
+contract("MyERC721Full", async accounts => {
+  const erc721 = await MyERC721Full.deployed();
 
   it("should get the contract name", async () => {
     const name = await erc721.name();
