@@ -3,6 +3,7 @@ const { Contract, ERC20, ERC721 } = Action;
 const { ERC20Detailed } = ERC20;
 const { ERC721Full } = ERC721;
 import GnosisSafeUtils from "./GnosisSafeUtils";
+import ActionUtils from "tasit-action/dist/contract/Utils.js";
 
 import gnosisSafeABI from "../../tasit-contracts/abi/GnosisSafe.json";
 import erc20ABI from "../../tasit-contracts/abi/MyERC20Full.json";
@@ -25,9 +26,23 @@ const operations = {
 
 const { CALL } = operations;
 
+const areValidSigners = signers => {
+  const { isEthersJsSigner: isSigner } = ActionUtils;
+  const { isArray } = Array;
+
+  if (!isArray(signers)) return false;
+
+  const allAreValid = !signers.map(isSigner).includes(false);
+
+  if (!allAreValid) return false;
+
+  return true;
+};
+
 // Extended Gnosis Safe wallet contract with higher-level functions
 export default class GnosisSafe extends Contract {
   #utils;
+  #signers;
 
   constructor(address, wallet) {
     const abi = gnosisSafeABI;
@@ -35,14 +50,22 @@ export default class GnosisSafe extends Contract {
     this.#utils = new GnosisSafeUtils(this);
   }
 
-  transferERC20 = async (signers, tokenAddress, toAddress, value) => {
+  setSigners = signers => {
+    if (!areValidSigners(signers))
+      throw new Error(
+        `Cannot set invalid signers for the Gnosis Safe contract.`
+      );
+
+    this.#signers = signers;
+  };
+
+  transferERC20 = async (tokenAddress, toAddress, value) => {
     const data = this.#utils.encodeFunctionCall(erc20ABI, "transfer", [
       toAddress,
       value,
     ]);
     const etherValue = "0";
     const action = await this.#executeTransaction(
-      signers,
       data,
       tokenAddress,
       etherValue
@@ -50,7 +73,7 @@ export default class GnosisSafe extends Contract {
     return action;
   };
 
-  transferNFT = async (signers, tokenAddress, toAddress, tokenId) => {
+  transferNFT = async (tokenAddress, toAddress, tokenId) => {
     const fromAddress = this.getAddress();
     const data = this.#utils.encodeFunctionCall(erc721ABI, "safeTransferFrom", [
       fromAddress,
@@ -59,7 +82,6 @@ export default class GnosisSafe extends Contract {
     ]);
     const etherValue = "0";
     const action = await this.#executeTransaction(
-      signers,
       data,
       tokenAddress,
       etherValue
@@ -67,19 +89,14 @@ export default class GnosisSafe extends Contract {
     return action;
   };
 
-  transferEther = async (signers, toAddress, value) => {
+  transferEther = async (toAddress, value) => {
     const data = "0x";
     const etherValue = value;
-    const action = await this.#executeTransaction(
-      signers,
-      data,
-      toAddress,
-      etherValue
-    );
+    const action = await this.#executeTransaction(data, toAddress, etherValue);
     return action;
   };
 
-  addSignerWithThreshold = async (signers, newSignerAddress, newThreshold) => {
+  addSignerWithThreshold = async (newSignerAddress, newThreshold) => {
     const data = this.#utils.encodeFunctionCall(
       this.getABI(),
       "addOwnerWithThreshold",
@@ -87,19 +104,21 @@ export default class GnosisSafe extends Contract {
     );
     const to = this.getAddress();
     const etherValue = "0";
-    const action = await this.#executeTransaction(
-      signers,
-      data,
-      to,
-      etherValue
-    );
+    const action = await this.#executeTransaction(data, to, etherValue);
     return action;
   };
 
   // Note: Should we move this function to sync to keep same behavior as
   // contract's write functions that returns an Action object?
   // See more: https://github.com/tasitlabs/TasitSDK/issues/234
-  #executeTransaction = async (signers, data, toAddress, etherValue) => {
+  #executeTransaction = async (data, toAddress, etherValue) => {
+    const signers = this.#signers;
+
+    if (!signers)
+      throw new Error(
+        `Cannot send an action to Gnosis Safe contract without signers.`
+      );
+
     const to = toAddress;
 
     const operation = CALL;
