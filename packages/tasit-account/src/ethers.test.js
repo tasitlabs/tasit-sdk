@@ -9,11 +9,10 @@ let wallet;
 // For a detailed explanation of why, see this GitHub issue:
 // https://github.com/tasitlabs/TasitSDK/issues/24#issuecomment-443576993
 describe("ethers.js", () => {
-  beforeEach("instantiate wallet and provider objects", async function() {
-    const privateKey =
-      "0x11d943d7649fbdeb146dc57bd9cfc80b086bfab2330c7b25651dbaf382392f60";
+  beforeEach("instantiate wallet and provider objects", async () => {
+    [wallet] = accounts;
+    wallet = wallet.connect(provider);
 
-    wallet = new ethers.Wallet(privateKey, provider);
     expect(wallet.address).to.have.lengthOf(42);
     expect(wallet.provider).to.be.not.undefined;
   });
