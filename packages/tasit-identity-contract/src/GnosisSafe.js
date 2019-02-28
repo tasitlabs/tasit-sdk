@@ -98,6 +98,7 @@ export default class GnosisSafe extends Contract {
 
   // Note: Should we move this function to sync to keep same behavior as
   // contract's write functions that returns an Action object?
+  // See more: https://github.com/tasitlabs/TasitSDK/issues/234
   #executeTransaction = async (signers, data, toAddress, etherValue) => {
     const to = toAddress;
 

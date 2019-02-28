@@ -64,7 +64,7 @@ describe("GnosisSafe", () => {
       expect(`${balance}`).to.equal(`${ONE}`);
     });
 
-    it("wallet owner should withdraw some ethers", async () => {
+    it("contract account should send ethers back to owner", async () => {
       const signers = [johnWallet];
       const { address: toAddress } = johnWallet;
       const value = ONE;
@@ -89,7 +89,7 @@ describe("GnosisSafe", () => {
       expect(`${balance}`).to.equal(`${ONE}`);
     });
 
-    it("wallet owner should withdraw some ERC20 tokens", async () => {
+    it("contract account should send ERC20 tokens back to owner", async () => {
       const signers = [johnWallet];
       const tokenAddress = ERC20_ADDRESS;
       const { address: toAddress } = johnWallet;
@@ -119,7 +119,7 @@ describe("GnosisSafe", () => {
       expect(`${balance}`).to.equal(`1`);
     });
 
-    it("wallet owner should withdraw a NFT token", async () => {
+    it("contract account should send NFT tokens back to owner", async () => {
       const signers = [johnWallet];
       const tokenAddress = NFT_ADDRESS;
       const { address: toAddress } = johnWallet;
