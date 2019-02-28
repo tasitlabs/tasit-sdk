@@ -41,7 +41,7 @@ export default class GnosisSafeUtils {
       [to, value, data, operation]
     );
 
-    // The response will be return via error message
+    // The response will be returned via error message
     const estimateResponse = await provider.call({
       to: safeContractAddress,
       from: safeContractAddress,
