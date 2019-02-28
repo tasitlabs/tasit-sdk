@@ -18,21 +18,19 @@ const { ZERO, ONE } = constants;
 
 describe("GnosisSafe", () => {
   let gnosisSafe;
-  let anaWallet;
+  let tokensOwner;
+  let johnWallet;
   let ephemeralWallet;
   let erc20;
   let nft;
 
   before("", async () => {
-    [anaWallet] = accounts;
+    tokensOwner = accounts[0];
+    johnWallet = accounts[9];
 
-    // Not using Account.create() because tasit-account isn't a dependency of that package
-    //const noFundsPrivateKey =
-    //"0x01234567890ABCDEF01234567890ABCDEF01234567890ABCDEF01234567890AB";
-    //ephemeralWallet = createFromPrivateKey(noFundsPrivateKey);
     ephemeralWallet = Account.create();
 
-    // Contract deployment setup with ana (accounts[0]) as the only owner
+    // Contract deployment setup with john (accounts[9]) as the only owner
     // To change that, edit the file "tasit-contract/3rd-parties/gnosis/scripts/2_deploy_contracts.js"
     gnosisSafe = new GnosisSafe(GNOSIS_SAFE_ADDRESS);
 
@@ -60,17 +58,17 @@ describe("GnosisSafe", () => {
 
   describe("test cases that needs ETH deposit to the wallet", async () => {
     beforeEach("faucet", async () => {
-      await etherFaucet(provider, anaWallet, GNOSIS_SAFE_ADDRESS, ONE);
+      await etherFaucet(provider, johnWallet, GNOSIS_SAFE_ADDRESS, ONE);
       const balance = await provider.getBalance(GNOSIS_SAFE_ADDRESS);
       expect(`${balance}`).to.equal(`${ONE}`);
     });
 
     it("wallet owner should withdraw some ethers", async () => {
-      const signers = [anaWallet];
-      const { address: toAddress } = anaWallet;
+      const signers = [johnWallet];
+      const { address: toAddress } = johnWallet;
       const value = ONE;
 
-      gnosisSafe.setWallet(anaWallet);
+      gnosisSafe.setWallet(johnWallet);
       const execTxAction = await gnosisSafe.transferEther(
         signers,
         toAddress,
@@ -85,18 +83,18 @@ describe("GnosisSafe", () => {
 
   describe("test cases that needs ERC20 deposit to the wallet", async () => {
     beforeEach("faucet", async () => {
-      await erc20Faucet(erc20, anaWallet, GNOSIS_SAFE_ADDRESS, ONE);
+      await erc20Faucet(erc20, tokensOwner, GNOSIS_SAFE_ADDRESS, ONE);
       const balance = await erc20.balanceOf(GNOSIS_SAFE_ADDRESS);
       expect(`${balance}`).to.equal(`${ONE}`);
     });
 
     it("wallet owner should withdraw some ERC20 tokens", async () => {
-      const signers = [anaWallet];
+      const signers = [johnWallet];
       const tokenAddress = ERC20_ADDRESS;
-      const { address: toAddress } = anaWallet;
+      const { address: toAddress } = johnWallet;
       const value = ONE;
 
-      gnosisSafe.setWallet(anaWallet);
+      gnosisSafe.setWallet(johnWallet);
       const action = await gnosisSafe.transferERC20(
         signers,
         tokenAddress,
@@ -114,18 +112,18 @@ describe("GnosisSafe", () => {
     const tokenId = 1;
 
     beforeEach("faucet", async () => {
-      await erc721Faucet(nft, anaWallet, GNOSIS_SAFE_ADDRESS, tokenId);
+      await erc721Faucet(nft, tokensOwner, GNOSIS_SAFE_ADDRESS, tokenId);
 
       const balance = await nft.balanceOf(GNOSIS_SAFE_ADDRESS);
       expect(`${balance}`).to.equal(`1`);
     });
 
     it("wallet owner should withdraw a NFT token", async () => {
-      const signers = [anaWallet];
+      const signers = [johnWallet];
       const tokenAddress = NFT_ADDRESS;
-      const { address: toAddress } = anaWallet;
+      const { address: toAddress } = johnWallet;
 
-      gnosisSafe.setWallet(anaWallet);
+      gnosisSafe.setWallet(johnWallet);
       const execTxAction = await gnosisSafe.transferNFT(
         signers,
         tokenAddress,
@@ -140,19 +138,19 @@ describe("GnosisSafe", () => {
   });
 
   it("wallet owner should add an account as signer", async () => {
-    const { address: anaAddress } = anaWallet;
+    const { address: johnAddress } = johnWallet;
 
     const ownersBefore = await gnosisSafe.getOwners();
-    expect(ownersBefore).deep.equal([anaAddress]);
+    expect(ownersBefore).deep.equal([johnAddress]);
 
     const thresholdBefore = await gnosisSafe.getThreshold();
     expect(`${thresholdBefore}`).to.equal(`1`);
 
-    const signers = [anaWallet];
+    const signers = [johnWallet];
     const { address: newSignerAddress } = ephemeralWallet;
     const newThreshold = `2`;
 
-    gnosisSafe.setWallet(anaWallet);
+    gnosisSafe.setWallet(johnWallet);
     const action = await gnosisSafe.addSignerWithThreshold(
       signers,
       newSignerAddress,
@@ -161,7 +159,7 @@ describe("GnosisSafe", () => {
     await action.waitForNonceToUpdate();
 
     const ownersAfter = await gnosisSafe.getOwners();
-    expect(ownersAfter).deep.equal([newSignerAddress, anaAddress]);
+    expect(ownersAfter).deep.equal([newSignerAddress, johnAddress]);
 
     const thresholdAdter = await gnosisSafe.getThreshold();
     expect(`${thresholdAdter}`).to.equal(`2`);

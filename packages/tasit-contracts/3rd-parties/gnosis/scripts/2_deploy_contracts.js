@@ -7,33 +7,15 @@ var WhitelistModule = artifacts.require("./WhitelistModule.sol");
 var CreateAndAddModules = artifacts.require("./CreateAndAddModules.sol");
 var MultiSend = artifacts.require("./MultiSend.sol");
 
-const anaAddress = "0xd68649157A061454e2c63c175236b07e98Bd9512";
-const bobAddress = "0x8a5D5298dcceA526754064b8094e663162E1dBEa";
+// accounts[9]
+const johnAddress = "0x8226bcef50b3c76a9eb7eba0c09ebbb2362e5db7";
 
 // Note: If you want to change this file, make sure that you are editing
 // the original file inside of the `tasit-contracts/3rd-parties/gnosis/scripts`
 module.exports = function(deployer) {
   deployer.deploy(ProxyFactory);
   deployer.deploy(GnosisSafe).then(function(safe) {
-    safe.setup([anaAddress], 1, 0, 0);
+    safe.setup([johnAddress], 1, 0, 0);
     return safe;
   });
-  deployer.deploy(StateChannelModule).then(function(module) {
-    module.setup();
-    return module;
-  });
-  deployer.deploy(DailyLimitModule).then(function(module) {
-    module.setup([], []);
-    return module;
-  });
-  deployer.deploy(SocialRecoveryModule).then(function(module) {
-    module.setup([anaAddress, bobAddress], 2);
-    return module;
-  });
-  deployer.deploy(WhitelistModule).then(function(module) {
-    module.setup([]);
-    return module;
-  });
-  deployer.deploy(CreateAndAddModules);
-  deployer.deploy(MultiSend);
 };

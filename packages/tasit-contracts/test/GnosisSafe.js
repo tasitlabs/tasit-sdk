@@ -8,7 +8,7 @@ const { GnosisSafe: contractAddress } = localAddresses;
 // (and most existing 3rd-party contracts tend to use Truffle which uses web3.js)
 contract("GnosisSafe", function(accounts) {
   const GnosisSafe = new web3.eth.Contract(abi, contractAddress);
-  const [ana, bob, carl] = accounts;
+  const jonh = accounts[9];
 
   it("should get the GnosisSafe name", async function() {
     const name = await GnosisSafe.methods.NAME().call();
@@ -21,6 +21,6 @@ contract("GnosisSafe", function(accounts) {
 
   it("should get the GnosisSafe owner", async function() {
     const [owner] = await GnosisSafe.methods.getOwners().call();
-    assert.equal(owner, ana, "Ana isn't the GnosisSafe owner.");
+    assert.equal(owner, jonh, "John isn't the GnosisSafe owner.");
   });
 });
