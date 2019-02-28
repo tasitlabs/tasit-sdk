@@ -18,14 +18,15 @@ const { ZERO, ONE } = constants;
 
 describe("GnosisSafe", () => {
   let gnosisSafe;
-  let tokensOwner;
+  let root;
   let johnWallet;
   let ephemeralWallet;
   let erc20;
   let nft;
 
   before("", async () => {
-    tokensOwner = accounts[0];
+    // That account is funded with ethers and is owner of all token contracts deployed
+    [root] = accounts;
     johnWallet = accounts[9];
 
     ephemeralWallet = Account.create();
@@ -58,7 +59,7 @@ describe("GnosisSafe", () => {
 
   describe("test cases that needs ETH deposit to the wallet", async () => {
     beforeEach("faucet", async () => {
-      await etherFaucet(provider, johnWallet, GNOSIS_SAFE_ADDRESS, ONE);
+      await etherFaucet(provider, root, GNOSIS_SAFE_ADDRESS, ONE);
       const balance = await provider.getBalance(GNOSIS_SAFE_ADDRESS);
       expect(`${balance}`).to.equal(`${ONE}`);
     });
@@ -83,7 +84,7 @@ describe("GnosisSafe", () => {
 
   describe("test cases that needs ERC20 deposit to the wallet", async () => {
     beforeEach("faucet", async () => {
-      await erc20Faucet(erc20, tokensOwner, GNOSIS_SAFE_ADDRESS, ONE);
+      await erc20Faucet(erc20, root, GNOSIS_SAFE_ADDRESS, ONE);
       const balance = await erc20.balanceOf(GNOSIS_SAFE_ADDRESS);
       expect(`${balance}`).to.equal(`${ONE}`);
     });
@@ -112,7 +113,7 @@ describe("GnosisSafe", () => {
     const tokenId = 1;
 
     beforeEach("faucet", async () => {
-      await erc721Faucet(nft, tokensOwner, GNOSIS_SAFE_ADDRESS, tokenId);
+      await erc721Faucet(nft, root, GNOSIS_SAFE_ADDRESS, tokenId);
 
       const balance = await nft.balanceOf(GNOSIS_SAFE_ADDRESS);
       expect(`${balance}`).to.equal(`1`);
