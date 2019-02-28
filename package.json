@@ -19,7 +19,7 @@
     "ganache:stop": "kill `ps ax|grep ganache-cli|grep -v grep| awk '{print $1}'` 2> /dev/null; exit 0",
     "truffle:migrate": "npx lerna run migrate --scope tasit-contracts --stream",
     "pretest": "npm run ganache:stop && npm run ganache:start && npm run truffle:migrate",
-    "test": "npx lerna run test --scope tasit-account --stream && npx lerna run test --scope tasit-action --stream && npx lerna run test --scope tasit-contracts --stream && npx lerna run test --scope tasit-identity-contract --stream && npx lerna run test --scope tasit-sdk --stream",
+    "test": "npx lerna run test --stream --concurrency 1",
     "posttest": "npm run ganache:stop"
   },
   "repository": {
