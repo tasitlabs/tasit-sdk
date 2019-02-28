@@ -121,7 +121,7 @@ export default class GnosisSafe extends Contract {
     // Address of receiver of gas payment (or 0 if tx.origin)
     const refundReceiver = "0x0000000000000000000000000000000000000000";
 
-    // Gas costs for data used to trigger the safe transaction and to pay the payment transfer
+    // Gas costs for data used to trigger the safe transaction and to pay for transferring a payment
     const { length: signersCount } = signers;
     const dataGas = this.#utils.estimateDataGas(
       this,

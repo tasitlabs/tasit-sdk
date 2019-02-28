@@ -1,6 +1,7 @@
 import { expect } from "chai";
 import { ethers } from "ethers";
 import ProviderFactory from "../ProviderFactory";
+import developmentConfig from "../config/default.js";
 
 // Note:  Using dist file because babel doesn't compile node_modules files.
 // Any changes on src should be followed by compilation to avoid unexpected behaviors.
@@ -180,6 +181,7 @@ export const helpers = {
   gasParams,
   ProviderFactory,
   accounts,
+  developmentConfig,
 };
 
 export default helpers;

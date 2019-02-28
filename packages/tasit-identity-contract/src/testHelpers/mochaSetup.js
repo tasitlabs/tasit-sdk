@@ -8,21 +8,7 @@ global = Object.assign(global, actionHelpers);
 
 import Action from "tasit-action";
 const { ConfigLoader } = Action;
-const config = {
-  provider: {
-    network: "other",
-    provider: "jsonrpc",
-    pollingInterval: 50,
-    jsonRpc: {
-      url: "http://localhost",
-      port: 8545,
-    },
-  },
-  events: {
-    timeout: 2000,
-  },
-};
-ConfigLoader.setConfig(config);
+ConfigLoader.setConfig(developmentConfig);
 
 // Global hooks
 let snapshotId;

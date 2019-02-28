@@ -18,8 +18,7 @@ global.createFromPrivateKey = createFromPrivateKey;
 
 import { Action } from "../TasitSdk";
 const { ConfigLoader } = Action;
-import config from "../config/default.js";
-ConfigLoader.setConfig(config);
+ConfigLoader.setConfig(developmentConfig);
 
 // Global hooks
 let snapshotId;
