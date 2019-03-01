@@ -9,41 +9,43 @@ const {
   EtherscanProvider,
 } = providers;
 
-const extractProviderConfig = async ethersProvider => {
-  await ethersProvider.ready;
-  const network = await ethersProvider.getNetwork();
+const parseNetworkNameFromEthres = networkName => {
+  if (networkName === "unknown") return "other";
+  if (networkName === "homestead") return "mainnet";
+  return networkName;
+};
+
+const extractProviderConfig = async provider => {
+  await provider.ready;
+  const network = await provider.getNetwork();
   let { name: networkName } = network;
   const {
     pollingInterval,
     apiAccessToken: infuraApiKey,
     apiKey: etherscanApiKey,
     connection,
-    provider,
     providers,
     path,
-  } = ethersProvider;
-
-  if (networkName === "unknown") networkName = "other";
-  else if (networkName === "homestead") networkName = "mainnet";
+  } = provider;
 
   let config = {
-    network: networkName,
+    network: parseNetworkNameFromEthres(networkName),
     pollingInterval,
   };
 
-  if (ethersProvider instanceof EtherscanProvider) {
+  if (provider instanceof EtherscanProvider) {
     config = {
       ...config,
       provider: "etherscan",
       etherscan: { apiKey: etherscanApiKey },
     };
-  } else if (ethersProvider instanceof InfuraProvider) {
+  } else if (provider instanceof InfuraProvider) {
     config = {
       ...config,
       provider: "infura",
       infura: { apiKey: infuraApiKey },
     };
-  } else if (ethersProvider instanceof JsonRpcProvider) {
+  } else if (provider instanceof JsonRpcProvider) {
     const { url, user, password, allowInsecure } = connection;
     const { protocol, hostname, port } = new URL(url);
     const jsonRpc = {
@@ -54,7 +56,7 @@ const extractProviderConfig = async ethersProvider => {
       allowInsecure,
     };
     config = { ...config, provider: "jsonrpc", jsonRpc };
-  } else if (ethersProvider instanceof FallbackProvider) {
+  } else if (provider instanceof FallbackProvider) {
     config = { ...config, provider: "fallback" };
   }
 
@@ -64,7 +66,6 @@ const extractProviderConfig = async ethersProvider => {
 const fulfillWithDefaults = config => {
   let { provider } = config;
   let { jsonRpc, provider: providerType, infura, etherscan } = provider;
-  const isJsonRpc = jsonRpc !== undefined;
 
   if (providerType === "etherscan") {
     if (!etherscan) etherscan = { apiKey: null };
@@ -118,7 +119,7 @@ describe("TasitAction.ConfigLoader", () => {
     defaultConfig = ConfigLoader.getConfig();
   });
 
-  afterEach("back to default config", async () => {
+  afterEach("back to default config", () => {
     ConfigLoader.setConfig(defaultConfig);
   });
 
@@ -218,7 +219,6 @@ describe("TasitAction.ConfigLoader", () => {
             apiKey: "ETHERSCAN_API_KEY",
           },
         },
-
         events: {
           timeout: 2000,
         },
