@@ -5,8 +5,6 @@ const { Mana } = ERC20;
 const { Estate, Land } = ERC721;
 const { Decentraland } = Marketplace;
 
-import DecentralandUtils from "./DecentralandUtils";
-
 // Helpers
 import actionHelpers from "tasit-action/dist/testHelpers/helpers";
 global = Object.assign(global, actionHelpers);
@@ -246,7 +244,6 @@ export const helpers = {
   bigNumberify,
   constants,
   ProviderFactory,
-  DecentralandUtils,
 };
 
 export default helpers;
