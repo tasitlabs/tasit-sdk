@@ -1,7 +1,8 @@
 import Estate from "./Estate";
-
-import { local as localAddresses } from "../../../tasit-contracts/3rd-parties/decentraland/addresses";
-const { EstateRegistry: ESTATE_ADDRESS } = localAddresses;
+import TasitContracts from "../../../tasit-contracts/dist";
+const { local: localContracts } = TasitContracts;
+const { EstateRegistry } = localContracts;
+const { address: ESTATE_ADDRESS } = EstateRegistry;
 
 describe("TasitAction.ERC721.Estate", () => {
   // Note: This test runs against an uninitialized contract.

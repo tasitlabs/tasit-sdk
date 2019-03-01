@@ -3,13 +3,13 @@ const { ERC20, ERC721 } = Action;
 const { ERC20Full } = ERC20;
 const { ERC721Full } = ERC721;
 import GnosisSafe from "./GnosisSafe";
-import { local as localAddresses } from "../../tasit-contracts/3rd-parties/gnosis/addresses";
-
-import Account from "../../tasit-account/dist/index";
-
-const { GnosisSafe: GNOSIS_SAFE_ADDRESS } = localAddresses;
-const ERC20_ADDRESS = "0x37E1A58dD465D33263D00185D065Ee36DD34CDb4";
-const NFT_ADDRESS = "0x0E86f209729bf54763789CDBcA9E8b94f0FD5333";
+import Account from "../../tasit-account/dist";
+import TasitContracts from "../../tasit-contracts/dist";
+const { local } = TasitContracts;
+const { GnosisSafe: GnosisSafeInfo, MyERC20Full, MyERC721Full } = local;
+const { address: GNOSIS_SAFE_ADDRESS } = GnosisSafeInfo;
+const { address: ERC20_ADDRESS } = MyERC20Full;
+const { address: NFT_ADDRESS } = MyERC721Full;
 
 // 100 gwei
 const GAS_PRICE = bigNumberify(`${1e11}`);

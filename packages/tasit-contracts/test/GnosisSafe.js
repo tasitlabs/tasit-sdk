@@ -1,26 +1,22 @@
-const abi = require("../3rd-parties/gnosis/safe-contracts/build/contracts/GnosisSafe.json")
-  .abi;
-const localAddresses = require("../3rd-parties/gnosis/addresses").local;
-const { GnosisSafe: contractAddress } = localAddresses;
+const TasitContracts = require("../dist/TasitContracts").TasitContracts;
+const { local } = TasitContracts;
+const { GnosisSafe } = local;
+const { address, abi } = GnosisSafe;
 
 // Note:
 // This test suite is using web3.js because contract deployment is made by a 3rd-party repository
 // (and most existing 3rd-party contracts tend to use Truffle which uses web3.js)
-contract("GnosisSafe", function(accounts) {
-  const GnosisSafe = new web3.eth.Contract(abi, contractAddress);
+contract("GnosisSafe", accounts => {
+  const gnosisSafe = new web3.eth.Contract(abi, address);
   const jonh = accounts[9];
 
   it("should get the GnosisSafe name", async function() {
-    const name = await GnosisSafe.methods.NAME().call();
-    assert.equal(
-      name,
-      "Gnosis Safe",
-      "'Gnosis Safe' isn't the GnosisSafe name."
-    );
+    const name = await gnosisSafe.methods.NAME().call();
+    assert.equal(name, "Gnosis Safe", "'Gnosis Safe' isn't the contract name.");
   });
 
-  it("should get the GnosisSafe owner", async function() {
-    const [owner] = await GnosisSafe.methods.getOwners().call();
-    assert.equal(owner, jonh, "John isn't the GnosisSafe owner.");
+  it("should get the GnosisSafe owner", async () => {
+    const [owner] = await gnosisSafe.methods.getOwners().call();
+    assert.equal(owner, jonh, "John isn't the contract owner.");
   });
 });

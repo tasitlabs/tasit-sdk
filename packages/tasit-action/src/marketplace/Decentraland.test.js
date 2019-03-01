@@ -1,7 +1,8 @@
 import Decentraland from "./Decentraland";
-
-import { local as localAddresses } from "../../../tasit-contracts/3rd-parties/decentraland/addresses";
-const { Marketplace: MARKETPLACE_ADDRESS } = localAddresses;
+import TasitContracts from "../../../tasit-contracts/dist";
+const { local: localContracts } = TasitContracts;
+const { Marketplace } = localContracts;
+const { address: MARKETPLACE_ADDRESS } = Marketplace;
 
 describe("TasitAction.Marketplace.Decentraland", () => {
   it("contract shouldn't be paused", async () => {

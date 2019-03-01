@@ -4,10 +4,12 @@ const { ERC20Detailed } = ERC20;
 const { ERC721Full } = ERC721;
 import GnosisSafeUtils from "./GnosisSafeUtils";
 import ActionUtils from "tasit-action/dist/contract/Utils.js";
-
-import gnosisSafeABI from "../../tasit-contracts/abi/GnosisSafe.json";
-import erc20ABI from "../../tasit-contracts/abi/MyERC20Full.json";
-import erc721ABI from "../../tasit-contracts/abi/MyERC721Full.json";
+import TasitContracts from "../../tasit-contracts/dist";
+const { local } = TasitContracts;
+const { GnosisSafe: GnosisSafeInfo, MyERC20Full, MyERC721Full } = local;
+const { abi: gnosisSafeABI } = GnosisSafeInfo;
+const { abi: erc20ABI } = MyERC20Full;
+const { abi: erc721ABI } = MyERC721Full;
 
 // TODO: Go deep on gas handling.
 // Without that, VM returns a revert error instead of out of gas error.

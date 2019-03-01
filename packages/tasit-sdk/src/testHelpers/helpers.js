@@ -4,8 +4,11 @@ const { Contract, ERC20, ERC721, Marketplace } = Action;
 const { Mana } = ERC20;
 const { Estate, Land } = ERC721;
 const { Decentraland } = Marketplace;
-
 import DecentralandUtils from "./DecentralandUtils";
+import TasitContracts from "../../../tasit-contracts/dist";
+const { local: localContracts, ropsten: ropstenContracts } = TasitContracts;
+const { LANDProxy } = localContracts;
+const { abi: landProxyABI } = LANDProxy;
 
 // Helpers
 import actionHelpers from "tasit-action/dist/testHelpers/helpers";
@@ -17,21 +20,20 @@ const {
   Contract: ethersContract,
 } = ethers;
 
-import { abi as landProxyABI } from "../../../tasit-contracts/abi/LANDProxy.json";
-
-import {
-  local as localAddresses,
-  ropsten as ropstenAddresses,
-} from "../../../tasit-contracts/3rd-parties/decentraland/addresses";
-
 const setupContracts = async ownerWallet => {
   const {
-    MANAToken: MANA_ADDRESS,
-    LANDRegistry: LAND_ADDRESS,
-    LANDProxy: LAND_PROXY_ADDRESS,
-    EstateRegistry: ESTATE_ADDRESS,
-    Marketplace: MARKETPLACE_ADDRESS,
-  } = localAddresses;
+    MANAToken,
+    LANDRegistry,
+    LANDProxy,
+    EstateRegistry,
+    Marketplace,
+  } = localContracts;
+
+  const { address: MANA_ADDRESS } = MANAToken;
+  const { address: LAND_ADDRESS } = LANDRegistry;
+  const { address: LAND_PROXY_ADDRESS } = LANDProxy;
+  const { address: ESTATE_ADDRESS } = EstateRegistry;
+  const { address: MARKETPLACE_ADDRESS } = Marketplace;
 
   // Note: It would be cooler to use NFT here if
   // Decentraland Land contract followed ERC721 exactly
@@ -220,7 +222,8 @@ const duration = {
 
 // The Mana contract deployed on ropsten network has a setBalance function
 const ropstenManaFaucet = async (provider, walletWithGas, to, amountInWei) => {
-  const { MANAToken: MANA_ADDRESS } = ropstenAddresses;
+  const { MANAToken } = ropstenContracts;
+  const { address: MANA_ADDRESS } = MANAToken;
   const connectedWallet = walletWithGas.connect(provider);
   const manaABI = ["function setBalance(address to, uint256 amount)"];
   const mana = new ethersContract(MANA_ADDRESS, manaABI, connectedWallet);

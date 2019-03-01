@@ -8,6 +8,8 @@ import myERC20FullABI from "../abi/MyERC20Full.json";
 import myERC721FullABI from "../abi/MyERC721Full.json";
 import sampleContractABI from "../abi/SampleContract.json";
 
+// Note: Under the current `tasit-contracts` setup the contracts always will deployed with these addresses
+// See https://github.com/tasitlabs/TasitSDK/issues/138
 const local = {
   EstateRegistry: {
     address: "0x6191bc768c2339da9eab9e589fc8bf0b3ab80975",
@@ -50,14 +52,20 @@ const local = {
 import decentralandAddresses from "../3rd-parties/decentraland/contracts/addresses.json";
 const { ropsten: decentralandRopstenAddresses } = decentralandAddresses;
 const {
+  EstateProxy: ROPSTEN_ESTATE_REGISTRY_PROXY_ADDRESS,
   EstateRegistry: ROPSTEN_ESTATE_REGISTRY_ADDRESS,
   LANDProxy: ROPSTEN_LAND_PROXY_ADDRESS,
   LANDRegistry: ROPSTEN_LAND_REGISTRY_ADDRESS,
   MANAToken: ROPSTEN_MANA_TOKEN_ADDRESS,
+  MarketplaceProxy: ROPSTEN_MARKETPLACE_PROXY_ADDRESS,
   Marketplace: ROPSTEN_MARKETPLACE_ADDRESS,
 } = decentralandRopstenAddresses;
 
 const ropsten = {
+  EstateProxy: {
+    address: ROPSTEN_ESTATE_REGISTRY_PROXY_ADDRESS,
+    abi: estateRegistryABI,
+  },
   EstateRegistry: {
     address: ROPSTEN_ESTATE_REGISTRY_ADDRESS,
     abi: estateRegistryABI,
@@ -76,6 +84,10 @@ const ropsten = {
   },
   Marketplace: {
     address: ROPSTEN_MARKETPLACE_ADDRESS,
+    abi: marketplaceABI,
+  },
+  MarketplaceProxy: {
+    address: ROPSTEN_MARKETPLACE_PROXY_ADDRESS,
     abi: marketplaceABI,
   },
 };

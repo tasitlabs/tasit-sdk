@@ -1,11 +1,12 @@
 import Contract from "./Contract";
 import Account from "tasit-account";
-
-import { abi as contractABI } from "../../../tasit-contracts/build/contracts/SampleContract.json";
-
-// Note: Under the current `tasit-contracts` setup SampleContract aways will deployed with this address
-// See https://github.com/tasitlabs/TasitSDK/issues/138
-const sampleContractAddress = "0x6C4A015797DDDd87866451914eCe1e8b19261931";
+import TasitContracts from "../../../tasit-contracts/dist";
+const { local: localContracts } = TasitContracts;
+const { SampleContract } = localContracts;
+const {
+  abi: sampleContractABI,
+  address: SAMPLE_CONTRACT_ADDRESS,
+} = SampleContract;
 
 describe("TasitAction.Contract", () => {
   let sampleContract;
@@ -23,13 +24,13 @@ describe("TasitAction.Contract", () => {
 
     [wallet] = accounts;
 
-    sampleContract = new Contract(sampleContractAddress, contractABI);
+    sampleContract = new Contract(SAMPLE_CONTRACT_ADDRESS, sampleContractABI);
     expect(sampleContract).to.exist;
-    expect(sampleContract.getAddress()).to.equal(sampleContractAddress);
+    expect(sampleContract.getAddress()).to.equal(SAMPLE_CONTRACT_ADDRESS);
     expect(sampleContract.getValue).to.exist;
     expect(sampleContract.setValue).to.exist;
     expect(sampleContract._getProvider()).to.exist;
-    expect(sampleContract.getABI()).to.deep.equal(contractABI);
+    expect(sampleContract.getABI()).to.deep.equal(sampleContractABI);
   });
 
   afterEach("revert blockchain snapshot", async () => {
@@ -62,25 +63,25 @@ describe("TasitAction.Contract", () => {
 
     it("constructor without ABI", async () => {
       expect(() => {
-        new Contract(sampleContractAddress);
+        new Contract(SAMPLE_CONTRACT_ADDRESS);
       }).to.throw();
     });
 
     it("constructor without address but with ABI", async () => {
       expect(() => {
-        new Contract(null, contractABI);
+        new Contract(null, sampleContractABI);
       }).to.throw();
     });
 
     it("constructor with invalid address and valid ABI", async () => {
       expect(() => {
-        new Contract("invalid address", contractABI);
+        new Contract("invalid address", sampleContractABI);
       }).to.throw();
     });
 
     it("constructor with valid address and invalid ABI", async () => {
       expect(() => {
-        new Contract(sampleContractAddress, "invalid abi");
+        new Contract(SAMPLE_CONTRACT_ADDRESS, "invalid abi");
       }).to.throw();
     });
   });

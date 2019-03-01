@@ -1,11 +1,12 @@
 import { ethers } from "ethers";
 ethers.errors.setLogLevel("error");
-
-import { abi as contractABI } from "../../tasit-contracts/build/contracts/SampleContract.json";
-
-// Note: Under the current `tasit-contracts` setup SampleContract aways will deployed with this address
-// See https://github.com/tasitlabs/TasitSDK/issues/138
-const sampleContractAddress = "0x6C4A015797DDDd87866451914eCe1e8b19261931";
+import TasitContracts from "../../tasit-contracts/dist";
+const { local: localContracts } = TasitContracts;
+const { SampleContract } = localContracts;
+const {
+  abi: sampleContractABI,
+  address: SAMPLE_CONTRACT_ADDRESS,
+} = SampleContract;
 
 let wallet;
 let sampleContract;
@@ -18,11 +19,11 @@ describe("ethers.js", () => {
     expect(wallet.provider).to.be.not.undefined;
 
     sampleContract = new ethers.Contract(
-      sampleContractAddress,
-      contractABI,
+      SAMPLE_CONTRACT_ADDRESS,
+      sampleContractABI,
       wallet
     );
-    expect(sampleContract.address).to.equal(sampleContractAddress);
+    expect(sampleContract.address).to.equal(SAMPLE_CONTRACT_ADDRESS);
   });
 
   it("should instatiate contract object using human-readable ABI", async () => {
@@ -35,7 +36,7 @@ describe("ethers.js", () => {
 
     sampleContract = undefined;
     sampleContract = new ethers.Contract(
-      sampleContractAddress,
+      SAMPLE_CONTRACT_ADDRESS,
       humanReadableABI,
       wallet
     );
