@@ -1,36 +1,49 @@
 import ProviderFactory from "./ProviderFactory";
 import ConfigLoader from "./ConfigLoader";
+import { ethers } from "ethers";
+const { providers } = ethers;
+const {
+  JsonRpcProvider,
+  FallbackProvider,
+  InfuraProvider,
+  EtherscanProvider,
+} = providers;
 
-const defaultConfig = ConfigLoader.getConfig();
-
-const extractConfigFromProvider = async ethersProvider => {
+const extractProviderConfig = async ethersProvider => {
   await ethersProvider.ready;
   const network = await ethersProvider.getNetwork();
   let { name: networkName } = network;
   const {
     pollingInterval,
+    apiAccessToken: infuraApiKey,
+    apiKey: etherscanApiKey,
     connection,
-    apiToken,
-    apiAccessToken,
     provider,
     providers,
     path,
   } = ethersProvider;
-  const isJsonRpc = connection !== undefined;
-  const isEtherscan = apiToken !== undefined;
-  const isInfura = apiAccessToken !== undefined;
-  const isWeb3 = provider !== undefined;
-  const isFallback = providers !== undefined;
-  const isIpc = path !== undefined;
 
   if (networkName === "unknown") networkName = "other";
+  else if (networkName === "homestead") networkName = "mainnet";
 
-  let configProvider = {
+  let config = {
     network: networkName,
     pollingInterval,
   };
 
-  if (isJsonRpc) {
+  if (ethersProvider instanceof EtherscanProvider) {
+    config = {
+      ...config,
+      provider: "etherscan",
+      etherscan: { apiKey: etherscanApiKey },
+    };
+  } else if (ethersProvider instanceof InfuraProvider) {
+    config = {
+      ...config,
+      provider: "infura",
+      infura: { apiKey: infuraApiKey },
+    };
+  } else if (ethersProvider instanceof JsonRpcProvider) {
     const { url, user, password, allowInsecure } = connection;
     const { protocol, hostname, port } = new URL(url);
     const jsonRpc = {
@@ -40,21 +53,41 @@ const extractConfigFromProvider = async ethersProvider => {
       password,
       allowInsecure,
     };
-    configProvider = { ...configProvider, provider: "jsonrpc", jsonRpc };
+    config = { ...config, provider: "jsonrpc", jsonRpc };
+  } else if (ethersProvider instanceof FallbackProvider) {
+    config = { ...config, provider: "fallback" };
   }
 
-  const config = { provider: configProvider, events: { timeout: 2000 } };
   return config;
 };
 
 const fulfillWithDefaults = config => {
   let { provider } = config;
-  let { jsonRpc } = provider;
+  let { jsonRpc, provider: providerType, infura, etherscan } = provider;
   const isJsonRpc = jsonRpc !== undefined;
-  if (isJsonRpc) {
+
+  if (providerType === "etherscan") {
+    if (!etherscan) etherscan = { apiKey: null };
+    else {
+      const { apiKey } = etherscan;
+      etherscan = { ...etherscan, apiKey };
+    }
+
+    provider = { ...provider, etherscan };
+  } else if (providerType === "infura") {
+    if (!infura) infura = { apiKey: null };
+    else {
+      const { apiKey } = infura;
+      infura = { ...infura, apiKey };
+    }
+
+    provider = { ...provider, infura };
+  } else if (providerType === "jsonrpc") {
     const { user, password, allowInsecure } = jsonRpc;
+    jsonRpc = { ...jsonRpc, user, password };
+
     if (allowInsecure === undefined)
-      jsonRpc = { ...jsonRpc, user, password, allowInsecure: false };
+      jsonRpc = { ...jsonRpc, allowInsecure: false };
 
     provider = { ...provider, jsonRpc };
   }
@@ -64,21 +97,33 @@ const fulfillWithDefaults = config => {
 };
 
 const checkConfig = async config => {
+  const userConfig = fulfillWithDefaults(config);
+
   ConfigLoader.setConfig(config);
   const provider = ProviderFactory.getProvider();
-  const configFromProvider = await extractConfigFromProvider(provider);
-  const configWithDefaults = fulfillWithDefaults(config);
+  const providerConfig = await extractProviderConfig(provider);
+  const eventsConfig = ConfigLoader.getConfig().events;
+  const loadedConfig = {
+    provider: providerConfig,
+    events: eventsConfig,
+  };
 
-  expect(configFromProvider).to.deep.equal(configWithDefaults);
+  expect(userConfig).to.deep.equal(loadedConfig);
 };
 
 describe("TasitAction.ConfigLoader", () => {
-  after("back to default config", async () => {
+  let defaultConfig;
+
+  beforeEach("store default config", () => {
+    defaultConfig = ConfigLoader.getConfig();
+  });
+
+  afterEach("back to default config", async () => {
     ConfigLoader.setConfig(defaultConfig);
   });
 
-  it("should create a provider from local blockchain config parameters", async () => {
-    const someConfig = {
+  it("should setup a provider connected to a local node using JsonRPC", async () => {
+    const config = {
       provider: {
         network: "other",
         provider: "jsonrpc",
@@ -93,6 +138,93 @@ describe("TasitAction.ConfigLoader", () => {
       },
     };
 
-    await checkConfig(someConfig);
+    await checkConfig(config);
+  });
+
+  it("should setup a provider connected to the rinkeby testnet using Fallback", async () => {
+    const config = {
+      provider: {
+        network: "rinkeby",
+        provider: "fallback",
+        pollingInterval: 4000,
+      },
+      events: {
+        timeout: 2000,
+      },
+    };
+
+    await checkConfig(config);
+  });
+
+  describe("should setup a provider connected to the ropsten testnet using Infura", async () => {
+    it("without apiKey", async () => {
+      const config = {
+        provider: {
+          network: "ropsten",
+          provider: "infura",
+          pollingInterval: 4000,
+        },
+        events: {
+          timeout: 2000,
+        },
+      };
+
+      await checkConfig(config);
+    });
+
+    it("with apiKey", async () => {
+      const config = {
+        provider: {
+          network: "ropsten",
+          provider: "infura",
+          pollingInterval: 4000,
+          infura: {
+            apiKey: "INFURA_API_KEY",
+          },
+        },
+
+        events: {
+          timeout: 2000,
+        },
+      };
+
+      await checkConfig(config);
+    });
+  });
+
+  describe("should setup a provider connected to the mainnet using Etherscan", async () => {
+    it("without apiKey", async () => {
+      const config = {
+        provider: {
+          network: "mainnet",
+          provider: "etherscan",
+          pollingInterval: 4000,
+        },
+        events: {
+          timeout: 2000,
+        },
+      };
+
+      await checkConfig(config);
+    });
+
+    it("with apiKey", async () => {
+      const config = {
+        provider: {
+          network: "mainnet",
+          provider: "etherscan",
+          pollingInterval: 4000,
+          etherscan: {
+            apiKey: "ETHERSCAN_API_KEY",
+          },
+        },
+
+        events: {
+          timeout: 2000,
+        },
+      };
+
+      await checkConfig(config);
+    });
   });
 });
