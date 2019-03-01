@@ -1,6 +1,6 @@
 import ERC721Full from "./ERC721Full";
 
-// Note: Under the current `tasit-contracts` setup ERC721Full aways will deployed with this address
+// Note: Under the current `tasit-contracts` setup MyERC721Full always will be deployed with this address
 // See https://github.com/tasitlabs/TasitSDK/issues/138
 const ERC721_FULL_ADDRESS = "0x0E86f209729bf54763789CDBcA9E8b94f0FD5333";
 
