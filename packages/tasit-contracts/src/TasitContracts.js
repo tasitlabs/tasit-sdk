@@ -6,6 +6,7 @@ import manaTokenABI from "../abi/MANAToken.json";
 import marketplaceABI from "../abi/Marketplace.json";
 import myERC20FullABI from "../abi/MyERC20Full.json";
 import myERC721FullABI from "../abi/MyERC721Full.json";
+import sampleContractABI from "../abi/SampleContract.json";
 
 const local = {
   EstateRegistry: {
@@ -39,6 +40,10 @@ const local = {
   MyERC721Full: {
     address: "0x0E86f209729bf54763789CDBcA9E8b94f0FD5333",
     abi: myERC721FullABI,
+  },
+  SampleContract: {
+    address: "0x6C4A015797DDDd87866451914eCe1e8b19261931",
+    abi: sampleContractABI,
   },
 };
 

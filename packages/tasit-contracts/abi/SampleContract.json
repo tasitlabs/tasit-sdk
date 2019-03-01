@@ -1,0 +1,184 @@
+[
+    {
+      "inputs": [
+        {
+          "name": "value",
+          "type": "string"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "constructor",
+      "signature": "constructor"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "name": "author",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "name": "oldValue",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "name": "newValue",
+          "type": "string"
+        }
+      ],
+      "name": "ValueChanged",
+      "type": "event",
+      "signature": "0xe826f71647b8486f2bae59832124c70792fba044036720a54ec8dacdd5df4fcb"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "name": "author",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "name": "oldValue",
+          "type": "string"
+        }
+      ],
+      "name": "ValueRemoved",
+      "type": "event",
+      "signature": "0xdc3a6c5e946bc46b06902f73c3c9a5689c461217698b8d53d4bbaa124a6519a2"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "getValue",
+      "outputs": [
+        {
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function",
+      "signature": "0x20965255"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "value",
+          "type": "string"
+        }
+      ],
+      "name": "setValue",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function",
+      "signature": "0x93a09352"
+    },
+    {
+      "constant": false,
+      "inputs": [],
+      "name": "removeValue",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function",
+      "signature": "0x2f5739dd"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "revertRead",
+      "outputs": [
+        {
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "pure",
+      "type": "function",
+      "signature": "0x9f558709"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "value",
+          "type": "string"
+        }
+      ],
+      "name": "revertWrite",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function",
+      "signature": "0xeb5c2318"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "a",
+          "type": "string"
+        }
+      ],
+      "name": "overloading",
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "pure",
+      "type": "function",
+      "signature": "0x1f8fce94"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "overloading",
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "pure",
+      "type": "function",
+      "signature": "0x62a871bd"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "a",
+          "type": "string"
+        },
+        {
+          "name": "b",
+          "type": "string"
+        }
+      ],
+      "name": "overloading",
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "pure",
+      "type": "function",
+      "signature": "0x8994b006"
+    }
+  ]
