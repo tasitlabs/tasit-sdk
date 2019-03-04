@@ -1,6 +1,6 @@
 import ERC20Full from "./ERC20Full";
 
-// Note: Under the current `tasit-contracts` setup ERC20Detailed aways will deployed with this address
+// Note: Under the current `tasit-contracts` setup MyERC20Full always will be deployed with this address
 // See https://github.com/tasitlabs/TasitSDK/issues/138
 const ERC20_FULL_ADDRESS = "0x37E1A58dD465D33263D00185D065Ee36DD34CDb4";
 

@@ -3,7 +3,7 @@ import Account from "tasit-account";
 
 import { abi as contractABI } from "../../../tasit-contracts/build/contracts/SampleContract.json";
 
-// Note: Under the current `tasit-contracts` setup SampleContract aways will deployed with this address
+// Note: Under the current `tasit-contracts` setup SampleContract always will be deployed with this address
 // See https://github.com/tasitlabs/TasitSDK/issues/138
 const sampleContractAddress = "0x6C4A015797DDDd87866451914eCe1e8b19261931";
 
