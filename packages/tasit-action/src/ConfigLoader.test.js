@@ -75,6 +75,7 @@ const fulfillWithDefaults = config => {
     }
 
     provider = { ...provider, etherscan };
+
   } else if (providerType === "infura") {
     if (!infura) infura = { apiKey: null };
     else {
