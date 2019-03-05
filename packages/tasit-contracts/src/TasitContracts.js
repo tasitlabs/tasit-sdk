@@ -8,6 +8,7 @@ import marketplaceABI from "../abi/Marketplace.json";
 
 import myERC20FullABI from "../abi/MyERC20Full.json";
 import myERC721FullABI from "../abi/MyERC721Full.json";
+
 import sampleContractABI from "../abi/SampleContract.json";
 
 // Note: Under the current `tasit-contracts` setup the contracts always will deployed with these addresses
