@@ -1,7 +1,8 @@
 import Land from "./Land";
-
-import { local as localAddresses } from "../../../tasit-contracts/3rd-parties/decentraland/addresses";
-const { LANDProxy: LAND_PROXY_ADDRESS } = localAddresses;
+import TasitContracts from "../../../tasit-contracts/dist";
+const { local: localContracts } = TasitContracts;
+const { LANDProxy } = localContracts;
+const { address: LAND_PROXY_ADDRESS } = LANDProxy;
 
 describe("TasitAction.ERC721.Land", () => {
   it("should get the Land owner", async () => {

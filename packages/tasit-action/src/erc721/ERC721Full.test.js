@@ -1,14 +1,10 @@
 import ERC721Full from "./ERC721Full";
 
-// Note: Under the current `tasit-contracts` setup MyERC721Full always will be deployed with this address
-// See https://github.com/tasitlabs/TasitSDK/issues/138
-const ERC721_FULL_ADDRESS = "0x0E86f209729bf54763789CDBcA9E8b94f0FD5333";
-
-// Note: This contract is used not because of the particulars of this contract, but
-// just because we needed a contract to send an NFT to and have it fail
-// when using safeTransferFrom because this contract doesn't implement
-// onERC721Received
-const SAMPLE_CONTRACT_ADDRESS = "0x6C4A015797DDDd87866451914eCe1e8b19261931";
+import TasitContracts from "../../../tasit-contracts/dist";
+const { local: localContracts } = TasitContracts;
+const { MyERC721Full, SampleContract } = localContracts;
+const { address: ERC721_FULL_ADDRESS } = MyERC721Full;
+const { address: SAMPLE_CONTRACT_ADDRESS } = SampleContract;
 
 describe("TasitAction.ERC721.ERC721Full", () => {
   let owner;

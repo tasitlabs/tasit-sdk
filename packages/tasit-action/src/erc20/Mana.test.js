@@ -1,7 +1,8 @@
 import Mana from "./Mana";
-
-import { local as localAddresses } from "../../../tasit-contracts/3rd-parties/decentraland/addresses";
-const { MANAToken: MANA_ADDRESS } = localAddresses;
+import TasitContracts from "../../../tasit-contracts/dist";
+const { local: localContracts } = TasitContracts;
+const { MANAToken } = localContracts;
+const { address: MANA_ADDRESS } = MANAToken;
 
 describe("TasitAction.Decentraland.Mana", () => {
   it("should get the MANAToken name", async () => {

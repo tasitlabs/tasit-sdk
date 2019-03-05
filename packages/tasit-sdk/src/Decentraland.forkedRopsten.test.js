@@ -3,17 +3,14 @@ const { ERC20, ERC721, Marketplace } = Action;
 const { Mana } = ERC20;
 const { Estate, Land } = ERC721;
 const { Decentraland: DecentralandMarketplace } = Marketplace;
-
-import DecentralandUtils from "./helpers/DecentralandUtils";
-
-import { ropsten as ropstenAddresses } from "../../tasit-contracts/3rd-parties/decentraland/addresses";
-
-const {
-  MarketplaceProxy: MARKETPLACE_ADDRESS,
-  LANDProxy: LAND_ADDRESS,
-  MANAToken: MANA_ADDRESS,
-  EstateProxy: ESTATE_ADDRESS,
-} = ropstenAddresses;
+import config from "./config/default";
+import TasitContracts from "../../../tasit-contracts/dist";
+const { ropsten } = TasitContracts;
+const { MarketplaceProxy, LANDProxy, MANAToken, EstateProxy } = ropsten;
+const { address: MARKETPLACE_ADDRESS } = MarketplaceProxy;
+const { address: LAND_ADDRESS } = LANDProxy;
+const { address: MANA_ADDRESS } = MANAToken;
+const { address: ESTATE_ADDRESS } = EstateProxy;
 
 const { ONE, TEN } = constants;
 

@@ -1,16 +1,16 @@
-const abi = require("../3rd-parties/decentraland/mana/build/contracts/MANAToken.json")
-  .abi;
-const localAddresses = require("../3rd-parties/decentraland/addresses").local;
-const { MANAToken: address } = localAddresses;
+const TasitContracts = require("../dist/TasitContracts").TasitContracts;
+const { local } = TasitContracts;
+const { MANAToken } = local;
+const { address, abi } = MANAToken;
 
 // Note:
 // This test suite is using web3.js because contract deployment is made by a 3rd-party repository
 // (and most existing 3rd-party contracts tend to use Truffle which uses web3.js)
-contract("MANAToken", function(accounts) {
-  it("should get the MANAToken name", async function() {
-    const MANAToken = new web3.eth.Contract(abi, address);
+contract("MANAToken", accounts => {
+  it("should get the MANAToken name", async () => {
+    const manaToken = new web3.eth.Contract(abi, address);
 
-    const name = await MANAToken.methods.name().call();
+    const name = await manaToken.methods.name().call();
 
     assert.equal(
       name,
