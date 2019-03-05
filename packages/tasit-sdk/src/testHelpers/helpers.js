@@ -4,7 +4,7 @@ const { Contract, ERC20, ERC721, Marketplace } = Action;
 const { Mana } = ERC20;
 const { Estate, Land } = ERC721;
 const { Decentraland } = Marketplace;
-import DecentralandUtils from "./DecentralandUtils";
+import DecentralandUtils from "../helpers/DecentralandUtils";
 import TasitContracts from "../../../tasit-contracts/dist";
 const { local: localContracts, ropsten: ropstenContracts } = TasitContracts;
 const { LANDProxy } = localContracts;
@@ -249,7 +249,6 @@ export const helpers = {
   bigNumberify,
   constants,
   ProviderFactory,
-  DecentralandUtils,
 };
 
 export default helpers;
