@@ -1,5 +1,6 @@
 import estateRegistryABI from "../abi/EstateRegistry.json";
 import gnosisSafeABI from "../abi/GnosisSafe.json";
+
 import landProxyABI from "../abi/LANDProxy.json";
 import landRegistryABI from "../abi/LANDRegistry.json";
 import manaTokenABI from "../abi/MANAToken.json";
