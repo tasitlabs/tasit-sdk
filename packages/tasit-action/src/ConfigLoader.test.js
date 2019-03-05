@@ -29,7 +29,7 @@ const extractProviderConfig = async provider => {
   } = provider;
 
   let config = {
-    network: parseNetworkNameFromEthres(networkName),
+    network: parseNetworkNameFromEthers(networkName),
     pollingInterval,
   };
 
