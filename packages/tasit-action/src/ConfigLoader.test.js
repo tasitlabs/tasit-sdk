@@ -58,12 +58,15 @@ const extractProviderConfig = async provider => {
     config = { ...config, provider: "jsonrpc", jsonRpc };
   } else if (provider instanceof FallbackProvider) {
     config = { ...config, provider: "fallback" };
+  } else {
+    throw new Error(
+      "Supported provider types: [EtherscanProvider, InfuraProvider, JsonRpcProvider, FallbackProvider]"
+    );
   }
-
   return config;
 };
 
-const fulfillWithDefaults = config => {
+const fulfillConfigWithDefaults = config => {
   let { provider } = config;
   let { jsonRpc, provider: providerType, infura, etherscan } = provider;
 
@@ -75,7 +78,6 @@ const fulfillWithDefaults = config => {
     }
 
     provider = { ...provider, etherscan };
-
   } else if (providerType === "infura") {
     if (!infura) infura = { apiKey: null };
     else {
@@ -84,7 +86,6 @@ const fulfillWithDefaults = config => {
     }
 
     provider = { ...provider, infura };
-
   } else if (providerType === "jsonrpc") {
     const { user, password, allowInsecure } = jsonRpc;
     jsonRpc = { ...jsonRpc, user, password };
@@ -100,7 +101,7 @@ const fulfillWithDefaults = config => {
 };
 
 const checkConfig = async config => {
-  const userConfig = fulfillWithDefaults(config);
+  const userConfig = fulfillConfigWithDefaults(config);
 
   ConfigLoader.setConfig(config);
   const provider = ProviderFactory.getProvider();
