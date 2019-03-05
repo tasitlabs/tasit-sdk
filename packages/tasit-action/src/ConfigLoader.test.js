@@ -84,6 +84,7 @@ const fulfillWithDefaults = config => {
     }
 
     provider = { ...provider, infura };
+
   } else if (providerType === "jsonrpc") {
     const { user, password, allowInsecure } = jsonRpc;
     jsonRpc = { ...jsonRpc, user, password };
