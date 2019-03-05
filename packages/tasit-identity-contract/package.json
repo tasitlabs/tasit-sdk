@@ -26,7 +26,7 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.1.5",
-    "ethers": "^4.0.21",
+    "ethers": "^4.0.26",
     "tasit-action": "0.0.9"
   },
   "devDependencies": {
