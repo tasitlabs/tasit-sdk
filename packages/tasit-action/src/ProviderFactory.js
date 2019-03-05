@@ -19,7 +19,7 @@ export class ProviderFactory {
     etherscan,
   }) => {
     const networks = ["mainnet", "rinkeby", "ropsten", "kovan", "other"];
-    const providers = ["fallback", "infura", "etherscan", "jsonrpc"];
+    const providers = ["default", "infura", "etherscan", "jsonrpc"];
 
     if (!networks.includes(network)) {
       throw new Error(`Invalid network, use: [${networks}].`);
@@ -29,7 +29,7 @@ export class ProviderFactory {
       throw new Error(`Invalid provider, use: [${providers}].`);
     }
 
-    if (provider === "fallback") provider = "default";
+    if (provider === "fallback") network = "default";
     if (network === "mainnet") network = "homestead";
     else if (network === "other") network = undefined;
 
@@ -40,23 +40,18 @@ export class ProviderFactory {
     switch (provider) {
       case "default":
         ethersProvider = ethers.getDefaultProvider(network);
-        break;
 
       case "infura":
-        const infuraApiKey = !infura ? null : infura.apiKey;
         ethersProvider = new ethers.providers.InfuraProvider(
           network,
-          infuraApiKey
+          infura.apiKey
         );
-        break;
 
       case "etherscan":
-        const etherscanApiKey = !etherscan ? null : etherscan.apiKey;
         ethersProvider = new ethers.providers.EtherscanProvider(
           network,
-          etherscanApiKey
+          etherscan.apiKey
         );
-        break;
 
       case "jsonrpc":
         let { url, port, user, password, allowInsecure } = jsonRpc;
@@ -69,7 +64,6 @@ export class ProviderFactory {
           { url: `${url}:${port}`, user, password, allowInsecure },
           network
         );
-        break;
     }
 
     if (pollingInterval) ethersProvider.pollingInterval = pollingInterval;

@@ -1,233 +1,40 @@
 import ProviderFactory from "./ProviderFactory";
 import ConfigLoader from "./ConfigLoader";
-import { ethers } from "ethers";
-const { providers } = ethers;
-const {
-  JsonRpcProvider,
-  FallbackProvider,
-  InfuraProvider,
-  EtherscanProvider,
-} = providers;
 
-const parseNetworkNameFromEthers = networkName => {
-  if (networkName === "unknown") return "other";
-  if (networkName === "homestead") return "mainnet";
-  return networkName;
-};
-
-const extractProviderConfig = async provider => {
-  await provider.ready;
-  const network = await provider.getNetwork();
-  let { name: networkName } = network;
-  const {
-    pollingInterval,
-    apiAccessToken: infuraApiKey,
-    apiKey: etherscanApiKey,
-    connection,
-    providers,
-    path,
-  } = provider;
-
-  let config = {
-    network: parseNetworkNameFromEthers(networkName),
-    pollingInterval,
-  };
-
-  if (provider instanceof EtherscanProvider) {
-    config = {
-      ...config,
-      provider: "etherscan",
-      etherscan: { apiKey: etherscanApiKey },
-    };
-  } else if (provider instanceof InfuraProvider) {
-    config = {
-      ...config,
-      provider: "infura",
-      infura: { apiKey: infuraApiKey },
-    };
-  } else if (provider instanceof JsonRpcProvider) {
-    const { url, user, password, allowInsecure } = connection;
-    const { protocol, hostname, port } = new URL(url);
-    const jsonRpc = {
-      url: `${protocol}//${hostname}`,
-      port: Number(port),
-      user,
-      password,
-      allowInsecure,
-    };
-    config = { ...config, provider: "jsonrpc", jsonRpc };
-  } else if (provider instanceof FallbackProvider) {
-    config = { ...config, provider: "fallback" };
-  } else {
-    throw new Error(
-      "Supported provider types: [EtherscanProvider, InfuraProvider, JsonRpcProvider, FallbackProvider]"
-    );
-  }
-  return config;
-};
-
-const fulfillConfigWithDefaults = config => {
-  let { provider } = config;
-  let { jsonRpc, provider: providerType, infura, etherscan } = provider;
-
-  if (providerType === "etherscan") {
-    if (!etherscan) etherscan = { apiKey: null };
-    else {
-      const { apiKey } = etherscan;
-      etherscan = { ...etherscan, apiKey };
-    }
-
-    provider = { ...provider, etherscan };
-  } else if (providerType === "infura") {
-    if (!infura) infura = { apiKey: null };
-    else {
-      const { apiKey } = infura;
-      infura = { ...infura, apiKey };
-    }
-
-    provider = { ...provider, infura };
-  } else if (providerType === "jsonrpc") {
-    const { user, password, allowInsecure } = jsonRpc;
-    jsonRpc = { ...jsonRpc, user, password };
-
-    if (allowInsecure === undefined)
-      jsonRpc = { ...jsonRpc, allowInsecure: false };
-
-    provider = { ...provider, jsonRpc };
-  }
-
-  config = { ...config, provider };
-  return config;
-};
-
-const checkConfig = async config => {
-  const userConfig = fulfillConfigWithDefaults(config);
-
-  ConfigLoader.setConfig(config);
-  const provider = ProviderFactory.getProvider();
-  const providerConfig = await extractProviderConfig(provider);
-  const eventsConfig = ConfigLoader.getConfig().events;
-  const loadedConfig = {
-    provider: providerConfig,
-    events: eventsConfig,
-  };
-
-  expect(userConfig).to.deep.equal(loadedConfig);
-};
-
+// Note: This test suite needs to be improved
 describe("TasitAction.ConfigLoader", () => {
   let defaultConfig;
 
-  beforeEach("store default config", () => {
+  before("save original config", async () => {
     defaultConfig = ConfigLoader.getConfig();
   });
 
-  afterEach("back to default config", () => {
+  after("back to original config", async () => {
     ConfigLoader.setConfig(defaultConfig);
   });
 
-  it("should setup a provider connected to a local node using JsonRPC", async () => {
+  it("should config provider from ConfigLoader parameters", async () => {
     const config = {
       provider: {
         network: "other",
         provider: "jsonrpc",
         pollingInterval: 50,
         jsonRpc: {
-          url: "http://localhost",
-          port: 8545,
+          url: "http://some.node.eth",
+          port: 1234,
         },
       },
       events: {
         timeout: 2000,
       },
     };
+    ConfigLoader.setConfig(config);
 
-    await checkConfig(config);
-  });
+    const provider = ProviderFactory.getProvider();
 
-  it("should setup a provider connected to the rinkeby testnet using Fallback", async () => {
-    const config = {
-      provider: {
-        network: "rinkeby",
-        provider: "fallback",
-        pollingInterval: 4000,
-      },
-      events: {
-        timeout: 2000,
-      },
-    };
+    const { connection } = provider;
+    const { url } = connection;
 
-    await checkConfig(config);
-  });
-
-  describe("should setup a provider connected to the ropsten testnet using Infura", async () => {
-    it("without apiKey", async () => {
-      const config = {
-        provider: {
-          network: "ropsten",
-          provider: "infura",
-          pollingInterval: 4000,
-        },
-        events: {
-          timeout: 2000,
-        },
-      };
-
-      await checkConfig(config);
-    });
-
-    it("with apiKey", async () => {
-      const config = {
-        provider: {
-          network: "ropsten",
-          provider: "infura",
-          pollingInterval: 4000,
-          infura: {
-            apiKey: "INFURA_API_KEY",
-          },
-        },
-
-        events: {
-          timeout: 2000,
-        },
-      };
-
-      await checkConfig(config);
-    });
-  });
-
-  describe("should setup a provider connected to the mainnet using Etherscan", async () => {
-    it("without apiKey", async () => {
-      const config = {
-        provider: {
-          network: "mainnet",
-          provider: "etherscan",
-          pollingInterval: 4000,
-        },
-        events: {
-          timeout: 2000,
-        },
-      };
-
-      await checkConfig(config);
-    });
-
-    it("with apiKey", async () => {
-      const config = {
-        provider: {
-          network: "mainnet",
-          provider: "etherscan",
-          pollingInterval: 4000,
-          etherscan: {
-            apiKey: "ETHERSCAN_API_KEY",
-          },
-        },
-        events: {
-          timeout: 2000,
-        },
-      };
-
-      await checkConfig(config);
-    });
+    expect(url).to.equal("http://some.node.eth:1234");
   });
 });
