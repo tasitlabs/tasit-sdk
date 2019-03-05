@@ -9,7 +9,7 @@ const {
   EtherscanProvider,
 } = providers;
 
-const parseNetworkNameFromEthres = networkName => {
+const parseNetworkNameFromEthers = networkName => {
   if (networkName === "unknown") return "other";
   if (networkName === "homestead") return "mainnet";
   return networkName;
