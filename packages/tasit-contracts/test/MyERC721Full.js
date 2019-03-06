@@ -7,8 +7,11 @@ const MyERC721Full = artifacts.require("./MyERC721Full.sol");
 // in tasit-contracts testing the same contract.
 // For that reason, a possible TODO is removing any truffle tests
 // other than those we directly add from 3rd-party projects
-contract("MyERC721Full", async accounts => {
-  const erc721 = await MyERC721Full.deployed();
+contract("MyERC721Full", accounts => {
+  let erc721;
+  before("", async () => {
+    erc721 = await MyERC721Full.deployed();
+  });
 
   it("should get the contract name", async () => {
     const name = await erc721.name();
