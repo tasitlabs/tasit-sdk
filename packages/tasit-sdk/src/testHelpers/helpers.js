@@ -55,32 +55,6 @@ const setupContracts = async ownerWallet => {
     ownerWallet
   );
 
-  const landProxyUpgrade = landProxyContract.upgrade(
-    LAND_ADDRESS,
-    ownerWallet.address,
-    gasParams
-  );
-  await landProxyUpgrade.waitForNonceToUpdate();
-
-  const estateInitialize = estateContract.initialize(
-    "Estate",
-    "EST",
-    landProxyContract.getAddress()
-  );
-  await estateInitialize.waitForNonceToUpdate();
-
-  const landInitialize = landProxyContractWithLandABI.initialize(
-    ownerWallet.address,
-    gasParams
-  );
-  await landInitialize.waitForNonceToUpdate();
-
-  const landEstateSetup = landProxyContractWithLandABI.setEstateRegistry(
-    estateContract.getAddress(),
-    gasParams
-  );
-  await landEstateSetup.waitForNonceToUpdate();
-
   const marketplaceInitialize = marketplaceContract.initialize(
     manaContract.getAddress(),
     estateContract.getAddress(),

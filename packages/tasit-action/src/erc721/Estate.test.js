@@ -5,11 +5,13 @@ const { EstateRegistry } = localContracts;
 const { address: ESTATE_ADDRESS } = EstateRegistry;
 
 describe("TasitAction.ERC721.Estate", () => {
-  // Note: This test runs against an uninitialized contract.
+  const [ownerWallet] = accounts;
+
   // TODO: Improve that test case when we move to forked from testnet blockchain.
   it("should get the Estate owner", async () => {
+    const { address: ownerAddress } = ownerWallet;
     const estate = new Estate(ESTATE_ADDRESS);
     let owner = await estate.owner();
-    expect(owner).to.equal("0x0000000000000000000000000000000000000000");
+    expect(owner).to.equal(ownerAddress);
   });
 });
