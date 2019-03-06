@@ -155,6 +155,8 @@ The Tasit SDK provides JavaScript middleware for reading from and writing to sma
 
 This library is written in such a way that the developer using the SDK can just think about writing data and listening for more data. The fact that there's a blockchain powering this is an implementation detail that is abstracted away.
 
+Meta-transactions are a first-class feature of the API for interacting with contracts.
+
 [Here is a lot more info](/packages/tasit-action/README.md) about how this can be used.
 
 [`tasit-action` is the child package](/packages/tasit-action/) that implements these features for the Tasit SDK.
