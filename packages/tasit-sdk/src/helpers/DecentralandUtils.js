@@ -1,7 +1,8 @@
 import { ethers } from "ethers";
 import TasitContracts from "../../../tasit-contracts/dist";
 const { ropsten } = TasitContracts;
-const { MarketplaceProxy } = ropsten;
+const { Marketplace, MarketplaceProxy } = ropsten;
+const { abi: marketplaceABI } = Marketplace;
 const { address: MARKETPLACE_ADDRESS } = MarketplaceProxy;
 
 // This util class is being used to fetch data from Decentraland Marketplace contract

@@ -3,8 +3,8 @@ const { ERC20, ERC721, Marketplace } = Action;
 const { Mana } = ERC20;
 const { Estate, Land } = ERC721;
 const { Decentraland: DecentralandMarketplace } = Marketplace;
-import config from "./config/default";
-import TasitContracts from "../../../tasit-contracts/dist";
+import DecentralandUtils from "./helpers/DecentralandUtils";
+import TasitContracts from "../../tasit-contracts/dist";
 const { ropsten } = TasitContracts;
 const { MarketplaceProxy, LANDProxy, MANAToken, EstateProxy } = ropsten;
 const { address: MARKETPLACE_ADDRESS } = MarketplaceProxy;
@@ -58,8 +58,8 @@ describe("Decentraland tasit app test cases (ropsten)", () => {
 
       // All parcels of land and estates for sale are expired (block 5058416) -
       // otherwise we would select one that isn't expired
-      if (isLand) landForSale = order;
-      if (isEstate) estateForSale = order;
+      if (isLand && !expired) landForSale = order;
+      if (isEstate && !expired) estateForSale = order;
 
       if (landForSale && estateForSale) break;
 
