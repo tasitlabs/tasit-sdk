@@ -1,31 +1,47 @@
 // This script will add land parcels, estates and sell orders to the Decentraland marketplace
 // This data is being used to test the Decentraland demo app using the ganache-cli local blockchain
-import { createFromPrivateKey } from "tasit-account/dist/testHelpers/helpers";
+
 import {
-  setupWallets,
-  setupContracts,
+  //gasParams,
   duration,
+  createParcels,
   createEstatesFromParcels,
   getEstateSellOrder,
-  gasParams,
 } from "../testHelpers/helpers";
+
+const { ONE, TEN } = constants;
+
 import { Action } from "../TasitSdk";
-import config from "../config/default";
-const { ConfigLoader } = Action;
+const {
+  ConfigLoader,
+  ERC20,
+  ERC721,
+  Marketplace: MarketplaceContracts,
+} = Action;
+const { Mana } = ERC20;
+const { Estate, Land } = ERC721;
+const { Decentraland } = MarketplaceContracts;
+
+import TasitContracts from "../../../tasit-contracts/dist";
+const { local } = TasitContracts;
+const { MANAToken, LANDProxy, EstateRegistry, Marketplace } = local;
+const { address: LAND_PROXY_ADDRESS } = LANDProxy;
+const { address: ESTATE_ADDRESS } = EstateRegistry;
+const { address: MARKETPLACE_ADDRESS } = Marketplace;
 
 // It's likely that script won't be necessary after 0.1.0 version of tasit demo app
 // Use npx babel-node to run this
 (async () => {
-  ConfigLoader.setConfig(config);
+  ConfigLoader.setConfig(developmentConfig);
 
-  const { ownerWallet, sellerWallet } = setupWallets();
-  const {
-    landContract,
-    estateContract,
-    marketplaceContract,
-  } = await setupContracts(ownerWallet);
+  const [ownerWallet, sellerWallet] = accounts;
 
-  const ONE = 1e18;
+  const landContract = new Land(LAND_PROXY_ADDRESS, ownerWallet);
+  const estateContract = new Estate(ESTATE_ADDRESS, ownerWallet);
+  const marketplaceContract = new Decentraland(
+    MARKETPLACE_ADDRESS,
+    ownerWallet
+  );
 
   const parcels = [
     { x: 0, y: 1 },
@@ -65,16 +81,4 @@ const { ConfigLoader } = Action;
     );
     await createOrder.waitForNonceToUpdate();
   }
-
-  const orders = [];
-  for (let id of estateIds) {
-    const order = await getEstateSellOrder(
-      marketplaceContract,
-      estateContract,
-      id
-    );
-    orders.push(order);
-  }
-
-  console.log(orders);
 })();

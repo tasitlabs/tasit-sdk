@@ -22,7 +22,7 @@ describe("Decentraland", () => {
   let landContract;
   let estateContract;
   let marketplaceContract;
-  let estateIds;
+  let landTotalSupply;
 
   before("", async () => {
     [ownerWallet, sellerWallet, buyerWallet] = accounts;
@@ -41,36 +41,14 @@ describe("Decentraland", () => {
     estateContract = new Estate(ESTATE_ADDRESS, ownerWallet);
     marketplaceContract = new Decentraland(MARKETPLACE_ADDRESS, ownerWallet);
 
-    const parcels = [
-      { x: 0, y: 1 },
-      { x: 0, y: 2 },
-      { x: 0, y: 3 },
-      { x: 0, y: 4 },
-      { x: 0, y: 5 },
-    ];
+    landTotalSupply = await landContract.totalSupply();
 
-    // Note: Often estates have more than one parcel of land in them
-    // but here we just have one parcel of land in each to keep this test short
-    estateIds = await createEstatesFromParcels(
-      estateContract,
-      landContract,
-      parcels,
-      sellerWallet
-    );
-
-    const estateData = await estateContract.getMetadata(estateIds[0]);
-    expect(estateData).to.equal(`cool estate ${parcels[0].x}x${parcels[0].y}`);
-
-    const totalSupply = await landContract.totalSupply();
-    expect(totalSupply.toNumber()).to.equal(parcels.length);
-
-    // After became part of an estate, parcels are no more accounted as LAND balance
     await confirmBalances(landContract, [sellerWallet.address], [0]);
 
     await confirmBalances(
       estateContract,
       [sellerWallet.address],
-      [estateIds.length]
+      [landTotalSupply]
     );
 
     await mineBlocks(provider, 1);
@@ -108,7 +86,7 @@ describe("Decentraland", () => {
       await confirmBalances(
         estateContract,
         [buyerAddress, sellerAddress],
-        [0, estateIds.length]
+        [0, landTotalSupply]
       );
 
       const assetId = 1;
@@ -139,34 +117,17 @@ describe("Decentraland", () => {
       await confirmBalances(
         estateContract,
         [buyerAddress, sellerAddress],
-        [1, estateIds.length - 1]
+        [1, Number(landTotalSupply) - 1]
       );
     });
 
     describe("Decentraland tasit app test cases", () => {
-      beforeEach(
-        "create sell orders and remove wallets from contracts",
-        async () => {
-          marketplaceContract.setWallet(sellerWallet);
-          for (let assetId of estateIds) {
-            const priceInWei = ONE.toString();
-            const expireAt = Date.now() + duration.years(1);
-            const createOrder = marketplaceContract.createOrder(
-              estateContract.getAddress(),
-              assetId,
-              priceInWei,
-              expireAt,
-              gasParams
-            );
-            await createOrder.waitForNonceToUpdate();
-          }
-
-          manaContract.removeWallet();
-          landContract.removeWallet();
-          estateContract.removeWallet();
-          marketplaceContract.removeWallet();
-        }
-      );
+      beforeEach("remove wallets from contracts", async () => {
+        manaContract.removeWallet();
+        landContract.removeWallet();
+        estateContract.removeWallet();
+        marketplaceContract.removeWallet();
+      });
 
       it("should list marketplace estates sell orders (without wallet)", async () => {
         const orders = [];

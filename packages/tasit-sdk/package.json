@@ -19,7 +19,7 @@
   "scripts": {
     "prepare": "npx babel src --out-dir dist --ignore **/*.test.js",
     "test": "npm run test:local",
-    "test:local": "npm run lint && npx mocha src/*.test.js --exclude src/*forkedRopsten.test.js --require @babel/register --file src/testHelpers/mochaSetup.js --no-timeouts",
+    "test:local": "npm run lint && npx babel-node src/scripts/decentralandOrdersLoad.js && npx mocha src/*.test.js --exclude src/*forkedRopsten.test.js --require @babel/register --file src/testHelpers/mochaSetup.js --no-timeouts",
     "test:forkedRopsten": "npm run lint && npx mocha src/*forkedRopsten.test.js --require @babel/register --file src/testHelpers/mochaSetup.js --no-timeouts",
     "lint": "npx prettier src/* --write"
   },

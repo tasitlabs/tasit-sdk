@@ -18,7 +18,7 @@ const {
   Contract: ethersContract,
 } = ethers;
 
-const createParcels = async (landContract, parcels, beneficiary) => {
+export const createParcels = async (landContract, parcels, beneficiary) => {
   let xArray = [];
   let yArray = [];
   parcels.forEach(parcel => {
@@ -72,7 +72,7 @@ const createEstate = async (
   return estateId;
 };
 
-const createEstatesFromParcels = async (
+export const createEstatesFromParcels = async (
   estateContract,
   landContract,
   parcels,
@@ -94,7 +94,7 @@ const createEstatesFromParcels = async (
   return estateIds;
 };
 
-const getEstateSellOrder = async (
+export const getEstateSellOrder = async (
   marketplaceContract,
   esteteContract,
   estateId
@@ -121,7 +121,7 @@ const getEstateSellOrder = async (
   };
 };
 
-const duration = {
+export const duration = {
   seconds: function(val) {
     return val;
   },
@@ -154,22 +154,11 @@ const ropstenManaFaucet = async (provider, walletWithGas, to, amountInWei) => {
 };
 
 export const helpers = {
-  mineBlocks,
-  createSnapshot,
-  revertFromSnapshot,
-  confirmBalances,
-  gasParams,
   duration,
   createParcels,
   createEstatesFromParcels,
   getEstateSellOrder,
-  etherFaucet,
-  erc20Faucet,
   ropstenManaFaucet,
-  addressesAreEqual,
-  bigNumberify,
-  constants,
-  ProviderFactory,
 };
 
 export default helpers;
