@@ -8,7 +8,6 @@ import DecentralandUtils from "../helpers/DecentralandUtils";
 import TasitContracts from "../../../tasit-contracts/dist";
 const { local: localContracts, ropsten: ropstenContracts } = TasitContracts;
 const { LANDProxy } = localContracts;
-const { abi: landProxyABI } = LANDProxy;
 
 // Helpers
 import actionHelpers from "tasit-action/dist/testHelpers/helpers";
@@ -24,47 +23,35 @@ const setupContracts = async ownerWallet => {
   const {
     MANAToken,
     LANDRegistry,
-    LANDProxy,
     EstateRegistry,
     Marketplace,
   } = localContracts;
 
   const { address: MANA_ADDRESS } = MANAToken;
-  const { address: LAND_ADDRESS } = LANDRegistry;
   const { address: LAND_PROXY_ADDRESS } = LANDProxy;
   const { address: ESTATE_ADDRESS } = EstateRegistry;
   const { address: MARKETPLACE_ADDRESS } = Marketplace;
 
   // Note: It would be cooler to use NFT here if
   // Decentraland Land contract followed ERC721 exactly
-  const landContract = new Land(LAND_ADDRESS, ownerWallet);
-  const landProxyContract = new Contract(
-    LAND_PROXY_ADDRESS,
-    landProxyABI,
-    ownerWallet
-  );
+  const landContract = new Land(LAND_PROXY_ADDRESS, ownerWallet);
   const estateContract = new Estate(ESTATE_ADDRESS, ownerWallet);
-
   const manaContract = new Mana(MANA_ADDRESS, ownerWallet);
   const marketplaceContract = new Decentraland(
     MARKETPLACE_ADDRESS,
     ownerWallet
   );
-  const landProxyContractWithLandABI = new Land(
-    LAND_PROXY_ADDRESS,
-    ownerWallet
-  );
 
-  const marketplaceInitialize = marketplaceContract.initialize(
-    manaContract.getAddress(),
-    estateContract.getAddress(),
-    ownerWallet.address
-  );
-  await marketplaceInitialize.waitForNonceToUpdate();
+  // const marketplaceInitialize = marketplaceContract.initialize(
+  //   manaContract.getAddress(),
+  //   estateContract.getAddress(),
+  //   ownerWallet.address
+  // );
+  // await marketplaceInitialize.waitForNonceToUpdate();
 
   return {
     manaContract,
-    landContract: landProxyContractWithLandABI,
+    landContract,
     estateContract,
     marketplaceContract,
   };

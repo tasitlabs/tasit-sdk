@@ -7,8 +7,8 @@ const fs = require("fs");
 const removeFromEstateRegistry = () => {
   const filePath = "../land/build/contracts/EstateRegistry.json";
   const rawdata = fs.readFileSync(filePath);
-  const estateJson = JSON.parse(rawdata);
-  const abi = estateJson.abi;
+  const contractJson = JSON.parse(rawdata);
+  const abi = contractJson.abi;
 
   const toRemove = json => {
     const isFunction = json.type === "function";
@@ -16,10 +16,29 @@ const removeFromEstateRegistry = () => {
     return isFunction && json.name === "initialize" && json.inputs.length != 3;
   };
 
-  estateJson.abi = abi.filter(json => !toRemove(json));
+  contractJson.abi = abi.filter(json => !toRemove(json));
 
-  const data = JSON.stringify(estateJson, null, 2);
+  const data = JSON.stringify(contractJson, null, 2);
+  fs.writeFileSync(filePath, data);
+};
+
+const removeFromMarketplace = () => {
+  const filePath = "../marketplace-contracts/build/contracts/Marketplace.json";
+  const rawdata = fs.readFileSync(filePath);
+  const contractJson = JSON.parse(rawdata);
+  const abi = contractJson.abi;
+
+  const toRemove = json => {
+    const isFunction = json.type === "function";
+
+    return isFunction && json.name === "initialize" && json.inputs.length != 3;
+  };
+
+  contractJson.abi = abi.filter(json => !toRemove(json));
+
+  const data = JSON.stringify(contractJson, null, 2);
   fs.writeFileSync(filePath, data);
 };
 
 removeFromEstateRegistry();
+removeFromMarketplace();
