@@ -1,4 +1,15 @@
-import { Account } from "./TasitSdk";
+import { Account, Action } from "./TasitSdk";
+const { ERC20, ERC721, Marketplace: MarketplaceContracts } = Action;
+const { Mana } = ERC20;
+const { Estate, Land } = ERC721;
+const { Decentraland } = MarketplaceContracts;
+import TasitContracts from "../../tasit-contracts/dist";
+const { local } = TasitContracts;
+const { MANAToken, LANDProxy, EstateRegistry, Marketplace } = local;
+const { address: MANA_ADDRESS } = MANAToken;
+const { address: LAND_PROXY_ADDRESS } = LANDProxy;
+const { address: ESTATE_ADDRESS } = EstateRegistry;
+const { address: MARKETPLACE_ADDRESS } = Marketplace;
 
 const { ONE, TEN } = constants;
 
@@ -25,12 +36,10 @@ describe("Decentraland", () => {
 
   beforeEach("", async () => {
     // Note: In future we can have other ERC20 than Mana to test the Marketplace orders
-    ({
-      manaContract,
-      landContract,
-      estateContract,
-      marketplaceContract,
-    } = await setupContracts(ownerWallet));
+    manaContract = new Mana(MANA_ADDRESS, ownerWallet);
+    landContract = new Land(LAND_PROXY_ADDRESS, ownerWallet);
+    estateContract = new Estate(ESTATE_ADDRESS, ownerWallet);
+    marketplaceContract = new Decentraland(MARKETPLACE_ADDRESS, ownerWallet);
 
     const parcels = [
       { x: 0, y: 1 },
