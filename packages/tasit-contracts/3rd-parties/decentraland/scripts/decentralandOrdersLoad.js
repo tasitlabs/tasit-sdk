@@ -1,27 +1,38 @@
 // This script will add land parcels, estates and sell orders to the Decentraland marketplace
-// This data is being used to test the Decentraland demo app using the ganache-cli local blockchain
+// This data is being used to test the Decentraland demo app
 
-import { duration } from "../testHelpers/helpers";
-
-const { ONE, TEN } = constants;
-
-import { Action } from "../TasitSdk";
+import TasitAction from "../../../../tasit-action/dist/";
 const {
   ConfigLoader,
   ERC20,
   ERC721,
   Marketplace: MarketplaceContracts,
-} = Action;
+} = TasitAction;
 const { Mana } = ERC20;
 const { Estate, Land } = ERC721;
 const { Decentraland } = MarketplaceContracts;
 
-import TasitContracts from "../../../tasit-contracts/dist";
-const { local } = TasitContracts;
-const { MANAToken, LANDProxy, EstateRegistry, Marketplace } = local;
+import config from "./config/default.js";
+const { provider } = config;
+const { network } = provider;
+
+// https://stats.goerli.net/
+if (network === "goerli")
+  gasParams = {
+    gasLimit: 8e6,
+    gasPrice: 1e10,
+  };
+
+import TasitContracts from "../../../dist";
+const { local, goerli } = TasitContracts;
+const blockchain = network === "goerli" ? goerli : local;
+const { MANAToken, LANDProxy, EstateRegistry, Marketplace } = blockchain;
 const { address: LAND_PROXY_ADDRESS } = LANDProxy;
 const { address: ESTATE_ADDRESS } = EstateRegistry;
 const { address: MARKETPLACE_ADDRESS } = Marketplace;
+
+import { duration } from "../../../../tasit-sdk/dist/testHelpers/helpers";
+const { ONE, TEN } = constants;
 
 const createMultipleParcels = async (
   landContract,
@@ -59,6 +70,8 @@ const createEstate = async (estateContract, landContract, estate, wallet) => {
     yArray.push(parcel.y);
   });
 
+  console.log(`creating estate.... ${xArray} - ${yArray}`);
+
   landContract.setWallet(wallet);
   const action = landContract.createEstateWithMetadata(
     xArray,
@@ -77,6 +90,7 @@ const createEstate = async (estateContract, landContract, estate, wallet) => {
   });
 
   await action.waitForNonceToUpdate();
+  console.log("created id =", estateId);
 
   return estateId;
 };
@@ -119,8 +133,8 @@ const placeEstatesSellOrders = async (
   expireAt,
   sellerWallet
 ) => {
+  marketplace.setWallet(sellerWallet);
   for (let assetId of estatesIds) {
-    marketplace.setWallet(sellerWallet);
     const action = marketplace.createOrder(
       ESTATE_ADDRESS,
       assetId,
@@ -153,7 +167,7 @@ const placeParcelsSellOrders = async (
 };
 
 (async () => {
-  ConfigLoader.setConfig(developmentConfig);
+  ConfigLoader.setConfig(config);
 
   const [ownerWallet, sellerWallet] = accounts;
   const { address: sellerAddress } = sellerWallet;
@@ -224,6 +238,7 @@ const placeParcelsSellOrders = async (
     },
   ];
 
+  console.log("Creating parcels...");
   await createMultipleParcels(
     landContract,
     allParcels,
@@ -237,6 +252,7 @@ const placeParcelsSellOrders = async (
   });
 
   // Update parcels with metadata
+  console.log("Updating parcels with metadata...");
   landContract.setWallet(sellerWallet);
   for (let parcel of allParcels) {
     const { x, y, metadata: parcelName } = parcel;
@@ -244,18 +260,21 @@ const placeParcelsSellOrders = async (
     await updateAction.waitForNonceToUpdate();
   }
 
+  console.log("Creating estates...");
   const allEstateIds = await createEstates(
     estateContract,
     landContract,
-    allEstates,
+    allEstates.slice(4, 5),
     sellerWallet
   );
 
+  console.log("Approving Marketplace...");
   await approveMarketplace(landContract, estateContract, sellerWallet);
 
   const priceInWei = `${ONE}`;
   const expireAt = Date.now() + duration.years(5);
 
+  console.log("Placing estates sellorders...");
   await placeEstatesSellOrders(
     marketplaceContract,
     allEstateIds,
@@ -267,6 +286,7 @@ const placeParcelsSellOrders = async (
   // All unique parcels
   const landsIdsToSell = allParcelsIds.slice(13, 19);
 
+  console.log("Placing parcels sellorders...");
   await placeParcelsSellOrders(
     marketplaceContract,
     landsIdsToSell,

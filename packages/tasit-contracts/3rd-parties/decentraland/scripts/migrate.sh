@@ -46,4 +46,5 @@ cd $DECENTRALAND_DIR/marketplace-contracts && npx truffle migrate --network $NET
 
 
 ### POPULATE BLOCKCHAIN
-node $PROJECT_DIR/../tasit-sdk/dist/scripts/decentralandOrdersLoad.js
+cp $DECENTRALAND_DIR/scripts/config/$NETWORK.js $DECENTRALAND_DIR/scripts/config/default.js 
+cd $PROJECT_DIR && npx babel-node $DECENTRALAND_DIR/scripts/decentralandOrdersLoad.js
