@@ -35,9 +35,8 @@ cd $DECENTRALAND_DIR/mana && npx truffle migrate ##--network goerli
 
 # land
 cp $DECENTRALAND_DIR/scripts/land/3_land_migrations.js $DECENTRALAND_DIR/land/migrations
-# land project has that network pointing to 8454 port of ganache
-# the default develop network is pointing to 18545 and isn't working
-cd $DECENTRALAND_DIR/land && npx truffle migrate --network livenet
+cp $DECENTRALAND_DIR/scripts/land/truffle-config.js $DECENTRALAND_DIR/land
+cd $DECENTRALAND_DIR/land && npx truffle migrate ##--network goerli
 
 # marketplace-contracts
 cp $DECENTRALAND_DIR/scripts/marketplace-contracts/3_marketplace-contracts_migrations.js $DECENTRALAND_DIR/marketplace-contracts/migrations
