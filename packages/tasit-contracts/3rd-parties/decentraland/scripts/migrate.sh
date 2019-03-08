@@ -30,7 +30,8 @@ node $DECENTRALAND_DIR/scripts/remove_functions_overloading.js
 ### MIGRATE
 # mana
 cp $DECENTRALAND_DIR/scripts/mana/3_mana_migrations.js $DECENTRALAND_DIR/mana/migrations
-cd $DECENTRALAND_DIR/mana && npx truffle migrate
+cp $DECENTRALAND_DIR/scripts/mana/truffle.js $DECENTRALAND_DIR/mana
+cd $DECENTRALAND_DIR/mana && npx truffle migrate ##--network goerli
 
 # land
 cp $DECENTRALAND_DIR/scripts/land/3_land_migrations.js $DECENTRALAND_DIR/land/migrations

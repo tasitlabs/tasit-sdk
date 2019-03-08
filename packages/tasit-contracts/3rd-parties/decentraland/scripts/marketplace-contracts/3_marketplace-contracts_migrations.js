@@ -5,6 +5,8 @@ const TasitContracts = require("../../../../dist/TasitContracts")
 // Note: If you want to change this file, make sure that you are editing
 // the original file inside of the `tasit-contracts/3rd-parties/decentraland/scripts`
 module.exports = (deployer, network, accounts) => {
+  const { network, network_id } = deployer;
+
   [owner] = accounts;
   const { local } = TasitContracts;
   const { MANAToken, EstateRegistry } = local;
