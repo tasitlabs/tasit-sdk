@@ -45,6 +45,8 @@ describe("Decentraland", () => {
     const fromBlock = 0;
     const openSellOrders = await getOpenSellOrders(fromBlock);
 
+    console.log(openSellOrders.length);
+
     // Note: The exact amount of land isn't predictable since we are forking from the latest block
     expect(openSellOrders).to.not.be.empty;
 
