@@ -41,3 +41,7 @@ cd $DECENTRALAND_DIR/land && npx truffle migrate --network livenet
 # marketplace-contracts
 cp $DECENTRALAND_DIR/scripts/3_marketplace-contracts_migrations.js $DECENTRALAND_DIR/marketplace-contracts/migrations
 cd $DECENTRALAND_DIR/marketplace-contracts && npx truffle migrate
+
+
+### POPULATE BLOCKCHAIN
+node $PROJECT_DIR/../tasit-sdk/dist/scripts/decentralandOrdersLoad.js
