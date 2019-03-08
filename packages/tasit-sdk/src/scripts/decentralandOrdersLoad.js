@@ -1,7 +1,7 @@
 // This script will add land parcels, estates and sell orders to the Decentraland marketplace
 // This data is being used to test the Decentraland demo app using the ganache-cli local blockchain
 
-import { duration, getEstateSellOrder } from "../testHelpers/helpers";
+import { duration } from "../testHelpers/helpers";
 
 const { ONE, TEN } = constants;
 
@@ -23,26 +23,7 @@ const { address: LAND_PROXY_ADDRESS } = LANDProxy;
 const { address: ESTATE_ADDRESS } = EstateRegistry;
 const { address: MARKETPLACE_ADDRESS } = Marketplace;
 
-// It's likely that script won't be necessary after 0.1.0 version of tasit demo app
-// Use npx babel-node to run this
 (async () => {
-  const createParcels = async (landContract, parcels, beneficiary) => {
-    let xArray = [];
-    let yArray = [];
-    parcels.forEach(parcel => {
-      xArray.push(parcel.x);
-      yArray.push(parcel.y);
-    });
-
-    const parcelsAssignment = landContract.assignMultipleParcels(
-      xArray,
-      yArray,
-      beneficiary.address,
-      gasParams
-    );
-    await parcelsAssignment.waitForNonceToUpdate();
-  };
-
   const createEstate = async (
     estateContract,
     landContract,
@@ -50,24 +31,25 @@ const { address: MARKETPLACE_ADDRESS } = Marketplace;
     parcels,
     ownerWallet
   ) => {
-    landContract.setWallet(ownerWallet);
-
+    const { address: ownerAddress } = ownerWallet;
     let xArray = [];
     let yArray = [];
+
     parcels.forEach(parcel => {
       xArray.push(parcel.x);
       yArray.push(parcel.y);
     });
 
+    landContract.setWallet(ownerWallet);
     const estateCreation = landContract.createEstateWithMetadata(
       xArray,
       yArray,
-      ownerWallet.address,
+      ownerAddress,
       estateName,
       gasParams
     );
 
-    const estateId = await new Promise(function(resolve, reject) {
+    const estateId = await new Promise((resolve, reject) => {
       estateContract.once("CreateEstate", message => {
         const { data } = message;
         const { args } = data;
@@ -80,6 +62,28 @@ const { address: MARKETPLACE_ADDRESS } = Marketplace;
     return estateId;
   };
 
+  const createMultipleParcels = async (
+    landContract,
+    parcels,
+    beneficiaryAddress
+  ) => {
+    let xArray = [];
+    let yArray = [];
+
+    parcels.forEach(parcel => {
+      xArray.push(parcel.x);
+      yArray.push(parcel.y);
+    });
+
+    const parcelsAssignment = landContract.assignMultipleParcels(
+      xArray,
+      yArray,
+      beneficiaryAddress,
+      gasParams
+    );
+    await parcelsAssignment.waitForNonceToUpdate();
+  };
+
   const createEstatesFromParcels = async (
     estateContract,
     landContract,
@@ -87,13 +91,13 @@ const { address: MARKETPLACE_ADDRESS } = Marketplace;
     beneficiary
   ) => {
     const estateIds = [];
-    await createParcels(landContract, parcels, beneficiary);
 
     for (let parcel of parcels) {
+      const { metadata: estateName } = parcel;
       const id = await createEstate(
         estateContract,
         landContract,
-        `cool estate ${parcel.x}x${parcel.y}`,
+        estateName,
         [parcel],
         beneficiary
       );
@@ -105,6 +109,7 @@ const { address: MARKETPLACE_ADDRESS } = Marketplace;
   ConfigLoader.setConfig(developmentConfig);
 
   const [ownerWallet, sellerWallet] = accounts;
+  const { address: sellerAddress } = sellerWallet;
 
   const landContract = new Land(LAND_PROXY_ADDRESS, ownerWallet);
   const estateContract = new Estate(ESTATE_ADDRESS, ownerWallet);
@@ -113,37 +118,49 @@ const { address: MARKETPLACE_ADDRESS } = Marketplace;
     ownerWallet
   );
 
-  const parcels = [
-    { x: 0, y: 1 },
-    { x: 0, y: 2 },
-    { x: 0, y: 3 },
-    { x: 0, y: 4 },
-    { x: 0, y: 5 },
+  const allParcels = [
+    { x: 0, y: 1, metadata: `cool estate 0x1` },
+    { x: 0, y: 2, metadata: `cool estate 0x2` },
+    { x: 0, y: 3, metadata: `cool estate 0x3` },
+    { x: 0, y: 4, metadata: `cool estate 0x4` },
+    { x: 0, y: 5, metadata: `cool estate 0x5` },
+    { x: 0, y: 6, metadata: `cool estate 0x6` },
   ];
+  await createMultipleParcels(landContract, allParcels, sellerAddress);
 
   // Note: Often estates have more than one parcel of land in them
   // but here we just have one parcel of land in each to keep this test short
+  const estateParcels = allParcels.slice(0, 5);
   const estateIds = await createEstatesFromParcels(
     estateContract,
     landContract,
-    parcels,
+    estateParcels,
     sellerWallet
   );
 
   estateContract.setWallet(sellerWallet);
-  const marketplaceApprovalBySeller = estateContract.setApprovalForAll(
-    marketplaceContract.getAddress(),
+  const estateApproval = estateContract.setApprovalForAll(
+    MARKETPLACE_ADDRESS,
     true,
     gasParams
   );
-  await marketplaceApprovalBySeller.waitForNonceToUpdate();
+  await estateApproval.waitForNonceToUpdate();
+
+  landContract.setWallet(sellerWallet);
+  const landApproval = landContract.setApprovalForAll(
+    MARKETPLACE_ADDRESS,
+    true,
+    gasParams
+  );
+  await landApproval.waitForNonceToUpdate();
+
+  const priceInWei = `${ONE}`;
+  const expireAt = Date.now() + duration.years(1);
 
   marketplaceContract.setWallet(sellerWallet);
   for (let assetId of estateIds) {
-    const priceInWei = ONE.toString();
-    const expireAt = Date.now() + duration.years(1);
     const createOrder = marketplaceContract.createOrder(
-      estateContract.getAddress(),
+      ESTATE_ADDRESS,
       assetId,
       priceInWei,
       expireAt,
@@ -151,4 +168,16 @@ const { address: MARKETPLACE_ADDRESS } = Marketplace;
     );
     await createOrder.waitForNonceToUpdate();
   }
+
+  const land = allParcels[5];
+  const landId = await landContract.encodeTokenId(land.x, land.y);
+
+  const createParcelOrder = marketplaceContract.createOrder(
+    LAND_PROXY_ADDRESS,
+    landId,
+    priceInWei,
+    expireAt,
+    gasParams
+  );
+  await createParcelOrder.waitForNonceToUpdate();
 })();

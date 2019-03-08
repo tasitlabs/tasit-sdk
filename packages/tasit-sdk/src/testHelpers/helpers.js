@@ -1,10 +1,4 @@
 import { ethers } from "ethers";
-import { Action } from "../TasitSdk";
-const { Contract, ERC20, ERC721, Marketplace } = Action;
-const { Mana } = ERC20;
-const { Estate, Land } = ERC721;
-const { Decentraland } = Marketplace;
-import DecentralandUtils from "../helpers/DecentralandUtils";
 import TasitContracts from "../../../tasit-contracts/dist";
 const { local: localContracts, ropsten: ropstenContracts } = TasitContracts;
 
@@ -12,38 +6,7 @@ const { local: localContracts, ropsten: ropstenContracts } = TasitContracts;
 import actionHelpers from "tasit-action/dist/testHelpers/helpers";
 global = Object.assign(global, actionHelpers);
 
-const {
-  utils: ethersUtils,
-  constants: ethersConstants,
-  Contract: ethersContract,
-} = ethers;
-
-export const getEstateSellOrder = async (
-  marketplaceContract,
-  esteteContract,
-  estateId
-) => {
-  const [
-    orderId,
-    seller,
-    price,
-    expiresAt,
-  ] = await marketplaceContract.auctionByAssetId(estateId);
-
-  const hasOrder = parseInt(orderId, 16) !== 0;
-  if (!hasOrder) return null;
-
-  const estateName = await esteteContract.getMetadata(estateId);
-
-  return {
-    estateId,
-    estateName,
-    orderId,
-    seller,
-    price,
-    expiresAt,
-  };
-};
+const { Contract: ethersContract } = ethers;
 
 export const duration = {
   seconds: function(val) {
@@ -79,7 +42,6 @@ const ropstenManaFaucet = async (provider, walletWithGas, to, amountInWei) => {
 
 export const helpers = {
   duration,
-  getEstateSellOrder,
   ropstenManaFaucet,
 };
 

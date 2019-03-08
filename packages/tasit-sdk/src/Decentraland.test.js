@@ -72,9 +72,7 @@ describe("Decentraland", () => {
     }
 
     expect(estateForSale).not.to.be.an("undefined");
-    // TODO: Script should create land sell orders as well
-    //expect(landForSale).not.to.be.an("undefined");
-    landForSale = { priceInWei: 0 };
+    expect(landForSale).not.to.be.an("undefined");
   });
 
   beforeEach("", async () => {
@@ -139,7 +137,7 @@ describe("Decentraland", () => {
     describe("read-only / without wallet test cases", () => {
       // Note: If Decentraland were leveraging ERC721Metadata token URI's more,
       // we would have done expectations on them in this test
-      it.skip("should get land for sale info", async () => {
+      it("should get land for sale info", async () => {
         const { assetId } = landForSale;
 
         const metadataPromise = landContract.tokenMetadata(assetId);
@@ -213,11 +211,12 @@ describe("Decentraland", () => {
           approvedForAll;
         expect(approved).to.be.true;
 
-        await confirmBalances(estateContract, [ephemeralWallet.address], [0]);
+        await confirmBalances(estateContract, [ephemeralAddress], [0]);
 
         const fingerprint = await estateContract.getFingerprint(
           assetId.toString()
         );
+
         marketplaceContract.setWallet(ephemeralWallet);
         const executeOrderAction = marketplaceContract.safeExecuteOrder(
           nftAddress,
@@ -232,7 +231,55 @@ describe("Decentraland", () => {
         await confirmBalances(estateContract, [ephemeralAddress], [1]);
       });
 
-      it.skip("should buy a parcel of land", async () => {});
+      it("should buy a parcel of land", async () => {
+        const {
+          assetId,
+          nftAddress,
+          seller,
+          priceInWei,
+          expiresAt,
+        } = landForSale;
+
+        const { address: ephemeralAddress } = ephemeralWallet;
+
+        const expiresTime = Number(expiresAt);
+        expect(Date.now()).to.be.below(expiresTime);
+
+        const priceInWeiBN = bigNumberify(priceInWei);
+
+        // Buyer (ephemeral wallet) has enough MANA
+        const manaBalance = await manaContract.balanceOf(ephemeralAddress);
+        const manaBalanceBN = bigNumberify(manaBalance);
+        expect(manaBalanceBN.gte(priceInWeiBN)).to.be.true;
+
+        // Marketplace is approved to transfer Land Parcel asset owned by the seller
+        const approvedForAsset = await landContract.getApproved(assetId);
+        const approvedForAll = await landContract.isApprovedForAll(
+          seller,
+          MARKETPLACE_ADDRESS
+        );
+        const approved =
+          addressesAreEqual(approvedForAsset, MARKETPLACE_ADDRESS) ||
+          approvedForAll;
+        expect(approved).to.be.true;
+
+        await confirmBalances(landContract, [ephemeralAddress], [0]);
+
+        // LANDRegistry contract doesn't implement getFingerprint function
+        const fingerprint = "0x";
+        marketplaceContract.setWallet(ephemeralWallet);
+        const executeOrderAction = marketplaceContract.safeExecuteOrder(
+          nftAddress,
+          `${assetId}`,
+          `${priceInWei}`,
+          `${fingerprint}`,
+          gasParams
+        );
+
+        await executeOrderAction.waitForNonceToUpdate();
+
+        await confirmBalances(landContract, [ephemeralAddress], [1]);
+      });
     });
   });
 });
