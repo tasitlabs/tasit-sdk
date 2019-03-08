@@ -1,12 +1,8 @@
-import { ethers } from "ethers";
-import TasitContracts from "../../../tasit-contracts/dist";
-const { local: localContracts, ropsten: ropstenContracts } = TasitContracts;
-
 // Helpers
 import actionHelpers from "tasit-action/dist/testHelpers/helpers";
 global = Object.assign(global, actionHelpers);
 
-const { Contract: ethersContract } = ethers;
+import DecentralandUtils from "../helpers/DecentralandUtils";
 
 export const duration = {
   seconds: function(val) {
@@ -29,20 +25,49 @@ export const duration = {
   },
 };
 
-// The Mana contract deployed on ropsten network has a setBalance function
-const ropstenManaFaucet = async (provider, walletWithGas, to, amountInWei) => {
-  const { MANAToken } = ropstenContracts;
-  const { address: MANA_ADDRESS } = MANAToken;
-  const connectedWallet = walletWithGas.connect(provider);
-  const manaABI = ["function setBalance(address to, uint256 amount)"];
-  const mana = new ethersContract(MANA_ADDRESS, manaABI, connectedWallet);
-  const tx = await mana.setBalance(to.address, amountInWei);
-  await provider.waitForTransaction(tx.hash);
+export const pickAssetsForSale = async () => {
+  let landForSale;
+  let estateForSale;
+
+  const decentralandUtils = new DecentralandUtils();
+  const { getOpenSellOrders } = decentralandUtils;
+
+  const fromBlock = 0;
+  const openSellOrders = await getOpenSellOrders(fromBlock);
+  console.log("test");
+
+  // Note: The exact amount of land isn't predictable since we are forking from the latest block
+  expect(openSellOrders).to.not.be.empty;
+
+  // Pick two open sell orders: one for a parcel of land and one for an estate
+  for (let sellOrder of openSellOrders) {
+    const { values: order } = sellOrder;
+    const { nftAddress, expiresAt } = order;
+
+    const isLand = addressesAreEqual(nftAddress, LAND_PROXY_ADDRESS);
+    const isEstate = addressesAreEqual(nftAddress, ESTATE_ADDRESS);
+    const expired = Number(expiresAt) < Date.now();
+
+    // All parcels of land and estates for sale are expired (block 5058416) -
+    // otherwise we would select one that isn't expired
+    if (isLand && !expired) landForSale = order;
+    if (isEstate && !expired) estateForSale = order;
+
+    if (landForSale && estateForSale) break;
+
+    if (!isLand && !isEstate)
+      expect(
+        false,
+        "All land for sale should be an NFT that is either a parcel of land or an estate"
+      ).to.equal(true);
+  }
+
+  return { landForSale, estateForSale };
 };
 
 export const helpers = {
   duration,
-  ropstenManaFaucet,
+  pickAssetsForSale,
 };
 
 export default helpers;

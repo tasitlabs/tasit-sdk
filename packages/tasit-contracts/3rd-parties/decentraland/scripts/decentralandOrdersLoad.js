@@ -264,7 +264,7 @@ const placeParcelsSellOrders = async (
   const allEstateIds = await createEstates(
     estateContract,
     landContract,
-    allEstates.slice(4, 5),
+    allEstates,
     sellerWallet
   );
 

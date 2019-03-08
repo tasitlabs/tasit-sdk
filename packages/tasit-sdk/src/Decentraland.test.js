@@ -1,19 +1,15 @@
 import { Account, Action } from "./TasitSdk";
-const { ERC20, ERC721, Marketplace: MarketplaceContracts } = Action;
+const {
+  ConfigLoader,
+  ERC20,
+  ERC721,
+  Marketplace: MarketplaceContracts,
+} = Action;
 const { Mana } = ERC20;
 const { Estate, Land } = ERC721;
 const { Decentraland } = MarketplaceContracts;
-import TasitContracts from "../../tasit-contracts/dist";
-const { local } = TasitContracts;
-const { MANAToken, LANDProxy, EstateRegistry, Marketplace } = local;
-const { address: MANA_ADDRESS } = MANAToken;
-const { address: LAND_PROXY_ADDRESS } = LANDProxy;
-const { address: ESTATE_ADDRESS } = EstateRegistry;
-const { address: MARKETPLACE_ADDRESS } = Marketplace;
 
 const { ONE, TEN } = constants;
-
-import DecentralandUtils from "./helpers/DecentralandUtils";
 
 describe("Decentraland", () => {
   let ownerWallet;
@@ -38,40 +34,7 @@ describe("Decentraland", () => {
     estateContract = new Estate(ESTATE_ADDRESS);
     marketplaceContract = new Decentraland(MARKETPLACE_ADDRESS);
 
-    // Move getting open orders code to testHelpers
-    const decentralandUtils = new DecentralandUtils();
-    const { getOpenSellOrders } = decentralandUtils;
-
-    const fromBlock = 0;
-    const openSellOrders = await getOpenSellOrders(fromBlock);
-
-    console.log(openSellOrders.length);
-
-    // Note: The exact amount of land isn't predictable since we are forking from the latest block
-    expect(openSellOrders).to.not.be.empty;
-
-    // Pick two open sell orders: one for a parcel of land and one for an estate
-    for (let sellOrder of openSellOrders) {
-      const { values: order } = sellOrder;
-      const { nftAddress, expiresAt } = order;
-
-      const isLand = addressesAreEqual(nftAddress, LAND_PROXY_ADDRESS);
-      const isEstate = addressesAreEqual(nftAddress, ESTATE_ADDRESS);
-      const expired = Number(expiresAt) < Date.now();
-
-      // All parcels of land and estates for sale are expired (block 5058416) -
-      // otherwise we would select one that isn't expired
-      if (isLand && !expired) landForSale = order;
-      if (isEstate && !expired) estateForSale = order;
-
-      if (landForSale && estateForSale) break;
-
-      if (!isLand && !isEstate)
-        expect(
-          false,
-          "All land for sale should be an NFT that is either a parcel of land or an estate"
-        ).to.equal(true);
-    }
+    ({ landForSale, estateForSale } = await pickAssetsForSale());
 
     expect(estateForSale).not.to.be.an("undefined");
     expect(landForSale).not.to.be.an("undefined");

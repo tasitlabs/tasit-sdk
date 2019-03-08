@@ -19,7 +19,9 @@
   "scripts": {
     "prepare": "npx babel src --out-dir dist --ignore **/*.test.js",
     "test": "npm run lint && npm run test:local",
-    "test:local": "npx mocha src/*.test.js --require @babel/register --file src/testHelpers/mochaSetup.js --no-timeouts",
+    "test:local": "cp src/config/development.js src/config/default.js && npm run test:run",
+    "test:forked-testnet": "cp src/config/forked-goerli.js src/config/default.js && npm run test:run",
+    "test:run": "npx mocha src/*.test.js --require @babel/register --file src/testHelpers/mochaSetup.js --no-timeouts",
     "lint": "npx prettier src/* --write"
   },
   "bugs": {
