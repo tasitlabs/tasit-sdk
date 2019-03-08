@@ -7,7 +7,8 @@ then
 fi
 
 DECENTRALAND_DIR="$PROJECT_DIR/3rd-parties/decentraland"
-
+# Use 'development' or 'goerli'
+NETWORK="development"
 
 ### CLEAN
 # land
@@ -31,16 +32,17 @@ node $DECENTRALAND_DIR/scripts/remove_functions_overloading.js
 # mana
 cp $DECENTRALAND_DIR/scripts/mana/3_mana_migrations.js $DECENTRALAND_DIR/mana/migrations
 cp $DECENTRALAND_DIR/scripts/mana/truffle.js $DECENTRALAND_DIR/mana
-cd $DECENTRALAND_DIR/mana && npx truffle migrate ##--network goerli
+cd $DECENTRALAND_DIR/mana && npx truffle migrate --network $NETWORK
 
 # land
 cp $DECENTRALAND_DIR/scripts/land/3_land_migrations.js $DECENTRALAND_DIR/land/migrations
 cp $DECENTRALAND_DIR/scripts/land/truffle-config.js $DECENTRALAND_DIR/land
-cd $DECENTRALAND_DIR/land && npx truffle migrate ##--network goerli
+cd $DECENTRALAND_DIR/land && npx truffle migrate --network $NETWORK
 
 # marketplace-contracts
 cp $DECENTRALAND_DIR/scripts/marketplace-contracts/3_marketplace-contracts_migrations.js $DECENTRALAND_DIR/marketplace-contracts/migrations
-cd $DECENTRALAND_DIR/marketplace-contracts && npx truffle migrate
+cp $DECENTRALAND_DIR/scripts/marketplace-contracts/truffle-config.js $DECENTRALAND_DIR/marketplace-contracts
+cd $DECENTRALAND_DIR/marketplace-contracts && npx truffle migrate --network $NETWORK
 
 
 ### POPULATE BLOCKCHAIN

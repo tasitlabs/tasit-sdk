@@ -5,13 +5,15 @@ const TasitContracts = require("../../../../dist/TasitContracts")
 // Note: If you want to change this file, make sure that you are editing
 // the original file inside of the `tasit-contracts/3rd-parties/decentraland/scripts`
 module.exports = (deployer, network, accounts) => {
-  const { network, network_id } = deployer;
-
   [owner] = accounts;
-  const { local } = TasitContracts;
-  const { MANAToken, EstateRegistry } = local;
+  const { network_id } = deployer;
+  const { local, goerli } = TasitContracts;
+  const blockchain = network_id == 5 ? goerli : local;
+  const { MANAToken, EstateRegistry } = blockchain;
   const { address: MANA_ADDRESS } = MANAToken;
   const { address: ESTATE_ADDRESS } = EstateRegistry;
+
+  console.log(MANA_ADDRESS, ESTATE_ADDRESS);
 
   // Workaround to write async/await migration scripts
   // See more: https://github.com/trufflesuite/truffle/issues/501#issuecomment-332589663
