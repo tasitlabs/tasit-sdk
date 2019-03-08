@@ -1,9 +1,6 @@
 import { ethers } from "ethers";
 import TasitContracts from "../../../tasit-contracts/dist";
-const { ropsten } = TasitContracts;
-const { Marketplace, MarketplaceProxy } = ropsten;
-const { abi: marketplaceABI } = Marketplace;
-const { address: MARKETPLACE_ADDRESS } = MarketplaceProxy;
+const { ropsten, local } = TasitContracts;
 
 // This util class is being used to fetch data from Decentraland Marketplace contract
 // Fetching data likely will be replaced with subgraph queries
@@ -12,16 +9,36 @@ export default class DecentralandUtils {
   #mana;
   #provider;
 
-  constructor() {
-    // Using ethers.js because Tasit Action isn't working with ropsten
-    // TODO: Fix ProviderFactory
-    this.#provider = ethers.getDefaultProvider("ropsten");
+  // Using ethers.js because Tasit Action isn't working with ropsten
+  // TODO: Fix ProviderFactory
+  constructor(network) {
+    if (network === "ropsten") {
+      // Using etherscan/infura APIs
+      this.#provider = ethers.getDefaultProvider("ropsten");
 
-    this.#marketplace = new ethers.Contract(
-      MARKETPLACE_ADDRESS,
-      marketplaceABI,
-      this.#provider
-    );
+      const { Marketplace, MarketplaceProxy } = ropsten;
+      const { abi: marketplaceABI } = Marketplace;
+      const { address: MARKETPLACE_ADDRESS } = MarketplaceProxy;
+
+      this.#marketplace = new ethers.Contract(
+        MARKETPLACE_ADDRESS,
+        marketplaceABI,
+        this.#provider
+      );
+    } else {
+      // Using local blockchain
+      this.#provider = new ethers.providers.JsonRpcProvider();
+
+      const { Marketplace } = local;
+      const { abi: marketplaceABI } = Marketplace;
+      const { address: MARKETPLACE_ADDRESS } = Marketplace;
+
+      this.#marketplace = new ethers.Contract(
+        MARKETPLACE_ADDRESS,
+        marketplaceABI,
+        this.#provider
+      );
+    }
   }
 
   getOpenSellOrders = async fromBlock => {

@@ -18,82 +18,6 @@ const {
   Contract: ethersContract,
 } = ethers;
 
-export const createParcels = async (landContract, parcels, beneficiary) => {
-  let xArray = [];
-  let yArray = [];
-  parcels.forEach(parcel => {
-    xArray.push(parcel.x);
-    yArray.push(parcel.y);
-  });
-
-  const parcelsAssignment = landContract.assignMultipleParcels(
-    xArray,
-    yArray,
-    beneficiary.address,
-    gasParams
-  );
-  await parcelsAssignment.waitForNonceToUpdate();
-};
-
-const createEstate = async (
-  estateContract,
-  landContract,
-  estateName,
-  parcels,
-  ownerWallet
-) => {
-  landContract.setWallet(ownerWallet);
-
-  let xArray = [];
-  let yArray = [];
-  parcels.forEach(parcel => {
-    xArray.push(parcel.x);
-    yArray.push(parcel.y);
-  });
-
-  const estateCreation = landContract.createEstateWithMetadata(
-    xArray,
-    yArray,
-    ownerWallet.address,
-    estateName,
-    gasParams
-  );
-
-  const estateId = await new Promise(function(resolve, reject) {
-    estateContract.once("CreateEstate", message => {
-      const { data } = message;
-      const { args } = data;
-      resolve(args._estateId);
-    });
-  });
-
-  await estateCreation.waitForNonceToUpdate();
-
-  return estateId;
-};
-
-export const createEstatesFromParcels = async (
-  estateContract,
-  landContract,
-  parcels,
-  beneficiary
-) => {
-  const estateIds = [];
-  await createParcels(landContract, parcels, beneficiary);
-
-  for (let parcel of parcels) {
-    const id = await createEstate(
-      estateContract,
-      landContract,
-      `cool estate ${parcel.x}x${parcel.y}`,
-      [parcel],
-      beneficiary
-    );
-    estateIds.push(id);
-  }
-  return estateIds;
-};
-
 export const getEstateSellOrder = async (
   marketplaceContract,
   esteteContract,
@@ -155,8 +79,6 @@ const ropstenManaFaucet = async (provider, walletWithGas, to, amountInWei) => {
 
 export const helpers = {
   duration,
-  createParcels,
-  createEstatesFromParcels,
   getEstateSellOrder,
   ropstenManaFaucet,
 };

@@ -1,13 +1,7 @@
 // This script will add land parcels, estates and sell orders to the Decentraland marketplace
 // This data is being used to test the Decentraland demo app using the ganache-cli local blockchain
 
-import {
-  //gasParams,
-  duration,
-  createParcels,
-  createEstatesFromParcels,
-  getEstateSellOrder,
-} from "../testHelpers/helpers";
+import { duration, getEstateSellOrder } from "../testHelpers/helpers";
 
 const { ONE, TEN } = constants;
 
@@ -32,6 +26,82 @@ const { address: MARKETPLACE_ADDRESS } = Marketplace;
 // It's likely that script won't be necessary after 0.1.0 version of tasit demo app
 // Use npx babel-node to run this
 (async () => {
+  const createParcels = async (landContract, parcels, beneficiary) => {
+    let xArray = [];
+    let yArray = [];
+    parcels.forEach(parcel => {
+      xArray.push(parcel.x);
+      yArray.push(parcel.y);
+    });
+
+    const parcelsAssignment = landContract.assignMultipleParcels(
+      xArray,
+      yArray,
+      beneficiary.address,
+      gasParams
+    );
+    await parcelsAssignment.waitForNonceToUpdate();
+  };
+
+  const createEstate = async (
+    estateContract,
+    landContract,
+    estateName,
+    parcels,
+    ownerWallet
+  ) => {
+    landContract.setWallet(ownerWallet);
+
+    let xArray = [];
+    let yArray = [];
+    parcels.forEach(parcel => {
+      xArray.push(parcel.x);
+      yArray.push(parcel.y);
+    });
+
+    const estateCreation = landContract.createEstateWithMetadata(
+      xArray,
+      yArray,
+      ownerWallet.address,
+      estateName,
+      gasParams
+    );
+
+    const estateId = await new Promise(function(resolve, reject) {
+      estateContract.once("CreateEstate", message => {
+        const { data } = message;
+        const { args } = data;
+        resolve(args._estateId);
+      });
+    });
+
+    await estateCreation.waitForNonceToUpdate();
+
+    return estateId;
+  };
+
+  const createEstatesFromParcels = async (
+    estateContract,
+    landContract,
+    parcels,
+    beneficiary
+  ) => {
+    const estateIds = [];
+    await createParcels(landContract, parcels, beneficiary);
+
+    for (let parcel of parcels) {
+      const id = await createEstate(
+        estateContract,
+        landContract,
+        `cool estate ${parcel.x}x${parcel.y}`,
+        [parcel],
+        beneficiary
+      );
+      estateIds.push(id);
+    }
+    return estateIds;
+  };
+
   ConfigLoader.setConfig(developmentConfig);
 
   const [ownerWallet, sellerWallet] = accounts;
