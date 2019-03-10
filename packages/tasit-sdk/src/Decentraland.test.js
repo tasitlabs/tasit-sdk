@@ -46,7 +46,6 @@ describe("Decentraland", () => {
     await etherFaucet(provider, ownerWallet, ephemeralAddress, ONE);
 
     await confirmBalances(manaContract, [ephemeralAddress], [0]);
-
     await confirmBalances(landContract, [ephemeralAddress], [0]);
     await confirmBalances(estateContract, [ephemeralAddress], [0]);
 
