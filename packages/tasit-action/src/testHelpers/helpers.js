@@ -152,12 +152,14 @@ const erc20Faucet = async (
   tokenContract.setWallet(ownerWallet);
   const mintAction = tokenContract.mint(toAddress, `${amountInWei}`);
   await mintAction.waitForNonceToUpdate();
+  await confirmBalances(tokenContract, [toAddress], [amountInWei]);
 };
 
 const erc721Faucet = async (tokenContract, ownerWallet, toAddress, tokenId) => {
   tokenContract.setWallet(ownerWallet);
   const mintAction = tokenContract.mint(toAddress, tokenId);
   await mintAction.waitForNonceToUpdate();
+  await confirmBalances(tokenContract, [toAddress], [1]);
 };
 
 const addressesAreEqual = (address1, address2) => {

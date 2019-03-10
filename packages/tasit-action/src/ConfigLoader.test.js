@@ -230,17 +230,12 @@ describe("TasitAction.ConfigLoader", () => {
       await checkConfig(config);
     });
 
-    // Note: ethers.js isn't supporting goerli with Infura yet
-    // See more: https://github.com/ethers-io/ethers.js/issues/421#issuecomment-471037522
     it("should setup a provider connected to the goerli testnet using Fallback", async () => {
       const config = {
         provider: {
           network: "goerli",
-          provider: "etherscan",
+          provider: "fallback",
           pollingInterval: 4000,
-          etherscan: {
-            apiKey: "ETHERSCAN_API_KEY",
-          },
         },
         events: {
           timeout: 2000,

@@ -20,7 +20,7 @@
     "prepare": "npx babel src --out-dir dist --ignore **/*.test.js",
     "test": "npm run lint && npm run test:local",
     "test:local": "cp src/config/development.js src/config/default.js && npm run test:run",
-    "test:forked-testnet": "npm run test:forket-ropsten",
+    "test:forked-testnet": "npm run test:forked-ropsten",
     "test:forked-ropsten": "cp src/config/forked-ropsten.js src/config/default.js && npm run test:run",
     "test:forked-goerli": "cp src/config/forked-goerli.js src/config/default.js && npm run test:run",
     "test:run": "npx mocha src/*.test.js  --require @babel/register --file src/testHelpers/mochaSetup.js --no-timeouts",
