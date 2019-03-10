@@ -8,7 +8,7 @@ fi
 
 DECENTRALAND_DIR="$PROJECT_DIR/3rd-parties/decentraland"
 # Use 'development', 'ropsten' or 'goerli'
-NETWORK="ropsten";
+NETWORK="development";
 MNEMONIC="beach swap combine paper music cook electric bullet trust actress liquid asthma";
 INFURA_TOKEN="974bd2e667b246f29d2589a59600530e";
 
