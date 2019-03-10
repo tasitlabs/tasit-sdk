@@ -19,7 +19,7 @@ export default class DecentralandUtils {
       const { name: networkName } = network;
 
       // Note: Infura/Etherscan API is a faster way to get logs than RPC connection from forked ganache
-      if (networkName === "goerli")
+      if (networkName === "goerli" || networkName === "ropsten")
         this.#provider = ethers.getDefaultProvider(networkName);
     }
 

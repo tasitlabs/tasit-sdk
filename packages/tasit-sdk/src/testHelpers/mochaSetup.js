@@ -25,8 +25,11 @@ const { provider: configProvider } = config;
 const { network } = configProvider;
 
 import TasitContracts from "../../../tasit-contracts/dist";
-const { local, goerli } = TasitContracts;
-const blockchain = network === "goerli" ? goerli : local;
+const { local, goerli, ropsten } = TasitContracts;
+let blockchain;
+if (network === "goerli") blockchain = goerli;
+else if (network === "ropsten") blockchain = ropsten;
+else blokchain = local;
 const { MANAToken, LANDProxy, EstateRegistry, Marketplace } = blockchain;
 const { address: MANA_ADDRESS } = MANAToken;
 const { address: LAND_PROXY_ADDRESS } = LANDProxy;

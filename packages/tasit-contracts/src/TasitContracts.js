@@ -75,45 +75,25 @@ const goerli = {
   },
 };
 
-import decentralandAddresses from "../3rd-parties/decentraland/contracts/addresses.json";
-const { ropsten: decentralandRopstenAddresses } = decentralandAddresses;
-const {
-  EstateProxy: ROPSTEN_ESTATE_REGISTRY_PROXY_ADDRESS,
-  EstateRegistry: ROPSTEN_ESTATE_REGISTRY_ADDRESS,
-  LANDProxy: ROPSTEN_LAND_PROXY_ADDRESS,
-  LANDRegistry: ROPSTEN_LAND_REGISTRY_ADDRESS,
-  MANAToken: ROPSTEN_MANA_TOKEN_ADDRESS,
-  MarketplaceProxy: ROPSTEN_MARKETPLACE_PROXY_ADDRESS,
-  Marketplace: ROPSTEN_MARKETPLACE_ADDRESS,
-} = decentralandRopstenAddresses;
-
 const ropsten = {
-  EstateProxy: {
-    address: ROPSTEN_ESTATE_REGISTRY_PROXY_ADDRESS,
-    abi: estateRegistryABI,
-  },
   EstateRegistry: {
-    address: ROPSTEN_ESTATE_REGISTRY_ADDRESS,
+    address: "0xb32939da0c44bf255b9810421a55be095f9bb3f4",
     abi: estateRegistryABI,
   },
   LANDProxy: {
-    address: ROPSTEN_LAND_PROXY_ADDRESS,
+    address: "0xb35420eea0bc8af4f8a74414d080ea45f1ebf7bb",
     abi: landProxyABI,
   },
   LANDRegistry: {
-    address: ROPSTEN_LAND_REGISTRY_ADDRESS,
+    address: "0x332bfb4d705d3ce37c4bf06141c7104984e91e79",
     abi: landRegistryABI,
   },
   MANAToken: {
-    address: ROPSTEN_MANA_TOKEN_ADDRESS,
+    address: "0x0e86f209729bf54763789cdbca9e8b94f0fd5333",
     abi: manaTokenABI,
   },
   Marketplace: {
-    address: ROPSTEN_MARKETPLACE_ADDRESS,
-    abi: marketplaceABI,
-  },
-  MarketplaceProxy: {
-    address: ROPSTEN_MARKETPLACE_PROXY_ADDRESS,
+    address: "0x289c42facf691946b64b4370361b1303f0a463ef",
     abi: marketplaceABI,
   },
 };

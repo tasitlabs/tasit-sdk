@@ -1,6 +1,6 @@
-const goerli = {
+const ropsten = {
   provider: {
-    network: "goerli",
+    network: "ropsten",
     provider: "infura",
     pollingInterval: 4000,
   },
@@ -9,4 +9,4 @@ const goerli = {
   },
 };
 
-module.exports = goerli;
+module.exports = ropsten;

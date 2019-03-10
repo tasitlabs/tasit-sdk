@@ -24,8 +24,11 @@ if (network === "goerli")
   };
 
 import TasitContracts from "../../../dist";
-const { local, goerli } = TasitContracts;
-const blockchain = network === "goerli" ? goerli : local;
+const { local, goerli, ropsten } = TasitContracts;
+let blockchain;
+if (network === "goerli") blockchain = goerli;
+else if (network === "ropsten") blockchain = ropsten;
+else blockchain = local;
 const { MANAToken, LANDProxy, EstateRegistry, Marketplace } = blockchain;
 const { address: LAND_PROXY_ADDRESS } = LANDProxy;
 const { address: ESTATE_ADDRESS } = EstateRegistry;
