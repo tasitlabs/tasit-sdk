@@ -14,6 +14,14 @@ export default class DecentralandUtils {
   constructor() {
     this.#provider = ProviderFactory.getProvider();
 
+    const { _network: network } = this.#provider;
+    const { name: networkName } = network;
+
+    // Note: Infura/Etherscan API is a faster way to get logs than RPC connection from forked ganache
+    if (networkName === "goerli") {
+      this.#provider = ethers.getDefaultProvider("goerli");
+    }
+
     this.#marketplace = new ethers.Contract(
       MARKETPLACE_ADDRESS,
       marketplaceABI,

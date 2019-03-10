@@ -26,7 +26,7 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.1.5",
-    "ethers": "^4.0.26"
+    "ethers": "^4.0.27"
   },
   "devDependencies": {
     "@babel/cli": "^7.1.5",

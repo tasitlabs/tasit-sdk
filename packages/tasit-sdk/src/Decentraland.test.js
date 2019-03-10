@@ -156,7 +156,8 @@ describe("Decentraland", () => {
         const { address: ephemeralAddress } = ephemeralWallet;
 
         const expiresTime = Number(expiresAt);
-        expect(Date.now()).to.be.below(expiresTime);
+        const nowInSeconds = Date.now() / 1000;
+        expect(nowInSeconds).to.be.below(expiresTime);
 
         const priceInWeiBN = bigNumberify(priceInWei);
 
@@ -208,7 +209,8 @@ describe("Decentraland", () => {
         const { address: ephemeralAddress } = ephemeralWallet;
 
         const expiresTime = Number(expiresAt);
-        expect(Date.now()).to.be.below(expiresTime);
+        const nowInSeconds = Date.now() / 1000;
+        expect(nowInSeconds).to.be.below(expiresTime);
 
         const priceInWeiBN = bigNumberify(priceInWei);
 

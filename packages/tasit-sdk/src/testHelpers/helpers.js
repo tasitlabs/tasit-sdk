@@ -34,7 +34,6 @@ export const pickAssetsForSale = async () => {
 
   const fromBlock = 0;
   const openSellOrders = await getOpenSellOrders(fromBlock);
-  console.log("test");
 
   // Note: The exact amount of land isn't predictable since we are forking from the latest block
   expect(openSellOrders).to.not.be.empty;
@@ -46,7 +45,9 @@ export const pickAssetsForSale = async () => {
 
     const isLand = addressesAreEqual(nftAddress, LAND_PROXY_ADDRESS);
     const isEstate = addressesAreEqual(nftAddress, ESTATE_ADDRESS);
-    const expired = Number(expiresAt) < Date.now();
+
+    const nowInSeconds = Date.now() / 1000;
+    const expired = Number(expiresAt) < nowInSeconds;
 
     // All parcels of land and estates for sale are expired (block 5058416) -
     // otherwise we would select one that isn't expired
