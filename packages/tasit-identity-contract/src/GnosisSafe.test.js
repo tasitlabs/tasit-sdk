@@ -174,7 +174,7 @@ describe("GnosisSafe", () => {
       };
 
       // Note: Some error events are been trigger only from the confirmationListener
-      // See more: [CREATE AN ISSUE]
+      // See more: https://github.com/tasitlabs/TasitSDK/issues/253
       const confirmationListener = () => {};
 
       execTxAction.on("error", errorListener);
