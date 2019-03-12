@@ -12,7 +12,7 @@ const { Mana } = ERC20;
 const { Estate, Land } = ERC721;
 const { Decentraland } = MarketplaceContracts;
 
-import config from "./config/default.js";
+import config from "./config/default";
 const { provider } = config;
 const { network } = provider;
 
