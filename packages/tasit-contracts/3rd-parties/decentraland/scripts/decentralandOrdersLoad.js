@@ -29,7 +29,7 @@ let blockchain;
 if (network === "goerli") blockchain = goerli;
 else if (network === "ropsten") blockchain = ropsten;
 else blockchain = local;
-const { MANAToken, LANDProxy, EstateRegistry, Marketplace } = blockchain;
+const { LANDProxy, EstateRegistry, Marketplace } = blockchain;
 const { address: LAND_PROXY_ADDRESS } = LANDProxy;
 const { address: ESTATE_ADDRESS } = EstateRegistry;
 const { address: MARKETPLACE_ADDRESS } = Marketplace;
