@@ -4,7 +4,7 @@ const { ERC20Detailed } = ERC20;
 const { ERC721Full } = ERC721;
 import GnosisSafeUtils from "./GnosisSafeUtils";
 import ActionUtils from "tasit-action/dist/contract/Utils.js";
-import TasitContracts from "../../tasit-contracts/dist";
+import TasitContracts from "tasit-contracts";
 const { local } = TasitContracts;
 const { GnosisSafe: GnosisSafeInfo, MyERC20Full, MyERC721Full } = local;
 const { abi: gnosisSafeABI } = GnosisSafeInfo;

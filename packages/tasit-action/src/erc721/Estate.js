@@ -1,9 +1,11 @@
 import Contract from "../contract/Contract";
-import estateRegistryABI from "../../../tasit-contracts/abi/EstateRegistry.json";
+import TasitContracts from "tasit-contracts";
+const { local } = TasitContracts;
+const { EstateRegistry } = local;
+const { abi } = EstateRegistry;
 
 export default class DecentralandEstate extends Contract {
   constructor(address, wallet) {
-    const abi = estateRegistryABI;
     super(address, abi, wallet);
   }
 }

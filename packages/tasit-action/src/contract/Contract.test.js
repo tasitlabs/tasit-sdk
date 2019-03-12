@@ -1,6 +1,6 @@
 import Contract from "./Contract";
 import Account from "tasit-account";
-import TasitContracts from "../../../tasit-contracts/dist";
+import TasitContracts from "tasit-contracts";
 const { local: localContracts } = TasitContracts;
 const { SampleContract } = localContracts;
 const {

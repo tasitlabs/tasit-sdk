@@ -1,5 +1,5 @@
 import Land from "./Land";
-import TasitContracts from "../../../tasit-contracts/dist";
+import TasitContracts from "tasit-contracts";
 const { local: localContracts } = TasitContracts;
 const { LANDProxy } = localContracts;
 const { address: LAND_PROXY_ADDRESS } = LANDProxy;

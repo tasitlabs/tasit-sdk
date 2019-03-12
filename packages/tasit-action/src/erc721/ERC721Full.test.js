@@ -1,6 +1,6 @@
 import ERC721Full from "./ERC721Full";
 
-import TasitContracts from "../../../tasit-contracts/dist";
+import TasitContracts from "tasit-contracts";
 const { local: localContracts } = TasitContracts;
 const { MyERC721Full, SampleContract } = localContracts;
 const { address: ERC721_FULL_ADDRESS } = MyERC721Full;

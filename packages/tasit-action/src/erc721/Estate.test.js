@@ -1,5 +1,5 @@
 import Estate from "./Estate";
-import TasitContracts from "../../../tasit-contracts/dist";
+import TasitContracts from "tasit-contracts";
 const { local: localContracts } = TasitContracts;
 const { EstateRegistry } = localContracts;
 const { address: ESTATE_ADDRESS } = EstateRegistry;

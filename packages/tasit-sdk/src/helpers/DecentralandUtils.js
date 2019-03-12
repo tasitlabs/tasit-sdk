@@ -1,5 +1,5 @@
 import { ethers } from "ethers";
-import TasitContracts from "../../../tasit-contracts/dist";
+import TasitContracts from "tasit-contracts";
 // ABI is the same among the networks. The ABI from local will work with tesnet.
 const { local } = TasitContracts;
 const { Marketplace } = local;

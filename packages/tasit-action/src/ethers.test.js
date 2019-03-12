@@ -1,6 +1,6 @@
 import { ethers } from "ethers";
 ethers.errors.setLogLevel("error");
-import TasitContracts from "../../tasit-contracts/dist";
+import TasitContracts from "tasit-contracts";
 const { local: localContracts } = TasitContracts;
 const { SampleContract } = localContracts;
 const {

@@ -1,9 +1,11 @@
 import Contract from "../contract/Contract";
-import marketplaceABI from "../../../tasit-contracts/abi/Marketplace.json";
+import TasitContracts from "tasit-contracts";
+const { local } = TasitContracts;
+const { Marketplace } = local;
+const { abi } = Marketplace;
 
 export default class Decentraland extends Contract {
   constructor(address, wallet) {
-    const abi = marketplaceABI;
     super(address, abi, wallet);
   }
 }

@@ -1,5 +1,5 @@
 import Mana from "./Mana";
-import TasitContracts from "../../../tasit-contracts/dist";
+import TasitContracts from "tasit-contracts";
 const { local: localContracts } = TasitContracts;
 const { MANAToken } = localContracts;
 const { address: MANA_ADDRESS } = MANAToken;
