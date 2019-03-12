@@ -131,7 +131,7 @@ const approveMarketplace = async (
 
 const placeEstatesSellOrders = async (
   marketplace,
-  estatesIds,
+  estateIds,
   priceInWei,
   expireAt,
   sellerWallet
