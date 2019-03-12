@@ -151,7 +151,7 @@ const placeEstatesSellOrders = async (
 
 const placeParcelsSellOrders = async (
   marketplace,
-  landsIds,
+  landIds,
   priceInWei,
   expireAt,
   sellerWallet
