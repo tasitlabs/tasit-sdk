@@ -1,5 +1,5 @@
 import Decentraland from "./Decentraland";
-import TasitContracts from "../../../tasit-contracts/dist";
+import TasitContracts from "tasit-contracts";
 const { local: localContracts } = TasitContracts;
 const { Marketplace } = localContracts;
 const { address: MARKETPLACE_ADDRESS } = Marketplace;

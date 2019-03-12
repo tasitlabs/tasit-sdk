@@ -12,7 +12,7 @@ import actionHelpers from "./helpers";
 global = Object.assign(global, actionHelpers);
 
 import ConfigLoader from "../ConfigLoader";
-import config from "../config/default.js";
+import config from "../config/default";
 ConfigLoader.setConfig(config);
 
 // Global hooks
