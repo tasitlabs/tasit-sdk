@@ -1,6 +1,6 @@
 {
   "name": "tasit-account",
-  "version": "0.0.9",
+  "version": "0.0.11",
   "description": "Library for using Ethereum accounts",
   "main": "dist/index.js",
   "keywords": [

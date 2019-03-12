@@ -1,6 +1,6 @@
 {
   "name": "tasit-identity-contract",
-  "version": "0.0.9",
+  "version": "0.0.11",
   "description": "Library for onboarding a user using a smart-contract-based identity.",
   "main": "dist/index.js",
   "keywords": [
@@ -27,7 +27,7 @@
   "dependencies": {
     "@babel/runtime": "^7.1.5",
     "ethers": "^4.0.27",
-    "tasit-action": "0.0.9"
+    "tasit-action": "^0.0.11"
   },
   "devDependencies": {
     "@babel/cli": "^7.1.5",
