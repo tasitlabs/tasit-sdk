@@ -155,7 +155,7 @@ describe("GnosisSafe", () => {
       expect(`${thresholdAfter}`).to.equal(`2`);
     });
 
-    it("shouldn't can execute transfer with insuficient signers", async () => {
+    it("shouldn't can execute transfer with insufficient signers", async () => {
       const onError = sinon.fake();
 
       await etherFaucet(provider, root, GNOSIS_SAFE_ADDRESS, ONE);
