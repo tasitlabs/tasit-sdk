@@ -72,7 +72,7 @@ describe("GnosisSafe", () => {
       const value = ONE;
 
       gnosisSafe.setWallet(johnWallet);
-      const execTxAction = await gnosisSafe.transferEther(toAddress, value);
+      const execTxAction = gnosisSafe.transferEther(toAddress, value);
       await execTxAction.waitForNonceToUpdate();
 
       const balance = await provider.getBalance(GNOSIS_SAFE_ADDRESS);
@@ -93,11 +93,7 @@ describe("GnosisSafe", () => {
       const value = ONE;
 
       gnosisSafe.setWallet(johnWallet);
-      const action = await gnosisSafe.transferERC20(
-        tokenAddress,
-        toAddress,
-        value
-      );
+      const action = gnosisSafe.transferERC20(tokenAddress, toAddress, value);
       await action.waitForNonceToUpdate();
 
       const balance = await erc20.balanceOf(GNOSIS_SAFE_ADDRESS);
@@ -120,7 +116,7 @@ describe("GnosisSafe", () => {
       const { address: toAddress } = johnWallet;
 
       gnosisSafe.setWallet(johnWallet);
-      const execTxAction = await gnosisSafe.transferNFT(
+      const execTxAction = gnosisSafe.transferNFT(
         tokenAddress,
         toAddress,
         tokenId
@@ -145,7 +141,7 @@ describe("GnosisSafe", () => {
     const newThreshold = `2`;
 
     gnosisSafe.setWallet(johnWallet);
-    const action = await gnosisSafe.addSignerWithThreshold(
+    const action = gnosisSafe.addSignerWithThreshold(
       newSignerAddress,
       newThreshold
     );

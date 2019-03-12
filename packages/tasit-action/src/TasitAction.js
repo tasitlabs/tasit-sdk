@@ -1,4 +1,5 @@
 import ConfigLoader from "./ConfigLoader";
+import Action from "./contract/Action";
 import Contract from "./contract/Contract";
 import ERC721Full from "./erc721/ERC721Full";
 import Land from "./erc721/Land";
@@ -19,6 +20,7 @@ export const TasitAction = {
   ERC20,
   ERC721,
   Marketplace,
+  Action,
 };
 
 export default TasitAction;
