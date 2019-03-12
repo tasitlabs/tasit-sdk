@@ -46,7 +46,7 @@ cd $DECENTRALAND_DIR/land && MNEMONIC=$MNEMONIC INFURA_TOKEN=$INFURA_TOKEN npx t
 # marketplace-contracts
 cp $DECENTRALAND_DIR/scripts/marketplace-contracts/3_marketplace-contracts_migrations.js $DECENTRALAND_DIR/marketplace-contracts/migrations
 cp $DECENTRALAND_DIR/scripts/marketplace-contracts/truffle-config.js $DECENTRALAND_DIR/marketplace-contracts
-cd $DECENTRALAND_DIR/marketplace-contracts &&  MNEMONIC=$MNEMONIC INFURA_TOKEN=$INFURA_TOKEN npx truffle migrate --network $NETWORK
+cd $DECENTRALAND_DIR/marketplace-contracts && MNEMONIC=$MNEMONIC INFURA_TOKEN=$INFURA_TOKEN npx truffle migrate --network $NETWORK
 
 
 ### POPULATE BLOCKCHAIN
