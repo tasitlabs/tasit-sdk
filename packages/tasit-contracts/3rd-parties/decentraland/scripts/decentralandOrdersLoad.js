@@ -137,7 +137,7 @@ const placeEstatesSellOrders = async (
   sellerWallet
 ) => {
   marketplace.setWallet(sellerWallet);
-  for (let assetId of estatesIds) {
+  for (let assetId of estateIds) {
     const action = marketplace.createOrder(
       ESTATE_ADDRESS,
       assetId,
@@ -157,7 +157,7 @@ const placeParcelsSellOrders = async (
   sellerWallet
 ) => {
   marketplace.setWallet(sellerWallet);
-  for (let assetId of landsIds) {
+  for (let assetId of landIds) {
     const action = marketplace.createOrder(
       LAND_PROXY_ADDRESS,
       assetId,
@@ -287,12 +287,12 @@ const placeParcelsSellOrders = async (
   );
 
   // All unique parcels
-  const landsIdsToSell = allParcelsIds.slice(13, 19);
+  const landIdsToSell = allParcelsIds.slice(13, 19);
 
   console.log("Placing parcels sellorders...");
   await placeParcelsSellOrders(
     marketplaceContract,
-    landsIdsToSell,
+    landIdsToSell,
     priceInWei,
     expireAt,
     sellerWallet
