@@ -229,5 +229,20 @@ describe("TasitAction.ConfigLoader", () => {
 
       await checkConfig(config);
     });
+
+    it("should setup a provider connected to the goerli testnet using Fallback", async () => {
+      const config = {
+        provider: {
+          network: "goerli",
+          provider: "fallback",
+          pollingInterval: 4000,
+        },
+        events: {
+          timeout: 2000,
+        },
+      };
+
+      await checkConfig(config);
+    });
   });
 });

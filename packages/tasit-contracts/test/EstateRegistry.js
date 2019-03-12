@@ -1,11 +1,7 @@
 const TasitContracts = require("../dist/TasitContracts").TasitContracts;
 const { local } = TasitContracts;
-const { EstateRegistry, LANDRegistry } = local;
-const {
-  address: ESTATE_REGISTRY_ADDRESS,
-  abi: estateRegistryABI,
-} = EstateRegistry;
-const { address: LAND_REGISTRY_ADDRESS } = LANDRegistry;
+const { EstateRegistry } = local;
+const { abi, address } = EstateRegistry;
 
 // Note:
 // This test suite is using web3.js because contract deployment is made by a 3rd-party repository
@@ -13,17 +9,8 @@ const { address: LAND_REGISTRY_ADDRESS } = LANDRegistry;
 contract("EstateRegistry", accounts => {
   const [owner] = accounts;
 
-  const gasParams = { gas: 7e6, gasPrice: 1e9 };
-
-  it("should initialize and get the EstateRegistry name", async () => {
-    const estateRegistry = new web3.eth.Contract(
-      estateRegistryABI,
-      ESTATE_REGISTRY_ADDRESS
-    );
-
-    await estateRegistry.methods
-      .initialize("Estate", "EST", LAND_REGISTRY_ADDRESS)
-      .send({ from: owner, ...gasParams });
+  it("should the EstateRegistry contract name", async () => {
+    const estateRegistry = new web3.eth.Contract(abi, address);
 
     let name = await estateRegistry.methods.name().call();
 

@@ -18,9 +18,12 @@
   },
   "scripts": {
     "prepare": "npx babel src --out-dir dist --ignore **/*.test.js",
-    "test": "npm run test:local",
-    "test:local": "npm run lint && npx mocha src/*.test.js --exclude src/*forkedRopsten.test.js --require @babel/register --file src/testHelpers/mochaSetup.js --no-timeouts",
-    "test:forkedRopsten": "npm run lint && npx mocha src/*forkedRopsten.test.js --require @babel/register --file src/testHelpers/mochaSetup.js --no-timeouts",
+    "setup:local": "cp src/config/development.js src/config/default.js",
+    "setup:forked-ropsten": "cp src/config/forked-ropsten.js src/config/default.js",
+    "setup:forked-goerli": "cp src/config/forked-goerli.js src/config/default.js",
+    "test": "npm run setup:local && npm run mocha",
+    "test:forked-testnet": "npm run setup:forked-ropsten && npm run mocha",
+    "mocha": "npx mocha src/*.test.js  --require @babel/register --file src/testHelpers/mochaSetup.js --no-timeouts",
     "lint": "npx prettier src/* --write"
   },
   "bugs": {
@@ -34,11 +37,10 @@
   "devDependencies": {
     "@babel/cli": "^7.1.5",
     "@babel/core": "^7.1.6",
-    "@babel/node": "^7.2.2",
     "@babel/preset-env": "^7.1.6",
     "@babel/register": "^7.0.0",
     "@babel/plugin-proposal-class-properties": "^7.2.3",
-    "ethers": "^4.0.26",
+    "ethers": "^4.0.27",
     "chai": "^4.2.0",
     "mocha": "^6.0.1"
   }

@@ -8,7 +8,10 @@ const MyERC20Full = artifacts.require("./MyERC20Full.sol");
 // For that reason, a possible TODO is removing any truffle tests
 // other than those we directly add from 3rd-party projects
 contract("MyERC20Full", async accounts => {
-  const erc20 = await MyERC20Full.deployed();
+  let erc20;
+  before("", async () => {
+    erc20 = await MyERC20Full.deployed();
+  });
 
   it("should get the contract name", async () => {
     const name = await erc20.name();

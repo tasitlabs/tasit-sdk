@@ -1,20 +1,27 @@
 import { ethers } from "ethers";
 import TasitContracts from "../../../tasit-contracts/dist";
-const { ropsten } = TasitContracts;
-const { MarketplaceProxy } = ropsten;
-const { address: MARKETPLACE_ADDRESS } = MarketplaceProxy;
+// ABI is the same among the networks. The ABI from local will work with tesnet.
+const { local } = TasitContracts;
+const { Marketplace } = local;
+const { abi: marketplaceABI } = Marketplace;
 
 // This util class is being used to fetch data from Decentraland Marketplace contract
 // Fetching data likely will be replaced with subgraph queries
 export default class DecentralandUtils {
   #marketplace;
-  #mana;
   #provider;
 
   constructor() {
-    // Using ethers.js because Tasit Action isn't working with ropsten
-    // TODO: Fix ProviderFactory
-    this.#provider = ethers.getDefaultProvider("ropsten");
+    this.#provider = ProviderFactory.getProvider();
+
+    const { _network: network } = this.#provider;
+    if (network) {
+      const { name: networkName } = network;
+
+      // Note: Infura/Etherscan API is a faster way to get logs than RPC connection from forked ganache
+      if (networkName === "goerli" || networkName === "ropsten")
+        this.#provider = ethers.getDefaultProvider(networkName);
+    }
 
     this.#marketplace = new ethers.Contract(
       MARKETPLACE_ADDRESS,

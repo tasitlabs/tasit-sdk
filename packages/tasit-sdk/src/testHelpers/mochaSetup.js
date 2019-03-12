@@ -18,7 +18,27 @@ global.createFromPrivateKey = createFromPrivateKey;
 
 import { Action } from "../TasitSdk";
 const { ConfigLoader } = Action;
-ConfigLoader.setConfig(developmentConfig);
+import config from "../config/default.js";
+ConfigLoader.setConfig(config);
+
+const { provider: configProvider } = config;
+const { network } = configProvider;
+
+import TasitContracts from "../../../tasit-contracts/dist";
+const { local, goerli, ropsten } = TasitContracts;
+let blockchain;
+if (network === "goerli") blockchain = goerli;
+else if (network === "ropsten") blockchain = ropsten;
+else blockchain = local;
+const { MANAToken, LANDProxy, EstateRegistry, Marketplace } = blockchain;
+const { address: MANA_ADDRESS } = MANAToken;
+const { address: LAND_PROXY_ADDRESS } = LANDProxy;
+const { address: ESTATE_ADDRESS } = EstateRegistry;
+const { address: MARKETPLACE_ADDRESS } = Marketplace;
+global.MANA_ADDRESS = MANA_ADDRESS;
+global.LAND_PROXY_ADDRESS = LAND_PROXY_ADDRESS;
+global.ESTATE_ADDRESS = ESTATE_ADDRESS;
+global.MARKETPLACE_ADDRESS = MARKETPLACE_ADDRESS;
 
 // Global hooks
 let snapshotId;
@@ -29,7 +49,6 @@ before("global before() hook", async () => {
 });
 
 beforeEach("global beforeEach() hook", async () => {
-  provider = ProviderFactory.getProvider();
   snapshotId = await createSnapshot(provider);
 
   while (snapshotId > 1) {

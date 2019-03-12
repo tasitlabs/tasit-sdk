@@ -18,7 +18,14 @@ export class ProviderFactory {
     infura,
     etherscan,
   }) => {
-    const networks = ["mainnet", "rinkeby", "ropsten", "kovan", "other"];
+    const networks = [
+      "mainnet",
+      "rinkeby",
+      "ropsten",
+      "kovan",
+      "goerli",
+      "other",
+    ];
     const providers = ["fallback", "infura", "etherscan", "jsonrpc"];
 
     if (!networks.includes(network)) {
