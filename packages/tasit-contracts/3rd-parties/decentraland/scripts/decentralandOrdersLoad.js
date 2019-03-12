@@ -112,10 +112,13 @@ const approveMarketplace = async (
   estateContract,
   assetsOwnerWallet
 ) => {
+  // Set false to remove approval
+  const authorized = true;
+
   estateContract.setWallet(assetsOwnerWallet);
   const estateApproval = estateContract.setApprovalForAll(
     MARKETPLACE_ADDRESS,
-    true,
+    authorized,
     gasParams
   );
   await estateApproval.waitForNonceToUpdate();
@@ -123,7 +126,7 @@ const approveMarketplace = async (
   landContract.setWallet(assetsOwnerWallet);
   const landApproval = landContract.setApprovalForAll(
     MARKETPLACE_ADDRESS,
-    true,
+    authorized,
     gasParams
   );
   await landApproval.waitForNonceToUpdate();
@@ -241,60 +244,64 @@ const placeParcelsSellOrders = async (
     },
   ];
 
-  console.log("Creating parcels...");
-  await createMultipleParcels(
-    landContract,
-    allParcels,
-    sellerAddress,
-    ownerWallet
-  );
+  try {
+    console.log("Creating parcels...");
+    await createMultipleParcels(
+      landContract,
+      allParcels,
+      sellerAddress,
+      ownerWallet
+    );
 
-  const allParcelsIds = allParcels.map(async parcel => {
-    const { x, y } = parcel;
-    return await landContract.encodeTokenId(x, y);
-  });
+    const allParcelsIds = allParcels.map(async parcel => {
+      const { x, y } = parcel;
+      return await landContract.encodeTokenId(x, y);
+    });
 
-  // Update parcels with metadata
-  console.log("Updating parcels with metadata...");
-  landContract.setWallet(sellerWallet);
-  for (let parcel of allParcels) {
-    const { x, y, metadata: parcelName } = parcel;
-    const updateAction = landContract.updateLandData(x, y, parcelName);
-    await updateAction.waitForNonceToUpdate();
+    // Update parcels with metadata
+    console.log("Updating parcels with metadata...");
+    landContract.setWallet(sellerWallet);
+    for (let parcel of allParcels) {
+      const { x, y, metadata: parcelName } = parcel;
+      const updateAction = landContract.updateLandData(x, y, parcelName);
+      await updateAction.waitForNonceToUpdate();
+    }
+
+    console.log("Creating estates...");
+    const allEstateIds = await createEstates(
+      estateContract,
+      landContract,
+      allEstates,
+      sellerWallet
+    );
+
+    console.log("Approving Marketplace...");
+    await approveMarketplace(landContract, estateContract, sellerWallet);
+
+    const priceInWei = `${ONE}`;
+    const expireAt = Date.now() + duration.years(5);
+
+    console.log("Placing estates sellorders...");
+    await placeEstatesSellOrders(
+      marketplaceContract,
+      allEstateIds,
+      priceInWei,
+      expireAt,
+      sellerWallet
+    );
+
+    // All unique parcels
+    const landIdsToSell = allParcelsIds.slice(13, 19);
+
+    console.log("Placing parcels sellorders...");
+    await placeParcelsSellOrders(
+      marketplaceContract,
+      landIdsToSell,
+      priceInWei,
+      expireAt,
+      sellerWallet
+    );
+  } catch (err) {
+    console.error(err);
   }
-
-  console.log("Creating estates...");
-  const allEstateIds = await createEstates(
-    estateContract,
-    landContract,
-    allEstates,
-    sellerWallet
-  );
-
-  console.log("Approving Marketplace...");
-  await approveMarketplace(landContract, estateContract, sellerWallet);
-
-  const priceInWei = `${ONE}`;
-  const expireAt = Date.now() + duration.years(5);
-
-  console.log("Placing estates sellorders...");
-  await placeEstatesSellOrders(
-    marketplaceContract,
-    allEstateIds,
-    priceInWei,
-    expireAt,
-    sellerWallet
-  );
-
-  // All unique parcels
-  const landIdsToSell = allParcelsIds.slice(13, 19);
-
-  console.log("Placing parcels sellorders...");
-  await placeParcelsSellOrders(
-    marketplaceContract,
-    landIdsToSell,
-    priceInWei,
-    expireAt,
-    sellerWallet
-  );
 })();
