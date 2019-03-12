@@ -24,7 +24,7 @@ ConfigLoader.setConfig(config);
 const { provider: configProvider } = config;
 const { network } = configProvider;
 
-import TasitContracts from "../../../tasit-contracts/dist";
+import TasitContracts from "tasit-contracts";
 const { local, goerli, ropsten } = TasitContracts;
 let blockchain;
 if (network === "goerli") blockchain = goerli;

@@ -32,7 +32,8 @@
   "dependencies": {
     "@babel/runtime": "^7.1.5",
     "tasit-account": "^0.0.11",
-    "tasit-action": "^0.0.11"
+    "tasit-action": "^0.0.11",
+    "tasit-contracts": "^0.0.11"
   },
   "devDependencies": {
     "@babel/cli": "^7.1.5",
@@ -42,7 +43,6 @@
     "@babel/register": "^7.0.0",
     "chai": "^4.2.0",
     "ethers": "^4.0.27",
-    "mocha": "^6.0.1",
-    "tasit-contracts": "^0.0.11"
+    "mocha": "^6.0.1"
   }
 }
