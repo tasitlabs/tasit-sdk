@@ -5,7 +5,6 @@ import ConfigLoader from "../ConfigLoader";
 // If necessary, we can create TransactionAction
 //  and/or MetaTxAction subclasses
 export class Action extends Subscription {
-  #txPromise;
   #provider;
   #tx;
   #txConfirmations;
@@ -20,7 +19,7 @@ export class Action extends Subscription {
     const { events } = ConfigLoader.getConfig();
     const { timeout } = events;
 
-    this.#txPromise = txPromise.then(
+    this.#tx = txPromise.then(
       tx => {
         return tx;
       },
@@ -76,11 +75,9 @@ export class Action extends Subscription {
 
     const baseEthersListener = async blockNumber => {
       try {
-        if (!this.#tx) this.#tx = await this.#txPromise;
+        const tx = await this.#tx;
 
-        const receipt = await this.#provider.getTransactionReceipt(
-          this.#tx.hash
-        );
+        const receipt = await this.#provider.getTransactionReceipt(tx.hash);
 
         const blockReorgOccurred =
           (receipt === null && this.#txConfirmations > 0) ||
@@ -157,8 +154,8 @@ export class Action extends Subscription {
   // See: https://github.com/ethereumbook/ethereumbook/blob/04f66ae45cd9405cce04a088556144be11979699/06transactions.asciidoc#keeping-track-of-nonces
   // How should we keep track of nonces?
   waitForNonceToUpdate = async () => {
-    if (!this.#tx) this.#tx = await this.#txPromise;
-    if (this.#tx) await this.#provider.waitForTransaction(this.#tx.hash);
+    const tx = await this.#tx;
+    if (tx) await this.#provider.waitForTransaction(tx.hash);
   };
 
   // For testing purposes
