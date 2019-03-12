@@ -49,8 +49,6 @@ export const pickAssetsForSale = async () => {
     const nowInSeconds = Date.now() / 1000;
     const expired = Number(expiresAt) < nowInSeconds;
 
-    // All parcels of land and estates for sale are expired (block 5058416) -
-    // otherwise we would select one that isn't expired
     if (isLand && !expired) landForSale = order;
     if (isEstate && !expired) estateForSale = order;
 
