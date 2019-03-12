@@ -30,7 +30,7 @@ module.exports = (deployer, network, accounts) => {
       LAND_PROXY_ADDRESS
     );
 
-    // Land Proxy contract with Land Regitry ABI
+    // Land Proxy contract with Land Registry ABI
     const land = await LANDRegistry.at(LAND_PROXY_ADDRESS);
     await land.initialize(owner);
     await land.setEstateRegistry(ESTATE_ADDRESS);
