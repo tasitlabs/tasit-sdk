@@ -219,8 +219,6 @@ const placeParcelsSellOrders = async (
     },
   ];
 
-  // Note: Often estates have more than one parcel of land in them
-  // but here we just have one parcel of land in each to keep this test short
   const allEstates = [
     {
       metadata: `all road adjacent parcels`,
