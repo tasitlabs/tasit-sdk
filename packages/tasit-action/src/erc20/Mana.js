@@ -1,9 +1,11 @@
 import Contract from "../contract/Contract";
-import manaTokenABI from "../../../tasit-contracts/abi/MANAToken.json";
+import TasitContracts from "tasit-contracts";
+const { local } = TasitContracts;
+const { MANAToken } = local;
+const { abi } = MANAToken;
 
 export default class Mana extends Contract {
   constructor(address, wallet) {
-    const abi = manaTokenABI;
     super(address, abi, wallet);
   }
 }

@@ -1,5 +1,8 @@
 import Contract from "../contract/Contract";
-import abi from "../../../tasit-contracts/abi/MyERC20Full.json";
+import TasitContracts from "tasit-contracts";
+const { local } = TasitContracts;
+const { MyERC20Full } = local;
+const { abi } = MyERC20Full;
 
 export default class ERC20Full extends Contract {
   constructor(address, wallet) {
