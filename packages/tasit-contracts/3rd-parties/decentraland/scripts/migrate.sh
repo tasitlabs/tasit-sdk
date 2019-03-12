@@ -28,7 +28,7 @@ cd $DECENTRALAND_DIR/land && npx truffle compile
 # marketplace-contracts
 cd $DECENTRALAND_DIR/marketplace-contracts && npx truffle compile
 
-# remove unnused overloaded functions from abis
+# remove unused overloaded functions from abis
 node $DECENTRALAND_DIR/scripts/remove_functions_overloading.js
 
 
