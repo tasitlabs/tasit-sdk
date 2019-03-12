@@ -97,6 +97,15 @@ export class Action extends Subscription {
           return;
         }
 
+        const txFailed = receipt.status == 0;
+        if (txFailed) {
+          this._emitErrorEventFromEventListener(
+            new Error(`Action failed.`),
+            eventName
+          );
+          return;
+        }
+
         this._clearEventTimerIfExists(eventName);
 
         this.#lastConfirmationTime = Date.now();

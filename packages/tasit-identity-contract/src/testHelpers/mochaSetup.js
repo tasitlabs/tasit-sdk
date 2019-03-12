@@ -2,6 +2,10 @@
 import { expect } from "chai";
 global.expect = expect;
 
+// Sinon
+import sinon from "sinon";
+global.sinon = sinon;
+
 // Helpers
 import actionHelpers from "tasit-action/dist/testHelpers/helpers";
 global = Object.assign(global, actionHelpers);
