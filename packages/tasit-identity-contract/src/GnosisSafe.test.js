@@ -4,7 +4,7 @@ const { ERC20Full } = ERC20;
 const { ERC721Full } = ERC721;
 import GnosisSafe from "./GnosisSafe";
 import Account from "../../tasit-account/dist";
-import TasitContracts from "../../tasit-contracts/dist";
+import TasitContracts from "tasit-contracts";
 const { local } = TasitContracts;
 const { GnosisSafe: GnosisSafeInfo, MyERC20Full, MyERC721Full } = local;
 const { address: GNOSIS_SAFE_ADDRESS } = GnosisSafeInfo;
