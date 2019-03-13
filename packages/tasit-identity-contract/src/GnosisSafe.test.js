@@ -15,7 +15,7 @@ const { ZERO, ONE } = constants;
 const SMALL_AMOUNT = bigNumberify(`${1e17}`); // 0.1 ethers
 
 describe("GnosisSafe", () => {
-  let root;
+  let minter;
   let gnosisSafeOwner;
   let ephemeralAccount;
   let someone;
@@ -25,7 +25,7 @@ describe("GnosisSafe", () => {
 
   before("", async () => {
     // That account is funded with ethers and is owner of all token contracts deployed
-    [root] = accounts;
+    [minter] = accounts;
     gnosisSafeOwner = accounts[9];
     ephemeralAccount = Account.create();
     someone = Account.create();
@@ -63,7 +63,7 @@ describe("GnosisSafe", () => {
 
   describe("test cases that need ETH deposit to the contract-based account", async () => {
     beforeEach("faucet", async () => {
-      await etherFaucet(provider, root, GNOSIS_SAFE_ADDRESS, ONE);
+      await etherFaucet(provider, minter, GNOSIS_SAFE_ADDRESS, ONE);
       confirmEtherBalances(provider, [GNOSIS_SAFE_ADDRESS], [ONE]);
     });
 
@@ -143,7 +143,7 @@ describe("GnosisSafe", () => {
 
   describe("test cases that need ERC20 deposit to the contract-based account", async () => {
     beforeEach("faucet", async () => {
-      await erc20Faucet(erc20, root, GNOSIS_SAFE_ADDRESS, ONE);
+      await erc20Faucet(erc20, minter, GNOSIS_SAFE_ADDRESS, ONE);
       confirmBalances(erc20, [GNOSIS_SAFE_ADDRESS], [ONE]);
     });
 
@@ -163,7 +163,7 @@ describe("GnosisSafe", () => {
     describe("spending by an ephemeral account", () => {
       beforeEach("ethers to the ephemeral account pay for gas", async () => {
         const { address: ephemeralAddress } = ephemeralAccount;
-        await etherFaucet(provider, root, ephemeralAddress, SMALL_AMOUNT);
+        await etherFaucet(provider, minter, ephemeralAddress, SMALL_AMOUNT);
         confirmEtherBalances(provider, [ephemeralAddress], [SMALL_AMOUNT]);
       });
 
@@ -251,7 +251,7 @@ describe("GnosisSafe", () => {
     const tokenId = 1;
 
     beforeEach("faucet", async () => {
-      await erc721Faucet(nft, root, GNOSIS_SAFE_ADDRESS, tokenId);
+      await erc721Faucet(nft, minter, GNOSIS_SAFE_ADDRESS, tokenId);
       confirmBalances(nft, [GNOSIS_SAFE_ADDRESS], [1]);
     });
 
