@@ -201,24 +201,52 @@ describe("GnosisSafe", () => {
         expect(`${balanceAfter}`).to.equal(`${balanceBefore}`);
       });
 
-      it("wallet owner should approve an ephemeral account to spend funds", async () => {
-        const tokenAddress = ERC20_ADDRESS;
-        const { address: spender } = johnWallet;
+      describe("", () => {
+        beforeEach(
+          "wallet owner should approve an ephemeral account to spend funds",
+          async () => {
+            const tokenAddress = ERC20_ADDRESS;
+            const { address: spender } = ephemeralWallet;
 
-        gnosisSafe.setSigners([johnWallet]);
-        gnosisSafe.setWallet(johnWallet);
-        const action = gnosisSafe.approveERC20(
-          tokenAddress,
-          spender,
-          SMALL_AMOUNT
+            gnosisSafe.setSigners([johnWallet]);
+            gnosisSafe.setWallet(johnWallet);
+            const action = gnosisSafe.approveERC20(
+              tokenAddress,
+              spender,
+              SMALL_AMOUNT
+            );
+            await action.waitForNonceToUpdate();
+
+            await mineBlocks(provider, 1);
+
+            const allowed = await erc20.allowance(GNOSIS_SAFE_ADDRESS, spender);
+
+            expect(`${allowed}`).to.equal(`${SMALL_AMOUNT}`);
+          }
         );
-        await action.waitForNonceToUpdate();
 
-        await mineBlocks(provider, 1);
+        it("ephemeral account should transfer allowed funds from wallet", async () => {
+          const balanceBefore = await erc20.balanceOf(GNOSIS_SAFE_ADDRESS);
 
-        const allowed = await erc20.allowance(GNOSIS_SAFE_ADDRESS, spender);
+          const { address: toAddress } = johnWallet;
 
-        expect(`${allowed}`).to.equal(`${SMALL_AMOUNT}`);
+          erc20.setWallet(ephemeralWallet);
+          const action = erc20.transferFrom(
+            GNOSIS_SAFE_ADDRESS,
+            toAddress,
+            SMALL_AMOUNT
+          );
+
+          await action.waitForNonceToUpdate();
+
+          await mineBlocks(provider, 1);
+
+          const balanceAfter = await erc20.balanceOf(GNOSIS_SAFE_ADDRESS);
+
+          expect(`${balanceAfter}`).to.equal(
+            `${balanceBefore.sub(SMALL_AMOUNT)}`
+          );
+        });
       });
     });
   });
