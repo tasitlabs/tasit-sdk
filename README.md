@@ -143,7 +143,7 @@ Using the Tasit SDK, you can generate a new Ethereum account and private key.
 
 The Tasit SDK makes it simple for a new account to be instantiated in each mobile app it is used in.
 
-The intended UX is that this account should NOT have any significant amount of ETH, ERC20, or ERC721 tokens sent to it. This app is NOT a wallet. Instead, this address should be authorized to perform actions on behalf of a smart-contract-based identity or software wallet a user already has with some ETH or tokens. This is an ephemeral account for that app on the device, and as the user gets more familiar with it their account can be progressively upgraded to a personal DAO later or their funds can be stored in their preferred primary software wallet.
+The intended UX is that this account should NOT have any significant amount of ETH, ERC20, or ERC721 tokens sent to it. This app is NOT a wallet. Instead, this address should be authorized to perform actions on behalf of a smart-contract-based account or software wallet a user already has with some ETH or tokens. This is an ephemeral account for that app on the device, and as the user gets more familiar with it their account can be progressively upgraded to a personal DAO later or their funds can be stored in their preferred primary software wallet.
 
 [`tasit-account` is the child package](/packages/tasit-account/) that implements these features for the Tasit SDK.
 
@@ -189,7 +189,7 @@ This can be done using [meta-transactions](https://medium.com/@austin_48503/ethe
 
 The approach with meta-transactions (and universal login) is that the user's account is only used to sign messages, and then as a developer you can use your preferred centralized or decentralized solution to relay that as an Ethereum tx and pay and/or be rewarded as each solution sees fit.
 
-[`tasit-identity-contract` is the child package](/packages/tasit-identity-contract/) that implements these features for the Tasit SDK.
+[`tasit-contract-based-account` is the child package](/packages/tasit-contract-based-account/) that implements these features for the Tasit SDK.
 
 ##### For users that do have funds
 

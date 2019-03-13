@@ -1,7 +1,7 @@
 {
-  "name": "tasit-identity-contract",
+  "name": "tasit-contract-based-account",
   "version": "0.0.12",
-  "description": "Library for onboarding a user using a smart-contract-based identity.",
+  "description": "Library for onboarding a user using a smart-contract-based account.",
   "main": "dist/index.js",
   "keywords": [
     "ethereum",

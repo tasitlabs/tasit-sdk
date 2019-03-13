@@ -646,6 +646,6 @@ describe("TasitAction.Contract", () => {
   });
 
   // Send method interface: Contract.send(tx: msg, bool: free) => Subscription
-  // On free send how know if identity-contract should be used?
+  // On free send how know if contract-based-account should be used?
   it.skip("should send a signed message", async () => {});
 });
