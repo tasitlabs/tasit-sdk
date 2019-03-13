@@ -61,7 +61,7 @@ describe("GnosisSafe", () => {
     expect(provider._events).to.be.empty;
   });
 
-  describe("test cases that need ETHs deposit to the contract-based account", async () => {
+  describe("test cases that need ETH deposit to the contract-based account", async () => {
     beforeEach("faucet", async () => {
       await etherFaucet(provider, root, GNOSIS_SAFE_ADDRESS, ONE);
       confirmEtherBalances(provider, [GNOSIS_SAFE_ADDRESS], [ONE]);
