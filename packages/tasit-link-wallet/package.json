@@ -1,0 +1,42 @@
+{
+  "name": "tasit-link-wallet",
+  "version": "0.0.12",
+  "description": "Library for onboarding a user by linking a dapp with a wallet of their choosing.",
+  "main": "dist/index.js",
+  "keywords": [
+    "ethereum",
+    "dapp",
+    "react",
+    "native"
+  ],
+  "author": "Tasit Labs",
+  "homepage": "https://github.com/tasitlabs/TasitSDK#readme",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tasitlabs/tasitsdk.git"
+  },
+  "scripts": {
+    "clean": "rm -rf dist/*",
+    "compile": "npx babel src --out-dir dist --ignore **/*.test.js",
+    "prepare": "npm run clean && npm run compile",
+    "lint": "npx prettier src/* --write",
+    "pretest": "npm run lint",
+    "test": "npx mocha src/*.test.js --require @babel/register --file src/testHelpers/mochaSetup.js"
+  },
+  "bugs": {
+    "url": "https://github.com/tasitlabs/tasitsdk/issues"
+  },
+  "dependencies": {
+    "@babel/runtime": "^7.1.5"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.1.5",
+    "@babel/core": "^7.1.6",
+    "@babel/preset-env": "^7.1.6",
+    "@babel/register": "^7.0.0",
+    "chai": "^4.2.0",
+    "mocha": "^6.0.2",
+    "tasit-action": "^0.0.12"
+  }
+}
