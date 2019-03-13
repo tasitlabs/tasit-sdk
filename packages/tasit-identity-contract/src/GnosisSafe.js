@@ -61,6 +61,16 @@ export default class GnosisSafe extends Contract {
     this.#signers = signers;
   };
 
+  approveERC20 = (tokenAddress, spender, value) => {
+    const data = this.#utils.encodeFunctionCall(erc20ABI, "approve", [
+      spender,
+      value,
+    ]);
+    const etherValue = "0";
+    const action = this.#executeTransaction(data, tokenAddress, etherValue);
+    return action;
+  };
+
   transferERC20 = (tokenAddress, toAddress, value) => {
     const data = this.#utils.encodeFunctionCall(erc20ABI, "transfer", [
       toAddress,

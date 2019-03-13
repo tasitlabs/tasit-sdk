@@ -117,6 +117,16 @@ const wait = async ms => {
   return new Promise(resolve => setTimeout(resolve, ms));
 };
 
+const confirmEtherBalances = async (provider, addresses, balances) => {
+  expect(addresses.length).to.equal(balances.length);
+  let index = 0;
+  for (let address of addresses) {
+    const balance = await provider.getBalance(address);
+    const expectedBalance = balances[index++];
+    expect(balance.toString()).to.equal(expectedBalance.toString());
+  }
+};
+
 const confirmBalances = async (token, addresses, balances) => {
   expect(addresses.length).to.equal(balances.length);
   let index = 0;
@@ -172,6 +182,7 @@ export const helpers = {
   createSnapshot,
   revertFromSnapshot,
   wait,
+  confirmEtherBalances,
   confirmBalances,
   etherFaucet,
   erc20Faucet,
