@@ -78,6 +78,64 @@ describe("GnosisSafe", () => {
       const balance = await provider.getBalance(GNOSIS_SAFE_ADDRESS);
       expect(`${balance}`).to.equal(`${ZERO}`);
     });
+
+    describe("test cases with more than one signer", () => {
+      beforeEach("wallet owner should add an account as signer", async () => {
+        const { address: johnAddress } = johnWallet;
+
+        const ownersBefore = await gnosisSafe.getOwners();
+        expect(ownersBefore).deep.equal([johnAddress]);
+
+        const thresholdBefore = await gnosisSafe.getThreshold();
+        expect(`${thresholdBefore}`).to.equal(`1`);
+
+        const { address: newSignerAddress } = ephemeralWallet;
+        const newThreshold = `2`;
+
+        gnosisSafe.setWallet(johnWallet);
+        const action = gnosisSafe.addSignerWithThreshold(
+          newSignerAddress,
+          newThreshold
+        );
+        await action.waitForNonceToUpdate();
+
+        const ownersAfter = await gnosisSafe.getOwners();
+        expect(ownersAfter).deep.equal([newSignerAddress, johnAddress]);
+
+        const thresholdAfter = await gnosisSafe.getThreshold();
+        expect(`${thresholdAfter}`).to.equal(`2`);
+      });
+
+      it("shouldn't be able to execute transfer with insufficient signers", async () => {
+        const onError = sinon.fake();
+        const balanceBefore = await provider.getBalance(GNOSIS_SAFE_ADDRESS);
+        const { address: toAddress } = johnWallet;
+        const value = ONE;
+
+        gnosisSafe.setWallet(johnWallet);
+        const execTxAction = gnosisSafe.transferEther(toAddress, value);
+
+        const errorListener = async message => {
+          onError();
+          execTxAction.unsubscribe();
+        };
+
+        // Note: Some error events are been trigger only from the confirmationListener
+        // See more: https://github.com/tasitlabs/TasitSDK/issues/253
+        const confirmationListener = () => {};
+
+        execTxAction.on("error", errorListener);
+        execTxAction.on("confirmation", confirmationListener);
+
+        await execTxAction.waitForNonceToUpdate();
+
+        await mineBlocks(provider, 1);
+
+        expect(onError.callCount).to.equal(1);
+        const balanceAfter = await provider.getBalance(GNOSIS_SAFE_ADDRESS);
+        expect(`${balanceAfter}`).to.equal(`${balanceBefore}`);
+      });
+    });
   });
 
   describe("test cases that needs ERC20 deposit to the wallet", async () => {
@@ -128,70 +186,10 @@ describe("GnosisSafe", () => {
     });
   });
 
-  describe("test cases with more than one signer", () => {
-    beforeEach("wallet owner should add an account as signer", async () => {
-      const { address: johnAddress } = johnWallet;
-
-      const ownersBefore = await gnosisSafe.getOwners();
-      expect(ownersBefore).deep.equal([johnAddress]);
-
-      const thresholdBefore = await gnosisSafe.getThreshold();
-      expect(`${thresholdBefore}`).to.equal(`1`);
-
-      const { address: newSignerAddress } = ephemeralWallet;
-      const newThreshold = `2`;
-
-      gnosisSafe.setWallet(johnWallet);
-      const action = gnosisSafe.addSignerWithThreshold(
-        newSignerAddress,
-        newThreshold
-      );
-      await action.waitForNonceToUpdate();
-
-      const ownersAfter = await gnosisSafe.getOwners();
-      expect(ownersAfter).deep.equal([newSignerAddress, johnAddress]);
-
-      const thresholdAfter = await gnosisSafe.getThreshold();
-      expect(`${thresholdAfter}`).to.equal(`2`);
-    });
-
-    it("shouldn't be able to execute transfer with insufficient signers", async () => {
-      const onError = sinon.fake();
-
-      await etherFaucet(provider, root, GNOSIS_SAFE_ADDRESS, ONE);
-      const balanceBefore = await provider.getBalance(GNOSIS_SAFE_ADDRESS);
-      expect(`${balanceBefore}`).to.equal(`${ONE}`);
-
-      const { address: toAddress } = johnWallet;
-      const value = ONE;
-
-      gnosisSafe.setWallet(johnWallet);
-      const execTxAction = gnosisSafe.transferEther(toAddress, value);
-
-      const errorListener = async message => {
-        onError();
-        execTxAction.unsubscribe();
-      };
-
-      // Note: Some error events are been trigger only from the confirmationListener
-      // See more: https://github.com/tasitlabs/TasitSDK/issues/253
-      const confirmationListener = () => {};
-
-      execTxAction.on("error", errorListener);
-      execTxAction.on("confirmation", confirmationListener);
-
-      await execTxAction.waitForNonceToUpdate();
-
-      await mineBlocks(provider, 1);
-
-      expect(onError.callCount).to.equal(1);
-      const balanceAfter = await provider.getBalance(GNOSIS_SAFE_ADDRESS);
-      expect(`${balanceAfter}`).to.equal(`${balanceBefore}`);
-    });
-  });
-
   // TODO:
-  // - Setup DailyLimitModule to the Gnosis Safe Contract
   // - Move to tasit-link-wallet
-  it.skip("wallet owner should approve an ephemeral account to spend funds", async () => {});
+  describe("spending by an ephemeral account", () => {
+    it("ephemeral account shouldn't be able to transfer funds from wallet", async () => {});
+    it("wallet owner should approve an ephemeral account to spend funds", async () => {});
+  });
 });
