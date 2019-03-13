@@ -124,7 +124,7 @@ describe("GnosisSafe", () => {
           action.unsubscribe();
         };
 
-        // Note: Some error events are been trigger only from the confirmationListener
+        // Note: Some error events are being triggered only from the confirmationListener
         // See more: https://github.com/tasitlabs/TasitSDK/issues/253
         const confirmationListener = () => {};
 
