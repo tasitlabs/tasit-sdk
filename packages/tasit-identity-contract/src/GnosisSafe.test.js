@@ -11,10 +11,8 @@ const { address: GNOSIS_SAFE_ADDRESS } = GnosisSafeInfo;
 const { address: ERC20_ADDRESS } = MyERC20Full;
 const { address: NFT_ADDRESS } = MyERC721Full;
 
-// 100 gwei
-const GAS_PRICE = bigNumberify(`${1e11}`);
-
 const { ZERO, ONE } = constants;
+const SMALL_AMOUNT = bigNumberify(`${1e17}`); // 0.1 ethers
 
 describe("GnosisSafe", () => {
   let gnosisSafe;
@@ -28,15 +26,11 @@ describe("GnosisSafe", () => {
     // That account is funded with ethers and is owner of all token contracts deployed
     [root] = accounts;
     johnWallet = accounts[9];
-
     ephemeralWallet = Account.create();
-
-    const signers = [johnWallet];
 
     // Contract deployment setup with john (accounts[9]) as the only owner
     // To change that, edit the file "tasit-contract/3rd-parties/gnosis/scripts/2_deploy_contracts.js"
     gnosisSafe = new GnosisSafe(GNOSIS_SAFE_ADDRESS);
-    gnosisSafe.setSigners(signers);
 
     erc20 = new ERC20Full(ERC20_ADDRESS);
 
@@ -50,6 +44,7 @@ describe("GnosisSafe", () => {
     const erc20Balance = await erc20.balanceOf(GNOSIS_SAFE_ADDRESS);
     expect(`${erc20Balance}`).to.equal(`${ZERO}`);
 
+    gnosisSafe.setSigners([]);
     gnosisSafe.removeWallet();
     erc20.removeWallet();
   });
@@ -71,6 +66,7 @@ describe("GnosisSafe", () => {
       const { address: toAddress } = johnWallet;
       const value = ONE;
 
+      gnosisSafe.setSigners([johnWallet]);
       gnosisSafe.setWallet(johnWallet);
       const execTxAction = gnosisSafe.transferEther(toAddress, value);
       await execTxAction.waitForNonceToUpdate();
@@ -92,6 +88,7 @@ describe("GnosisSafe", () => {
         const { address: newSignerAddress } = ephemeralWallet;
         const newThreshold = `2`;
 
+        gnosisSafe.setSigners([johnWallet]);
         gnosisSafe.setWallet(johnWallet);
         const action = gnosisSafe.addSignerWithThreshold(
           newSignerAddress,
@@ -112,6 +109,7 @@ describe("GnosisSafe", () => {
         const { address: toAddress } = johnWallet;
         const value = ONE;
 
+        gnosisSafe.setSigners([johnWallet]);
         gnosisSafe.setWallet(johnWallet);
         const execTxAction = gnosisSafe.transferEther(toAddress, value);
 
@@ -150,12 +148,78 @@ describe("GnosisSafe", () => {
       const { address: toAddress } = johnWallet;
       const value = ONE;
 
+      gnosisSafe.setSigners([johnWallet]);
       gnosisSafe.setWallet(johnWallet);
       const action = gnosisSafe.transferERC20(tokenAddress, toAddress, value);
       await action.waitForNonceToUpdate();
 
       const balance = await erc20.balanceOf(GNOSIS_SAFE_ADDRESS);
       expect(`${balance}`).to.equal(`${ZERO}`);
+    });
+
+    // TODO: Move to tasit-link-wallet
+    describe("spending by an ephemeral account", () => {
+      beforeEach("ethers to the ephemeral account pay for gas", async () => {
+        const { address: ephemeralAddress } = ephemeralWallet;
+        await etherFaucet(provider, root, ephemeralAddress, SMALL_AMOUNT);
+        const balance = await provider.getBalance(ephemeralAddress);
+        expect(`${balance}`).to.equal(`${SMALL_AMOUNT}`);
+      });
+
+      it("ephemeral account shouldn't be able to transfer funds from wallet without allowance", async () => {
+        const onError = sinon.fake();
+        const balanceBefore = await erc20.balanceOf(GNOSIS_SAFE_ADDRESS);
+
+        const { address: toAddress } = johnWallet;
+        const value = ONE;
+
+        gnosisSafe.setWallet(ephemeralWallet);
+        const action = erc20.transferFrom(
+          GNOSIS_SAFE_ADDRESS,
+          toAddress,
+          value
+        );
+
+        const errorListener = async message => {
+          onError();
+          action.unsubscribe();
+        };
+
+        // Note: Some error events are been trigger only from the confirmationListener
+        // See more: https://github.com/tasitlabs/TasitSDK/issues/253
+        const confirmationListener = () => {};
+
+        action.on("error", errorListener);
+        action.on("confirmation", confirmationListener);
+
+        await action.waitForNonceToUpdate();
+
+        await mineBlocks(provider, 1);
+
+        expect(onError.callCount).to.equal(1);
+        const balanceAfter = await erc20.balanceOf(GNOSIS_SAFE_ADDRESS);
+        expect(`${balanceAfter}`).to.equal(`${balanceBefore}`);
+      });
+
+      it("wallet owner should approve an ephemeral account to spend funds", async () => {
+        const tokenAddress = ERC20_ADDRESS;
+        const { address: spender } = johnWallet;
+
+        gnosisSafe.setSigners([johnWallet]);
+        gnosisSafe.setWallet(johnWallet);
+        const action = gnosisSafe.approveERC20(
+          tokenAddress,
+          spender,
+          SMALL_AMOUNT
+        );
+        await action.waitForNonceToUpdate();
+
+        await mineBlocks(provider, 1);
+
+        const allowed = await erc20.allowance(GNOSIS_SAFE_ADDRESS, spender);
+
+        expect(`${allowed}`).to.equal(`${SMALL_AMOUNT}`);
+      });
     });
   });
 
@@ -173,6 +237,7 @@ describe("GnosisSafe", () => {
       const tokenAddress = NFT_ADDRESS;
       const { address: toAddress } = johnWallet;
 
+      gnosisSafe.setSigners([johnWallet]);
       gnosisSafe.setWallet(johnWallet);
       const execTxAction = gnosisSafe.transferNFT(
         tokenAddress,
@@ -184,12 +249,5 @@ describe("GnosisSafe", () => {
       const balance = await erc20.balanceOf(GNOSIS_SAFE_ADDRESS);
       expect(`${balance}`).to.equal(`${ZERO}`);
     });
-  });
-
-  // TODO:
-  // - Move to tasit-link-wallet
-  describe("spending by an ephemeral account", () => {
-    it("ephemeral account shouldn't be able to transfer funds from wallet", async () => {});
-    it("wallet owner should approve an ephemeral account to spend funds", async () => {});
   });
 });
