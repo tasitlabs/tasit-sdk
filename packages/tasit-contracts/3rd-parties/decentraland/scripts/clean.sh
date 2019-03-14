@@ -15,5 +15,5 @@ for repo in $REPOS;
 do
     REPO_DIR="$DECENTRALAND_DIR/$repo";
     cd $REPO_DIR && git reset --hard && git clean -f
-    rm -rf $DECENTRALAND_DIR/$repo/build
+    rm -rf $REPO_DIR/build
 done

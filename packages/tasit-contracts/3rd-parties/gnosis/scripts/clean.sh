@@ -15,4 +15,5 @@ for repo in $REPOS;
 do
     REPO_DIR="$GNOSIS_DIR/$repo";
     cd $REPO_DIR && git reset --hard && git clean -f
+    rm -rf $REPO_DIR/build
 done

@@ -120,14 +120,14 @@ module.exports = {
           path:
             "./3rd-parties/decentraland/marketplace-contracts/build/contracts/Marketplace.json",
         },
-        // {
-        //   path:
-        //     "./3rd-parties/gnosis/safe-contracts/build/contracts/ProxyFactory.json",
-        // },
-        // {
-        //   path:
-        //     "./3rd-parties/gnosis/safe-contracts/build/contracts/GnosisSafe.json",
-        // },
+        {
+          path:
+            "./3rd-parties/gnosis/safe-contracts/build/contracts/ProxyFactory.json",
+        },
+        {
+          path:
+            "./3rd-parties/gnosis/safe-contracts/build/contracts/GnosisSafe.json",
+        },
       ],
     },
   },

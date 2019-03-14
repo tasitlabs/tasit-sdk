@@ -23,7 +23,7 @@
     "babel:compile": "npx babel src --out-dir dist --ignore src/*.test.js,src/**/*.test.js",
     "truffle:clean": "rm -rf build/",
     "truffle:compile": "npm run truffle:clean && npx truffle compile",
-    "truffle:migrate": "npx truffle migrate",
+    "truffle:migrate": "npm run truffle:clean && npx truffle migrate --reset",
     "truffle:test": "npx truffle test",
     "prepare": "npm run install:3rd-parties && npm run babel:compile",
     "migrate": "npm run clean && npm run truffle:migrate && npm run migrate:3rd-parties",
