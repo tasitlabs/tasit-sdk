@@ -100,7 +100,7 @@ module.exports = {
       command: "./3rd-parties/run_on_all.sh compile `pwd`",
       targets: [
         {
-          // This is a transpiled file from original json created by mana project truffle
+          // This is a transpiled file from original json created by mana projects' truffle
           // See more: https://github.com/trufflesuite/truffle/issues/1799#issuecomment-472821965
           path: "./3rd-parties/decentraland/scripts/mana/MANAToken.json",
         },
@@ -116,10 +116,10 @@ module.exports = {
           path:
             "./3rd-parties/decentraland/land/build/contracts/LANDProxy.json",
         },
-        // {
-        //   path:
-        //     "./3rd-parties/decentraland/marketplace-contracts/build/contracts/Marketplace.json",
-        // },
+        {
+          path:
+            "./3rd-parties/decentraland/marketplace-contracts/build/contracts/Marketplace.json",
+        },
         // {
         //   path:
         //     "./3rd-parties/gnosis/safe-contracts/build/contracts/ProxyFactory.json",

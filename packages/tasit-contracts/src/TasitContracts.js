@@ -43,11 +43,11 @@ const local = {
     abi: landProxyABI,
   },
   Marketplace: {
-    address: "0x289c42facf691946b64b4370361b1303f0a463ef",
+    address: "0x1212F783f11611b0c029d5e6f86a23BE621669E0",
     abi: marketplaceABI,
   },
   GnosisSafe: {
-    address: "0x9a4a2e7ed3ee6d481624f5392d8c6169c62065b7",
+    address: "0x388ec86c6963009c8286f5390bae9459700555d0",
     abi: gnosisSafeABI,
   },
 };
