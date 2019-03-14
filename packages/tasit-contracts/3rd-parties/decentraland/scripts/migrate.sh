@@ -33,11 +33,6 @@ node $DECENTRALAND_DIR/scripts/remove_functions_overloading.js
 
 
 ### MIGRATE
-# mana
-cp $DECENTRALAND_DIR/scripts/mana/3_mana_migrations.js $DECENTRALAND_DIR/mana/migrations
-cp $DECENTRALAND_DIR/scripts/mana/truffle.js $DECENTRALAND_DIR/mana
-cd $DECENTRALAND_DIR/mana && MNEMONIC=$MNEMONIC INFURA_TOKEN=$INFURA_TOKEN npx truffle migrate --network $NETWORK
-
 # land
 cp $DECENTRALAND_DIR/scripts/land/3_land_migrations.js $DECENTRALAND_DIR/land/migrations
 cp $DECENTRALAND_DIR/scripts/land/truffle-config.js $DECENTRALAND_DIR/land

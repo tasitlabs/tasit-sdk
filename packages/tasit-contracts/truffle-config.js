@@ -96,5 +96,39 @@ module.exports = {
       //  evmVersion: "byzantium"
       // }
     },
+    external: {
+      command: "exit 0",
+      targets: [
+        {
+          // This is a transpiled file from original json created by mana project truffle
+          // See more: https://github.com/trufflesuite/truffle/issues/1799#issuecomment-472821965
+          path: "./3rd-parties/decentraland/scripts/mana/MANAToken.json",
+        },
+        // {
+        //   path:
+        //     "./3rd-parties/decentraland/land/build/contracts/EstateRegistry.json",
+        // },
+        // {
+        //   path:
+        //     "./3rd-parties/decentraland/land/build/contracts/LANDRegistry.json",
+        // },
+        // {
+        //   path:
+        //     "./3rd-parties/decentraland/land/build/contracts/LANDProxy.json",
+        // },
+        // {
+        //   path:
+        //     "./3rd-parties/decentraland/marketplace-contracts/build/contracts/Marketplace.json",
+        // },
+        // {
+        //   path:
+        //     "./3rd-parties/gnosis/safe-contracts/build/contracts/ProxyFactory.json",
+        // },
+        // {
+        //   path:
+        //     "./3rd-parties/gnosis/safe-contracts/build/contracts/GnosisSafe.json",
+        // },
+      ],
+    },
   },
 };

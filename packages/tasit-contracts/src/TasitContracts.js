@@ -14,40 +14,40 @@ import sampleContractABI from "../abi/SampleContract.json";
 // Note: Under the current `tasit-contracts` setup the contracts always will deployed with these addresses
 // See https://github.com/tasitlabs/TasitSDK/issues/138
 const local = {
-  MyERC20Full: {
-    address: "0x37E1A58dD465D33263D00185D065Ee36DD34CDb4",
-    abi: myERC20FullABI,
+  SampleContract: {
+    address: "0x6C4A015797DDDd87866451914eCe1e8b19261931",
+    abi: sampleContractABI,
   },
   MyERC721Full: {
     address: "0x0E86f209729bf54763789CDBcA9E8b94f0FD5333",
     abi: myERC721FullABI,
   },
-  SampleContract: {
-    address: "0x6C4A015797DDDd87866451914eCe1e8b19261931",
-    abi: sampleContractABI,
+  MyERC20Full: {
+    address: "0x37E1A58dD465D33263D00185D065Ee36DD34CDb4",
+    abi: myERC20FullABI,
   },
   MANAToken: {
-    address: "0x332bfb4d705d3ce37c4bf06141c7104984e91e79",
+    address: "0xa6BAc51994B4993D0452e03F9f3106a66fEcA94F",
     abi: manaTokenABI,
   },
   EstateRegistry: {
-    address: "0x6191bc768c2339da9eab9e589fc8bf0b3ab80975",
+    address: "0xd84620e3b20d45693e2d5ccf35fb5694f435e7b6",
     abi: estateRegistryABI,
   },
-  LANDProxy: {
-    address: "0x1212f783f11611b0c029d5e6f86a23be621669e0",
-    abi: landProxyABI,
-  },
   LANDRegistry: {
-    address: "0x773f11ed472aa43e4ebaa963bcfbbea5a10c1bbd",
+    address: "0x523532e5aa1907459aa7474724b3e55b8ac8405b",
     abi: landRegistryABI,
   },
+  LANDProxy: {
+    address: "0x41b598a2c618b59b74540ac3afffb32f7971b37a",
+    abi: landProxyABI,
+  },
   Marketplace: {
-    address: "0x2b3f477b0b056e91b8a389a904f2b6e1a9c00266",
+    address: "0xcf0ae15d4df4c0606c0d4cfb27204ebf8b607383",
     abi: marketplaceABI,
   },
   GnosisSafe: {
-    address: "0x241bf551c22a5e1d05d3d066f5689d084a570016",
+    address: "0xa5a1967312d70fdacfcda84141370098ef540a0d",
     abi: gnosisSafeABI,
   },
 };

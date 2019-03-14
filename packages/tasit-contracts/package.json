@@ -18,13 +18,17 @@
     "url": "git+https://github.com/tasitlabs/tasitsdk.git"
   },
   "scripts": {
-    "compile": "npx babel src --out-dir dist --ignore src/*.test.js,src/**/*.test.js",
-    "prepare": "npm run install:3rd-parties && npm run compile",
-    "migrate": "rm -rf ./build && npx truffle migrate && npm run migrate:3rd-parties",
-    "test": "npx truffle test",
+    "clean:3rd-parties": "./3rd-parties/run_on_all.sh clean `pwd`",
+    "clean": "rm -rf build/ && npm run clean:3rd-parties",
+    "babel:compile": "npx babel src --out-dir dist --ignore src/*.test.js,src/**/*.test.js",
+    "truffle:compile": "npx truffle compile",
+    "truffle:migrate": "npx truffle migrate",
+    "truffle:test": "npx truffle test",
+    "prepare": "npm run install:3rd-parties && npm run babel:compile",
+    "migrate": "npm run clean && npm run truffle:migrate && npm run migrate:3rd-parties",
+    "test": "npm run truffle:test",
     "install:3rd-parties": "./3rd-parties/run_on_all.sh install `pwd`",
-    "migrate:3rd-parties": "./3rd-parties/run_on_all.sh migrate `pwd`",
-    "clean:3rd-parties": "./3rd-parties/run_on_all.sh clean `pwd`"
+    "migrate:3rd-parties": "./3rd-parties/run_on_all.sh migrate `pwd`"
   },
   "bugs": {
     "url": "https://github.com/tasitlabs/tasitsdk/issues"
@@ -36,7 +40,7 @@
     "@babel/preset-env": "^7.1.6",
     "chai-as-promised": "^7.1.1",
     "npm-run-all": "^4.1.5",
-    "truffle": "^5.0.6"
+    "truffle": "^5.0.8"
   },
   "dependencies": {
     "openzeppelin-solidity": "^2.1.3"
