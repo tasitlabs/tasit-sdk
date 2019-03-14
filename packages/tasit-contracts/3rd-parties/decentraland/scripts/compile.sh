@@ -8,7 +8,6 @@ fi
 
 DECENTRALAND_DIR="$PROJECT_DIR/3rd-parties/decentraland"
 
-
 ### COMPILE
 # mana
 cd $DECENTRALAND_DIR/mana && npx truffle compile

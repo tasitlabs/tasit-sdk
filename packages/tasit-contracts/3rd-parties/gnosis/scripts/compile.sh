@@ -6,9 +6,7 @@ then
     exit;
 fi
 
-
 GNOSIS_DIR="$PROJECT_DIR/3rd-parties/gnosis"
-
 
 ### COMPILE
 # safe-contracts

@@ -1,10 +1,8 @@
 const fs = require("fs");
 
 // Remove overloaded functions
-// Overloaded function call was only allowed since Truffle v5. Decentraland Land and Marketplace projects use truffle v4.1.13
-// See more: https://github.com/trufflesuite/truffle/issues/737#issuecomment-454892913
-// As workaround solution, unused functions should be removed from abi
-
+// This helper isn't be used right now, but it'll be useful on that issue:
+// https://github.com/tasitlabs/TasitSDK/issues/241 (step 3)
 const removeFunctionsFromABI = (contractJsonPath, removalCondition) => {
   const rawdata = fs.readFileSync(contractJsonPath);
   let contractJson = JSON.parse(rawdata);
@@ -43,6 +41,3 @@ const removeFromMarketplace = () => {
 
   removeFunctionsFromABI(filePath, removalCondition);
 };
-
-//removeFromEstateRegistry();
-removeFromMarketplace();

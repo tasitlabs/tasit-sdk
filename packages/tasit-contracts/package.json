@@ -35,9 +35,8 @@
     "@babel/core": "^7.1.6",
     "@babel/node": "^7.2.2",
     "@babel/preset-env": "^7.1.6",
-    "chai-as-promised": "^7.1.1",
-    "npm-run-all": "^4.1.5",
-    "truffle": "^5.0.8"
+    "truffle": "^5.0.8",
+    "truffle-hdwallet-provider": "^1.0.0-web3one.5"
   },
   "dependencies": {
     "openzeppelin-solidity": "^2.1.3"

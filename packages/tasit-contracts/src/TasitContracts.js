@@ -31,23 +31,23 @@ const local = {
     abi: manaTokenABI,
   },
   EstateRegistry: {
-    address: "0xB32939dA0c44BF255B9810421A55be095F9bB3f4",
+    address: "0xCa4A5347C1E0460567b299a69135100fb98ebdA7",
     abi: estateRegistryABI,
   },
   LANDRegistry: {
-    address: "0x332BfB4d705d3Ce37c4Bf06141c7104984e91E79",
+    address: "0xB32939dA0c44BF255B9810421A55be095F9bB3f4",
     abi: landRegistryABI,
   },
   LANDProxy: {
-    address: "0xB35420EEa0bC8af4F8A74414D080EA45f1EBf7bb",
+    address: "0x332BfB4d705d3Ce37c4Bf06141c7104984e91E79",
     abi: landProxyABI,
   },
   Marketplace: {
-    address: "0x1212F783f11611b0c029d5e6f86a23BE621669E0",
+    address: "0x6191BC768C2339dA9EAB9e589FC8BF0B3Ab80975",
     abi: marketplaceABI,
   },
   GnosisSafe: {
-    address: "0x07c0e972064e5C05F7B3596d81dE1AfD35457EaE",
+    address: "0x289C42facf691946B64b4370361B1303f0A463EF",
     abi: gnosisSafeABI,
   },
 };
