@@ -47,7 +47,7 @@ const local = {
     abi: marketplaceABI,
   },
   GnosisSafe: {
-    address: "0x289C42facf691946B64b4370361B1303f0A463EF",
+    address: "0xA84F6990607546cEb41cAdbd37D2A886Ce96f8E8",
     abi: gnosisSafeABI,
   },
 };

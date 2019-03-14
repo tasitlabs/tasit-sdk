@@ -25,11 +25,13 @@ do
         rm -rf $REPO_DIR;
         git clone https://github.com/gnosis/$REPO.git $REPO_DIR;
         cd $REPO_DIR && git fetch origin $COMMIT && git reset --hard FETCH_HEAD;
+
+        if [ $IS_NPM ];
+        then
+            npm i --prefix $REPO_DIR;
+        fi
     fi
 
-    if [ $IS_NPM ];
-    then
-        npm i --prefix $REPO_DIR;
-    fi
+
 
 done

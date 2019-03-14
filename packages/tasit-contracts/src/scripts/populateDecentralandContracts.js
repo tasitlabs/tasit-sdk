@@ -157,7 +157,9 @@ const placeParcelsSellOrders = async (
   }
 };
 
-export const populate = async network => {
+let network = process.env.NETWORK;
+
+(async () => {
   const config = require(`../config/${network}.js`);
 
   // https://stats.goerli.net/
@@ -310,6 +312,4 @@ export const populate = async network => {
   } catch (err) {
     console.error(err);
   }
-};
-
-export default { populate };
+})();

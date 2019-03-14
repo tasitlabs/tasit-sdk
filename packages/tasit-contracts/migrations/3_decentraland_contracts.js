@@ -4,8 +4,6 @@ const EstateRegistry = artifacts.require("./EstateRegistry.sol");
 const LANDProxy = artifacts.require("./LANDProxy.sol");
 const Marketplace = artifacts.require("./Marketplace.sol");
 
-const { populate } = require("../dist/scripts/populateDecentralandContracts");
-
 module.exports = (deployer, network, accounts) => {
   [owner] = accounts;
 
@@ -46,8 +44,5 @@ module.exports = (deployer, network, accounts) => {
       ESTATE_ADDRESS,
       owner
     );
-
-    // Call script to populate contract with sell orders
-    await populate(deployer.network);
   });
 };
