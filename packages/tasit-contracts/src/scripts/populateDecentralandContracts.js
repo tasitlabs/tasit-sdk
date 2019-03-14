@@ -1,7 +1,7 @@
 // This script will add land parcels, estates and sell orders to the Decentraland marketplace
 // This data is being used to test the Decentraland demo app
 
-import TasitAction from "../../../../tasit-action/dist/";
+import TasitAction from "../../../tasit-action/dist/";
 const {
   ConfigLoader,
   ERC20,
@@ -12,29 +12,11 @@ const { Mana } = ERC20;
 const { Estate, Land } = ERC721;
 const { Decentraland } = MarketplaceContracts;
 
-import config from "./config/default";
-const { provider } = config;
-const { network } = provider;
+import TasitContracts from "..";
 
-// https://stats.goerli.net/
-if (network === "goerli")
-  gasParams = {
-    gasLimit: 8e6,
-    gasPrice: 1e10,
-  };
+import fs from "fs";
 
-import TasitContracts from "../../../dist";
-const { local, goerli, ropsten } = TasitContracts;
-let blockchain;
-if (network === "goerli") blockchain = goerli;
-else if (network === "ropsten") blockchain = ropsten;
-else blockchain = local;
-const { LANDProxy, EstateRegistry, Marketplace } = blockchain;
-const { address: LAND_PROXY_ADDRESS } = LANDProxy;
-const { address: ESTATE_ADDRESS } = EstateRegistry;
-const { address: MARKETPLACE_ADDRESS } = Marketplace;
-
-import { duration } from "../../../../tasit-sdk/dist/testHelpers/helpers";
+import { duration } from "../../../tasit-sdk/dist/testHelpers/helpers";
 const { ONE, TEN } = constants;
 
 const createMultipleParcels = async (
@@ -108,6 +90,7 @@ const createEstates = async (estateContract, landContract, estates, wallet) => {
 };
 
 const approveMarketplace = async (
+  marketplaceAddress,
   landContract,
   estateContract,
   assetsOwnerWallet
@@ -117,7 +100,7 @@ const approveMarketplace = async (
 
   estateContract.setWallet(assetsOwnerWallet);
   const estateApproval = estateContract.setApprovalForAll(
-    MARKETPLACE_ADDRESS,
+    marketplaceAddress,
     authorized,
     gasParams
   );
@@ -125,7 +108,7 @@ const approveMarketplace = async (
 
   landContract.setWallet(assetsOwnerWallet);
   const landApproval = landContract.setApprovalForAll(
-    MARKETPLACE_ADDRESS,
+    marketplaceAddress,
     authorized,
     gasParams
   );
@@ -134,6 +117,7 @@ const approveMarketplace = async (
 
 const placeEstatesSellOrders = async (
   marketplace,
+  estateAddress,
   estateIds,
   priceInWei,
   expireAt,
@@ -142,7 +126,7 @@ const placeEstatesSellOrders = async (
   marketplace.setWallet(sellerWallet);
   for (let assetId of estateIds) {
     const action = marketplace.createOrder(
-      ESTATE_ADDRESS,
+      estateAddress,
       assetId,
       priceInWei,
       expireAt,
@@ -154,6 +138,7 @@ const placeEstatesSellOrders = async (
 
 const placeParcelsSellOrders = async (
   marketplace,
+  landAddress,
   landIds,
   priceInWei,
   expireAt,
@@ -162,7 +147,7 @@ const placeParcelsSellOrders = async (
   marketplace.setWallet(sellerWallet);
   for (let assetId of landIds) {
     const action = marketplace.createOrder(
-      LAND_PROXY_ADDRESS,
+      landAddress,
       assetId,
       priceInWei,
       expireAt,
@@ -172,7 +157,25 @@ const placeParcelsSellOrders = async (
   }
 };
 
+let network = process.env.NETWORK;
+
 (async () => {
+  const config = require(`../config/${network}.js`);
+
+  // https://stats.goerli.net/
+  if (network === "goerli")
+    gasParams = {
+      gasLimit: 8e6,
+      gasPrice: 1e10,
+    };
+  else if (network === "development") {
+    network = "local";
+  }
+  const { LANDProxy, EstateRegistry, Marketplace } = TasitContracts[network];
+  const { address: LAND_PROXY_ADDRESS } = LANDProxy;
+  const { address: ESTATE_ADDRESS } = EstateRegistry;
+  const { address: MARKETPLACE_ADDRESS } = Marketplace;
+
   ConfigLoader.setConfig(config);
 
   const [ownerWallet, sellerWallet] = accounts;
@@ -274,7 +277,12 @@ const placeParcelsSellOrders = async (
     );
 
     console.log("Approving Marketplace...");
-    await approveMarketplace(landContract, estateContract, sellerWallet);
+    await approveMarketplace(
+      MARKETPLACE_ADDRESS,
+      landContract,
+      estateContract,
+      sellerWallet
+    );
 
     const priceInWei = `${ONE}`;
     const expireAt = Date.now() + duration.years(5);
@@ -282,6 +290,7 @@ const placeParcelsSellOrders = async (
     console.log("Placing estates sellorders...");
     await placeEstatesSellOrders(
       marketplaceContract,
+      ESTATE_ADDRESS,
       allEstateIds,
       priceInWei,
       expireAt,
@@ -294,6 +303,7 @@ const placeParcelsSellOrders = async (
     console.log("Placing parcels sellorders...");
     await placeParcelsSellOrders(
       marketplaceContract,
+      LAND_PROXY_ADDRESS,
       landIdsToSell,
       priceInWei,
       expireAt,

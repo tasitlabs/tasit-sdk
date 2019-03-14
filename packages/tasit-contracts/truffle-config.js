@@ -21,12 +21,17 @@
  * phrase from a file you've .gitignored so it doesn't accidentally become public.
  *
  */
+const fs = require("fs");
 
-// const HDWallet = require('truffle-hdwallet-provider');
-// const infuraKey = "fj4jll3k.....";
-//
-// const fs = require('fs');
-// const mnemonic = fs.readFileSync(".secret").toString().trim();
+const HDWallet = require("truffle-hdwallet-provider");
+
+const createInfuraProvider = (network = "mainnet") => {
+  const secretFile = fs.readFileSync(".secret.json");
+  const secret = JSON.parse(secretFile);
+  const { mnemonic, infuraKey } = secret[network];
+  const rpcEndpoint = `https://${network}.infura.io/${infuraKey}`;
+  return new HDWalletProvider(mnemonic, rpcEndpoint);
+};
 
 module.exports = {
   /**
@@ -50,6 +55,15 @@ module.exports = {
       host: "127.0.0.1", // Localhost (default: none)
       port: 8545, // Standard Ethereum port (default: none)
       network_id: "*", // Any network (default: none)
+    },
+    goerli: {
+      provider: () => createInfuraProvider("goerli"),
+      network_id: 5,
+      gasPrice: 10000000000, // 10 Gwei (https://stats.goerli.net/)
+    },
+    ropsten: {
+      provider: () => createInfuraProvider("ropsten"),
+      network_id: 3,
     },
     // Another network with more advanced options...
     // advanced: {
@@ -95,6 +109,40 @@ module.exports = {
       //  },
       //  evmVersion: "byzantium"
       // }
+    },
+    external: {
+      command: "./3rd-parties/run_on_all.sh compile `pwd`",
+      targets: [
+        {
+          // This is a transpiled file from original json created by mana projects' truffle
+          // See more: https://github.com/trufflesuite/truffle/issues/1799#issuecomment-472821965
+          path: "./3rd-parties/decentraland/scripts/mana/MANAToken.json",
+        },
+        {
+          path:
+            "./3rd-parties/decentraland/land/build/contracts/EstateRegistry.json",
+        },
+        {
+          path:
+            "./3rd-parties/decentraland/land/build/contracts/LANDRegistry.json",
+        },
+        {
+          path:
+            "./3rd-parties/decentraland/land/build/contracts/LANDProxy.json",
+        },
+        {
+          path:
+            "./3rd-parties/decentraland/marketplace-contracts/build/contracts/Marketplace.json",
+        },
+        {
+          path:
+            "./3rd-parties/gnosis/safe-contracts/build/contracts/ProxyFactory.json",
+        },
+        {
+          path:
+            "./3rd-parties/gnosis/safe-contracts/build/contracts/GnosisSafe.json",
+        },
+      ],
     },
   },
 };

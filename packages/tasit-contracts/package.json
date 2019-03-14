@@ -18,13 +18,14 @@
     "url": "git+https://github.com/tasitlabs/tasitsdk.git"
   },
   "scripts": {
+    "clean": "rm -rf build/ dist/",
     "compile": "npx babel src --out-dir dist --ignore src/*.test.js,src/**/*.test.js",
+    "migrate": "npx truffle migrate && npm run populate-contracts",
     "prepare": "npm run install:3rd-parties && npm run compile",
-    "migrate": "rm -rf ./build && npx truffle migrate && npm run migrate:3rd-parties",
     "test": "npx truffle test",
     "install:3rd-parties": "./3rd-parties/run_on_all.sh install `pwd`",
-    "migrate:3rd-parties": "./3rd-parties/run_on_all.sh migrate `pwd`",
-    "clean:3rd-parties": "./3rd-parties/run_on_all.sh clean `pwd`"
+    "compile:3rd-parties": "./3rd-parties/run_on_all.sh compile `pwd`",
+    "populate-contracts": "NETWORK=development npx babel-node src/scripts/populateDecentralandContracts.js"
   },
   "bugs": {
     "url": "https://github.com/tasitlabs/tasitsdk/issues"
@@ -34,9 +35,8 @@
     "@babel/core": "^7.1.6",
     "@babel/node": "^7.2.2",
     "@babel/preset-env": "^7.1.6",
-    "chai-as-promised": "^7.1.1",
-    "npm-run-all": "^4.1.5",
-    "truffle": "^5.0.6"
+    "truffle": "^5.0.8",
+    "truffle-hdwallet-provider": "^1.0.0-web3one.5"
   },
   "dependencies": {
     "openzeppelin-solidity": "^2.1.3"

@@ -1,2 +1,3 @@
 build/**
 3rd-parties/**/scripts/config/default.js
+.secret.json
