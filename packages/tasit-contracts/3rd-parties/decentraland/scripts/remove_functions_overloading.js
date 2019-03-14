@@ -44,5 +44,5 @@ const removeFromMarketplace = () => {
   removeFunctionsFromABI(filePath, removalCondition);
 };
 
-removeFromEstateRegistry();
+//removeFromEstateRegistry();
 removeFromMarketplace();

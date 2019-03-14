@@ -2,8 +2,6 @@ const LANDRegistry = artifacts.require("./LANDRegistry.sol");
 const EstateRegistry = artifacts.require("./EstateRegistry.sol");
 const LANDProxy = artifacts.require("./LANDProxy.sol");
 
-// Note: If you want to change this file, make sure that you are editing
-// the original file inside of the `tasit-contracts/3rd-parties/decentraland/scripts/land` folder
 module.exports = (deployer, network, accounts) => {
   [owner] = accounts;
 
@@ -24,7 +22,7 @@ module.exports = (deployer, network, accounts) => {
     // Initialize Estate ERC721 contract
     const estateContractName = "Estate";
     const estateContractSymbol = "EST";
-    await estate.initialize(
+    await estate.methods["initialize(string,string,address)"](
       estateContractName,
       estateContractSymbol,
       LAND_PROXY_ADDRESS

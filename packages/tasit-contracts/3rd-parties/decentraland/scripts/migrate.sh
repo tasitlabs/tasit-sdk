@@ -14,17 +14,7 @@ INFURA_TOKEN="974bd2e667b246f29d2589a59600530e";
 
 ### Note: Compiling is done as a separate step from Migration to allow removal of unused overloaded functions from contract ABIs.
 
-### CLEAN
-# land
-rm -rf $DECENTRALAND_DIR/land/build/
-
-# marketplace-contracts
-rm -rf $DECENTRALAND_DIR/marketplace-contracts/build/
-
 ### COMPILE
-# land
-cd $DECENTRALAND_DIR/land && npx truffle compile
-
 # marketplace-contracts
 cd $DECENTRALAND_DIR/marketplace-contracts && npx truffle compile
 
@@ -33,11 +23,6 @@ node $DECENTRALAND_DIR/scripts/remove_functions_overloading.js
 
 
 ### MIGRATE
-# land
-cp $DECENTRALAND_DIR/scripts/land/3_land_migrations.js $DECENTRALAND_DIR/land/migrations
-cp $DECENTRALAND_DIR/scripts/land/truffle-config.js $DECENTRALAND_DIR/land
-cd $DECENTRALAND_DIR/land && MNEMONIC=$MNEMONIC INFURA_TOKEN=$INFURA_TOKEN npx truffle migrate --network $NETWORK
-
 # marketplace-contracts
 cp $DECENTRALAND_DIR/scripts/marketplace-contracts/3_marketplace-contracts_migrations.js $DECENTRALAND_DIR/marketplace-contracts/migrations
 cp $DECENTRALAND_DIR/scripts/marketplace-contracts/truffle-config.js $DECENTRALAND_DIR/marketplace-contracts
