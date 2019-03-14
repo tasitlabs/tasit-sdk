@@ -12,9 +12,6 @@ NETWORK="development";
 MNEMONIC="beach swap combine paper music cook electric bullet trust actress liquid asthma";
 INFURA_TOKEN="974bd2e667b246f29d2589a59600530e";
 
-# remove unused overloaded functions from abis
-#node $DECENTRALAND_DIR/scripts/remove_functions_overloading.js
-
 ### POPULATE BLOCKCHAIN
-cp $DECENTRALAND_DIR/scripts/config/$NETWORK.js $DECENTRALAND_DIR/scripts/config/default.js
-cd $PROJECT_DIR && npx babel-node $DECENTRALAND_DIR/scripts/decentralandOrdersLoad.js
+#cp $DECENTRALAND_DIR/scripts/config/$NETWORK.js $DECENTRALAND_DIR/scripts/config/default.js
+#cd $PROJECT_DIR && npx babel-node $DECENTRALAND_DIR/scripts/decentralandOrdersLoad.js

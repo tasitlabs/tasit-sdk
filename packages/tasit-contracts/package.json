@@ -18,19 +18,14 @@
     "url": "git+https://github.com/tasitlabs/tasitsdk.git"
   },
   "scripts": {
-    "clean:3rd-parties": "./3rd-parties/run_on_all.sh clean `pwd`",
-    "clean": "npm run truffle:clean && npm run clean:3rd-parties",
-    "babel:compile": "npx babel src --out-dir dist --ignore src/*.test.js,src/**/*.test.js",
-    "truffle:clean": "rm -rf build/",
-    "truffle:compile": "npm run truffle:clean && npx truffle compile",
-    "truffle:migrate": "npm run truffle:clean && npx truffle migrate --reset",
-    "truffle:test": "npx truffle test",
+    "clean": "rm -rf build/ dist/",
+    "compile": "npx babel src --out-dir dist --ignore src/*.test.js,src/**/*.test.js",
+    "migrate": "npx truffle migrate --reset && npm run populate-contracts",
     "prepare": "npm run install:3rd-parties && npm run babel:compile",
-    "migrate": "npm run clean && npm run truffle:migrate && npm run migrate:3rd-parties",
-    "test": "npm run truffle:test",
+    "test": "npx truffle test",
     "install:3rd-parties": "./3rd-parties/run_on_all.sh install `pwd`",
-    "migrate:3rd-parties": "./3rd-parties/run_on_all.sh migrate `pwd`",
-    "compile:3rd-parties": "./3rd-parties/run_on_all.sh compile `pwd`"
+    "compile:3rd-parties": "./3rd-parties/run_on_all.sh compile `pwd`",
+    "populate-contracts": "npx babel-node src/scripts/populateDecentralandContracts.js"
   },
   "bugs": {
     "url": "https://github.com/tasitlabs/tasitsdk/issues"

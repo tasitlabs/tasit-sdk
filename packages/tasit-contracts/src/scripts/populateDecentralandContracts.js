@@ -1,7 +1,7 @@
 // This script will add land parcels, estates and sell orders to the Decentraland marketplace
 // This data is being used to test the Decentraland demo app
 
-import TasitAction from "../../../../tasit-action/dist/";
+import TasitAction from "../../../tasit-action/dist/";
 const {
   ConfigLoader,
   ERC20,
@@ -12,7 +12,7 @@ const { Mana } = ERC20;
 const { Estate, Land } = ERC721;
 const { Decentraland } = MarketplaceContracts;
 
-import config from "./config/default";
+import config from "../config/default";
 const { provider } = config;
 const { network } = provider;
 
@@ -23,7 +23,7 @@ if (network === "goerli")
     gasPrice: 1e10,
   };
 
-import TasitContracts from "../../../dist";
+import TasitContracts from "..";
 const { local, goerli, ropsten } = TasitContracts;
 let blockchain;
 if (network === "goerli") blockchain = goerli;
@@ -34,7 +34,7 @@ const { address: LAND_PROXY_ADDRESS } = LANDProxy;
 const { address: ESTATE_ADDRESS } = EstateRegistry;
 const { address: MARKETPLACE_ADDRESS } = Marketplace;
 
-import { duration } from "../../../../tasit-sdk/dist/testHelpers/helpers";
+import { duration } from "../../../tasit-sdk/dist/testHelpers/helpers";
 const { ONE, TEN } = constants;
 
 const createMultipleParcels = async (
