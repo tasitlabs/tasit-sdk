@@ -1,19 +1,22 @@
-const TasitContracts = require("../dist/TasitContracts").TasitContracts;
-const { local } = TasitContracts;
-const { EstateRegistry } = local;
-const { abi, address } = EstateRegistry;
-
-// Note:
-// This test suite is using web3.js because contract deployment is made by a 3rd-party repository
-// (and most existing 3rd-party contracts tend to use Truffle which uses web3.js)
+const EstateRegistry = artifacts.require("./EstateRegistry.sol");
+// Note: It will probably be a point of confusion for new developers
+// coming to this project that they'll have to get used to the web3.js
+// API for writing truffle tests but then use the ethers.js API and our
+// own API also in JavaScript for testing our own code. So the
+// ethers.js tests in tasit-action will look different than the truffle tests
+// in tasit-contracts testing the same contract.
+// For that reason, a possible TODO is removing any truffle tests
+// other than those we directly add from 3rd-party projects
 contract("EstateRegistry", accounts => {
   const [owner] = accounts;
+  let estate;
 
-  it("should the EstateRegistry contract name", async () => {
-    const estateRegistry = new web3.eth.Contract(abi, address);
+  before("", async () => {
+    estate = await EstateRegistry.deployed();
+  });
 
-    let name = await estateRegistry.methods.name().call();
-
+  it("should get the contract name", async () => {
+    const name = await estate.name();
     assert.equal(
       name,
       "Estate",
