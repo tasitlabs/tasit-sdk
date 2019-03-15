@@ -1,8 +1,9 @@
-import { Account, Action } from "./TasitSdk";
+import { Account, Action, ContractBasedAccount } from "./TasitSdk";
 const { ConfigLoader, ERC20, ERC721, Marketplace: marketplaces } = Action;
 const { Mana } = ERC20;
 const { Estate, Land } = ERC721;
 const { Decentraland } = marketplaces;
+const { GnosisSafe } = ContractBasedAccount;
 
 const { ONE, TEN } = constants;
 
@@ -106,7 +107,9 @@ describe("Decentraland", () => {
       });
 
       describe("Using a Gnosis Safe wallet to buy assets", () => {
+        const gnosisSafeOwner = accounts[9];
         let gnosisSafe;
+
         before("", async () => {
           gnosisSafe = new GnosisSafe(GNOSIS_SAFE_ADDRESS);
         });
