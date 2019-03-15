@@ -101,17 +101,19 @@ describe("Decentraland", () => {
     });
 
     describe("write / with wallet test cases", () => {
-      beforeEach(
-        "buyer and seller approve marketplace contract to transfer tokens on their behalf",
-        async () => {
+      let manaAmountForShopping;
+
+      beforeEach("", async () => {
+        const { priceInWei: landPrice } = landForSale;
+        const { priceInWei: estatePrice } = estateForSale;
+
+        manaAmountForShopping = bigNumberify(landPrice).add(
+          bigNumberify(estatePrice)
+        );
+      });
+      describe("Using a Gnosis Safe wallet to buy assets", () => {
+        beforeEach("onboarding", async () => {
           const { address: ephemeralAddress } = ephemeralWallet;
-
-          const { priceInWei: landPrice } = landForSale;
-          const { priceInWei: estatePrice } = estateForSale;
-
-          const manaAmountForShopping = bigNumberify(landPrice).add(
-            bigNumberify(estatePrice)
-          );
 
           await etherFaucet(provider, ownerWallet, ephemeralAddress, ONE);
           await confirmEtherBalances(provider, [ephemeralAddress], [ONE]);
@@ -143,76 +145,182 @@ describe("Decentraland", () => {
           );
 
           expect(`${allowance}`).to.equal(`${manaAmountForShopping}`);
-        }
-      );
+        });
 
-      it("should buy an estate", async () => {
-        const {
-          assetId,
-          nftAddress,
-          seller,
-          priceInWei,
-          expiresAt,
-        } = estateForSale;
+        it("should buy an estate", async () => {
+          const {
+            assetId,
+            nftAddress,
+            seller,
+            priceInWei,
+            expiresAt,
+          } = estateForSale;
 
-        const { address: ephemeralAddress } = ephemeralWallet;
+          const { address: ephemeralAddress } = ephemeralWallet;
 
-        checkAsset(
-          estateContract,
-          manaContract,
-          estateForSale,
-          ephemeralAddress
-        );
+          checkAsset(
+            estateContract,
+            manaContract,
+            estateForSale,
+            ephemeralAddress
+          );
 
-        await confirmBalances(estateContract, [ephemeralAddress], [0]);
+          await confirmBalances(estateContract, [ephemeralAddress], [0]);
 
-        const fingerprint = await estateContract.getFingerprint(
-          assetId.toString()
-        );
+          const fingerprint = await estateContract.getFingerprint(
+            assetId.toString()
+          );
 
-        marketplaceContract.setWallet(ephemeralWallet);
-        const executeOrderAction = marketplaceContract.safeExecuteOrder(
-          nftAddress,
-          `${assetId}`,
-          `${priceInWei}`,
-          `${fingerprint}`,
-          gasParams
-        );
+          marketplaceContract.setWallet(ephemeralWallet);
+          const executeOrderAction = marketplaceContract.safeExecuteOrder(
+            nftAddress,
+            `${assetId}`,
+            `${priceInWei}`,
+            `${fingerprint}`,
+            gasParams
+          );
 
-        await executeOrderAction.waitForNonceToUpdate();
+          await executeOrderAction.waitForNonceToUpdate();
 
-        await confirmBalances(estateContract, [ephemeralAddress], [1]);
+          await confirmBalances(estateContract, [ephemeralAddress], [1]);
+        });
+
+        it("should buy a parcel of land", async () => {
+          const {
+            assetId,
+            nftAddress,
+            seller,
+            priceInWei,
+            expiresAt,
+          } = landForSale;
+
+          const { address: ephemeralAddress } = ephemeralWallet;
+
+          checkAsset(landContract, manaContract, landForSale, ephemeralAddress);
+
+          await confirmBalances(landContract, [ephemeralAddress], [0]);
+
+          // LANDRegistry contract doesn't implement getFingerprint function
+          const fingerprint = "0x";
+          marketplaceContract.setWallet(ephemeralWallet);
+          const executeOrderAction = marketplaceContract.safeExecuteOrder(
+            nftAddress,
+            `${assetId}`,
+            `${priceInWei}`,
+            `${fingerprint}`,
+            gasParams
+          );
+
+          await executeOrderAction.waitForNonceToUpdate();
+
+          await confirmBalances(landContract, [ephemeralAddress], [1]);
+        });
       });
 
-      it("should buy a parcel of land", async () => {
-        const {
-          assetId,
-          nftAddress,
-          seller,
-          priceInWei,
-          expiresAt,
-        } = landForSale;
+      describe.skip("Using a funded ephemeral wallet to buy assets", () => {
+        beforeEach("onboarding", async () => {
+          const { address: ephemeralAddress } = ephemeralWallet;
 
-        const { address: ephemeralAddress } = ephemeralWallet;
+          await etherFaucet(provider, ownerWallet, ephemeralAddress, ONE);
+          await confirmEtherBalances(provider, [ephemeralAddress], [ONE]);
 
-        checkAsset(landContract, manaContract, landForSale, ephemeralAddress);
+          await erc20Faucet(
+            manaContract,
+            ownerWallet,
+            ephemeralAddress,
+            manaAmountForShopping
+          );
 
-        await confirmBalances(landContract, [ephemeralAddress], [0]);
+          await confirmBalances(
+            manaContract,
+            [ephemeralAddress],
+            [manaAmountForShopping]
+          );
 
-        // LANDRegistry contract doesn't implement getFingerprint function
-        const fingerprint = "0x";
-        marketplaceContract.setWallet(ephemeralWallet);
-        const executeOrderAction = marketplaceContract.safeExecuteOrder(
-          nftAddress,
-          `${assetId}`,
-          `${priceInWei}`,
-          `${fingerprint}`,
-          gasParams
-        );
+          manaContract.setWallet(ephemeralWallet);
+          const approvalAction = manaContract.approve(
+            MARKETPLACE_ADDRESS,
+            manaAmountForShopping,
+            gasParams
+          );
+          await approvalAction.waitForNonceToUpdate();
 
-        await executeOrderAction.waitForNonceToUpdate();
+          const allowance = await manaContract.allowance(
+            ephemeralAddress,
+            MARKETPLACE_ADDRESS
+          );
 
-        await confirmBalances(landContract, [ephemeralAddress], [1]);
+          expect(`${allowance}`).to.equal(`${manaAmountForShopping}`);
+        });
+
+        it("should buy an estate", async () => {
+          const {
+            assetId,
+            nftAddress,
+            seller,
+            priceInWei,
+            expiresAt,
+          } = estateForSale;
+
+          const { address: ephemeralAddress } = ephemeralWallet;
+
+          checkAsset(
+            estateContract,
+            manaContract,
+            estateForSale,
+            ephemeralAddress
+          );
+
+          await confirmBalances(estateContract, [ephemeralAddress], [0]);
+
+          const fingerprint = await estateContract.getFingerprint(
+            assetId.toString()
+          );
+
+          marketplaceContract.setWallet(ephemeralWallet);
+          const executeOrderAction = marketplaceContract.safeExecuteOrder(
+            nftAddress,
+            `${assetId}`,
+            `${priceInWei}`,
+            `${fingerprint}`,
+            gasParams
+          );
+
+          await executeOrderAction.waitForNonceToUpdate();
+
+          await confirmBalances(estateContract, [ephemeralAddress], [1]);
+        });
+
+        it("should buy a parcel of land", async () => {
+          const {
+            assetId,
+            nftAddress,
+            seller,
+            priceInWei,
+            expiresAt,
+          } = landForSale;
+
+          const { address: ephemeralAddress } = ephemeralWallet;
+
+          checkAsset(landContract, manaContract, landForSale, ephemeralAddress);
+
+          await confirmBalances(landContract, [ephemeralAddress], [0]);
+
+          // LANDRegistry contract doesn't implement getFingerprint function
+          const fingerprint = "0x";
+          marketplaceContract.setWallet(ephemeralWallet);
+          const executeOrderAction = marketplaceContract.safeExecuteOrder(
+            nftAddress,
+            `${assetId}`,
+            `${priceInWei}`,
+            `${fingerprint}`,
+            gasParams
+          );
+
+          await executeOrderAction.waitForNonceToUpdate();
+
+          await confirmBalances(landContract, [ephemeralAddress], [1]);
+        });
       });
     });
   });
