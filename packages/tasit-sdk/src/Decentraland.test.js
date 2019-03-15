@@ -142,111 +142,76 @@ describe("Decentraland", () => {
         expect(size.toNumber()).to.be.a("number");
         expect(size.toNumber()).to.be.at.least(0);
       });
+    });
 
-      describe("write / with wallet test cases", () => {
-        it("should buy an estate", async () => {
-          const {
-            assetId,
-            nftAddress,
-            seller,
-            priceInWei,
-            expiresAt,
-          } = estateForSale;
+    describe("write / with wallet test cases", () => {
+      it("should buy an estate", async () => {
+        const {
+          assetId,
+          nftAddress,
+          seller,
+          priceInWei,
+          expiresAt,
+        } = estateForSale;
 
-          const { address: ephemeralAddress } = ephemeralWallet;
+        const { address: ephemeralAddress } = ephemeralWallet;
 
-          const expiresTime = Number(expiresAt);
-          const nowInSeconds = Date.now() / 1000;
-          expect(nowInSeconds).to.be.below(expiresTime);
+        checkAsset(
+          estateContract,
+          manaContract,
+          estateForSale,
+          ephemeralAddress
+        );
 
-          const priceInWeiBN = bigNumberify(priceInWei);
+        await confirmBalances(estateContract, [ephemeralAddress], [0]);
 
-          // Buyer (ephemeral wallet) has enough MANA
-          const manaBalance = await manaContract.balanceOf(ephemeralAddress);
-          const manaBalanceBN = bigNumberify(manaBalance);
-          expect(manaBalanceBN.gte(priceInWeiBN)).to.be.true;
+        const fingerprint = await estateContract.getFingerprint(
+          assetId.toString()
+        );
 
-          // Marketplace is approved to transfer Estate asset owned by the seller
-          const approvedForAsset = await estateContract.getApproved(assetId);
-          const approvedForAll = await estateContract.isApprovedForAll(
-            seller,
-            MARKETPLACE_ADDRESS
-          );
-          const approved =
-            addressesAreEqual(approvedForAsset, MARKETPLACE_ADDRESS) ||
-            approvedForAll;
-          expect(approved).to.be.true;
+        marketplaceContract.setWallet(ephemeralWallet);
+        const executeOrderAction = marketplaceContract.safeExecuteOrder(
+          nftAddress,
+          `${assetId}`,
+          `${priceInWei}`,
+          `${fingerprint}`,
+          gasParams
+        );
 
-          await confirmBalances(estateContract, [ephemeralAddress], [0]);
+        await executeOrderAction.waitForNonceToUpdate();
 
-          const fingerprint = await estateContract.getFingerprint(
-            assetId.toString()
-          );
+        await confirmBalances(estateContract, [ephemeralAddress], [1]);
+      });
 
-          marketplaceContract.setWallet(ephemeralWallet);
-          const executeOrderAction = marketplaceContract.safeExecuteOrder(
-            nftAddress,
-            `${assetId}`,
-            `${priceInWei}`,
-            `${fingerprint}`,
-            gasParams
-          );
+      it("should buy a parcel of land", async () => {
+        const {
+          assetId,
+          nftAddress,
+          seller,
+          priceInWei,
+          expiresAt,
+        } = landForSale;
 
-          await executeOrderAction.waitForNonceToUpdate();
+        const { address: ephemeralAddress } = ephemeralWallet;
 
-          await confirmBalances(estateContract, [ephemeralAddress], [1]);
-        });
+        checkAsset(landContract, manaContract, landForSale, ephemeralAddress);
 
-        it("should buy a parcel of land", async () => {
-          const {
-            assetId,
-            nftAddress,
-            seller,
-            priceInWei,
-            expiresAt,
-          } = landForSale;
+        await confirmBalances(landContract, [ephemeralAddress], [0]);
 
-          const { address: ephemeralAddress } = ephemeralWallet;
+        // LANDRegistry contract doesn't implement getFingerprint function
+        const fingerprint = "0x";
+        marketplaceContract.setWallet(ephemeralWallet);
+        const executeOrderAction = marketplaceContract.safeExecuteOrder(
+          nftAddress,
+          `${assetId}`,
+          `${priceInWei}`,
+          `${fingerprint}`,
+          gasParams
+        );
 
-          const expiresTime = Number(expiresAt);
-          const nowInSeconds = Date.now() / 1000;
-          expect(nowInSeconds).to.be.below(expiresTime);
+        await executeOrderAction.waitForNonceToUpdate();
 
-          const priceInWeiBN = bigNumberify(priceInWei);
-
-          // Buyer (ephemeral wallet) has enough MANA
-          const manaBalance = await manaContract.balanceOf(ephemeralAddress);
-          const manaBalanceBN = bigNumberify(manaBalance);
-          expect(manaBalanceBN.gte(priceInWeiBN)).to.be.true;
-
-          // Marketplace is approved to transfer Land Parcel asset owned by the seller
-          const approvedForAsset = await landContract.getApproved(assetId);
-          const approvedForAll = await landContract.isApprovedForAll(
-            seller,
-            MARKETPLACE_ADDRESS
-          );
-          const approved =
-            addressesAreEqual(approvedForAsset, MARKETPLACE_ADDRESS) ||
-            approvedForAll;
-          expect(approved).to.be.true;
-
-          await confirmBalances(landContract, [ephemeralAddress], [0]);
-
-          // LANDRegistry contract doesn't implement getFingerprint function
-          const fingerprint = "0x";
-          marketplaceContract.setWallet(ephemeralWallet);
-          const executeOrderAction = marketplaceContract.safeExecuteOrder(
-            nftAddress,
-            `${assetId}`,
-            `${priceInWei}`,
-            `${fingerprint}`,
-            gasParams
-          );
-
-          await executeOrderAction.waitForNonceToUpdate();
-
-          await confirmBalances(landContract, [ephemeralAddress], [1]);
-        });
+        await confirmBalances(landContract, [ephemeralAddress], [1]);
       });
     });
   });
