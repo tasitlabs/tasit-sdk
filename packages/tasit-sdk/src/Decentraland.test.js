@@ -175,6 +175,7 @@ describe("Decentraland", () => {
 
           // Gnosis Safe should approve Marketplace to spend its MANA Tokens
           // TODO: ephemeralWallet should broadcast this action
+          gnosisSafe.once("ExecutionFailed", console.log);
           const contractAddress = marketplace.getAddress();
           const contractABI = marketplace.getABI();
           const functionName = "safeExecuteOrder";
@@ -196,6 +197,8 @@ describe("Decentraland", () => {
             ethersAmount
           );
           await executeOrderAction.waitForNonceToUpdate();
+
+          await mineBlocks(provider, 1);
 
           await confirmBalances(estate, [GNOSIS_SAFE_ADDRESS], [1]);
         });
