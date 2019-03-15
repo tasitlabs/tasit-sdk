@@ -62,34 +62,71 @@ export default class GnosisSafe extends Contract {
   };
 
   approveERC20 = (tokenAddress, spender, value) => {
-    const data = this.#utils.encodeFunctionCall(erc20ABI, "approve", [
-      spender,
-      value,
-    ]);
-    const etherValue = "0";
-    const action = this.#executeTransaction(data, tokenAddress, etherValue);
+    const contractAddress = tokenAddress;
+    const contractABI = erc20ABI;
+    const functionName = "approve";
+    const argsArray = [spender, value];
+    const ethersAmount = "0";
+
+    const action = this.customContractAction(
+      contractAddress,
+      contractABI,
+      functionName,
+      argsArray,
+      ethersAmount
+    );
     return action;
   };
 
   transferERC20 = (tokenAddress, toAddress, value) => {
-    const data = this.#utils.encodeFunctionCall(erc20ABI, "transfer", [
-      toAddress,
-      value,
-    ]);
-    const etherValue = "0";
-    const action = this.#executeTransaction(data, tokenAddress, etherValue);
+    const contractAddress = tokenAddress;
+    const contractABI = erc20ABI;
+    const functionName = "transfer";
+    const argsArray = [toAddress, value];
+    const ethersAmount = "0";
+
+    const action = this.customContractAction(
+      contractAddress,
+      contractABI,
+      functionName,
+      argsArray,
+      ethersAmount
+    );
     return action;
   };
 
   transferNFT = (tokenAddress, toAddress, tokenId) => {
+    const contractAddress = tokenAddress;
+    const contractABI = erc721ABI;
+    const functionName = "safeTransferFrom";
     const fromAddress = this.getAddress();
-    const data = this.#utils.encodeFunctionCall(erc721ABI, "safeTransferFrom", [
-      fromAddress,
-      toAddress,
-      tokenId,
-    ]);
-    const etherValue = "0";
-    const action = this.#executeTransaction(data, tokenAddress, etherValue);
+    const argsArray = [fromAddress, toAddress, tokenId];
+    const ethersAmount = "0";
+
+    const action = this.customContractAction(
+      contractAddress,
+      contractABI,
+      functionName,
+      argsArray,
+      ethersAmount
+    );
+    return action;
+  };
+
+  addSignerWithThreshold = (newSignerAddress, newThreshold) => {
+    const contractAddress = this.getAddress();
+    const contractABI = this.getABI();
+    const functionName = "addOwnerWithThreshold";
+    const argsArray = [newSignerAddress, newThreshold];
+    const ethersAmount = "0";
+
+    const action = this.customContractAction(
+      contractAddress,
+      contractABI,
+      functionName,
+      argsArray,
+      ethersAmount
+    );
     return action;
   };
 
@@ -100,15 +137,27 @@ export default class GnosisSafe extends Contract {
     return action;
   };
 
-  addSignerWithThreshold = (newSignerAddress, newThreshold) => {
+  // Note: When the Action class no more sends transaction on the same moment then building,
+  // a new function such `Action.getData()` could be created and this function
+  // could be changed to something like `customContractAction(actionData)`
+  // Related to: https://github.com/tasitlabs/TasitSDK/issues/162
+  customContractAction = (
+    contractAddress,
+    contractABI,
+    functionName,
+    argsArray,
+    ethersAmount
+  ) => {
     const data = this.#utils.encodeFunctionCall(
-      this.getABI(),
-      "addOwnerWithThreshold",
-      [newSignerAddress, newThreshold]
+      contractABI,
+      functionName,
+      argsArray
     );
-    const to = this.getAddress();
-    const etherValue = "0";
-    const action = this.#executeTransaction(data, to, etherValue);
+    const action = this.#executeTransaction(
+      data,
+      contractAddress,
+      ethersAmount
+    );
     return action;
   };
 
