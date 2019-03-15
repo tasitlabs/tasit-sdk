@@ -7,7 +7,7 @@ const { Decentraland } = marketplaces;
 const { ONE, TEN } = constants;
 
 describe("Decentraland", () => {
-  let ownerWallet;
+  let minterWallet;
   let ephemeralWallet;
   let ephemeralAddress;
   let mana;
@@ -19,7 +19,7 @@ describe("Decentraland", () => {
 
   // TODO: Assign different contract objects for each wallet (avoiding setWallet)
   before("", async () => {
-    [ownerWallet] = accounts;
+    [minterWallet] = accounts;
     ephemeralWallet = Account.create();
     ({ address: ephemeralAddress } = ephemeralWallet);
 
@@ -106,13 +106,21 @@ describe("Decentraland", () => {
       });
 
       describe("Using a Gnosis Safe wallet to buy assets", () => {
+        let gnosisSafe;
+        before("", async () => {
+          gnosisSafe = new GnosisSafe(GNOSIS_SAFE_ADDRESS);
+        });
+
         beforeEach("onboarding", async () => {
-          await etherFaucet(provider, ownerWallet, ephemeralAddress, ONE);
+          gnosisSafe.removeWallet();
+          gnosisSafe.setSigners([]);
+
+          await etherFaucet(provider, minterWallet, ephemeralAddress, ONE);
           await confirmEtherBalances(provider, [ephemeralAddress], [ONE]);
 
           await erc20Faucet(
             mana,
-            ownerWallet,
+            minterWallet,
             ephemeralAddress,
             manaAmountForShopping
           );
@@ -200,12 +208,12 @@ describe("Decentraland", () => {
 
       describe.skip("Using a funded ephemeral wallet to buy assets", () => {
         beforeEach("onboarding", async () => {
-          await etherFaucet(provider, ownerWallet, ephemeralAddress, ONE);
+          await etherFaucet(provider, minterWallet, ephemeralAddress, ONE);
           await confirmEtherBalances(provider, [ephemeralAddress], [ONE]);
 
           await erc20Faucet(
             mana,
-            ownerWallet,
+            minterWallet,
             ephemeralAddress,
             manaAmountForShopping
           );

@@ -35,10 +35,12 @@ const { address: MANA_ADDRESS } = MANAToken;
 const { address: LAND_PROXY_ADDRESS } = LANDProxy;
 const { address: ESTATE_ADDRESS } = EstateRegistry;
 const { address: MARKETPLACE_ADDRESS } = Marketplace;
+const { address: GNOSIS_SAFE } = GnosisSafe;
 global.MANA_ADDRESS = MANA_ADDRESS;
 global.LAND_PROXY_ADDRESS = LAND_PROXY_ADDRESS;
 global.ESTATE_ADDRESS = ESTATE_ADDRESS;
 global.MARKETPLACE_ADDRESS = MARKETPLACE_ADDRESS;
+global.GNOSIS_SAFE = GNOSIS_SAFE;
 
 // Global hooks
 let snapshotId;
