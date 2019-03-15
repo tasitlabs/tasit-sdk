@@ -43,8 +43,6 @@ describe("Decentraland", () => {
   beforeEach("", async () => {
     const { address: ephemeralAddress } = ephemeralWallet;
 
-    await etherFaucet(provider, ownerWallet, ephemeralAddress, ONE);
-
     await confirmBalances(manaContract, [ephemeralAddress], [0]);
     await confirmBalances(landContract, [ephemeralAddress], [0]);
     await confirmBalances(estateContract, [ephemeralAddress], [0]);
@@ -56,48 +54,6 @@ describe("Decentraland", () => {
   });
 
   describe("Marketplace", () => {
-    beforeEach(
-      "buyer and seller approve marketplace contract to transfer tokens on their behalf",
-      async () => {
-        const { address: ephemeralAddress } = ephemeralWallet;
-
-        const { priceInWei: landPrice } = landForSale;
-        const { priceInWei: estatePrice } = estateForSale;
-
-        const manaAmountForShopping = bigNumberify(landPrice).add(
-          bigNumberify(estatePrice)
-        );
-
-        await erc20Faucet(
-          manaContract,
-          ownerWallet,
-          ephemeralAddress,
-          manaAmountForShopping
-        );
-
-        await confirmBalances(
-          manaContract,
-          [ephemeralAddress],
-          [manaAmountForShopping]
-        );
-
-        manaContract.setWallet(ephemeralWallet);
-        const approvalAction = manaContract.approve(
-          MARKETPLACE_ADDRESS,
-          manaAmountForShopping,
-          gasParams
-        );
-        await approvalAction.waitForNonceToUpdate();
-
-        const allowance = await manaContract.allowance(
-          ephemeralAddress,
-          MARKETPLACE_ADDRESS
-        );
-
-        expect(`${allowance}`).to.equal(`${manaAmountForShopping}`);
-      }
-    );
-
     describe("read-only / without wallet test cases", () => {
       // Note: If Decentraland were leveraging ERC721Metadata token URI's more,
       // we would have done expectations on them in this test
@@ -145,6 +101,51 @@ describe("Decentraland", () => {
     });
 
     describe("write / with wallet test cases", () => {
+      beforeEach(
+        "buyer and seller approve marketplace contract to transfer tokens on their behalf",
+        async () => {
+          const { address: ephemeralAddress } = ephemeralWallet;
+
+          const { priceInWei: landPrice } = landForSale;
+          const { priceInWei: estatePrice } = estateForSale;
+
+          const manaAmountForShopping = bigNumberify(landPrice).add(
+            bigNumberify(estatePrice)
+          );
+
+          await etherFaucet(provider, ownerWallet, ephemeralAddress, ONE);
+          await confirmEtherBalances(provider, [ephemeralAddress], [ONE]);
+
+          await erc20Faucet(
+            manaContract,
+            ownerWallet,
+            ephemeralAddress,
+            manaAmountForShopping
+          );
+
+          await confirmBalances(
+            manaContract,
+            [ephemeralAddress],
+            [manaAmountForShopping]
+          );
+
+          manaContract.setWallet(ephemeralWallet);
+          const approvalAction = manaContract.approve(
+            MARKETPLACE_ADDRESS,
+            manaAmountForShopping,
+            gasParams
+          );
+          await approvalAction.waitForNonceToUpdate();
+
+          const allowance = await manaContract.allowance(
+            ephemeralAddress,
+            MARKETPLACE_ADDRESS
+          );
+
+          expect(`${allowance}`).to.equal(`${manaAmountForShopping}`);
+        }
+      );
+
       it("should buy an estate", async () => {
         const {
           assetId,
