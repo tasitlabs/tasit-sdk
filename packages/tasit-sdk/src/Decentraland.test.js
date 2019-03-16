@@ -4,6 +4,7 @@ const { Mana } = ERC20;
 const { Estate, Land } = ERC721;
 const { Decentraland } = marketplaces;
 const { GnosisSafe } = ContractBasedAccount;
+import { ethers } from "ethers";
 
 const { ONE, TEN } = constants;
 
@@ -175,7 +176,7 @@ describe("Decentraland", () => {
 
           // Gnosis Safe should approve Marketplace to spend its MANA Tokens
           // TODO: ephemeralWallet should broadcast this action
-          gnosisSafe.once("ExecutionFailed", console.log);
+          //gnosisSafe.once("ExecutionFailed", console.log);
           const contractAddress = marketplace.getAddress();
           const contractABI = marketplace.getABI();
           const functionName = "safeExecuteOrder";
@@ -196,6 +197,19 @@ describe("Decentraland", () => {
             argsArray,
             ethersAmount
           );
+
+          const tx = await executeOrderAction.getTransaction();
+          provider.on(tx.hash, receipt => {
+            const { logs } = receipt;
+
+            let iface = new ethers.utils.Interface(gnosisSafe.getABI());
+
+            logs.forEach(log => {
+              console.log(iface.parseLog(log));
+            });
+
+            provider.removeAllListeners(tx.hash);
+          });
           await executeOrderAction.waitForNonceToUpdate();
 
           await mineBlocks(provider, 1);
@@ -233,7 +247,7 @@ describe("Decentraland", () => {
         });
       });
 
-      describe.skip("Using a funded ephemeral wallet to buy assets", () => {
+      describe("Using a funded ephemeral wallet to buy assets", () => {
         beforeEach("onboarding", async () => {
           await etherFaucet(provider, minterWallet, ephemeralAddress, ONE);
           await confirmEtherBalances(provider, [ephemeralAddress], [ONE]);
