@@ -66,14 +66,12 @@ export default class GnosisSafe extends Contract {
     const contractABI = erc20ABI;
     const functionName = "approve";
     const argsArray = [spender, value];
-    const ethersAmount = "0";
 
     const action = this.customContractAction(
       contractAddress,
       contractABI,
       functionName,
-      argsArray,
-      ethersAmount
+      argsArray
     );
     return action;
   };
@@ -83,14 +81,12 @@ export default class GnosisSafe extends Contract {
     const contractABI = erc20ABI;
     const functionName = "transfer";
     const argsArray = [toAddress, value];
-    const ethersAmount = "0";
 
     const action = this.customContractAction(
       contractAddress,
       contractABI,
       functionName,
-      argsArray,
-      ethersAmount
+      argsArray
     );
     return action;
   };
@@ -101,14 +97,12 @@ export default class GnosisSafe extends Contract {
     const functionName = "safeTransferFrom";
     const fromAddress = this.getAddress();
     const argsArray = [fromAddress, toAddress, tokenId];
-    const ethersAmount = "0";
 
     const action = this.customContractAction(
       contractAddress,
       contractABI,
       functionName,
-      argsArray,
-      ethersAmount
+      argsArray
     );
     return action;
   };
@@ -118,14 +112,12 @@ export default class GnosisSafe extends Contract {
     const contractABI = this.getABI();
     const functionName = "addOwnerWithThreshold";
     const argsArray = [newSignerAddress, newThreshold];
-    const ethersAmount = "0";
 
     const action = this.customContractAction(
       contractAddress,
       contractABI,
       functionName,
-      argsArray,
-      ethersAmount
+      argsArray
     );
     return action;
   };
@@ -146,7 +138,7 @@ export default class GnosisSafe extends Contract {
     contractABI,
     functionName,
     argsArray,
-    ethersAmount
+    ethersAmount = 0
   ) => {
     const data = this.#utils.encodeFunctionCall(
       contractABI,
@@ -176,13 +168,11 @@ export default class GnosisSafe extends Contract {
         `Cannot send an action to Gnosis Safe contract without signers.`
       );
 
-    const to = toAddress;
-
     const operation = CALL;
 
     // Gas that should be used for the Safe transaction.
     const safeTxGas = await this.#utils.estimateFromSafeTxGas(
-      to,
+      toAddress,
       etherValue,
       data,
       operation
@@ -202,7 +192,7 @@ export default class GnosisSafe extends Contract {
     const { length: signersCount } = signers;
     const dataGas = this.#utils.estimateDataGas(
       this,
-      to,
+      toAddress,
       etherValue,
       data,
       operation,
@@ -215,7 +205,7 @@ export default class GnosisSafe extends Contract {
     const nonce = await this.nonce();
 
     const transactionHash = await this.getTransactionHash(
-      to,
+      toAddress,
       etherValue,
       data,
       operation,
@@ -230,7 +220,7 @@ export default class GnosisSafe extends Contract {
     const signatures = this.#utils.multiSign(signers, transactionHash);
 
     const execTxAction = this.execTransaction(
-      to,
+      toAddress,
       etherValue,
       data,
       operation,

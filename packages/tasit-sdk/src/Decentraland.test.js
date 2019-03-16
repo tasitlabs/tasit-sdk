@@ -7,6 +7,7 @@ const { GnosisSafe } = ContractBasedAccount;
 import { ethers } from "ethers";
 
 const { ONE, TEN } = constants;
+const SMALL_AMOUNT = `${1e17}`;
 
 describe("Decentraland", () => {
   let minterWallet;
@@ -110,6 +111,7 @@ describe("Decentraland", () => {
 
         gnosisSafe = new GnosisSafe(GNOSIS_SAFE_ADDRESS);
 
+        // Funding Gnosis Safe wallet
         await etherFaucet(provider, minterWallet, GNOSIS_SAFE_ADDRESS, TEN);
         await confirmEtherBalances(provider, [GNOSIS_SAFE_ADDRESS], [TEN]);
 
@@ -117,7 +119,7 @@ describe("Decentraland", () => {
         await confirmBalances(mana, [GNOSIS_SAFE_ADDRESS], [TEN]);
       });
 
-      describe("Using a funded ephemeral wallet to buy assets", () => {
+      describe("Using an ephemeral wallet funded by a Gnosis Safe wallet", () => {
         beforeEach("onboarding", async () => {
           gnosisSafe.setSigners([gnosisSafeOwner]);
           gnosisSafe.setWallet(gnosisSafeOwner);
@@ -125,9 +127,12 @@ describe("Decentraland", () => {
           const toAddress = ephemeralAddress;
 
           // Transfer a small amount of ethers do ephemeral account pay for gas
-          const transferEthersAction = gnosisSafe.transferEther(toAddress, ONE);
+          const transferEthersAction = gnosisSafe.transferEther(
+            toAddress,
+            SMALL_AMOUNT
+          );
           await transferEthersAction.waitForNonceToUpdate();
-          await confirmEtherBalances(provider, [toAddress], [ONE]);
+          await confirmEtherBalances(provider, [toAddress], [SMALL_AMOUNT]);
 
           const transferManaAction = gnosisSafe.transferERC20(
             MANA_ADDRESS,
@@ -166,7 +171,7 @@ describe("Decentraland", () => {
 
           await confirmBalances(estate, [ephemeralAddress], [0]);
 
-          const fingerprint = await estate.getFingerprint(assetId.toString());
+          const fingerprint = await estate.getFingerprint(`${assetId}`);
 
           marketplace.setWallet(ephemeralWallet);
           const executeOrderAction = marketplace.safeExecuteOrder(
@@ -213,17 +218,19 @@ describe("Decentraland", () => {
       });
 
       // Note: Not working because of gas issue on Marketplace.safeExecuteOrder() call
-      describe.skip("Using a Gnosis Safe wallet to buy assets", () => {
+      describe.skip("Using a Gnosis Safe wallet", () => {
         beforeEach("onboarding", async () => {
           // Funding ephemeral account with some ethers to pay for gas
-          // TODO: Replace ONE -> SMALL_AMONT (0.1)
           // TODO: ephemeralWallet should broadcast this action
           const toAddress = ephemeralAddress;
           gnosisSafe.setSigners([gnosisSafeOwner]);
           gnosisSafe.setWallet(gnosisSafeOwner);
-          const transferEthersAction = gnosisSafe.transferEther(toAddress, ONE);
+          const transferEthersAction = gnosisSafe.transferEther(
+            toAddress,
+            SMALL_AMOUNT
+          );
           await transferEthersAction.waitForNonceToUpdate();
-          await confirmEtherBalances(provider, [toAddress], [ONE]);
+          await confirmEtherBalances(provider, [toAddress], [SMALL_AMOUNT]);
 
           // Gnosis Safe should approve Marketplace to spend its MANA Tokens
           // TODO: ephemeralWallet should broadcast this action
@@ -231,15 +238,13 @@ describe("Decentraland", () => {
           const contractABI = mana.getABI();
           const functionName = "approve";
           const argsArray = [MARKETPLACE_ADDRESS, manaAmountForShopping];
-          const ethersAmount = "0";
           gnosisSafe.setSigners([gnosisSafeOwner]);
           gnosisSafe.setWallet(gnosisSafeOwner);
           const approvalAction = gnosisSafe.customContractAction(
             contractAddress,
             contractABI,
             functionName,
-            argsArray,
-            ethersAmount
+            argsArray
           );
           await approvalAction.waitForNonceToUpdate();
 
@@ -271,25 +276,29 @@ describe("Decentraland", () => {
           const contractAddress = marketplace.getAddress();
           const contractABI = marketplace.getABI();
           const functionName = "safeExecuteOrder";
-          const fingerprint = await estate.getFingerprint(assetId.toString());
+          const fingerprint = await estate.getFingerprint(`${assetId}`);
           const argsArray = [
             nftAddress,
             `${assetId}`,
             `${priceInWei}`,
             `${fingerprint}`,
           ];
-          const ethersAmount = "0";
+
           gnosisSafe.setSigners([gnosisSafeOwner]);
           gnosisSafe.setWallet(gnosisSafeOwner);
           const executeOrderAction = gnosisSafe.customContractAction(
             contractAddress,
             contractABI,
             functionName,
-            argsArray,
-            ethersAmount
+            argsArray
           );
 
-          gnosisSafe.once("ExecutionFailed", console.log);
+          const onFailed = message => {
+            const { data } = message;
+            const { args } = data;
+            const { txHash } = args;
+          };
+          gnosisSafe.once("ExecutionFailed", onFailed);
 
           await executeOrderAction.waitForNonceToUpdate();
 
@@ -335,7 +344,12 @@ describe("Decentraland", () => {
             ethersAmount
           );
 
-          gnosisSafe.once("ExecutionFailed", console.log);
+          const onFailed = message => {
+            const { data } = message;
+            const { args } = data;
+            const { txHash } = args;
+          };
+          gnosisSafe.once("ExecutionFailed", onFailed);
 
           await executeOrderAction.waitForNonceToUpdate();
 
@@ -346,6 +360,9 @@ describe("Decentraland", () => {
           await confirmBalances(land, [GNOSIS_SAFE_ADDRESS], [1]);
         });
       });
+
+      // TODO: https://github.com/tasitlabs/TasitSDK/issues/273
+      describe.skip("Using an ephemeral wallet allowed to spend Gnosis Safe wallets' funds", () => {});
     });
   });
 });
