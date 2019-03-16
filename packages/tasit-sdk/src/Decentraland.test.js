@@ -7,7 +7,7 @@ const { GnosisSafe } = ContractBasedAccount;
 import { ethers } from "ethers";
 
 const { ONE, TEN } = constants;
-const SMALL_AMOUNT = `${1e17}`;
+const SMALL_AMOUNT = bigNumberify(`${1e17}`); // 0.1 ethers
 
 describe("Decentraland", () => {
   let minterWallet;
@@ -108,7 +108,9 @@ describe("Decentraland", () => {
         manaAmountForShopping = bigNumberify(landPrice).add(
           bigNumberify(estatePrice)
         );
+      });
 
+      beforeEach("", async () => {
         gnosisSafe = new GnosisSafe(GNOSIS_SAFE_ADDRESS);
 
         // Funding Gnosis Safe wallet
@@ -117,6 +119,112 @@ describe("Decentraland", () => {
 
         await erc20Faucet(mana, minterWallet, GNOSIS_SAFE_ADDRESS, TEN);
         await confirmBalances(mana, [GNOSIS_SAFE_ADDRESS], [TEN]);
+
+        gnosisSafe.removeWallet();
+        gnosisSafe.setSigners([]);
+      });
+
+      describe("Using an ephemeral wallet funded by faucets", () => {
+        beforeEach("onboarding", async () => {
+          const toAddress = ephemeralAddress;
+
+          await etherFaucet(
+            provider,
+            minterWallet,
+            ephemeralAddress,
+            SMALL_AMOUNT
+          );
+          await confirmEtherBalances(
+            provider,
+            [ephemeralAddress],
+            [SMALL_AMOUNT]
+          );
+
+          await erc20Faucet(
+            mana,
+            minterWallet,
+            ephemeralAddress,
+            manaAmountForShopping
+          );
+          await confirmBalances(
+            mana,
+            [ephemeralAddress],
+            [manaAmountForShopping]
+          );
+
+          mana.setWallet(ephemeralWallet);
+          const approvalAction = mana.approve(
+            MARKETPLACE_ADDRESS,
+            manaAmountForShopping,
+            gasParams
+          );
+          await approvalAction.waitForNonceToUpdate();
+
+          const allowance = await mana.allowance(
+            ephemeralAddress,
+            MARKETPLACE_ADDRESS
+          );
+
+          expect(`${allowance}`).to.equal(`${manaAmountForShopping}`);
+        });
+
+        it("should buy an estate", async () => {
+          const {
+            assetId,
+            nftAddress,
+            seller,
+            priceInWei,
+            expiresAt,
+          } = estateForSale;
+
+          checkAsset(estate, mana, estateForSale, ephemeralAddress);
+
+          await confirmBalances(estate, [ephemeralAddress], [0]);
+
+          const fingerprint = await estate.getFingerprint(`${assetId}`);
+
+          marketplace.setWallet(ephemeralWallet);
+          const executeOrderAction = marketplace.safeExecuteOrder(
+            nftAddress,
+            `${assetId}`,
+            `${priceInWei}`,
+            `${fingerprint}`,
+            gasParams
+          );
+
+          await executeOrderAction.waitForNonceToUpdate();
+
+          await confirmBalances(estate, [ephemeralAddress], [1]);
+        });
+
+        it("should buy a parcel of land", async () => {
+          const {
+            assetId,
+            nftAddress,
+            seller,
+            priceInWei,
+            expiresAt,
+          } = landForSale;
+
+          checkAsset(land, mana, landForSale, ephemeralAddress);
+
+          await confirmBalances(land, [ephemeralAddress], [0]);
+
+          // LANDRegistry contract doesn't implement getFingerprint function
+          const fingerprint = "0x";
+          marketplace.setWallet(ephemeralWallet);
+          const executeOrderAction = marketplace.safeExecuteOrder(
+            nftAddress,
+            `${assetId}`,
+            `${priceInWei}`,
+            `${fingerprint}`,
+            gasParams
+          );
+
+          await executeOrderAction.waitForNonceToUpdate();
+
+          await confirmBalances(land, [ephemeralAddress], [1]);
+        });
       });
 
       describe("Using an ephemeral wallet funded by a Gnosis Safe wallet", () => {
@@ -217,7 +325,7 @@ describe("Decentraland", () => {
         });
       });
 
-      // Note: Not working because of gas issue on Marketplace.safeExecuteOrder() call
+      // WIP: Not working because of gas issue on Marketplace.safeExecuteOrder() call
       describe.skip("Using a Gnosis Safe wallet", () => {
         beforeEach("onboarding", async () => {
           // Funding ephemeral account with some ethers to pay for gas
@@ -252,9 +360,6 @@ describe("Decentraland", () => {
           const spender = MARKETPLACE_ADDRESS;
           const allowance = await mana.allowance(owner, spender);
           expect(`${allowance}`).to.equal(`${manaAmountForShopping}`);
-
-          gnosisSafe.removeWallet();
-          gnosisSafe.setSigners([]);
         });
 
         it("should buy an estate", async () => {
@@ -361,8 +466,116 @@ describe("Decentraland", () => {
         });
       });
 
-      // TODO: https://github.com/tasitlabs/TasitSDK/issues/273
-      describe.skip("Using an ephemeral wallet allowed to spend Gnosis Safe wallets' funds", () => {});
+      // Allowence-of-allowence doesn't work
+      // See more: https://github.com/tasitlabs/TasitSDK/issues/273
+      describe.skip("Using an ephemeral wallet allowed to spend Gnosis Safe wallets' funds", () => {
+        beforeEach("onboarding", async () => {
+          // Funding ephemeral account with some ethers to pay for gas
+          // TODO: ephemeralWallet should broadcast this action
+          const toAddress = ephemeralAddress;
+          gnosisSafe.setSigners([gnosisSafeOwner]);
+          gnosisSafe.setWallet(gnosisSafeOwner);
+          const transferEthersAction = gnosisSafe.transferEther(
+            toAddress,
+            SMALL_AMOUNT
+          );
+          await transferEthersAction.waitForNonceToUpdate();
+          await confirmEtherBalances(provider, [toAddress], [SMALL_AMOUNT]);
+
+          // Gnosis Safe should approve ephemeral account to spend its MANA Tokens
+          // TODO: ephemeralWallet should broadcast this action
+          const contractAddress = mana.getAddress();
+          const contractABI = mana.getABI();
+          const functionName = "approve";
+          const spender = ephemeralAddress;
+          const argsArray = [spender, manaAmountForShopping];
+          gnosisSafe.setSigners([gnosisSafeOwner]);
+          gnosisSafe.setWallet(gnosisSafeOwner);
+          const ephemeralApprovalAction = gnosisSafe.customContractAction(
+            contractAddress,
+            contractABI,
+            functionName,
+            argsArray
+          );
+          await ephemeralApprovalAction.waitForNonceToUpdate();
+          const owner = GNOSIS_SAFE_ADDRESS;
+          const ephemeralAllowance = await mana.allowance(owner, spender);
+          expect(`${ephemeralAllowance}`).to.equal(`${manaAmountForShopping}`);
+
+          // Ephemeral account approves Marketplace to spend their mana tokens (actually tokens from Gnosis Safe).
+          mana.setWallet(ephemeralWallet);
+          const marketplaceApprovalAction = mana.approve(
+            MARKETPLACE_ADDRESS,
+            manaAmountForShopping,
+            gasParams
+          );
+          await marketplaceApprovalAction.waitForNonceToUpdate();
+          const marketplaceAllowance = await mana.allowance(
+            ephemeralAddress,
+            MARKETPLACE_ADDRESS
+          );
+          expect(`${marketplaceAllowance}`).to.equal(
+            `${manaAmountForShopping}`
+          );
+        });
+
+        it("should buy an estate", async () => {
+          const {
+            assetId,
+            nftAddress,
+            seller,
+            priceInWei,
+            expiresAt,
+          } = estateForSale;
+
+          checkAsset(estate, mana, estateForSale, GNOSIS_SAFE_ADDRESS);
+          await confirmBalances(estate, [ephemeralAddress], [0]);
+
+          const fingerprint = await estate.getFingerprint(`${assetId}`);
+
+          marketplace.setWallet(ephemeralWallet);
+          const executeOrderAction = marketplace.safeExecuteOrder(
+            nftAddress,
+            `${assetId}`,
+            `${priceInWei}`,
+            `${fingerprint}`,
+            gasParams
+          );
+
+          await executeOrderAction.waitForNonceToUpdate();
+
+          await confirmBalances(estate, [ephemeralAddress], [1]);
+        });
+
+        it("should buy a parcel of land", async () => {
+          const {
+            assetId,
+            nftAddress,
+            seller,
+            priceInWei,
+            expiresAt,
+          } = landForSale;
+
+          checkAsset(land, mana, landForSale, GNOSIS_SAFE_ADDRESS);
+
+          await confirmBalances(land, [ephemeralAddress], [0]);
+
+          // LANDRegistry contract doesn't implement getFingerprint function
+          const fingerprint = "0x";
+          marketplace.setWallet(ephemeralWallet);
+          const executeOrderAction = marketplace.safeExecuteOrder(
+            nftAddress,
+            `${assetId}`,
+            `${priceInWei}`,
+            `${fingerprint}`,
+            gasParams
+          );
+
+          await executeOrderAction.waitForNonceToUpdate();
+
+          await confirmBalances(land, [ephemeralAddress], [1]);
+        });
+      });
     });
   });
 });
