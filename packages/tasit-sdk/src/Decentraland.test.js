@@ -6,7 +6,7 @@ const { Decentraland } = marketplaces;
 const { GnosisSafe } = ContractBasedAccount;
 import { ethers } from "ethers";
 
-const { ONE, TEN } = constants;
+const { ONE, TEN, ONE_HUNDRED } = constants;
 const SMALL_AMOUNT = bigNumberify(`${1e17}`); // 0.1 ethers
 
 describe("Decentraland", () => {
@@ -113,12 +113,9 @@ describe("Decentraland", () => {
       beforeEach("", async () => {
         gnosisSafe = new GnosisSafe(GNOSIS_SAFE_ADDRESS);
 
-        // Funding Gnosis Safe wallet
-        await etherFaucet(provider, minterWallet, GNOSIS_SAFE_ADDRESS, TEN);
-        await confirmEtherBalances(provider, [GNOSIS_SAFE_ADDRESS], [TEN]);
-
-        await erc20Faucet(mana, minterWallet, GNOSIS_SAFE_ADDRESS, TEN);
-        await confirmBalances(mana, [GNOSIS_SAFE_ADDRESS], [TEN]);
+        // Expect an already funded Gnosis Safe wallet
+        await confirmEtherBalances(provider, [GNOSIS_SAFE_ADDRESS], [ONE]);
+        await confirmBalances(mana, [GNOSIS_SAFE_ADDRESS], [ONE_HUNDRED]);
 
         gnosisSafe.removeWallet();
         gnosisSafe.setSigners([]);
