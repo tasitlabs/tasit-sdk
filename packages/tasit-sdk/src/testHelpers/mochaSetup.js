@@ -18,7 +18,7 @@ global.createFromPrivateKey = createFromPrivateKey;
 
 import { Action } from "../TasitSdk";
 const { ConfigLoader } = Action;
-import config from "../config/default.js";
+import config from "../config/default";
 ConfigLoader.setConfig(config);
 
 const provider = ProviderFactory.getProvider();
