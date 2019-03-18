@@ -181,7 +181,7 @@ describe("Decentraland", () => {
             expiresAt,
           } = estateForSale;
 
-          checkAsset(estate, mana, estateForSale, ephemeralAddress);
+          await checkAsset(estate, mana, estateForSale, ephemeralAddress);
 
           await confirmBalances(estate, [ephemeralAddress], [0]);
 
@@ -210,7 +210,7 @@ describe("Decentraland", () => {
             expiresAt,
           } = landForSale;
 
-          checkAsset(land, mana, landForSale, ephemeralAddress);
+          await checkAsset(land, mana, landForSale, ephemeralAddress);
 
           await confirmBalances(land, [ephemeralAddress], [0]);
 
@@ -237,7 +237,7 @@ describe("Decentraland", () => {
           gnosisSafe.setSigners([gnosisSafeOwner]);
           gnosisSafe.setWallet(gnosisSafeOwner);
 
-          // Gnosis Safe owner should have enough ethers to pay for the transactions gas
+          // Gnosis Safe owner should have enough ethers to pay for the transaction's gas
           const gnosisSafeOwnerBalance = await provider.getBalance(
             gnosisSafeOwnerAddress
           );
@@ -247,7 +247,7 @@ describe("Decentraland", () => {
 
           const toAddress = ephemeralAddress;
 
-          // Transfer a small amount of ethers do ephemeral account pay for gas
+          // Transfer a small amount of ethers to ephemeral account to pay for gas
           const transferEthersAction = gnosisSafe.transferEther(
             toAddress,
             SMALL_AMOUNT
@@ -288,7 +288,7 @@ describe("Decentraland", () => {
             expiresAt,
           } = estateForSale;
 
-          checkAsset(estate, mana, estateForSale, ephemeralAddress);
+          await checkAsset(estate, mana, estateForSale, ephemeralAddress);
 
           await confirmBalances(estate, [ephemeralAddress], [0]);
 
@@ -317,7 +317,7 @@ describe("Decentraland", () => {
             expiresAt,
           } = landForSale;
 
-          checkAsset(land, mana, landForSale, ephemeralAddress);
+          await checkAsset(land, mana, landForSale, ephemeralAddress);
 
           await confirmBalances(land, [ephemeralAddress], [0]);
 
@@ -339,7 +339,7 @@ describe("Decentraland", () => {
       });
 
       // WIP: Not working because of gas issue on Marketplace.safeExecuteOrder() call
-      describe.skip("Using a Gnosis Safe wallet", () => {
+      describe.skip("Using funds from a Gnosis Safe wallet", () => {
         beforeEach("onboarding", async () => {
           // Funding ephemeral account with some ethers to pay for gas
           // TODO: ephemeralWallet should broadcast this action
@@ -389,7 +389,7 @@ describe("Decentraland", () => {
 
           await confirmBalances(estate, [GNOSIS_SAFE_ADDRESS], [0]);
 
-          // Gnosis Safe should approve Marketplace to spend its MANA Tokens
+          // Gnosis Safe should execute an open order
           // TODO: ephemeralWallet should broadcast this action
           const contractAddress = marketplace.getAddress();
           const contractABI = marketplace.getABI();
@@ -434,11 +434,11 @@ describe("Decentraland", () => {
             expiresAt,
           } = landForSale;
 
-          checkAsset(land, mana, landForSale, GNOSIS_SAFE_ADDRESS);
+          await checkAsset(land, mana, landForSale, GNOSIS_SAFE_ADDRESS);
 
           await confirmBalances(land, [GNOSIS_SAFE_ADDRESS], [0]);
 
-          // Gnosis Safe should approve Marketplace to spend its MANA Tokens
+          // Gnosis Safe should execute an open order
           // TODO: ephemeralWallet should broadcast this action
           const contractAddress = marketplace.getAddress();
           const contractABI = marketplace.getABI();
@@ -479,9 +479,9 @@ describe("Decentraland", () => {
         });
       });
 
-      // Allowence-of-allowence doesn't work
+      // Allowance-of-allowance doesn't work
       // See more: https://github.com/tasitlabs/TasitSDK/issues/273
-      describe.skip("Using an ephemeral wallet allowed to spend Gnosis Safe wallets' funds", () => {
+      describe.skip("Using an ephemeral wallet allowed to spend Gnosis Safe wallet's funds", () => {
         beforeEach("onboarding", async () => {
           // Funding ephemeral account with some ethers to pay for gas
           // TODO: ephemeralWallet should broadcast this action
@@ -541,7 +541,7 @@ describe("Decentraland", () => {
             expiresAt,
           } = estateForSale;
 
-          checkAsset(estate, mana, estateForSale, GNOSIS_SAFE_ADDRESS);
+          await checkAsset(estate, mana, estateForSale, GNOSIS_SAFE_ADDRESS);
           await confirmBalances(estate, [ephemeralAddress], [0]);
 
           const fingerprint = await estate.getFingerprint(`${assetId}`);
@@ -569,7 +569,7 @@ describe("Decentraland", () => {
             expiresAt,
           } = landForSale;
 
-          checkAsset(land, mana, landForSale, GNOSIS_SAFE_ADDRESS);
+          await checkAsset(land, mana, landForSale, GNOSIS_SAFE_ADDRESS);
 
           await confirmBalances(land, [ephemeralAddress], [0]);
 

@@ -192,7 +192,7 @@ let network = process.env.NETWORK;
 
   ConfigLoader.setConfig(config);
 
-  const [ownerWallet, sellerWallet] = accounts;
+  const [minterWallet, sellerWallet] = accounts;
   const { address: sellerAddress } = sellerWallet;
 
   const manaContract = new Mana(MANA_ADDRESS);
@@ -202,7 +202,6 @@ let network = process.env.NETWORK;
   const gnosisSafeContract = new GnosisSafe(GNOSIS_SAFE_ADDRESS);
 
   // Fund Gnosis Safe wallet with Mana tokens and ethers
-  const minterWallet = ownerWallet;
   const provider = ProviderFactory.getProvider();
   await etherFaucet(provider, minterWallet, GNOSIS_SAFE_ADDRESS, ONE);
   await erc20Faucet(
@@ -278,7 +277,7 @@ let network = process.env.NETWORK;
       landContract,
       allParcels,
       sellerAddress,
-      ownerWallet
+      minterWallet
     );
 
     const allParcelsIds = allParcels.map(async parcel => {

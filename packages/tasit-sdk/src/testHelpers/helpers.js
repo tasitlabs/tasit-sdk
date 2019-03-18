@@ -87,7 +87,7 @@ export const checkAsset = async (
   const balance = bigNumberify(balanceInWei);
   expect(balance.gte(price)).to.be.true;
 
-  // Marketplace is approved to transfer Estate asset owned by the seller
+  // Marketplace is approved to transfer Estate or Parcel asset owned by the seller
   const approvedForAsset = await nftContract.getApproved(assetId);
   const approvedForAll = await nftContract.isApprovedForAll(
     seller,
