@@ -113,7 +113,7 @@ describe("Decentraland", () => {
       beforeEach("", async () => {
         gnosisSafe = new GnosisSafe(GNOSIS_SAFE_ADDRESS);
 
-        // Expect an already funded Gnosis Safe wallet
+        // Expect an already-funded Gnosis Safe wallet
         await confirmEtherBalances(provider, [GNOSIS_SAFE_ADDRESS], [ONE]);
         await confirmBalances(mana, [GNOSIS_SAFE_ADDRESS], [ONE_HUNDRED]);
 
