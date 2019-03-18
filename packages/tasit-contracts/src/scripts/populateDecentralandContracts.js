@@ -23,7 +23,7 @@ import fs from "fs";
 
 import { duration } from "../../../tasit-sdk/dist/testHelpers/helpers";
 
-const { ONE, TEN, ONE_HUNDRED } = constants;
+const { ONE, TEN, ONE_HUNDRED, ONE_THOUSAND } = constants;
 
 const createMultipleParcels = async (
   landContract,
@@ -209,7 +209,7 @@ let network = process.env.NETWORK;
     manaContract,
     minterWallet,
     GNOSIS_SAFE_ADDRESS,
-    ONE_HUNDRED
+    ONE_THOUSAND
   );
 
   const allParcels = [

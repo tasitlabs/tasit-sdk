@@ -27,6 +27,7 @@ const ZERO = 0;
 const ONE = bigNumberify(1).mul(WeiPerEther);
 const TEN = bigNumberify(10).mul(WeiPerEther);
 const ONE_HUNDRED = bigNumberify(100).mul(WeiPerEther);
+const ONE_THOUSAND = bigNumberify(1000).mul(WeiPerEther);
 const BILLION = bigNumberify(`${1e9}`).mul(WeiPerEther);
 
 const constants = {
@@ -34,6 +35,7 @@ const constants = {
   ONE,
   TEN,
   ONE_HUNDRED,
+  ONE_THOUSAND,
   BILLION,
   WeiPerEther,
 };
