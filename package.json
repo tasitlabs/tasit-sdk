@@ -11,7 +11,7 @@
   },
   "scripts": {
     "clean:all": "npx lerna run clean --stream && npx lerna clean --yes && rm -rf ./node_modules",
-    "publish": "npm run clean:all && npm run bootstrap && npm test && npm run clean:3rd-parties && npx lerna publish",
+    "publish": "npm run clean:all && npm run bootstrap && npm test && npx lerna publish",
     "bootstrap": "npx lerna bootstrap --hoist",
     "ganache:start:forked-ropsten": "npx ganache-cli --fork https://ropsten.infura.io --noVMErrorsOnRPCResponse true -m 'beach swap combine paper music cook electric bullet trust actress liquid asthma' --gasLimit 1000000000000 --host 0.0.0.0 > /dev/null 2>&1 &",
     "ganache:start:forked-goerli": "npx ganache-cli --fork https://goerli.infura.io/v3/974bd2e667b246f29d2589a59600530e --noVMErrorsOnRPCResponse true -m 'beach swap combine paper music cook electric bullet trust actress liquid asthma' --gasLimit 1000000000000 --host 0.0.0.0 > /dev/null 2>&1 &",
