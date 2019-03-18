@@ -174,7 +174,7 @@ describe("Decentraland", () => {
             expiresAt,
           } = estateForSale;
 
-          checkAsset(estate, mana, estateForSale, ephemeralAddress);
+          await checkAsset(estate, mana, estateForSale, ephemeralAddress);
 
           await confirmBalances(estate, [ephemeralAddress], [0]);
 
@@ -203,7 +203,7 @@ describe("Decentraland", () => {
             expiresAt,
           } = landForSale;
 
-          checkAsset(land, mana, landForSale, ephemeralAddress);
+          await checkAsset(land, mana, landForSale, ephemeralAddress);
 
           await confirmBalances(land, [ephemeralAddress], [0]);
 
@@ -281,7 +281,7 @@ describe("Decentraland", () => {
             expiresAt,
           } = estateForSale;
 
-          checkAsset(estate, mana, estateForSale, ephemeralAddress);
+          await checkAsset(estate, mana, estateForSale, ephemeralAddress);
 
           await confirmBalances(estate, [ephemeralAddress], [0]);
 
@@ -310,7 +310,7 @@ describe("Decentraland", () => {
             expiresAt,
           } = landForSale;
 
-          checkAsset(land, mana, landForSale, ephemeralAddress);
+          await checkAsset(land, mana, landForSale, ephemeralAddress);
 
           await confirmBalances(land, [ephemeralAddress], [0]);
 
@@ -332,7 +332,7 @@ describe("Decentraland", () => {
       });
 
       // WIP: Not working because of gas issue on Marketplace.safeExecuteOrder() call
-      describe.skip("Using a Gnosis Safe wallet", () => {
+      describe.skip("Using funds from a Gnosis Safe wallet", () => {
         beforeEach("onboarding", async () => {
           // Funding ephemeral account with some ethers to pay for gas
           // TODO: ephemeralWallet should broadcast this action
@@ -382,7 +382,7 @@ describe("Decentraland", () => {
 
           await confirmBalances(estate, [GNOSIS_SAFE_ADDRESS], [0]);
 
-          // Gnosis Safe should approve Marketplace to spend its MANA Tokens
+          // Gnosis Safe should execute an open order
           // TODO: ephemeralWallet should broadcast this action
           const contractAddress = marketplace.getAddress();
           const contractABI = marketplace.getABI();
@@ -427,11 +427,11 @@ describe("Decentraland", () => {
             expiresAt,
           } = landForSale;
 
-          checkAsset(land, mana, landForSale, GNOSIS_SAFE_ADDRESS);
+          await checkAsset(land, mana, landForSale, GNOSIS_SAFE_ADDRESS);
 
           await confirmBalances(land, [GNOSIS_SAFE_ADDRESS], [0]);
 
-          // Gnosis Safe should approve Marketplace to spend its MANA Tokens
+          // Gnosis Safe should execute an open order
           // TODO: ephemeralWallet should broadcast this action
           const contractAddress = marketplace.getAddress();
           const contractABI = marketplace.getABI();
@@ -534,7 +534,7 @@ describe("Decentraland", () => {
             expiresAt,
           } = estateForSale;
 
-          checkAsset(estate, mana, estateForSale, GNOSIS_SAFE_ADDRESS);
+          await checkAsset(estate, mana, estateForSale, GNOSIS_SAFE_ADDRESS);
           await confirmBalances(estate, [ephemeralAddress], [0]);
 
           const fingerprint = await estate.getFingerprint(`${assetId}`);
@@ -562,7 +562,7 @@ describe("Decentraland", () => {
             expiresAt,
           } = landForSale;
 
-          checkAsset(land, mana, landForSale, GNOSIS_SAFE_ADDRESS);
+          await checkAsset(land, mana, landForSale, GNOSIS_SAFE_ADDRESS);
 
           await confirmBalances(land, [ephemeralAddress], [0]);
 
