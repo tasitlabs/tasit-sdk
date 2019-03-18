@@ -472,7 +472,7 @@ describe("Decentraland", () => {
         });
       });
 
-      // Allowence-of-allowence doesn't work
+      // Allowance-of-allowance doesn't work
       // See more: https://github.com/tasitlabs/TasitSDK/issues/273
       describe.skip("Using an ephemeral wallet allowed to spend Gnosis Safe wallets' funds", () => {
         beforeEach("onboarding", async () => {
