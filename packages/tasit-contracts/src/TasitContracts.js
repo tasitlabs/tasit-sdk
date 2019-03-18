@@ -96,6 +96,10 @@ const ropsten = {
     address: "0x289c42facf691946b64b4370361b1303f0a463ef",
     abi: marketplaceABI,
   },
+  GnosisSafe: {
+    address: "0xd68649157A061454e2c63c175236b07e98Bd9512",
+    abi: gnosisSafeABI,
+  },
 };
 
 export const TasitContracts = {
