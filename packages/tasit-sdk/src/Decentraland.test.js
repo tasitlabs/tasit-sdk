@@ -474,7 +474,7 @@ describe("Decentraland", () => {
 
       // Allowance-of-allowance doesn't work
       // See more: https://github.com/tasitlabs/TasitSDK/issues/273
-      describe.skip("Using an ephemeral wallet allowed to spend Gnosis Safe wallets' funds", () => {
+      describe.skip("Using an ephemeral wallet allowed to spend Gnosis Safe wallet's funds", () => {
         beforeEach("onboarding", async () => {
           // Funding ephemeral account with some ethers to pay for gas
           // TODO: ephemeralWallet should broadcast this action
