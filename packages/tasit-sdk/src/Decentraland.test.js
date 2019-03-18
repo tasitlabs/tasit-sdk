@@ -240,7 +240,7 @@ describe("Decentraland", () => {
 
           const toAddress = ephemeralAddress;
 
-          // Transfer a small amount of ethers do ephemeral account pay for gas
+          // Transfer a small amount of ethers to ephemeral account to pay for gas
           const transferEthersAction = gnosisSafe.transferEther(
             toAddress,
             SMALL_AMOUNT
