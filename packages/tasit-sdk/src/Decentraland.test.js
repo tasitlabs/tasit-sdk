@@ -110,12 +110,19 @@ describe("Decentraland", () => {
         );
       });
 
-      beforeEach("", async () => {
+      beforeEach("check Gnosis Safe balance", async () => {
         gnosisSafe = new GnosisSafe(GNOSIS_SAFE_ADDRESS);
 
         // Expect an already funded Gnosis Safe wallet
-        await confirmEtherBalances(provider, [GNOSIS_SAFE_ADDRESS], [ONE]);
-        await confirmBalances(mana, [GNOSIS_SAFE_ADDRESS], [ONE_HUNDRED]);
+        let etherBalance = await provider.getBalance(GNOSIS_SAFE_ADDRESS);
+        etherBalance = bigNumberify(etherBalance);
+        const one = bigNumberify(ONE);
+        expect(etherBalance.gte(one)).to.be.true;
+
+        let manaBalance = await mana.balanceOf(GNOSIS_SAFE_ADDRESS);
+        manaBalance = bigNumberify(manaBalance);
+        const oneHundred = bigNumberify(ONE_HUNDRED);
+        expect(manaBalance.gte(oneHundred)).to.be.true;
 
         gnosisSafe.removeWallet();
         gnosisSafe.setSigners([]);
