@@ -21,9 +21,10 @@ const { ConfigLoader } = Action;
 import config from "../config/default.js";
 ConfigLoader.setConfig(config);
 
-const { provider: configProvider } = config;
-const { network } = configProvider;
-const networkName = network == "other" ? "local" : network;
+const provider = ProviderFactory.getProvider();
+
+const { _network: network } = provider;
+const networkName = !network ? "local" : network.name;
 
 import TasitContracts from "tasit-contracts";
 const {
@@ -48,7 +49,6 @@ global.GNOSIS_SAFE_ADDRESS = GNOSIS_SAFE_ADDRESS;
 let snapshotId;
 
 before("global before() hook", async () => {
-  const provider = ProviderFactory.getProvider();
   global.provider = provider;
 });
 
