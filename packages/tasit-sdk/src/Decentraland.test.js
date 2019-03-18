@@ -226,8 +226,17 @@ describe("Decentraland", () => {
 
       describe("Using an ephemeral wallet funded by a Gnosis Safe wallet", () => {
         beforeEach("onboarding", async () => {
+          const { address: gnosisSafeOwnerAddress } = gnosisSafeOwner;
           gnosisSafe.setSigners([gnosisSafeOwner]);
           gnosisSafe.setWallet(gnosisSafeOwner);
+
+          // Gnosis Safe owner should have enough ethers to pay for the transactions gas
+          const gnosisSafeOwnerBalance = await provider.getBalance(
+            gnosisSafeOwnerAddress
+          );
+          const gnosisSafeOwnerBalanceBN = bigNumberify(gnosisSafeOwnerBalance);
+          const smallAmountBN = bigNumberify(SMALL_AMOUNT);
+          expect(gnosisSafeOwnerBalanceBN.gte(smallAmountBN)).to.be.true;
 
           const toAddress = ephemeralAddress;
 
