@@ -129,7 +129,7 @@ export default class GnosisSafe extends Contract {
     return action;
   };
 
-  // Note: When the Action class no more sends transaction on the same moment then building,
+  // Note: Once the Action doesn't send the transaction immediately after building the transaction,
   // a new function such `Action.getData()` could be created and this function
   // could be changed to something like `customContractAction(actionData)`
   // Related to: https://github.com/tasitlabs/TasitSDK/issues/162
