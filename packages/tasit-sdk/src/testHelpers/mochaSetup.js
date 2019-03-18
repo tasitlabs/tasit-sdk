@@ -23,20 +23,16 @@ ConfigLoader.setConfig(config);
 
 const { provider: configProvider } = config;
 const { network } = configProvider;
+const networkName = network == "other" ? "local" : network;
 
 import TasitContracts from "tasit-contracts";
-const { local, goerli, ropsten } = TasitContracts;
-let blockchain;
-if (network === "goerli") blockchain = goerli;
-else if (network === "ropsten") blockchain = ropsten;
-else blockchain = local;
 const {
   MANAToken,
   LANDProxy,
   EstateRegistry,
   Marketplace,
   GnosisSafe,
-} = blockchain;
+} = TasitContracts[networkName];
 const { address: MANA_ADDRESS } = MANAToken;
 const { address: LAND_PROXY_ADDRESS } = LANDProxy;
 const { address: ESTATE_ADDRESS } = EstateRegistry;
