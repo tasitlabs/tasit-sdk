@@ -230,7 +230,7 @@ describe("Decentraland", () => {
           gnosisSafe.setSigners([gnosisSafeOwner]);
           gnosisSafe.setWallet(gnosisSafeOwner);
 
-          // Gnosis Safe owner should have enough ethers to pay for the transactions gas
+          // Gnosis Safe owner should have enough ethers to pay for the transaction's gas
           const gnosisSafeOwnerBalance = await provider.getBalance(
             gnosisSafeOwnerAddress
           );
