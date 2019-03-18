@@ -1,8 +1,8 @@
 import { Account, Action, ContractBasedAccount } from "./TasitSdk";
-const { ConfigLoader, ERC20, ERC721, Marketplace: marketplaces } = Action;
+const { ConfigLoader, ERC20, ERC721, Marketplace } = Action;
 const { Mana } = ERC20;
 const { Estate, Land } = ERC721;
-const { Decentraland } = marketplaces;
+const { Decentraland } = Marketplace;
 const { GnosisSafe } = ContractBasedAccount;
 import { ethers } from "ethers";
 
