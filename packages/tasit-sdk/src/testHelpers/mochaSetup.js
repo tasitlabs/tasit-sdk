@@ -18,33 +18,37 @@ global.createFromPrivateKey = createFromPrivateKey;
 
 import { Action } from "../TasitSdk";
 const { ConfigLoader } = Action;
-import config from "../config/default.js";
+import config from "../config/default";
 ConfigLoader.setConfig(config);
 
-const { provider: configProvider } = config;
-const { network } = configProvider;
+const provider = ProviderFactory.getProvider();
+
+const { _network: network } = provider;
+const networkName = !network ? "local" : network.name;
 
 import TasitContracts from "tasit-contracts";
-const { local, goerli, ropsten } = TasitContracts;
-let blockchain;
-if (network === "goerli") blockchain = goerli;
-else if (network === "ropsten") blockchain = ropsten;
-else blockchain = local;
-const { MANAToken, LANDProxy, EstateRegistry, Marketplace } = blockchain;
+const {
+  MANAToken,
+  LANDProxy,
+  EstateRegistry,
+  Marketplace,
+  GnosisSafe,
+} = TasitContracts[networkName];
 const { address: MANA_ADDRESS } = MANAToken;
 const { address: LAND_PROXY_ADDRESS } = LANDProxy;
 const { address: ESTATE_ADDRESS } = EstateRegistry;
 const { address: MARKETPLACE_ADDRESS } = Marketplace;
+const { address: GNOSIS_SAFE_ADDRESS } = GnosisSafe;
 global.MANA_ADDRESS = MANA_ADDRESS;
 global.LAND_PROXY_ADDRESS = LAND_PROXY_ADDRESS;
 global.ESTATE_ADDRESS = ESTATE_ADDRESS;
 global.MARKETPLACE_ADDRESS = MARKETPLACE_ADDRESS;
+global.GNOSIS_SAFE_ADDRESS = GNOSIS_SAFE_ADDRESS;
 
 // Global hooks
 let snapshotId;
 
 before("global before() hook", async () => {
-  const provider = ProviderFactory.getProvider();
   global.provider = provider;
 });
 

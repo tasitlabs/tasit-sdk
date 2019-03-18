@@ -23,7 +23,7 @@
  */
 const fs = require("fs");
 
-const HDWallet = require("truffle-hdwallet-provider");
+const HDWalletProvider = require("truffle-hdwallet-provider");
 
 const createInfuraProvider = (network = "mainnet") => {
   const secretFile = fs.readFileSync(".secret.json");

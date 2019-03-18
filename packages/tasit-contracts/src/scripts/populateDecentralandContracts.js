@@ -12,12 +12,18 @@ const { Mana } = ERC20;
 const { Estate, Land } = ERC721;
 const { Decentraland } = MarketplaceContracts;
 
+import ProviderFactory from "../../../tasit-action/dist/ProviderFactory";
+
+import TasitContractBasedAccount from "../../../tasit-contract-based-account/dist/";
+const { GnosisSafe } = TasitContractBasedAccount;
+
 import TasitContracts from "..";
 
 import fs from "fs";
 
 import { duration } from "../../../tasit-sdk/dist/testHelpers/helpers";
-const { ONE, TEN } = constants;
+
+const { ONE, TEN, ONE_HUNDRED } = constants;
 
 const createMultipleParcels = async (
   landContract,
@@ -171,19 +177,39 @@ let network = process.env.NETWORK;
   else if (network === "development") {
     network = "local";
   }
-  const { LANDProxy, EstateRegistry, Marketplace } = TasitContracts[network];
+  const {
+    LANDProxy,
+    EstateRegistry,
+    Marketplace,
+    GnosisSafe: GnosisSafeInfo,
+    MANAToken,
+  } = TasitContracts[network];
+  const { address: MANA_ADDRESS } = MANAToken;
   const { address: LAND_PROXY_ADDRESS } = LANDProxy;
   const { address: ESTATE_ADDRESS } = EstateRegistry;
   const { address: MARKETPLACE_ADDRESS } = Marketplace;
+  const { address: GNOSIS_SAFE_ADDRESS } = GnosisSafeInfo;
 
   ConfigLoader.setConfig(config);
 
-  const [ownerWallet, sellerWallet] = accounts;
+  const [minterWallet, sellerWallet] = accounts;
   const { address: sellerAddress } = sellerWallet;
 
+  const manaContract = new Mana(MANA_ADDRESS);
   const landContract = new Land(LAND_PROXY_ADDRESS);
   const estateContract = new Estate(ESTATE_ADDRESS);
   const marketplaceContract = new Decentraland(MARKETPLACE_ADDRESS);
+  const gnosisSafeContract = new GnosisSafe(GNOSIS_SAFE_ADDRESS);
+
+  // Fund Gnosis Safe wallet with Mana tokens and ethers
+  const provider = ProviderFactory.getProvider();
+  await etherFaucet(provider, minterWallet, GNOSIS_SAFE_ADDRESS, ONE);
+  await erc20Faucet(
+    manaContract,
+    minterWallet,
+    GNOSIS_SAFE_ADDRESS,
+    ONE_HUNDRED
+  );
 
   const allParcels = [
     // Estate: all road adjacent parcels
@@ -251,7 +277,7 @@ let network = process.env.NETWORK;
       landContract,
       allParcels,
       sellerAddress,
-      ownerWallet
+      minterWallet
     );
 
     const allParcelsIds = allParcels.map(async parcel => {

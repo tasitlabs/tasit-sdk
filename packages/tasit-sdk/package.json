@@ -33,7 +33,8 @@
     "@babel/runtime": "^7.1.5",
     "tasit-account": "^0.0.12",
     "tasit-action": "^0.0.12",
-    "tasit-contracts": "^0.0.12"
+    "tasit-contracts": "^0.0.12",
+    "tasit-contract-based-account": "^0.0.12"
   },
   "devDependencies": {
     "@babel/cli": "^7.1.5",

@@ -64,9 +64,44 @@ export const pickAssetsForSale = async () => {
   return { landForSale, estateForSale };
 };
 
+export const checkAsset = async (
+  nftContract,
+  erc20Contract,
+  assetForSale,
+  buyerAddress
+) => {
+  const { assetId, nftAddress, seller, priceInWei, expiresAt } = assetForSale;
+
+  // Asset is the same as expected
+  const nftContractAddress = nftContract.getAddress();
+  expect(addressesAreEqual(nftAddress, nftContractAddress)).to.be.true;
+
+  // Sell order isn't expired
+  const expiresTime = Number(expiresAt);
+  const nowInSeconds = Date.now() / 1000;
+  expect(nowInSeconds).to.be.below(expiresTime);
+
+  // Buyer has enough MANA
+  const price = bigNumberify(priceInWei);
+  const balanceInWei = await erc20Contract.balanceOf(buyerAddress);
+  const balance = bigNumberify(balanceInWei);
+  expect(balance.gte(price)).to.be.true;
+
+  // Marketplace is approved to transfer Estate or Parcel asset owned by the seller
+  const approvedForAsset = await nftContract.getApproved(assetId);
+  const approvedForAll = await nftContract.isApprovedForAll(
+    seller,
+    MARKETPLACE_ADDRESS
+  );
+  const approved =
+    addressesAreEqual(approvedForAsset, MARKETPLACE_ADDRESS) || approvedForAll;
+  expect(approved).to.be.true;
+};
+
 export const helpers = {
   duration,
   pickAssetsForSale,
+  checkAsset,
 };
 
 export default helpers;
