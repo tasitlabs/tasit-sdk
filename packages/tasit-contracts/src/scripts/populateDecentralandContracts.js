@@ -192,7 +192,7 @@ let network = process.env.NETWORK;
 
   ConfigLoader.setConfig(config);
 
-  const [ownerWallet, sellerWallet] = accounts;
+  const [minterWallet, sellerWallet] = accounts;
   const { address: sellerAddress } = sellerWallet;
 
   const manaContract = new Mana(MANA_ADDRESS);
@@ -277,7 +277,7 @@ let network = process.env.NETWORK;
       landContract,
       allParcels,
       sellerAddress,
-      ownerWallet
+      minterWallet
     );
 
     const allParcelsIds = allParcels.map(async parcel => {
