@@ -95,6 +95,9 @@ const mineOneBlock = async provider => {
 };
 
 const mineBlocks = async (provider, n) => {
+  // Do nothing if provider isn't a JSON-RPC
+  if (!provider.send) return;
+
   for (let i = 0; i < n; i++) {
     await mineOneBlock(provider);
 
@@ -107,11 +110,15 @@ const mineBlocks = async (provider, n) => {
 };
 
 const createSnapshot = async provider => {
+  // Do nothing if provider isn't a JSON-RPC
+  if (!provider.send) return 1;
   const id = await provider.send("evm_snapshot", []);
   return Number(id);
 };
 
 const revertFromSnapshot = async (provider, snapshotId) => {
+  // Do nothing if provider isn't a JSON-RPC
+  if (!provider.send) return true;
   return await provider.send("evm_revert", [snapshotId]);
 };
 
