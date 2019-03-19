@@ -82,10 +82,7 @@ export const checkAsset = async (
   expect(nowInSeconds).to.be.below(expiresTime);
 
   // Buyer has enough MANA
-  const price = bigNumberify(priceInWei);
-  const balanceInWei = await erc20Contract.balanceOf(buyerAddress);
-  const balance = bigNumberify(balanceInWei);
-  expect(balance.gte(price)).to.be.true;
+  await tokenBalancesAreAtLeast(erc20Contract, [buyerAddress], [priceInWei]);
 
   // Marketplace is approved to transfer Estate or Parcel asset owned by the seller
   const approvedForAsset = await nftContract.getApproved(assetId);

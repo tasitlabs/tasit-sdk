@@ -114,15 +114,13 @@ describe("Decentraland", () => {
         gnosisSafe = new GnosisSafe(GNOSIS_SAFE_ADDRESS);
 
         // Expect an already-funded Gnosis Safe wallet
-        let etherBalance = await provider.getBalance(GNOSIS_SAFE_ADDRESS);
-        etherBalance = bigNumberify(etherBalance);
-        const one = bigNumberify(ONE);
-        expect(etherBalance.gte(one)).to.be.true;
+        await etherBalancesAreAtLeast(provider, [GNOSIS_SAFE_ADDRESS], [ONE]);
 
-        let manaBalance = await mana.balanceOf(GNOSIS_SAFE_ADDRESS);
-        manaBalance = bigNumberify(manaBalance);
-        const oneHundred = bigNumberify(ONE_HUNDRED);
-        expect(manaBalance.gte(oneHundred)).to.be.true;
+        await tokenBalancesAreAtLeast(
+          mana,
+          [GNOSIS_SAFE_ADDRESS],
+          [ONE_HUNDRED]
+        );
 
         gnosisSafe.removeWallet();
         gnosisSafe.setSigners([]);
@@ -138,7 +136,7 @@ describe("Decentraland", () => {
             ephemeralAddress,
             SMALL_AMOUNT
           );
-          await confirmEtherBalances(
+          await etherBalancesAreEqual(
             provider,
             [ephemeralAddress],
             [SMALL_AMOUNT]
@@ -253,7 +251,7 @@ describe("Decentraland", () => {
             SMALL_AMOUNT
           );
           await transferEthersAction.waitForNonceToUpdate();
-          await confirmEtherBalances(provider, [toAddress], [SMALL_AMOUNT]);
+          await etherBalancesAreEqual(provider, [toAddress], [SMALL_AMOUNT]);
 
           const transferManaAction = gnosisSafe.transferERC20(
             MANA_ADDRESS,
@@ -355,7 +353,7 @@ describe("Decentraland", () => {
             SMALL_AMOUNT
           );
           await transferEthersAction.waitForNonceToUpdate();
-          await confirmEtherBalances(provider, [toAddress], [SMALL_AMOUNT]);
+          await etherBalancesAreEqual(provider, [toAddress], [SMALL_AMOUNT]);
 
           // Gnosis Safe should approve Marketplace to spend its MANA Tokens
           // TODO: ephemeralWallet should broadcast this action
@@ -497,7 +495,7 @@ describe("Decentraland", () => {
             SMALL_AMOUNT
           );
           await transferEthersAction.waitForNonceToUpdate();
-          await confirmEtherBalances(provider, [toAddress], [SMALL_AMOUNT]);
+          await etherBalancesAreEqual(provider, [toAddress], [SMALL_AMOUNT]);
 
           // Gnosis Safe should approve ephemeral account to spend its MANA Tokens
           // TODO: ephemeralWallet should broadcast this action

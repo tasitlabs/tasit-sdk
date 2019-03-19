@@ -42,15 +42,12 @@ describe("GnosisSafe", () => {
     const { address: someoneAddress } = someone;
 
     // Expect an already-funded Gnosis Safe wallet
-    let etherBalance = await provider.getBalance(GNOSIS_SAFE_ADDRESS);
-    etherBalance = bigNumberify(etherBalance);
-    const one = bigNumberify(ONE);
-    expect(etherBalance.gte(one)).to.be.true;
+    await etherBalancesAreAtLeast(provider, [GNOSIS_SAFE_ADDRESS], [ONE]);
 
     await tokenBalancesAreEqual(erc20, [GNOSIS_SAFE_ADDRESS], [ZERO]);
     await tokenBalancesAreEqual(nft, [GNOSIS_SAFE_ADDRESS], [ZERO]);
 
-    await confirmEtherBalances(provider, [someoneAddress], [ZERO]);
+    await etherBalancesAreEqual(provider, [someoneAddress], [ZERO]);
     await tokenBalancesAreEqual(erc20, [someoneAddress], [ZERO]);
     await tokenBalancesAreEqual(nft, [someoneAddress], [ZERO]);
 
@@ -75,8 +72,8 @@ describe("GnosisSafe", () => {
       const action = gnosisSafe.transferEther(toAddress, ONE);
       await action.waitForNonceToUpdate();
 
-      await confirmEtherBalances(provider, [GNOSIS_SAFE_ADDRESS], [ZERO]);
-      await confirmEtherBalances(provider, [toAddress], [ONE]);
+      await etherBalancesAreEqual(provider, [GNOSIS_SAFE_ADDRESS], [ZERO]);
+      await etherBalancesAreEqual(provider, [toAddress], [ONE]);
     });
 
     describe("test cases with more than one signer", () => {
@@ -136,7 +133,7 @@ describe("GnosisSafe", () => {
         await mineBlocks(provider, 1);
 
         expect(onError.callCount).to.equal(1);
-        await confirmEtherBalances(
+        await etherBalancesAreEqual(
           provider,
           [GNOSIS_SAFE_ADDRESS],
           [balanceBefore]
@@ -168,7 +165,7 @@ describe("GnosisSafe", () => {
       beforeEach("ethers to the ephemeral account pay for gas", async () => {
         const { address: ephemeralAddress } = ephemeralAccount;
         await etherFaucet(provider, minter, ephemeralAddress, SMALL_AMOUNT);
-        await confirmEtherBalances(
+        await etherBalancesAreEqual(
           provider,
           [ephemeralAddress],
           [SMALL_AMOUNT]
