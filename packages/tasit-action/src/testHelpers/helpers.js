@@ -48,38 +48,19 @@ const gasParams = {
   gasPrice: 1e9,
 };
 
-const accounts = [
-  createFromPrivateKey(
-    "0x11d943d7649fbdeb146dc57bd9cfc80b086bfab2330c7b25651dbaf382392f60"
-  ),
-  createFromPrivateKey(
-    "0xc181b6b02c9757f13f5aa15d1342a58970a8a489722dc0608a1d09fea717c181"
-  ),
-  createFromPrivateKey(
-    "0x4f09311114f0ff4dfad0edaa932a3e01a4ee9f34da2cbd087aa0e6ffcb9eb322"
-  ),
-  createFromPrivateKey(
-    "0xb52de6b5c3b38277edc6a30db517c719af6c7f0d3743a254cb2e0b54408ecbd8"
-  ),
-  createFromPrivateKey(
-    "0x65a6dacaed00c004c4739a121c2c4908d5da41e4015f9f7cf75f8686a019d419"
-  ),
-  createFromPrivateKey(
-    "0x17f6836e922fde89ca95883631f02ff89787ec0ac593106527f9bd2635080fb6"
-  ),
-  createFromPrivateKey(
-    "0xe28dec48b18fb80369ea651cf703a053b2a5cce868e3450b4e532ca0fb8149b4"
-  ),
-  createFromPrivateKey(
-    "0xd79a1249c9ec1b468a71971fe551358ca4d1f9167f085b87f33c1783839c4d9d"
-  ),
-  createFromPrivateKey(
-    "0x8fb382c5caa48ed928e6f6324e3b8112e43e2aaa9a761b12501321630a512b49"
-  ),
-  createFromPrivateKey(
-    "0xee0c6b1a7adea9f87b1a422eb06b245fc714b8eca4c8c0578d6cf946beba86f1"
-  ),
+const privateKeys = [
+  "0x02380f59eeed7a02557aeaab089606739feb0e1db34c6b08374ad31188a3892d",
+  "0x2232aa52d058352511c5dd2d0ebcc0cfb6dfb5f051a9b367b7505556d2672490",
+  "0x573862e2beaa8dcaf00094c7a56dcb81bcf82c83fc1bb0f9292d6cd656db45df",
+  "0xcc51b0d7bb32d222416bfd885498659a9270a1790ba0fcb1771a5fd20507ffa9",
+  "0x1fed0a74c3c287f5c93479ff5ba60e1a32974d49425bd6d596ecd0b0f77e0352",
+  "0x9f071322c7c55e5d8b7e9778788e798384371c5ec716c60614dd7db009947e18",
+  "0xa6d4b9724775bbc5541158ad69e6428af60e5f2251d0bf8fd3e8ab7efa12ee93",
+  "0xe1ba62dfb842495d59579dfca29e212ceb78818af7c5869623317fc46dd1a5bf",
+  "0xda1a8c477afeb99ae2c2300b22ad612ccf4c184564e332ae9a32f784bbca8d6b",
+  "0x633a290bcdabb9075c5a4b3885c69ce64b4b0e6079eb929abb2ac9427c49733b",
 ];
+const accounts = privateKeys.map(createFromPrivateKey);
 
 const waitForEthersEvent = async (eventEmitter, eventName, callback) => {
   return new Promise(function(resolve, reject) {
@@ -129,7 +110,7 @@ const wait = async ms => {
   return new Promise(resolve => setTimeout(resolve, ms));
 };
 
-const etherBalancesAreEqual = async (provider, addresses, balances) => {
+const expectExactEtherBalances = async (provider, addresses, balances) => {
   expect(addresses.length).to.equal(balances.length);
   let index = 0;
   for (let address of addresses) {
@@ -139,7 +120,7 @@ const etherBalancesAreEqual = async (provider, addresses, balances) => {
   }
 };
 
-const etherBalancesAreAtLeast = async (provider, addresses, balances) => {
+const expectMinimumEtherBalances = async (provider, addresses, balances) => {
   expect(addresses.length).to.equal(balances.length);
   let index = 0;
   for (let address of addresses) {
@@ -150,7 +131,7 @@ const etherBalancesAreAtLeast = async (provider, addresses, balances) => {
   }
 };
 
-const tokenBalancesAreAtLeast = async (token, addresses, balances) => {
+const expectMinimumTokenBalances = async (token, addresses, balances) => {
   expect(addresses.length).to.equal(balances.length);
   let index = 0;
   for (let address of addresses) {
@@ -161,7 +142,7 @@ const tokenBalancesAreAtLeast = async (token, addresses, balances) => {
   }
 };
 
-const tokenBalancesAreEqual = async (token, addresses, balances) => {
+const expectExactTokenBalances = async (token, addresses, balances) => {
   expect(addresses.length).to.equal(balances.length);
   let index = 0;
   for (let address of addresses) {
@@ -196,14 +177,14 @@ const erc20Faucet = async (
   tokenContract.setWallet(ownerWallet);
   const mintAction = tokenContract.mint(toAddress, `${amountInWei}`);
   await mintAction.waitForNonceToUpdate();
-  await tokenBalancesAreEqual(tokenContract, [toAddress], [amountInWei]);
+  await expectExactTokenBalances(tokenContract, [toAddress], [amountInWei]);
 };
 
 const erc721Faucet = async (tokenContract, ownerWallet, toAddress, tokenId) => {
   tokenContract.setWallet(ownerWallet);
   const mintAction = tokenContract.mint(toAddress, tokenId);
   await mintAction.waitForNonceToUpdate();
-  await tokenBalancesAreEqual(tokenContract, [toAddress], [1]);
+  await expectExactTokenBalances(tokenContract, [toAddress], [1]);
 };
 
 const addressesAreEqual = (address1, address2) => {
@@ -216,10 +197,10 @@ export const helpers = {
   createSnapshot,
   revertFromSnapshot,
   wait,
-  etherBalancesAreEqual,
-  etherBalancesAreAtLeast,
-  tokenBalancesAreAtLeast,
-  tokenBalancesAreEqual,
+  expectExactEtherBalances,
+  expectMinimumEtherBalances,
+  expectMinimumTokenBalances,
+  expectExactTokenBalances,
   etherFaucet,
   erc20Faucet,
   erc721Faucet,

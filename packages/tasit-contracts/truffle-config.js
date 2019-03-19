@@ -22,11 +22,17 @@
  *
  */
 const fs = require("fs");
+let secretFile;
+try {
+  secretFile = fs.readFileSync(".secret.json");
+} catch (error) {
+  // Ignoring since it isn't necessary for development migrations
+}
 
 const HDWalletProvider = require("truffle-hdwallet-provider");
 
 const createInfuraProvider = (network = "mainnet") => {
-  const secretFile = fs.readFileSync(".secret.json");
+  if (!secretFile) throw Error("ERROR: .secret.json file not found.");
   const secret = JSON.parse(secretFile);
   const { mnemonic, infuraKey } = secret[network];
   const rpcEndpoint = `https://${network}.infura.io/${infuraKey}`;
@@ -64,6 +70,7 @@ module.exports = {
     ropsten: {
       provider: () => createInfuraProvider("ropsten"),
       network_id: 3,
+      gas: 8000000,
     },
     // Another network with more advanced options...
     // advanced: {

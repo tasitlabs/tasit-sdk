@@ -1,4 +1,3 @@
-var ProxyFactory = artifacts.require("./ProxyFactory.sol");
 var GnosisSafe = artifacts.require("./GnosisSafe.sol");
 
 module.exports = (deployer, network, accounts) => {
@@ -7,7 +6,6 @@ module.exports = (deployer, network, accounts) => {
   // Workaround to write async/await migration scripts
   // See more: https://github.com/trufflesuite/truffle/issues/501#issuecomment-332589663
   deployer.then(async () => {
-    const proxyFactory = await deployer.deploy(ProxyFactory);
     const safe = await deployer.deploy(GnosisSafe);
     const owners = [signer];
     const threshold = 1;
