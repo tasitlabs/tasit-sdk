@@ -33,7 +33,7 @@ describe("TasitAction.ERC721.ERC721Full", () => {
     // Two blocks to minimize the risk that polling doesn't occur.
     await mineBlocks(provider, 2);
 
-    await confirmBalances(
+    await tokenBalancesAreEqual(
       erc721,
       [owner.address, ana.address, bob.address],
       [0, 0, 0]
@@ -128,7 +128,7 @@ describe("TasitAction.ERC721.ERC721Full", () => {
       expect(event.to).to.equal(ana.address);
       expect(event.tokenId.eq(tokenId)).to.be.true;
 
-      await confirmBalances(erc721, [ana.address], [1]);
+      await tokenBalancesAreEqual(erc721, [ana.address], [1]);
     });
 
     // Non-deterministic
@@ -154,7 +154,7 @@ describe("TasitAction.ERC721.ERC721Full", () => {
       expect(event.to).to.equal(bob.address);
       expect(event.tokenId.toNumber()).to.equal(tokenId);
 
-      await confirmBalances(erc721, [ana.address, bob.address], [0, 1]);
+      await tokenBalancesAreEqual(erc721, [ana.address, bob.address], [0, 1]);
     });
 
     it("should transfer an approved token", async () => {
@@ -168,7 +168,7 @@ describe("TasitAction.ERC721.ERC721Full", () => {
 
       await action.waitForNonceToUpdate();
 
-      await confirmBalances(erc721, [bob.address], [1]);
+      await tokenBalancesAreEqual(erc721, [bob.address], [1]);
     });
 
     it("should transfer an owned token using safeTransferFrom", async () => {
@@ -178,7 +178,7 @@ describe("TasitAction.ERC721.ERC721Full", () => {
 
       await action.waitForNonceToUpdate();
 
-      await confirmBalances(erc721, [ana.address, bob.address], [0, 1]);
+      await tokenBalancesAreEqual(erc721, [ana.address, bob.address], [0, 1]);
     });
 
     it("should trigger an error if the user is listening for errors from a contract and tries safeTransferFrom to a contract without onERC721Received", async () => {
@@ -205,7 +205,7 @@ describe("TasitAction.ERC721.ERC721Full", () => {
 
       expect(contractErrorFakeFn.called).to.be.true;
 
-      await confirmBalances(
+      await tokenBalancesAreEqual(
         erc721,
         [ana.address, SAMPLE_CONTRACT_ADDRESS],
         [1, 0]
@@ -236,7 +236,7 @@ describe("TasitAction.ERC721.ERC721Full", () => {
 
       expect(actionErrorFakeFn.called).to.be.true;
 
-      await confirmBalances(
+      await tokenBalancesAreEqual(
         erc721,
         [ana.address, SAMPLE_CONTRACT_ADDRESS],
         [1, 0]

@@ -27,6 +27,7 @@ const ZERO = 0;
 const ONE = bigNumberify(1).mul(WeiPerEther);
 const TEN = bigNumberify(10).mul(WeiPerEther);
 const ONE_HUNDRED = bigNumberify(100).mul(WeiPerEther);
+const ONE_THOUSAND = bigNumberify(1000).mul(WeiPerEther);
 const BILLION = bigNumberify(`${1e9}`).mul(WeiPerEther);
 
 const constants = {
@@ -34,6 +35,7 @@ const constants = {
   ONE,
   TEN,
   ONE_HUNDRED,
+  ONE_THOUSAND,
   BILLION,
   WeiPerEther,
 };
@@ -95,6 +97,10 @@ const mineOneBlock = async provider => {
 };
 
 const mineBlocks = async (provider, n) => {
+  // Do nothing if provider isn't a JSON-RPC
+  // (Infura uses RPC calls over HTTP as opposed to JSON-RPC directly)
+  if (!provider.send) return;
+
   for (let i = 0; i < n; i++) {
     await mineOneBlock(provider);
 
@@ -107,11 +113,15 @@ const mineBlocks = async (provider, n) => {
 };
 
 const createSnapshot = async provider => {
+  // Do nothing if provider isn't a JSON-RPC
+  if (!provider.send) return 1;
   const id = await provider.send("evm_snapshot", []);
   return Number(id);
 };
 
 const revertFromSnapshot = async (provider, snapshotId) => {
+  // Do nothing if provider isn't a JSON-RPC
+  if (!provider.send) return true;
   return await provider.send("evm_revert", [snapshotId]);
 };
 
@@ -119,7 +129,7 @@ const wait = async ms => {
   return new Promise(resolve => setTimeout(resolve, ms));
 };
 
-const confirmEtherBalances = async (provider, addresses, balances) => {
+const etherBalancesAreEqual = async (provider, addresses, balances) => {
   expect(addresses.length).to.equal(balances.length);
   let index = 0;
   for (let address of addresses) {
@@ -129,7 +139,29 @@ const confirmEtherBalances = async (provider, addresses, balances) => {
   }
 };
 
-const confirmBalances = async (token, addresses, balances) => {
+const etherBalancesAreAtLeast = async (provider, addresses, balances) => {
+  expect(addresses.length).to.equal(balances.length);
+  let index = 0;
+  for (let address of addresses) {
+    const balance = await provider.getBalance(address);
+    const actual = bigNumberify(balance);
+    const expected = bigNumberify(balances[index++]);
+    expect(actual.gte(expected)).to.be.true;
+  }
+};
+
+const tokenBalancesAreAtLeast = async (token, addresses, balances) => {
+  expect(addresses.length).to.equal(balances.length);
+  let index = 0;
+  for (let address of addresses) {
+    const balance = await token.balanceOf(address);
+    const actual = bigNumberify(balance);
+    const expected = bigNumberify(balances[index++]);
+    expect(actual.gte(expected)).to.be.true;
+  }
+};
+
+const tokenBalancesAreEqual = async (token, addresses, balances) => {
   expect(addresses.length).to.equal(balances.length);
   let index = 0;
   for (let address of addresses) {
@@ -164,14 +196,14 @@ const erc20Faucet = async (
   tokenContract.setWallet(ownerWallet);
   const mintAction = tokenContract.mint(toAddress, `${amountInWei}`);
   await mintAction.waitForNonceToUpdate();
-  await confirmBalances(tokenContract, [toAddress], [amountInWei]);
+  await tokenBalancesAreEqual(tokenContract, [toAddress], [amountInWei]);
 };
 
 const erc721Faucet = async (tokenContract, ownerWallet, toAddress, tokenId) => {
   tokenContract.setWallet(ownerWallet);
   const mintAction = tokenContract.mint(toAddress, tokenId);
   await mintAction.waitForNonceToUpdate();
-  await confirmBalances(tokenContract, [toAddress], [1]);
+  await tokenBalancesAreEqual(tokenContract, [toAddress], [1]);
 };
 
 const addressesAreEqual = (address1, address2) => {
@@ -184,8 +216,10 @@ export const helpers = {
   createSnapshot,
   revertFromSnapshot,
   wait,
-  confirmEtherBalances,
-  confirmBalances,
+  etherBalancesAreEqual,
+  etherBalancesAreAtLeast,
+  tokenBalancesAreAtLeast,
+  tokenBalancesAreEqual,
   etherFaucet,
   erc20Faucet,
   erc721Faucet,

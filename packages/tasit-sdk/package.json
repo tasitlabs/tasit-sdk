@@ -19,10 +19,12 @@
   "scripts": {
     "prepare": "npx babel src --out-dir dist --ignore **/*.test.js",
     "setup:local": "cp src/config/development.js src/config/default.js",
+    "setup:ropsten": "cp src/config/ropsten.js src/config/default.js",
     "setup:forked-ropsten": "cp src/config/forked-ropsten.js src/config/default.js",
     "setup:forked-goerli": "cp src/config/forked-goerli.js src/config/default.js",
     "test": "npm run setup:local && npm run mocha",
     "test:forked-testnet": "npm run setup:forked-ropsten && npm run mocha",
+    "test:testnet": "npm run setup:ropsten && npm run mocha",
     "mocha": "npx mocha src/*.test.js  --require @babel/register --file src/testHelpers/mochaSetup.js --no-timeouts",
     "lint": "npx prettier src/* --write"
   },
