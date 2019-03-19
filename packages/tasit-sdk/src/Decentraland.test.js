@@ -39,9 +39,9 @@ describe("Decentraland", () => {
   });
 
   beforeEach("", async () => {
-    await tokenBalancesAreEqual(mana, [ephemeralAddress], [0]);
-    await tokenBalancesAreEqual(land, [ephemeralAddress], [0]);
-    await tokenBalancesAreEqual(estate, [ephemeralAddress], [0]);
+    await expectExactTokenBalances(mana, [ephemeralAddress], [0]);
+    await expectExactTokenBalances(land, [ephemeralAddress], [0]);
+    await expectExactTokenBalances(estate, [ephemeralAddress], [0]);
 
     mana.removeWallet();
     land.removeWallet();
@@ -114,9 +114,13 @@ describe("Decentraland", () => {
         gnosisSafe = new GnosisSafe(GNOSIS_SAFE_ADDRESS);
 
         // Expect an already-funded Gnosis Safe wallet
-        await etherBalancesAreAtLeast(provider, [GNOSIS_SAFE_ADDRESS], [ONE]);
+        await expectMinimumEtherBalances(
+          provider,
+          [GNOSIS_SAFE_ADDRESS],
+          [ONE]
+        );
 
-        await tokenBalancesAreAtLeast(
+        await expectMinimumTokenBalances(
           mana,
           [GNOSIS_SAFE_ADDRESS],
           [ONE_HUNDRED]
@@ -136,7 +140,7 @@ describe("Decentraland", () => {
             ephemeralAddress,
             SMALL_AMOUNT
           );
-          await etherBalancesAreEqual(
+          await expectExactEtherBalances(
             provider,
             [ephemeralAddress],
             [SMALL_AMOUNT]
@@ -148,7 +152,7 @@ describe("Decentraland", () => {
             ephemeralAddress,
             manaAmountForShopping
           );
-          await tokenBalancesAreEqual(
+          await expectExactTokenBalances(
             mana,
             [ephemeralAddress],
             [manaAmountForShopping]
@@ -181,7 +185,7 @@ describe("Decentraland", () => {
 
           await checkAsset(estate, mana, estateForSale, ephemeralAddress);
 
-          await tokenBalancesAreEqual(estate, [ephemeralAddress], [0]);
+          await expectExactTokenBalances(estate, [ephemeralAddress], [0]);
 
           const fingerprint = await estate.getFingerprint(`${assetId}`);
 
@@ -196,7 +200,7 @@ describe("Decentraland", () => {
 
           await executeOrderAction.waitForNonceToUpdate();
 
-          await tokenBalancesAreEqual(estate, [ephemeralAddress], [1]);
+          await expectExactTokenBalances(estate, [ephemeralAddress], [1]);
         });
 
         it("should buy a parcel of land", async () => {
@@ -210,7 +214,7 @@ describe("Decentraland", () => {
 
           await checkAsset(land, mana, landForSale, ephemeralAddress);
 
-          await tokenBalancesAreEqual(land, [ephemeralAddress], [0]);
+          await expectExactTokenBalances(land, [ephemeralAddress], [0]);
 
           // LANDRegistry contract doesn't implement getFingerprint function
           const fingerprint = "0x";
@@ -225,7 +229,7 @@ describe("Decentraland", () => {
 
           await executeOrderAction.waitForNonceToUpdate();
 
-          await tokenBalancesAreEqual(land, [ephemeralAddress], [1]);
+          await expectExactTokenBalances(land, [ephemeralAddress], [1]);
         });
       });
 
@@ -236,12 +240,11 @@ describe("Decentraland", () => {
           gnosisSafe.setWallet(gnosisSafeOwner);
 
           // Gnosis Safe owner should have enough ethers to pay for the transaction's gas
-          const gnosisSafeOwnerBalance = await provider.getBalance(
-            gnosisSafeOwnerAddress
+          await expectMinimumEtherBalances(
+            provider,
+            [gnosisSafeOwnerAddress],
+            [SMALL_AMOUNT]
           );
-          const gnosisSafeOwnerBalanceBN = bigNumberify(gnosisSafeOwnerBalance);
-          const smallAmountBN = bigNumberify(SMALL_AMOUNT);
-          expect(gnosisSafeOwnerBalanceBN.gte(smallAmountBN)).to.be.true;
 
           const toAddress = ephemeralAddress;
 
@@ -251,7 +254,7 @@ describe("Decentraland", () => {
             SMALL_AMOUNT
           );
           await transferEthersAction.waitForNonceToUpdate();
-          await etherBalancesAreEqual(provider, [toAddress], [SMALL_AMOUNT]);
+          await expectExactEtherBalances(provider, [toAddress], [SMALL_AMOUNT]);
 
           const transferManaAction = gnosisSafe.transferERC20(
             MANA_ADDRESS,
@@ -259,7 +262,7 @@ describe("Decentraland", () => {
             manaAmountForShopping
           );
           await transferManaAction.waitForNonceToUpdate();
-          await tokenBalancesAreEqual(
+          await expectExactTokenBalances(
             mana,
             [toAddress],
             [manaAmountForShopping]
@@ -292,7 +295,7 @@ describe("Decentraland", () => {
 
           await checkAsset(estate, mana, estateForSale, ephemeralAddress);
 
-          await tokenBalancesAreEqual(estate, [ephemeralAddress], [0]);
+          await expectExactTokenBalances(estate, [ephemeralAddress], [0]);
 
           const fingerprint = await estate.getFingerprint(`${assetId}`);
 
@@ -307,7 +310,7 @@ describe("Decentraland", () => {
 
           await executeOrderAction.waitForNonceToUpdate();
 
-          await tokenBalancesAreEqual(estate, [ephemeralAddress], [1]);
+          await expectExactTokenBalances(estate, [ephemeralAddress], [1]);
         });
 
         it("should buy a parcel of land", async () => {
@@ -321,7 +324,7 @@ describe("Decentraland", () => {
 
           await checkAsset(land, mana, landForSale, ephemeralAddress);
 
-          await tokenBalancesAreEqual(land, [ephemeralAddress], [0]);
+          await expectExactTokenBalances(land, [ephemeralAddress], [0]);
 
           // LANDRegistry contract doesn't implement getFingerprint function
           const fingerprint = "0x";
@@ -336,7 +339,7 @@ describe("Decentraland", () => {
 
           await executeOrderAction.waitForNonceToUpdate();
 
-          await tokenBalancesAreEqual(land, [ephemeralAddress], [1]);
+          await expectExactTokenBalances(land, [ephemeralAddress], [1]);
         });
       });
 
@@ -353,7 +356,7 @@ describe("Decentraland", () => {
             SMALL_AMOUNT
           );
           await transferEthersAction.waitForNonceToUpdate();
-          await etherBalancesAreEqual(provider, [toAddress], [SMALL_AMOUNT]);
+          await expectExactEtherBalances(provider, [toAddress], [SMALL_AMOUNT]);
 
           // Gnosis Safe should approve Marketplace to spend its MANA Tokens
           // TODO: ephemeralWallet should broadcast this action
@@ -389,7 +392,7 @@ describe("Decentraland", () => {
           const buyerAddress = GNOSIS_SAFE_ADDRESS;
           await checkAsset(estate, mana, estateForSale, buyerAddress);
 
-          await tokenBalancesAreEqual(estate, [GNOSIS_SAFE_ADDRESS], [0]);
+          await expectExactTokenBalances(estate, [GNOSIS_SAFE_ADDRESS], [0]);
 
           // Gnosis Safe should execute an open order
           // TODO: ephemeralWallet should broadcast this action
@@ -424,7 +427,7 @@ describe("Decentraland", () => {
 
           await mineBlocks(provider, 1);
 
-          await tokenBalancesAreEqual(estate, [GNOSIS_SAFE_ADDRESS], [1]);
+          await expectExactTokenBalances(estate, [GNOSIS_SAFE_ADDRESS], [1]);
         });
 
         it("should buy a parcel of land", async () => {
@@ -438,7 +441,7 @@ describe("Decentraland", () => {
 
           await checkAsset(land, mana, landForSale, GNOSIS_SAFE_ADDRESS);
 
-          await tokenBalancesAreEqual(land, [GNOSIS_SAFE_ADDRESS], [0]);
+          await expectExactTokenBalances(land, [GNOSIS_SAFE_ADDRESS], [0]);
 
           // Gnosis Safe should execute an open order
           // TODO: ephemeralWallet should broadcast this action
@@ -477,7 +480,7 @@ describe("Decentraland", () => {
 
           await executeOrderAction.waitForNonceToUpdate();
 
-          await tokenBalancesAreEqual(land, [GNOSIS_SAFE_ADDRESS], [1]);
+          await expectExactTokenBalances(land, [GNOSIS_SAFE_ADDRESS], [1]);
         });
       });
 
@@ -495,7 +498,7 @@ describe("Decentraland", () => {
             SMALL_AMOUNT
           );
           await transferEthersAction.waitForNonceToUpdate();
-          await etherBalancesAreEqual(provider, [toAddress], [SMALL_AMOUNT]);
+          await expectExactEtherBalances(provider, [toAddress], [SMALL_AMOUNT]);
 
           // Gnosis Safe should approve ephemeral account to spend its MANA Tokens
           // TODO: ephemeralWallet should broadcast this action
@@ -544,7 +547,7 @@ describe("Decentraland", () => {
           } = estateForSale;
 
           await checkAsset(estate, mana, estateForSale, GNOSIS_SAFE_ADDRESS);
-          await tokenBalancesAreEqual(estate, [ephemeralAddress], [0]);
+          await expectExactTokenBalances(estate, [ephemeralAddress], [0]);
 
           const fingerprint = await estate.getFingerprint(`${assetId}`);
 
@@ -559,7 +562,7 @@ describe("Decentraland", () => {
 
           await executeOrderAction.waitForNonceToUpdate();
 
-          await tokenBalancesAreEqual(estate, [ephemeralAddress], [1]);
+          await expectExactTokenBalances(estate, [ephemeralAddress], [1]);
         });
 
         it("should buy a parcel of land", async () => {
@@ -573,7 +576,7 @@ describe("Decentraland", () => {
 
           await checkAsset(land, mana, landForSale, GNOSIS_SAFE_ADDRESS);
 
-          await tokenBalancesAreEqual(land, [ephemeralAddress], [0]);
+          await expectExactTokenBalances(land, [ephemeralAddress], [0]);
 
           // LANDRegistry contract doesn't implement getFingerprint function
           const fingerprint = "0x";
@@ -588,7 +591,7 @@ describe("Decentraland", () => {
 
           await executeOrderAction.waitForNonceToUpdate();
 
-          await tokenBalancesAreEqual(land, [ephemeralAddress], [1]);
+          await expectExactTokenBalances(land, [ephemeralAddress], [1]);
         });
       });
     });
