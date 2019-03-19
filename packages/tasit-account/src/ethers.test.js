@@ -41,9 +41,7 @@ describe("ethers.js", () => {
     const rawMsg = "Hello World!";
     const signedMsg = await wallet.signMessage(rawMsg);
 
-    const expectedSignedMsg =
-      "0x372577a100b677f28381347d58369557563ffddfbc523c0e4a2348ed489427d25bd7" +
-      "595ce0f5a0da811bd7cc558e9e6eeed09988cd06fe0c0c9e7df69d373fec1b";
+    const expectedSignedMsg = `0x1d43db04021e3ff7e122e5298b3fc18f1c1d36da7874c44f1eb8d372a037ebd21a5ceac64a29723e13893ec502ae5a1b5f15239b585bdad5801852c712e101671b`;
 
     expect(signedMsg).to.be.equals(expectedSignedMsg);
   });
@@ -55,9 +53,7 @@ describe("ethers.js", () => {
 
     const binData = ethers.utils.arrayify(hash);
 
-    const expectedSignedBinData =
-      "0x9c9eab15e04614df2748f3515261b2c15c0cf0e2208d9f3a7610955d511a97c064d8" +
-      "7ed31e727052e695859aaa4b00b208a0d088fb17897dda42ac59aad0e1de1c";
+    const expectedSignedBinData = `0xcc803c1bfd6805ccbe8ce6c9c3770e6d023210c308d69284c4ea7b0e54cdb82f41238cbc6f027b40dfca5897b7626734f17ca50cdc797782e92840ca930647261b`;
 
     const signedBinData = await wallet.signMessage(binData);
 
@@ -76,11 +72,7 @@ describe("ethers.js", () => {
   it("should sign a raw transaction", async () => {
     const signedTx = await wallet.sign(rawTx);
 
-    const expectedSignedTx =
-      "0xf869808504a817c8008252089488a5c2d9919e46f883eb62f7b8dd9d0cc45bc29085" +
-      "174876e800801ca0855408709023b3d4e827c7aeb7b1adc4a5480e37601a20d881d10e" +
-      "4fd39207aca0179492402dd7a8fdc6190ecdae6ce28f1b6900297b08ed1a18252142d9" +
-      "d8c95a";
+    const expectedSignedTx = `0xf869808504a817c8008252089488a5c2d9919e46f883eb62f7b8dd9d0cc45bc29085174876e800801ba0ea1e53eb8f5510a729eea0612b9b7d9ef36a0a360305db5c5496200f3e07e8f7a0680c0ef7b4cdf854ded2bda1a205725afc3e9a240fe21466ec86426a461e0532`;
 
     expect(signedTx).to.equal(expectedSignedTx);
   });

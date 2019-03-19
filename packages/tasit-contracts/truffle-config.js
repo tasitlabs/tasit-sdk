@@ -22,12 +22,12 @@
  *
  */
 const fs = require("fs");
+const secretFile = fs.readFileSync(".secret.json");
+const secret = JSON.parse(secretFile);
 
 const HDWalletProvider = require("truffle-hdwallet-provider");
 
 const createInfuraProvider = (network = "mainnet") => {
-  const secretFile = fs.readFileSync(".secret.json");
-  const secret = JSON.parse(secretFile);
   const { mnemonic, infuraKey } = secret[network];
   const rpcEndpoint = `https://${network}.infura.io/${infuraKey}`;
   return new HDWalletProvider(mnemonic, rpcEndpoint);
@@ -64,6 +64,7 @@ module.exports = {
     ropsten: {
       provider: () => createInfuraProvider("ropsten"),
       network_id: 3,
+      gas: 8000000,
     },
     // Another network with more advanced options...
     // advanced: {

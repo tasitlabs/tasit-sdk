@@ -5,9 +5,11 @@ const { LANDProxy } = localContracts;
 const { address: LAND_PROXY_ADDRESS } = LANDProxy;
 
 describe("TasitAction.ERC721.Land", () => {
+  const [contractOwnerWallet] = accounts;
   it("should get the Land owner", async () => {
     const land = new Land(LAND_PROXY_ADDRESS);
-    let owner = await land.owner();
-    expect(owner).to.equal("0xd68649157A061454e2c63c175236b07e98Bd9512");
+    const owner = await land.owner();
+    const { address: expectedOwner } = contractOwnerWallet;
+    expect(owner).to.equal(expectedOwner);
   });
 });
