@@ -128,13 +128,35 @@ const wait = async ms => {
   return new Promise(resolve => setTimeout(resolve, ms));
 };
 
-const confirmEtherBalances = async (provider, addresses, balances) => {
+const etherBalancesAreEqual = async (provider, addresses, balances) => {
   expect(addresses.length).to.equal(balances.length);
   let index = 0;
   for (let address of addresses) {
     const balance = await provider.getBalance(address);
     const expectedBalance = balances[index++];
     expect(balance.toString()).to.equal(expectedBalance.toString());
+  }
+};
+
+const etherBalancesAreAtLeast = async (provider, addresses, balances) => {
+  expect(addresses.length).to.equal(balances.length);
+  let index = 0;
+  for (let address of addresses) {
+    const balance = await provider.getBalance(address);
+    const actual = bigNumberify(balance);
+    const expected = bigNumberify(balances[index++]);
+    expect(actual.gte(expected)).to.be.true;
+  }
+};
+
+const tokenBalancesAreAtLeast = async (token, addresses, balances) => {
+  expect(addresses.length).to.equal(balances.length);
+  let index = 0;
+  for (let address of addresses) {
+    const balance = await token.balanceOf(address);
+    const actual = bigNumberify(balance);
+    const expected = bigNumberify(balances[index++]);
+    expect(actual.gte(expected)).to.be.true;
   }
 };
 
@@ -193,7 +215,9 @@ export const helpers = {
   createSnapshot,
   revertFromSnapshot,
   wait,
-  confirmEtherBalances,
+  etherBalancesAreEqual,
+  etherBalancesAreAtLeast,
+  tokenBalancesAreAtLeast,
   tokenBalancesAreEqual,
   etherFaucet,
   erc20Faucet,
