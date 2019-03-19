@@ -79,6 +79,7 @@ const mineOneBlock = async provider => {
 
 const mineBlocks = async (provider, n) => {
   // Do nothing if provider isn't a JSON-RPC
+  // (Infura uses RPC calls over HTTP as opposed to JSON-RPC directly)
   if (!provider.send) return;
 
   for (let i = 0; i < n; i++) {
