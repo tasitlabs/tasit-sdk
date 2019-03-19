@@ -41,7 +41,7 @@ describe("GnosisSafe", () => {
   beforeEach("", async () => {
     const { address: someoneAddress } = someone;
 
-    // Expect an already funded Gnosis Safe wallet
+    // Expect an already-funded Gnosis Safe wallet
     let etherBalance = await provider.getBalance(GNOSIS_SAFE_ADDRESS);
     etherBalance = bigNumberify(etherBalance);
     const one = bigNumberify(ONE);
