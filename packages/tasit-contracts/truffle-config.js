@@ -32,7 +32,7 @@ try {
 const HDWalletProvider = require("truffle-hdwallet-provider");
 
 const createInfuraProvider = (network = "mainnet") => {
-  if (!secretFile) throw Error("ERROR: The .secret.json file not found.");
+  if (!secretFile) throw Error("ERROR: .secret.json file not found.");
   const secret = JSON.parse(secretFile);
   const { mnemonic, infuraKey } = secret[network];
   const rpcEndpoint = `https://${network}.infura.io/${infuraKey}`;
