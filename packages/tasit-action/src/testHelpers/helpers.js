@@ -138,7 +138,7 @@ const confirmEtherBalances = async (provider, addresses, balances) => {
   }
 };
 
-const confirmBalances = async (token, addresses, balances) => {
+const tokenBalancesAreEqual = async (token, addresses, balances) => {
   expect(addresses.length).to.equal(balances.length);
   let index = 0;
   for (let address of addresses) {
@@ -173,14 +173,14 @@ const erc20Faucet = async (
   tokenContract.setWallet(ownerWallet);
   const mintAction = tokenContract.mint(toAddress, `${amountInWei}`);
   await mintAction.waitForNonceToUpdate();
-  await confirmBalances(tokenContract, [toAddress], [amountInWei]);
+  await tokenBalancesAreEqual(tokenContract, [toAddress], [amountInWei]);
 };
 
 const erc721Faucet = async (tokenContract, ownerWallet, toAddress, tokenId) => {
   tokenContract.setWallet(ownerWallet);
   const mintAction = tokenContract.mint(toAddress, tokenId);
   await mintAction.waitForNonceToUpdate();
-  await confirmBalances(tokenContract, [toAddress], [1]);
+  await tokenBalancesAreEqual(tokenContract, [toAddress], [1]);
 };
 
 const addressesAreEqual = (address1, address2) => {
@@ -194,7 +194,7 @@ export const helpers = {
   revertFromSnapshot,
   wait,
   confirmEtherBalances,
-  confirmBalances,
+  tokenBalancesAreEqual,
   etherFaucet,
   erc20Faucet,
   erc721Faucet,

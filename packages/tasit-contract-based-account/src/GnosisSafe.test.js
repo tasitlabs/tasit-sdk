@@ -47,12 +47,12 @@ describe("GnosisSafe", () => {
     const one = bigNumberify(ONE);
     expect(etherBalance.gte(one)).to.be.true;
 
-    await confirmBalances(erc20, [GNOSIS_SAFE_ADDRESS], [ZERO]);
-    await confirmBalances(nft, [GNOSIS_SAFE_ADDRESS], [ZERO]);
+    await tokenBalancesAreEqual(erc20, [GNOSIS_SAFE_ADDRESS], [ZERO]);
+    await tokenBalancesAreEqual(nft, [GNOSIS_SAFE_ADDRESS], [ZERO]);
 
     await confirmEtherBalances(provider, [someoneAddress], [ZERO]);
-    await confirmBalances(erc20, [someoneAddress], [ZERO]);
-    await confirmBalances(nft, [someoneAddress], [ZERO]);
+    await tokenBalancesAreEqual(erc20, [someoneAddress], [ZERO]);
+    await tokenBalancesAreEqual(nft, [someoneAddress], [ZERO]);
 
     gnosisSafe.setSigners([]);
     gnosisSafe.removeWallet();
@@ -148,7 +148,7 @@ describe("GnosisSafe", () => {
   describe("test cases that need ERC20 deposit to the contract-based account", async () => {
     beforeEach("faucet", async () => {
       await erc20Faucet(erc20, minter, GNOSIS_SAFE_ADDRESS, ONE);
-      await confirmBalances(erc20, [GNOSIS_SAFE_ADDRESS], [ONE]);
+      await tokenBalancesAreEqual(erc20, [GNOSIS_SAFE_ADDRESS], [ONE]);
     });
 
     it("contract-based account should send ERC20 tokens to someone", async () => {
@@ -160,8 +160,8 @@ describe("GnosisSafe", () => {
       const action = gnosisSafe.transferERC20(tokenAddress, toAddress, ONE);
       await action.waitForNonceToUpdate();
 
-      await confirmBalances(erc20, [GNOSIS_SAFE_ADDRESS], [ZERO]);
-      await confirmBalances(erc20, [toAddress], [ONE]);
+      await tokenBalancesAreEqual(erc20, [GNOSIS_SAFE_ADDRESS], [ZERO]);
+      await tokenBalancesAreEqual(erc20, [toAddress], [ONE]);
     });
 
     describe("spending by an ephemeral account", () => {
@@ -201,7 +201,11 @@ describe("GnosisSafe", () => {
         await mineBlocks(provider, 1);
 
         expect(onError.callCount).to.equal(1);
-        await confirmBalances(erc20, [GNOSIS_SAFE_ADDRESS], [balanceBefore]);
+        await tokenBalancesAreEqual(
+          erc20,
+          [GNOSIS_SAFE_ADDRESS],
+          [balanceBefore]
+        );
       });
 
       describe("test cases that need ERC20 spending approval for ephemeral account", () => {
@@ -248,12 +252,12 @@ describe("GnosisSafe", () => {
           await mineBlocks(provider, 1);
 
           const expectedBalance = balanceBefore.sub(SMALL_AMOUNT);
-          await confirmBalances(
+          await tokenBalancesAreEqual(
             erc20,
             [GNOSIS_SAFE_ADDRESS],
             [expectedBalance]
           );
-          await confirmBalances(erc20, [toAddress], [SMALL_AMOUNT]);
+          await tokenBalancesAreEqual(erc20, [toAddress], [SMALL_AMOUNT]);
         });
       });
     });
@@ -264,7 +268,7 @@ describe("GnosisSafe", () => {
 
     beforeEach("faucet", async () => {
       await erc721Faucet(nft, minter, GNOSIS_SAFE_ADDRESS, tokenId);
-      await confirmBalances(nft, [GNOSIS_SAFE_ADDRESS], [1]);
+      await tokenBalancesAreEqual(nft, [GNOSIS_SAFE_ADDRESS], [1]);
     });
 
     it("contract-based account should send NFT tokens to someone", async () => {
@@ -276,8 +280,8 @@ describe("GnosisSafe", () => {
       const action = gnosisSafe.transferNFT(tokenAddress, toAddress, tokenId);
       await action.waitForNonceToUpdate();
 
-      await confirmBalances(nft, [GNOSIS_SAFE_ADDRESS], [ZERO]);
-      await confirmBalances(nft, [toAddress], [1]);
+      await tokenBalancesAreEqual(nft, [GNOSIS_SAFE_ADDRESS], [ZERO]);
+      await tokenBalancesAreEqual(nft, [toAddress], [1]);
     });
   });
 });
