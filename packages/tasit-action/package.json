@@ -1,6 +1,6 @@
 {
   "name": "tasit-action",
-  "version": "0.0.13",
+  "version": "0.0.14",
   "description": "A library for using Ethereum smart contracts that abstracts away the low-level blockchain-related details so that developers can focus on the core business logic for their app",
   "main": "dist/index.js",
   "keywords": [
@@ -27,7 +27,7 @@
   "dependencies": {
     "@babel/runtime": "^7.1.5",
     "ethers": "^4.0.27",
-    "tasit-contracts": "^0.0.13"
+    "tasit-contracts": "^0.0.14"
   },
   "devDependencies": {
     "@babel/cli": "^7.1.5",
@@ -39,6 +39,6 @@
     "chai-as-promised": "^7.1.1",
     "mocha": "^6.0.2",
     "sinon": "^7.2.5",
-    "tasit-account": "^0.0.13"
+    "tasit-account": "^0.0.14"
   }
 }
