@@ -30,17 +30,15 @@ export const pickAssetsForSale = async () => {
   let estateForSale;
 
   const decentralandUtils = new DecentralandUtils();
-  const { getOpenSellOrders } = decentralandUtils;
+  const { getAllAssetsForSale } = decentralandUtils;
 
-  const fromBlock = 0;
-  const openSellOrders = await getOpenSellOrders(fromBlock);
+  const openSellOrders = await getAllAssetsForSale();
 
   // Note: The exact amount of land isn't predictable since we are forking from the latest block
   expect(openSellOrders).to.not.be.empty;
 
   // Pick two open sell orders: one for a parcel of land and one for an estate
-  for (let sellOrder of openSellOrders) {
-    const { values: order } = sellOrder;
+  for (let order of openSellOrders) {
     const { nftAddress, expiresAt } = order;
 
     const isLand = addressesAreEqual(nftAddress, LAND_PROXY_ADDRESS);
