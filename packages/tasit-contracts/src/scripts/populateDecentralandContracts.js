@@ -23,7 +23,7 @@ import fs from "fs";
 
 import { duration } from "../../../tasit-sdk/dist/testHelpers/helpers";
 
-const { ONE, TEN, ONE_HUNDRED, ONE_THOUSAND, BILLION } = constants;
+const { ONE, TEN, ONE_HUNDRED, ONE_THOUSAND, BILLION, WeiPerEther } = constants;
 
 const createMultipleParcels = async (
   landContract,
@@ -121,14 +121,22 @@ const approveMarketplace = async (
   await landApproval.waitForNonceToUpdate();
 };
 
+function getRandomInt(min, max) {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min)) + min; //The maximum is exclusive and the minimum is inclusive
+}
+
 const placeEstatesSellOrders = async (
   marketplace,
   estateAddress,
   estateIds,
-  priceInWei,
   expireAt,
   sellerWallet
 ) => {
+  const price = getRandomInt(10, 100) + "000";
+  const priceInWei = bigNumberify(price).mul(WeiPerEther);
+
   marketplace.setWallet(sellerWallet);
   for (let assetId of estateIds) {
     const action = marketplace.createOrder(
@@ -146,10 +154,12 @@ const placeParcelsSellOrders = async (
   marketplace,
   landAddress,
   landIds,
-  priceInWei,
   expireAt,
   sellerWallet
 ) => {
+  const price = getRandomInt(10, 100) + "000";
+  const priceInWei = bigNumberify(price).mul(WeiPerEther);
+
   marketplace.setWallet(sellerWallet);
   for (let assetId of landIds) {
     const action = marketplace.createOrder(
@@ -305,7 +315,6 @@ let network = process.env.NETWORK;
       sellerWallet
     );
 
-    const priceInWei = `${ONE}`;
     const expireAt = Date.now() + duration.years(5);
 
     console.log("Placing estates sellorders...");
@@ -313,7 +322,6 @@ let network = process.env.NETWORK;
       marketplaceContract,
       ESTATE_ADDRESS,
       allEstateIds,
-      priceInWei,
       expireAt,
       sellerWallet
     );
@@ -326,7 +334,6 @@ let network = process.env.NETWORK;
       marketplaceContract,
       LAND_PROXY_ADDRESS,
       landIdsToSell,
-      priceInWei,
       expireAt,
       sellerWallet
     );
