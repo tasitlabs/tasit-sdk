@@ -25,6 +25,7 @@ const { bigNumberify } = ethersUtils;
 // See more: https://github.com/ethers-io/ethers.js/issues/228
 const ZERO = 0;
 const ONE = bigNumberify(1).mul(WeiPerEther);
+const TWO = bigNumberify(2).mul(WeiPerEther);
 const TEN = bigNumberify(10).mul(WeiPerEther);
 const ONE_HUNDRED = bigNumberify(100).mul(WeiPerEther);
 const ONE_THOUSAND = bigNumberify(1000).mul(WeiPerEther);
@@ -33,6 +34,7 @@ const BILLION = bigNumberify(`${1e9}`).mul(WeiPerEther);
 const constants = {
   ZERO,
   ONE,
+  TWO,
   TEN,
   ONE_HUNDRED,
   ONE_THOUSAND,
@@ -127,7 +129,7 @@ const expectMinimumEtherBalances = async (provider, addresses, balances) => {
     const balance = await provider.getBalance(address);
     const actual = bigNumberify(balance);
     const expected = bigNumberify(balances[index++]);
-    expect(actual.gte(expected)).to.be.true;
+    expect(actual.gte(expected), `${actual} isn't >= ${expected}`).to.be.true;
   }
 };
 
@@ -138,7 +140,7 @@ const expectMinimumTokenBalances = async (token, addresses, balances) => {
     const balance = await token.balanceOf(address);
     const actual = bigNumberify(balance);
     const expected = bigNumberify(balances[index++]);
-    expect(actual.gte(expected)).to.be.true;
+    expect(actual.gte(expected), `${actual} isn't >= ${expected}`).to.be.true;
   }
 };
 

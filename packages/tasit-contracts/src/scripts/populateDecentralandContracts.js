@@ -23,7 +23,7 @@ import fs from "fs";
 
 import { duration } from "../../../tasit-sdk/dist/testHelpers/helpers";
 
-const { ONE, TEN, ONE_HUNDRED, ONE_THOUSAND } = constants;
+const { ONE, TEN, ONE_HUNDRED, ONE_THOUSAND, BILLION } = constants;
 
 const createMultipleParcels = async (
   landContract,
@@ -203,13 +203,8 @@ let network = process.env.NETWORK;
 
   // Fund Gnosis Safe wallet with Mana tokens and ethers
   const provider = ProviderFactory.getProvider();
-  await etherFaucet(provider, minterWallet, GNOSIS_SAFE_ADDRESS, ONE);
-  await erc20Faucet(
-    manaContract,
-    minterWallet,
-    GNOSIS_SAFE_ADDRESS,
-    ONE_THOUSAND
-  );
+  await etherFaucet(provider, minterWallet, GNOSIS_SAFE_ADDRESS, TEN);
+  await erc20Faucet(manaContract, minterWallet, GNOSIS_SAFE_ADDRESS, BILLION);
 
   const allParcels = [
     // Estate: all road adjacent parcels
