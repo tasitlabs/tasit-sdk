@@ -46,6 +46,7 @@ const createMultipleParcels = async (
     beneficiaryAddress,
     gasParams
   );
+
   await assignAction.waitForNonceToUpdate();
 };
 
@@ -189,18 +190,25 @@ const getParcels = async () => {
     },
   ];
 
-  // const res = await fetch(
-  //   "https://api.decentraland.org/v1/parcels?status=open&limit=50"
-  // );
-  // const json = await res.json();
-  // const { data: jsonData } = json;
-  // const { parcels: parcelsFromAPI } = jsonData;
-  //
-  // parcelsFromAPI.map(parcel => {
-  //   const { x, y, data } = parcel;
-  //   const { name: metadata } = data;
-  //   parcels = [...parcels, { x, y, metadata }];
-  // });
+  const res = await fetch(
+    "https://api.decentraland.org/v1/parcels?status=open&limit=50"
+  );
+  const json = await res.json();
+  const { data: jsonData } = json;
+  const { parcels: parcelsFromAPI } = jsonData;
+
+  // Note: Since the current test net contract was populated with the assets above,
+  // this check is necessary. From a new deployment we should keep on this function
+  // assets only from Decentraland API
+  const withoutDuplicates = parcelsFromAPI.filter(
+    fromAPI => !parcels.find(p => p.x == fromAPI.x && p.y == fromAPI.y)
+  );
+
+  withoutDuplicates.map(parcel => {
+    const { x, y, data } = parcel;
+    const { name: metadata } = data;
+    parcels = [...parcels, { x, y, metadata }];
+  });
 
   return parcels;
 };
@@ -329,7 +337,9 @@ const getEstates = async () => {
     console.log("Updating parcels with metadata...");
     landContract.setWallet(sellerWallet);
     for (let parcel of allParcels) {
-      const { x, y, metadata: parcelName } = parcel;
+      let { x, y, metadata: parcelName } = parcel;
+      if (!parcelName) parcelName = "";
+      console.log(`Updating ${x},${y}`);
       const updateAction = landContract.updateLandData(x, y, parcelName);
       await updateAction.waitForNonceToUpdate();
     }
@@ -361,14 +371,11 @@ const getEstates = async () => {
       sellerWallet
     );
 
-    // All unique parcels
-    const landIdsToSell = allParcelsIds.slice(13, 19);
-
     console.log("Placing parcels sellorders...");
     await placeParcelsSellOrders(
       marketplaceContract,
       LAND_PROXY_ADDRESS,
-      landIdsToSell,
+      allParcelsIds,
       expireAt,
       sellerWallet
     );
