@@ -43,8 +43,8 @@ describe("Decentraland App pre-conditions", () => {
   });
 
   describe("Marketplace", () => {
-    it("should have at least 50 assets for sale", async () => {
-      expect(assetsForSale.length).to.be.at.least(50);
+    it("should have at least 100 assets for sale", async () => {
+      expect(assetsForSale.length).to.be.at.least(100);
     });
   });
 

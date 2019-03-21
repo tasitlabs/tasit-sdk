@@ -73,12 +73,34 @@ const provider = ProviderFactory.getProvider();
     // Data created by hand and previously added to the contracts
     await populateDecentralandContractsWithInitialData();
 
+    await cancelInitialOrders();
+
     // Additional data created based on Decentraland API
     await populateDecentralandContractsWithAdditionalData();
   } catch (err) {
     console.error(err);
   }
 })();
+
+const cancelInitialOrders = async () => {
+  const uniqueParcels = getInitialParcels();
+  const estates = getInitialEstates();
+
+  const parcelIds = await getIdsFromParcels(uniqueParcels);
+  const estateIds = [...Array(estates.length).keys()].map(n => n + 1);
+
+  for (let id of parcelIds) await cancelSellOrder(LAND_PROXY_ADDRESS, id);
+  for (let id of estateIds) await cancelSellOrder(ESTATE_ADDRESS, id);
+};
+
+const cancelSellOrder = async (nftAddress, id) => {
+  const action = marketplaceContract.cancelOrder(
+    nftAddress,
+    `${id}`,
+    gasParams
+  );
+  await action.waitForNonceToUpdate();
+};
 
 const cancelOrdersOfEstatesWithoutImage = async estatesIds => {
   const getImageDataFromEstateId = async id => {
@@ -101,12 +123,7 @@ const cancelOrdersOfEstatesWithoutImage = async estatesIds => {
         `Removing order of estate (id: ${id}) because it's with a blank image.`
       );
 
-      const action = marketplaceContract.cancelOrder(
-        ESTATE_ADDRESS,
-        `${id}`,
-        gasParams
-      );
-      await action.waitForNonceToUpdate();
+      await cancelSellOrder(ESTATE_ADDRESS, id);
     }
   }
 };
@@ -146,6 +163,7 @@ const populateDecentralandContractsWithAdditionalData = async () => {
   const estatesIds = [...Array(estatesAmount).keys()].map(n => n + 1);
 
   await cancelOrdersOfEstatesWithoutImage(estatesIds);
+  await cancelInitialOrders();
 };
 
 const getAllInitialParcels = () => {
@@ -168,20 +186,11 @@ const populateDecentralandContractsWithInitialData = async () => {
 const populateDecentralandContracts = async (parcels, estates) => {
   const parcelIds = await createParcels(parcels);
 
-  // const parcelIds = parcels.map(async parcel => {
-  //   const { x, y } = parcel;
-  //   return await landContract.encodeTokenId(x, y);
-  // });
-
   await updateParcelsData(parcels);
 
   const estateIds = await createEstates(estates);
 
   await approveMarketplace();
-
-  // await placeEstatesSellOrders(estateIds);
-  //
-  // await placeParcelsSellOrders(parcelIds);
 
   await placeAssesOrders(estateIds, parcelIds);
 };
@@ -200,12 +209,12 @@ const updateParcelsData = async parcels => {
 };
 
 const getIdsFromParcels = async parcels => {
-  const parcelIds = parcels.map(parcel => {
+  const parcelIds = [];
+  for (let parcel of parcels) {
     const { x, y } = parcel;
-    return landContract.encodeTokenId(`${x}`, `${y}`);
-  });
-
-  await Promise.all(parcelIds);
+    const id = await landContract.encodeTokenId(`${x}`, `${y}`);
+    parcelIds.push(id);
+  }
 
   return parcelIds;
 };
@@ -405,7 +414,7 @@ const getInitialEstates = () => {
 
 const getParcelsFromAPI = async () => {
   const res = await fetch(
-    "https://api.decentraland.org/v1/parcels?status=open&limit=200"
+    "https://api.decentraland.org/v1/parcels?status=open&limit=100"
   );
   const json = await res.json();
   const { data: jsonData } = json;
@@ -457,7 +466,7 @@ const estateContainsParcelFromList = (estate, listOfParcels) => {
 
 const getEstatesFromAPI = async () => {
   const res = await fetch(
-    "https://api.decentraland.org/v1/estates?status=open&limit=200"
+    "https://api.decentraland.org/v1/estates?status=open&limit=100"
   );
   const json = await res.json();
   const { data: jsonData } = json;
@@ -485,5 +494,8 @@ const getEstatesFromAPI = async () => {
       }
   }
 
-  return withoutDuplicates.filter(e => e.parcels.length < 10);
+  // Keep estates with small number of parcels to avoid out-of-gas on creation
+  withoutDuplicates = withoutDuplicates.filter(e => e.parcels.length < 10);
+
+  return withoutDuplicates;
 };
