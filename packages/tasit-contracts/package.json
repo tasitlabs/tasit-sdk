@@ -26,7 +26,7 @@
     "install:3rd-parties": "./3rd-parties/run_on_all.sh install `pwd`",
     "compile:3rd-parties": "./3rd-parties/run_on_all.sh compile `pwd`",
     "clean:3rd-parties": "./3rd-parties/run_on_all.sh clean `pwd`",
-    "populate-contracts": "NETWORK=development npx babel-node src/scripts/populateDecentralandContracts.js && NETWORK=development npx babel-node src/scripts/populateDecentralandContracts_append.js"
+    "populate-contracts": "NETWORK=development npx babel-node src/scripts/populateDecentralandContracts.js"
   },
   "bugs": {
     "url": "https://github.com/tasitlabs/tasitsdk/issues"

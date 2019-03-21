@@ -25,33 +25,165 @@ import { duration } from "../../../tasit-sdk/dist/testHelpers/helpers";
 
 const { ONE, TEN, ONE_HUNDRED, ONE_THOUSAND, BILLION, WeiPerEther } = constants;
 
-const createMultipleParcels = async (
-  landContract,
-  parcels,
-  beneficiaryAddress,
-  contractOwnerWallet
-) => {
-  let xArray = [];
-  let yArray = [];
+let network = process.env.NETWORK;
 
-  parcels.forEach(parcel => {
-    xArray.push(parcel.x);
-    yArray.push(parcel.y);
+const config = require(`../config/${network}.js`);
+
+// https://stats.goerli.net/
+if (network === "goerli")
+  gasParams = {
+    gasLimit: 8e6,
+    gasPrice: 1e10,
+  };
+else if (network === "development") {
+  network = "local";
+}
+const {
+  LANDProxy,
+  EstateRegistry,
+  Marketplace,
+  GnosisSafe: GnosisSafeInfo,
+  MANAToken,
+} = TasitContracts[network];
+const { address: MANA_ADDRESS } = MANAToken;
+const { address: LAND_PROXY_ADDRESS } = LANDProxy;
+const { address: ESTATE_ADDRESS } = EstateRegistry;
+const { address: MARKETPLACE_ADDRESS } = Marketplace;
+const { address: GNOSIS_SAFE_ADDRESS } = GnosisSafeInfo;
+
+ConfigLoader.setConfig(config);
+
+const [minterWallet, sellerWallet] = accounts;
+const { address: sellerAddress } = sellerWallet;
+
+const manaContract = new Mana(MANA_ADDRESS);
+const landContract = new Land(LAND_PROXY_ADDRESS);
+const estateContract = new Estate(ESTATE_ADDRESS);
+const marketplaceContract = new Decentraland(MARKETPLACE_ADDRESS);
+const gnosisSafeContract = new GnosisSafe(GNOSIS_SAFE_ADDRESS);
+
+const provider = ProviderFactory.getProvider();
+
+(async () => {
+  // Fund Gnosis Safe wallet with Mana tokens and ethers
+  await etherFaucet(provider, minterWallet, GNOSIS_SAFE_ADDRESS, TEN);
+  await erc20Faucet(manaContract, minterWallet, GNOSIS_SAFE_ADDRESS, BILLION);
+
+  try {
+    await populateDecentralandContractsWithInitialData();
+    console.log("hey");
+    await populateDecentralandContractsWithAdditionalData();
+  } catch (err) {
+    console.error(err);
+  }
+})();
+
+const populateDecentralandContractsWithAdditionalData = async () => {
+  const parcelsFromAPI = await getParcelsFromAPI();
+  const estatesFromAPI = await getEstatesFromAPI();
+
+  let parcelsToCreate = [...parcelsFromAPI];
+  //let estatesToCreate = [];
+  let allEstates = [...estatesFromAPI];
+
+  // Extract parcels from estates
+  estatesFromAPI.forEach(estate => {
+    const { parcels } = estate;
+    const withoutDup = parcels.filter(p => !findParcel(p, parcelsFromAPI));
+    parcelsToCreate = [...parcelsToCreate, ...withoutDup];
   });
 
-  landContract.setWallet(contractOwnerWallet);
-  const assignAction = landContract.assignMultipleParcels(
-    xArray,
-    yArray,
-    beneficiaryAddress,
-    gasParams
-  );
-  await assignAction.waitForNonceToUpdate();
+  await populateDecentralandContracts(parcelsToCreate, allEstates);
 };
 
-const createEstate = async (estateContract, landContract, estate, wallet) => {
+const populateDecentralandContractsWithInitialData = async () => {
+  const uniqueParcels = getInitialParcels();
+  const allEstates = getInitialEstates();
+
+  let allParcels = [];
+  allEstates.forEach(
+    estate => (allParcels = [...allParcels, ...estate.parcels])
+  );
+  allParcels = [...allParcels, ...uniqueParcels];
+
+  await populateDecentralandContracts(allParcels, allEstates);
+};
+
+const populateDecentralandContracts = async (parcels, estates) => {
+  const allParcelsIds = await createParcels(parcels);
+
+  await updateParcelsData(parcels);
+
+  const allEstateIds = await createEstates(estates);
+
+  await approveMarketplace();
+
+  await placeEstatesSellOrders(allEstateIds);
+
+  // All unique parcels
+  const landIdsToSell = allParcelsIds.slice(13, 19);
+  await placeParcelsSellOrders(landIdsToSell);
+};
+
+const updateParcelsData = async parcels => {
+  console.log("Updating parcels with metadata...");
+
+  landContract.setWallet(sellerWallet);
+  for (let parcel of parcels) {
+    let { x, y, metadata: parcelName } = parcel;
+    if (!parcelName) parcelName = "";
+    const updateAction = landContract.updateLandData(x, y, parcelName);
+    await updateAction.waitForNonceToUpdate();
+  }
+};
+
+const createParcels = async parcels => {
+  console.log("Creating parcels...");
+
+  landContract.setWallet(minterWallet);
+
+  // let xArray = [];
+  // let yArray = [];
+  //
+  // parcels.forEach(parcel => {
+  //   xArray.push(parcel.x);
+  //   yArray.push(parcel.y);
+  // });
+  //
+  // const assignAction = landContract.assignMultipleParcels(
+  //   xArray,
+  //   yArray,
+  //   sellerAddress,
+  //   gasParams
+  // );
+  // await assignAction.waitForNonceToUpdate();
+
+  for (let parcel of parcels) {
+    const { x, y } = parcel;
+    console.log(`creating parcel ${x},${y}....`);
+    const assignAction = landContract.assignNewParcel(
+      `${x}`,
+      `${y}`,
+      sellerAddress,
+      gasParams
+    );
+
+    await assignAction.waitForNonceToUpdate();
+  }
+
+  const parcelsIds = parcels.map(async parcel => {
+    const { x, y } = parcel;
+    return landContract.encodeTokenId(x, y);
+  });
+  await Promise.all(parcelsIds);
+  return parcelsIds;
+};
+
+const createEstate = async estate => {
+  console.log("Creating estates...");
+
   const { metadata: estateName, parcels } = estate;
-  const { address: beneficiaryAddress } = wallet;
+  const { address: beneficiaryAddress } = sellerWallet;
 
   let xArray = [];
   let yArray = [];
@@ -63,7 +195,7 @@ const createEstate = async (estateContract, landContract, estate, wallet) => {
 
   console.log(`creating estate.... ${xArray} - ${yArray}`);
 
-  landContract.setWallet(wallet);
+  landContract.setWallet(sellerWallet);
   const action = landContract.createEstateWithMetadata(
     xArray,
     yArray,
@@ -86,35 +218,32 @@ const createEstate = async (estateContract, landContract, estate, wallet) => {
   return estateId;
 };
 
-const createEstates = async (estateContract, landContract, estates, wallet) => {
+const createEstates = async estates => {
   const estateIds = [];
   for (let estate of estates) {
-    const id = await createEstate(estateContract, landContract, estate, wallet);
+    const id = await createEstate(estate, sellerWallet);
     estateIds.push(id);
   }
   return estateIds;
 };
 
-const approveMarketplace = async (
-  marketplaceAddress,
-  landContract,
-  estateContract,
-  assetsOwnerWallet
-) => {
+const approveMarketplace = async () => {
+  console.log("Approving Marketplace...");
+
   // Set false to remove approval
   const authorized = true;
 
-  estateContract.setWallet(assetsOwnerWallet);
+  estateContract.setWallet(sellerWallet);
   const estateApproval = estateContract.setApprovalForAll(
-    marketplaceAddress,
+    MARKETPLACE_ADDRESS,
     authorized,
     gasParams
   );
   await estateApproval.waitForNonceToUpdate();
 
-  landContract.setWallet(assetsOwnerWallet);
+  landContract.setWallet(sellerWallet);
   const landApproval = landContract.setApprovalForAll(
-    marketplaceAddress,
+    MARKETPLACE_ADDRESS,
     authorized,
     gasParams
   );
@@ -124,23 +253,20 @@ const approveMarketplace = async (
 function getRandomInt(min, max) {
   min = Math.ceil(min);
   max = Math.floor(max);
-  return Math.floor(Math.random() * (max - min)) + min; //The maximum is exclusive and the minimum is inclusive
+  return Math.floor(Math.random() * (max - min)) + min;
 }
 
-const placeEstatesSellOrders = async (
-  marketplace,
-  estateAddress,
-  estateIds,
-  expireAt,
-  sellerWallet
-) => {
+const placeEstatesSellOrders = async estateIds => {
+  console.log("Placing estates sellorders...");
+
+  const expireAt = Date.now() + duration.years(5);
   const price = getRandomInt(10, 100) + "000";
   const priceInWei = bigNumberify(price).mul(WeiPerEther);
 
-  marketplace.setWallet(sellerWallet);
+  marketplaceContract.setWallet(sellerWallet);
   for (let assetId of estateIds) {
-    const action = marketplace.createOrder(
-      estateAddress,
+    const action = marketplaceContract.createOrder(
+      ESTATE_ADDRESS,
       assetId,
       priceInWei,
       expireAt,
@@ -150,20 +276,17 @@ const placeEstatesSellOrders = async (
   }
 };
 
-const placeParcelsSellOrders = async (
-  marketplace,
-  landAddress,
-  landIds,
-  expireAt,
-  sellerWallet
-) => {
+const placeParcelsSellOrders = async landIds => {
+  console.log("Placing parcels sellorders...");
+
+  const expireAt = Date.now() + duration.years(5);
   const price = getRandomInt(10, 100) + "000";
   const priceInWei = bigNumberify(price).mul(WeiPerEther);
 
-  marketplace.setWallet(sellerWallet);
+  marketplaceContract.setWallet(sellerWallet);
   for (let assetId of landIds) {
-    const action = marketplace.createOrder(
-      landAddress,
+    const action = marketplaceContract.createOrder(
+      LAND_PROXY_ADDRESS,
       assetId,
       priceInWei,
       expireAt,
@@ -173,9 +296,7 @@ const placeParcelsSellOrders = async (
   }
 };
 
-let network = process.env.NETWORK;
-
-const getParcels = async () => {
+const getInitialParcels = () => {
   let parcels = [
     { x: -20, y: 36, metadata: `Premium Downtown,road adjacent,central area.` },
     { x: -61, y: 125, metadata: `Vegas/Univeristy` },
@@ -192,7 +313,7 @@ const getParcels = async () => {
   return parcels;
 };
 
-const getEstates = async () => {
+const getInitialEstates = () => {
   let estates = [
     {
       metadata: `all road adjacent parcels`,
@@ -234,120 +355,100 @@ const getEstates = async () => {
   return estates;
 };
 
-(async () => {
-  const config = require(`../config/${network}.js`);
+const getAllInitialParcels = () => {
+  const uniqueParcels = getInitialParcels();
+  const estates = getInitialEstates();
 
-  // https://stats.goerli.net/
-  if (network === "goerli")
-    gasParams = {
-      gasLimit: 8e6,
-      gasPrice: 1e10,
-    };
-  else if (network === "development") {
-    network = "local";
-  }
-  const {
-    LANDProxy,
-    EstateRegistry,
-    Marketplace,
-    GnosisSafe: GnosisSafeInfo,
-    MANAToken,
-  } = TasitContracts[network];
-  const { address: MANA_ADDRESS } = MANAToken;
-  const { address: LAND_PROXY_ADDRESS } = LANDProxy;
-  const { address: ESTATE_ADDRESS } = EstateRegistry;
-  const { address: MARKETPLACE_ADDRESS } = Marketplace;
-  const { address: GNOSIS_SAFE_ADDRESS } = GnosisSafeInfo;
+  let estatesParcels = [];
 
-  ConfigLoader.setConfig(config);
-
-  const [minterWallet, sellerWallet] = accounts;
-  const { address: sellerAddress } = sellerWallet;
-
-  const manaContract = new Mana(MANA_ADDRESS);
-  const landContract = new Land(LAND_PROXY_ADDRESS);
-  const estateContract = new Estate(ESTATE_ADDRESS);
-  const marketplaceContract = new Decentraland(MARKETPLACE_ADDRESS);
-  const gnosisSafeContract = new GnosisSafe(GNOSIS_SAFE_ADDRESS);
-
-  // Fund Gnosis Safe wallet with Mana tokens and ethers
-  const provider = ProviderFactory.getProvider();
-  await etherFaucet(provider, minterWallet, GNOSIS_SAFE_ADDRESS, TEN);
-  await erc20Faucet(manaContract, minterWallet, GNOSIS_SAFE_ADDRESS, BILLION);
-
-  const uniqueParcels = await getParcels();
-  const allEstates = await getEstates();
-  let allParcels = [];
-  allEstates.forEach(
-    estate => (allParcels = [...allParcels, ...estate.parcels])
+  estates.forEach(
+    estate => (estatesParcels = [...estatesParcels, ...estate.parcels])
   );
-  allParcels = [...allParcels, ...uniqueParcels];
 
-  try {
-    console.log("Creating parcels...");
-    await createMultipleParcels(
-      landContract,
-      allParcels,
-      sellerAddress,
-      minterWallet
-    );
+  return [...estatesParcels, ...uniqueParcels];
+};
 
-    const allParcelsIds = allParcels.map(async parcel => {
-      const { x, y } = parcel;
-      return landContract.encodeTokenId(x, y);
-    });
+const getParcelsFromAPI = async () => {
+  const res = await fetch(
+    "https://api.decentraland.org/v1/parcels?status=open&limit=100"
+  );
+  const json = await res.json();
+  const { data: jsonData } = json;
+  const { parcels: parcelsFromAPI } = jsonData;
 
-    await Promise.all(allParcelsIds);
+  const parcels = parcelsFromAPI.map(parcel => {
+    const { x, y, data } = parcel;
+    let { name: metadata } = data;
+    if (!metadata) metadata = "";
+    return { x, y, metadata };
+  });
 
-    // Update parcels with metadata
-    console.log("Updating parcels with metadata...");
-    landContract.setWallet(sellerWallet);
-    for (let parcel of allParcels) {
-      let { x, y, metadata: parcelName } = parcel;
-      if (!parcelName) parcelName = "";
-      const updateAction = landContract.updateLandData(x, y, parcelName);
-      await updateAction.waitForNonceToUpdate();
+  // Note: Since the current test net contract was populated with the assets, this check is necessary.
+  const createdParcels = getAllInitialParcels();
+  const withoutDuplicates = parcels.filter(
+    fromAPI => !createdParcels.find(p => p.x == fromAPI.x && p.y == fromAPI.y)
+  );
+
+  return withoutDuplicates;
+};
+
+const parcelsAreEqual = (p1, p2) => p1.x === p2.x && p1.y === p2.y;
+
+const findParcel = (parcel, listOfParcels) => {
+  return listOfParcels.find(p => parcelsAreEqual(p, parcel));
+};
+
+// Tech-debt: Move to a functional approach
+const estatesWithConflict = (estate1, estate2) => {
+  const { parcels: parcels1 } = estate1;
+  const { parcels: parcels2 } = estate2;
+  for (let p1 of parcels1) {
+    for (let p2 of parcels2) {
+      if (parcelsAreEqual(p1, p2)) return true;
     }
-
-    console.log("Creating estates...");
-    const allEstateIds = await createEstates(
-      estateContract,
-      landContract,
-      allEstates,
-      sellerWallet
-    );
-
-    console.log("Approving Marketplace...");
-    await approveMarketplace(
-      MARKETPLACE_ADDRESS,
-      landContract,
-      estateContract,
-      sellerWallet
-    );
-
-    const expireAt = Date.now() + duration.years(5);
-
-    console.log("Placing estates sellorders...");
-    await placeEstatesSellOrders(
-      marketplaceContract,
-      ESTATE_ADDRESS,
-      allEstateIds,
-      expireAt,
-      sellerWallet
-    );
-
-    // All unique parcels
-    const landIdsToSell = allParcelsIds.slice(13, 19);
-
-    console.log("Placing parcels sellorders...");
-    await placeParcelsSellOrders(
-      marketplaceContract,
-      LAND_PROXY_ADDRESS,
-      landIdsToSell,
-      expireAt,
-      sellerWallet
-    );
-  } catch (err) {
-    console.error(err);
   }
-})();
+
+  return false;
+};
+
+const estateContainsParcelFromList = (estate, listOfParcels) => {
+  const { parcels: estateParcels } = estate;
+
+  for (let parcel of estateParcels)
+    if (findParcel(parcel, listOfParcels)) return true;
+
+  return false;
+};
+
+const getEstatesFromAPI = async () => {
+  const res = await fetch(
+    "https://api.decentraland.org/v1/estates?status=open&limit=100"
+  );
+  const json = await res.json();
+  const { data: jsonData } = json;
+  const { estates: estatesFromAPI } = jsonData;
+
+  let estates = estatesFromAPI.map(estate => {
+    const { data } = estate;
+    const { name: metadata, parcels } = data;
+    return { metadata, parcels };
+  });
+
+  const createdParcels = getAllInitialParcels();
+  estates = estates.filter(
+    estate => !estateContainsParcelFromList(estate, createdParcels)
+  );
+
+  const createdEstates = getInitialEstates();
+  let withoutDuplicates = [];
+  for (let e1 of estates) {
+    for (let e2 of createdEstates)
+      if (!estatesWithConflict(e1, e2)) {
+        withoutDuplicates = [...withoutDuplicates, e1];
+        break;
+      }
+  }
+
+  return withoutDuplicates.filter(e => e.parcels.length < 10);
+  //return [];
+};
