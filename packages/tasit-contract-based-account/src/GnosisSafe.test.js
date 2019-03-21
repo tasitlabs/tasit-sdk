@@ -72,7 +72,6 @@ describe("GnosisSafe", () => {
       const action = gnosisSafe.transferEther(toAddress, ONE);
       await action.waitForNonceToUpdate();
 
-      await expectExactEtherBalances(provider, [GNOSIS_SAFE_ADDRESS], [ZERO]);
       await expectExactEtherBalances(provider, [toAddress], [ONE]);
     });
 
