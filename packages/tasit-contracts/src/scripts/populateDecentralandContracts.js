@@ -168,15 +168,22 @@ const populateDecentralandContractsWithInitialData = async () => {
 const populateDecentralandContracts = async (parcels, estates) => {
   const parcelIds = await createParcels(parcels);
 
+  // const parcelIds = parcels.map(async parcel => {
+  //   const { x, y } = parcel;
+  //   return await landContract.encodeTokenId(x, y);
+  // });
+
   await updateParcelsData(parcels);
 
   const estateIds = await createEstates(estates);
 
   await approveMarketplace();
 
-  await placeEstatesSellOrders(estateIds);
+  // await placeEstatesSellOrders(estateIds);
+  //
+  // await placeParcelsSellOrders(parcelIds);
 
-  await placeParcelsSellOrders(parcelIds);
+  await placeAssesOrders(estateIds, parcelIds);
 };
 
 const updateParcelsData = async parcels => {
@@ -193,42 +200,28 @@ const updateParcelsData = async parcels => {
 };
 
 const getIdsFromParcels = async parcels => {
-  const parcelsIds = parcels.map(parcel => {
+  const parcelIds = parcels.map(parcel => {
     const { x, y } = parcel;
-    return landContract.encodeTokenId(x, y);
+    return landContract.encodeTokenId(`${x}`, `${y}`);
   });
 
-  await Promise.all(parcelsIds);
+  await Promise.all(parcelIds);
 
-  return parcelsIds;
+  return parcelIds;
 };
 
+// Tech-debt: Use `assignMultipleParcels` to save gas cost.
+// The number of parcels per call should be short enough to avoid out-of-gas.
 const createParcels = async allParcels => {
   console.log("Creating parcels...");
 
-  const chunkArray = (myArray, chunkSize) => {
-    var results = [];
-    while (myArray.length) results.push(myArray.splice(0, chunkSize));
-    return results;
-  };
-
   landContract.setWallet(minterWallet);
 
-  // Note: Limiting size of each creation to avoid running out of gas
-  const maxAmountToCreateOnce = 25;
-  const parcelsBatches = chunkArray(allParcels, maxAmountToCreateOnce);
-  for (let parcels of parcelsBatches) {
-    let xArray = [];
-    let yArray = [];
-
-    parcels.forEach(parcel => {
-      xArray.push(parcel.x);
-      yArray.push(parcel.y);
-    });
-
-    const assignAction = landContract.assignMultipleParcels(
-      xArray,
-      yArray,
+  for (let parcel of allParcels) {
+    const { x, y } = parcel;
+    const assignAction = landContract.assignNewParcel(
+      `${x}`,
+      `${y}`,
       sellerAddress,
       gasParams
     );
@@ -316,18 +309,22 @@ function getRandomInt(min, max) {
   return Math.floor(Math.random() * (max - min)) + min;
 }
 
-const placeAssesOrders = async (estatesIds, parcelsIds) => {
-  const estateOrders = estatesIds.map(id => {
-    return async () => {};
+const placeAssesOrders = async (estateIds, parcelIds) => {
+  const shuffleArray = arr => arr.sort(() => Math.random() - 0.5);
+
+  const estatesToSell = estateIds.map(id => {
+    return { nftAddress: ESTATE_ADDRESS, id };
   });
-};
 
-const placeEstatesSellOrders = async estateIds => {
-  console.log("Placing estates sellorders...");
+  const parcelsToSell = parcelIds.map(id => {
+    return { nftAddress: LAND_PROXY_ADDRESS, id };
+  });
 
-  marketplaceContract.setWallet(sellerWallet);
-  for (let id of estateIds) {
-    await placeAssetSellOrder(ESTATE_ADDRESS, id);
+  const assetsToSell = shuffleArray([...estatesToSell, ...parcelsToSell]);
+
+  for (let asset of assetsToSell) {
+    const { nftAddress, id } = asset;
+    await placeAssetSellOrder(nftAddress, id);
   }
 };
 
@@ -345,14 +342,6 @@ const placeAssetSellOrder = async (nftAddress, assetId) => {
     gasParams
   );
   await action.waitForNonceToUpdate();
-};
-
-const placeParcelsSellOrders = async parcelsIds => {
-  console.log("Placing parcels sellorders...");
-
-  for (let id of parcelsIds) {
-    await placeAssetSellOrder(LAND_PROXY_ADDRESS, id);
-  }
 };
 
 const getInitialParcels = () => {
