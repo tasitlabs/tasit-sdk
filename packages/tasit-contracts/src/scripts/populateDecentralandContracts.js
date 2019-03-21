@@ -1,6 +1,6 @@
 // This script will add land parcels, estates and sell orders to the Decentraland marketplace
 // This data is being used to test the Decentraland demo app
-
+import fetch from "node-fetch";
 import TasitAction from "../../../tasit-action/dist/";
 const {
   ConfigLoader,
@@ -173,8 +173,10 @@ const placeParcelsSellOrders = async (
   }
 };
 
-const getParcels = () => {
-  const parcels = [
+let network = process.env.NETWORK;
+
+const getParcels = async () => {
+  let parcels = [
     { x: -20, y: 36, metadata: `Premium Downtown,road adjacent,central area.` },
     { x: -61, y: 125, metadata: `Vegas/Univeristy` },
     { x: 141, y: -122, metadata: `dePeets Place 6` },
@@ -187,11 +189,24 @@ const getParcels = () => {
     },
   ];
 
+  // const res = await fetch(
+  //   "https://api.decentraland.org/v1/parcels?status=open&limit=50"
+  // );
+  // const json = await res.json();
+  // const { data: jsonData } = json;
+  // const { parcels: parcelsFromAPI } = jsonData;
+  //
+  // parcelsFromAPI.map(parcel => {
+  //   const { x, y, data } = parcel;
+  //   const { name: metadata } = data;
+  //   parcels = [...parcels, { x, y, metadata }];
+  // });
+
   return parcels;
 };
 
-const getEstates = () => {
-  const estates = [
+const getEstates = async () => {
+  let estates = [
     {
       metadata: `all road adjacent parcels`,
       parcels: [
@@ -229,10 +244,21 @@ const getEstates = () => {
     },
   ];
 
+  // const res = await fetch(
+  //   "https://api.decentraland.org/v1/estates?status=open&limit=50"
+  // );
+  // const json = await res.json();
+  // const { data: jsonData } = json;
+  // const { estates: estatesFromAPI } = jsonData;
+  //
+  // estatesFromAPI.map(estate => {
+  //   const { data } = estate;
+  //   const { name: metadata, parcels } = data;
+  //   estates = [...estates, { metadata, parcels }];
+  // });
+
   return estates;
 };
-
-let network = process.env.NETWORK;
 
 (async () => {
   const config = require(`../config/${network}.js`);
@@ -275,8 +301,8 @@ let network = process.env.NETWORK;
   await etherFaucet(provider, minterWallet, GNOSIS_SAFE_ADDRESS, TEN);
   await erc20Faucet(manaContract, minterWallet, GNOSIS_SAFE_ADDRESS, BILLION);
 
-  const uniqueParcels = getParcels();
-  const allEstates = getEstates();
+  const uniqueParcels = await getParcels();
+  const allEstates = await getEstates();
   let allParcels = [];
   allEstates.forEach(
     estate => (allParcels = [...allParcels, ...estate.parcels])
@@ -294,8 +320,10 @@ let network = process.env.NETWORK;
 
     const allParcelsIds = allParcels.map(async parcel => {
       const { x, y } = parcel;
-      return await landContract.encodeTokenId(x, y);
+      return landContract.encodeTokenId(x, y);
     });
+
+    await Promise.all(allParcelsIds);
 
     // Update parcels with metadata
     console.log("Updating parcels with metadata...");

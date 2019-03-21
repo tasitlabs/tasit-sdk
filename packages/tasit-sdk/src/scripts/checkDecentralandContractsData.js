@@ -72,7 +72,10 @@ describe("Decentraland App pre-conditions", () => {
         `https://api.decentraland.org/v1/estates/${assetId}/map.png`
       );
       const imageData = (await image.buffer()).toString("base64");
-      expect(imageData).not.equals(blankImageData);
+      expect(
+        imageData,
+        `The image of the estate (id: ${assetId}) is blank`
+      ).not.equals(blankImageData);
     }
   });
 });
