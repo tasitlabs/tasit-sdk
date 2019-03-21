@@ -134,49 +134,51 @@ const populateDecentralandContractsWithAdditionalData = async () => {
     ...parcelsFromAPI,
     ...estatesParcelsWithoutDuplication,
   ];
+
   const estatesToCreate = [...estatesFromAPI];
-  // Extract parcels from estates
-  // estatesFromAPI.forEach(estate => {
-  //   const { parcels } = estate;
-  //   const withoutDup = parcels.filter(p => !findParcel(p, parcelsFromAPI));
-  //   parcelsToCreate = [...parcelsToCreate, ...withoutDup];
-  // });
 
   await populateDecentralandContracts(parcelsToCreate, estatesToCreate);
 
-  const estatesAmount = estatesToCreate.length + 5;
+  const alreadyCreatedEstates = getInitialEstates();
+  const estatesAmount = alreadyCreatedEstates.length + estatesToCreate.length;
+
+  // Creating an array of all estates ids
   const estatesIds = [...Array(estatesAmount).keys()].map(n => n + 1);
 
   await cancelOrdersOfEstatesWithoutImage(estatesIds);
 };
 
-const populateDecentralandContractsWithInitialData = async () => {
+const getAllInitialParcels = () => {
   const uniqueParcels = getInitialParcels();
-  const allEstates = getInitialEstates();
+  const estates = getInitialEstates();
 
-  let allParcels = [];
-  allEstates.forEach(
-    estate => (allParcels = [...allParcels, ...estate.parcels])
-  );
-  allParcels = [...allParcels, ...uniqueParcels];
+  const estatesParcels = extractParcelsFromEstates(estates);
+  const allParcels = [...estatesParcels, ...uniqueParcels];
 
-  await populateDecentralandContracts(allParcels, allEstates);
+  return allParcels;
+};
+
+const populateDecentralandContractsWithInitialData = async () => {
+  const allParcels = getAllInitialParcels();
+  const estates = getInitialEstates();
+
+  await populateDecentralandContracts(allParcels, estates);
 };
 
 const populateDecentralandContracts = async (parcels, estates) => {
-  const allParcelsIds = await createParcels(parcels);
+  const parcelIds = await createParcels(parcels);
 
   await updateParcelsData(parcels);
 
-  const allEstateIds = await createEstates(estates);
+  const estateIds = await createEstates(estates);
 
   await approveMarketplace();
 
-  await placeEstatesSellOrders(allEstateIds);
+  await placeEstatesSellOrders(estateIds);
 
   // All unique parcels
-  const landIdsToSell = allParcelsIds.slice(13, 19);
-  await placeParcelsSellOrders(landIdsToSell);
+  const parcelIdsToSell = parcelIds.slice(13, 19);
+  await placeParcelsSellOrders(parcelIdsToSell);
 };
 
 const updateParcelsData = async parcels => {
@@ -192,45 +194,45 @@ const updateParcelsData = async parcels => {
   }
 };
 
-const createParcels = async parcels => {
+const createParcels = async allParcels => {
   console.log("Creating parcels...");
+
+  const chunkArray = (myArray, chunkSize) => {
+    var results = [];
+    while (myArray.length) results.push(myArray.splice(0, chunkSize));
+    return results;
+  };
 
   landContract.setWallet(minterWallet);
 
-  // let xArray = [];
-  // let yArray = [];
-  //
-  // parcels.forEach(parcel => {
-  //   xArray.push(parcel.x);
-  //   yArray.push(parcel.y);
-  // });
-  //
-  // const assignAction = landContract.assignMultipleParcels(
-  //   xArray,
-  //   yArray,
-  //   sellerAddress,
-  //   gasParams
-  // );
-  // await assignAction.waitForNonceToUpdate();
+  // Note: Limiting size of each creation to avoid running out of gas
+  const maxAmountToCreateOnce = 25;
+  const parcelsBatches = chunkArray(allParcels, maxAmountToCreateOnce);
+  for (let parcels of parcelsBatches) {
+    let xArray = [];
+    let yArray = [];
 
-  for (let parcel of parcels) {
-    const { x, y } = parcel;
-    console.log(`creating parcel ${x},${y}....`);
-    const assignAction = landContract.assignNewParcel(
-      `${x}`,
-      `${y}`,
+    parcels.forEach(parcel => {
+      xArray.push(parcel.x);
+      yArray.push(parcel.y);
+    });
+
+    const assignAction = landContract.assignMultipleParcels(
+      xArray,
+      yArray,
       sellerAddress,
       gasParams
     );
-
     await assignAction.waitForNonceToUpdate();
   }
 
-  const parcelsIds = parcels.map(async parcel => {
+  const parcelsIds = allParcels.map(parcel => {
     const { x, y } = parcel;
     return landContract.encodeTokenId(x, y);
   });
+
   await Promise.all(parcelsIds);
+
   return parcelsIds;
 };
 
@@ -315,11 +317,12 @@ const placeEstatesSellOrders = async estateIds => {
   console.log("Placing estates sellorders...");
 
   const expireAt = Date.now() + duration.years(5);
-  const price = getRandomInt(10, 100) + "000";
-  const priceInWei = bigNumberify(price).mul(WeiPerEther);
 
   marketplaceContract.setWallet(sellerWallet);
   for (let assetId of estateIds) {
+    const price = getRandomInt(10, 100) + "000";
+    const priceInWei = bigNumberify(price).mul(WeiPerEther);
+
     const action = marketplaceContract.createOrder(
       ESTATE_ADDRESS,
       assetId,
@@ -335,11 +338,12 @@ const placeParcelsSellOrders = async landIds => {
   console.log("Placing parcels sellorders...");
 
   const expireAt = Date.now() + duration.years(5);
-  const price = getRandomInt(10, 100) + "000";
-  const priceInWei = bigNumberify(price).mul(WeiPerEther);
 
   marketplaceContract.setWallet(sellerWallet);
   for (let assetId of landIds) {
+    const price = getRandomInt(10, 100) + "000";
+    const priceInWei = bigNumberify(price).mul(WeiPerEther);
+
     const action = marketplaceContract.createOrder(
       LAND_PROXY_ADDRESS,
       assetId,
@@ -408,19 +412,6 @@ const getInitialEstates = () => {
   ];
 
   return estates;
-};
-
-const getAllInitialParcels = () => {
-  const uniqueParcels = getInitialParcels();
-  const estates = getInitialEstates();
-
-  let estatesParcels = [];
-
-  estates.forEach(
-    estate => (estatesParcels = [...estatesParcels, ...estate.parcels])
-  );
-
-  return [...estatesParcels, ...uniqueParcels];
 };
 
 const getParcelsFromAPI = async () => {
