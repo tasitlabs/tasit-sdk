@@ -176,9 +176,7 @@ const populateDecentralandContracts = async (parcels, estates) => {
 
   await placeEstatesSellOrders(estateIds);
 
-  // All unique parcels
-  const parcelIdsToSell = parcelIds.slice(13, 19);
-  await placeParcelsSellOrders(parcelIdsToSell);
+  await placeParcelsSellOrders(parcelIds);
 };
 
 const updateParcelsData = async parcels => {
@@ -192,6 +190,17 @@ const updateParcelsData = async parcels => {
       await updateAction.waitForNonceToUpdate();
     }
   }
+};
+
+const getIdsFromParcels = async parcels => {
+  const parcelsIds = parcels.map(parcel => {
+    const { x, y } = parcel;
+    return landContract.encodeTokenId(x, y);
+  });
+
+  await Promise.all(parcelsIds);
+
+  return parcelsIds;
 };
 
 const createParcels = async allParcels => {
@@ -226,19 +235,11 @@ const createParcels = async allParcels => {
     await assignAction.waitForNonceToUpdate();
   }
 
-  const parcelsIds = allParcels.map(parcel => {
-    const { x, y } = parcel;
-    return landContract.encodeTokenId(x, y);
-  });
-
-  await Promise.all(parcelsIds);
-
+  const parcelsIds = await getIdsFromParcels(allParcels);
   return parcelsIds;
 };
 
 const createEstate = async estate => {
-  console.log("Creating estates...");
-
   const { metadata: estateName, parcels } = estate;
   const { address: beneficiaryAddress } = sellerWallet;
 
@@ -276,6 +277,8 @@ const createEstate = async estate => {
 };
 
 const createEstates = async estates => {
+  console.log("Creating estates...");
+
   const estateIds = [];
   for (let estate of estates) {
     const id = await createEstate(estate, sellerWallet);
@@ -313,45 +316,42 @@ function getRandomInt(min, max) {
   return Math.floor(Math.random() * (max - min)) + min;
 }
 
+const placeAssesOrders = async (estatesIds, parcelsIds) => {
+  const estateOrders = estatesIds.map(id => {
+    return async () => {};
+  });
+};
+
 const placeEstatesSellOrders = async estateIds => {
   console.log("Placing estates sellorders...");
 
-  const expireAt = Date.now() + duration.years(5);
-
   marketplaceContract.setWallet(sellerWallet);
-  for (let assetId of estateIds) {
-    const price = getRandomInt(10, 100) + "000";
-    const priceInWei = bigNumberify(price).mul(WeiPerEther);
-
-    const action = marketplaceContract.createOrder(
-      ESTATE_ADDRESS,
-      assetId,
-      priceInWei,
-      expireAt,
-      gasParams
-    );
-    await action.waitForNonceToUpdate();
+  for (let id of estateIds) {
+    await placeAssetSellOrder(ESTATE_ADDRESS, id);
   }
 };
 
-const placeParcelsSellOrders = async landIds => {
+const placeAssetSellOrder = async (nftAddress, assetId) => {
+  marketplaceContract.setWallet(sellerWallet);
+  const expireAt = Date.now() + duration.years(5);
+  const price = getRandomInt(10, 100) + "000";
+  const priceInWei = bigNumberify(price).mul(WeiPerEther);
+
+  const action = marketplaceContract.createOrder(
+    nftAddress,
+    assetId,
+    priceInWei,
+    expireAt,
+    gasParams
+  );
+  await action.waitForNonceToUpdate();
+};
+
+const placeParcelsSellOrders = async parcelsIds => {
   console.log("Placing parcels sellorders...");
 
-  const expireAt = Date.now() + duration.years(5);
-
-  marketplaceContract.setWallet(sellerWallet);
-  for (let assetId of landIds) {
-    const price = getRandomInt(10, 100) + "000";
-    const priceInWei = bigNumberify(price).mul(WeiPerEther);
-
-    const action = marketplaceContract.createOrder(
-      LAND_PROXY_ADDRESS,
-      assetId,
-      priceInWei,
-      expireAt,
-      gasParams
-    );
-    await action.waitForNonceToUpdate();
+  for (let id of parcelsIds) {
+    await placeAssetSellOrder(LAND_PROXY_ADDRESS, id);
   }
 };
 
@@ -429,7 +429,7 @@ const getParcelsFromAPI = async () => {
     return { x, y, metadata };
   });
 
-  // Note: Since the current test net contract was populated with the assets, this check is necessary.
+  // Note: Since the current testnet contract was populated with the assets, this check is necessary.
   const createdParcels = getAllInitialParcels();
   const withoutDuplicates = parcels.filter(
     fromAPI => !createdParcels.find(p => p.x == fromAPI.x && p.y == fromAPI.y)
@@ -485,6 +485,7 @@ const getEstatesFromAPI = async () => {
     estate => !estateContainsParcelFromList(estate, createdParcels)
   );
 
+  // Tech-debt: Rewrite that
   const createdEstates = getInitialEstates();
   let withoutDuplicates = [];
   for (let e1 of estates) {
@@ -496,5 +497,4 @@ const getEstatesFromAPI = async () => {
   }
 
   return withoutDuplicates.filter(e => e.parcels.length < 10);
-  //return [];
 };
