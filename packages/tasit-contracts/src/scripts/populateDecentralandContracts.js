@@ -65,34 +65,42 @@ const gnosisSafeContract = new GnosisSafe(GNOSIS_SAFE_ADDRESS);
 const provider = ProviderFactory.getProvider();
 
 (async () => {
-  // Fund Gnosis Safe wallet with Mana tokens and ethers
-  await etherFaucet(provider, minterWallet, GNOSIS_SAFE_ADDRESS, TEN);
-  await erc20Faucet(manaContract, minterWallet, GNOSIS_SAFE_ADDRESS, BILLION);
-
   try {
+    // Fund Gnosis Safe wallet with Mana tokens and ethers
+    await etherFaucet(provider, minterWallet, GNOSIS_SAFE_ADDRESS, TEN);
+    await erc20Faucet(manaContract, minterWallet, GNOSIS_SAFE_ADDRESS, BILLION);
+
+    // Data created by hand and previously added to the contracts
     await populateDecentralandContractsWithInitialData();
+
+    // Additional data created based on Decentraland API
     await populateDecentralandContractsWithAdditionalData();
   } catch (err) {
     console.error(err);
   }
 })();
 
-const cancelOrdersOfAssetsWithoutImage = async estatesIds => {
-  const estateImage = id =>
-    `https://api.decentraland.org/v1/estates/${id}/map.png`;
+const cancelOrdersOfEstatesWithoutImage = async estatesIds => {
+  const getImageDataFromEstateId = async id => {
+    const image = await fetch(
+      `https://api.decentraland.org/v1/estates/${id}/map.png`
+    );
+    const data = (await image.buffer()).toString("base64");
+    return data;
+  };
 
-  const blankImage = await fetch(estateImage(5));
-  const blankImageData = (await blankImage.buffer()).toString("base64");
+  // Note: Estate with 5 is one of the estates with blank image
+  const blankImageData = await getImageDataFromEstateId(5);
 
+  marketplaceContract.setWallet(sellerWallet);
   for (let id of estatesIds) {
-    const image = await fetch(estateImage(id));
-    const imageData = (await image.buffer()).toString("base64");
+    const imageData = await getImageDataFromEstateId(id);
+
     if (imageData === blankImageData) {
       console.log(
         `Removing order of estate (id: ${id}) because it's with a blank image.`
       );
 
-      marketplaceContract.setWallet(sellerWallet);
       const action = marketplaceContract.cancelOrder(
         ESTATE_ADDRESS,
         `${id}`,
@@ -103,27 +111,43 @@ const cancelOrdersOfAssetsWithoutImage = async estatesIds => {
   }
 };
 
+const extractParcelsFromEstates = estates => {
+  let estatesParcels = [];
+  estates.forEach(estate => {
+    const { parcels } = estate;
+    estatesParcels = [...estatesParcels, ...parcels];
+  });
+  return estatesParcels;
+};
+
 const populateDecentralandContractsWithAdditionalData = async () => {
   const parcelsFromAPI = await getParcelsFromAPI();
   const estatesFromAPI = await getEstatesFromAPI();
 
-  let parcelsToCreate = [...parcelsFromAPI];
-  //let estatesToCreate = [];
-  let allEstates = [...estatesFromAPI];
+  const estatesParcels = extractParcelsFromEstates(estatesFromAPI);
 
+  const estatesParcelsWithoutDuplication = estatesParcels.filter(
+    p => !findParcel(p, parcelsFromAPI)
+  );
+
+  const parcelsToCreate = [
+    ...parcelsFromAPI,
+    ...estatesParcelsWithoutDuplication,
+  ];
+  const estatesToCreate = [...estatesFromAPI];
   // Extract parcels from estates
-  estatesFromAPI.forEach(estate => {
-    const { parcels } = estate;
-    const withoutDup = parcels.filter(p => !findParcel(p, parcelsFromAPI));
-    parcelsToCreate = [...parcelsToCreate, ...withoutDup];
-  });
+  // estatesFromAPI.forEach(estate => {
+  //   const { parcels } = estate;
+  //   const withoutDup = parcels.filter(p => !findParcel(p, parcelsFromAPI));
+  //   parcelsToCreate = [...parcelsToCreate, ...withoutDup];
+  // });
 
-  await populateDecentralandContracts(parcelsToCreate, allEstates);
+  await populateDecentralandContracts(parcelsToCreate, estatesToCreate);
 
-  const estatesAmount = allEstates.length + 5;
+  const estatesAmount = estatesToCreate.length + 5;
   const estatesIds = [...Array(estatesAmount).keys()].map(n => n + 1);
 
-  await cancelOrdersOfAssetsWithoutImage(estatesIds);
+  await cancelOrdersOfEstatesWithoutImage(estatesIds);
 };
 
 const populateDecentralandContractsWithInitialData = async () => {
