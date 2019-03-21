@@ -71,12 +71,37 @@ const provider = ProviderFactory.getProvider();
 
   try {
     await populateDecentralandContractsWithInitialData();
-    console.log("hey");
     await populateDecentralandContractsWithAdditionalData();
   } catch (err) {
     console.error(err);
   }
 })();
+
+const cancelOrdersOfAssetsWithoutImage = async estatesIds => {
+  const estateImage = id =>
+    `https://api.decentraland.org/v1/estates/${id}/map.png`;
+
+  const blankImage = await fetch(estateImage(5));
+  const blankImageData = (await blankImage.buffer()).toString("base64");
+
+  for (let id of estatesIds) {
+    const image = await fetch(estateImage(id));
+    const imageData = (await image.buffer()).toString("base64");
+    if (imageData === blankImageData) {
+      console.log(
+        `Removing order of estate (id: ${id}) because it's with a blank image.`
+      );
+
+      marketplaceContract.setWallet(sellerWallet);
+      const action = marketplaceContract.cancelOrder(
+        ESTATE_ADDRESS,
+        `${id}`,
+        gasParams
+      );
+      await action.waitForNonceToUpdate();
+    }
+  }
+};
 
 const populateDecentralandContractsWithAdditionalData = async () => {
   const parcelsFromAPI = await getParcelsFromAPI();
@@ -94,6 +119,11 @@ const populateDecentralandContractsWithAdditionalData = async () => {
   });
 
   await populateDecentralandContracts(parcelsToCreate, allEstates);
+
+  const estatesAmount = allEstates.length + 5;
+  const estatesIds = [...Array(estatesAmount).keys()].map(n => n + 1);
+
+  await cancelOrdersOfAssetsWithoutImage(estatesIds);
 };
 
 const populateDecentralandContractsWithInitialData = async () => {
@@ -131,9 +161,10 @@ const updateParcelsData = async parcels => {
   landContract.setWallet(sellerWallet);
   for (let parcel of parcels) {
     let { x, y, metadata: parcelName } = parcel;
-    if (!parcelName) parcelName = "";
-    const updateAction = landContract.updateLandData(x, y, parcelName);
-    await updateAction.waitForNonceToUpdate();
+    if (parcelName && parcelName !== "") {
+      const updateAction = landContract.updateLandData(x, y, parcelName);
+      await updateAction.waitForNonceToUpdate();
+    }
   }
 };
 
@@ -370,7 +401,7 @@ const getAllInitialParcels = () => {
 
 const getParcelsFromAPI = async () => {
   const res = await fetch(
-    "https://api.decentraland.org/v1/parcels?status=open&limit=100"
+    "https://api.decentraland.org/v1/parcels?status=open&limit=200"
   );
   const json = await res.json();
   const { data: jsonData } = json;
@@ -422,7 +453,7 @@ const estateContainsParcelFromList = (estate, listOfParcels) => {
 
 const getEstatesFromAPI = async () => {
   const res = await fetch(
-    "https://api.decentraland.org/v1/estates?status=open&limit=100"
+    "https://api.decentraland.org/v1/estates?status=open&limit=200"
   );
   const json = await res.json();
   const { data: jsonData } = json;

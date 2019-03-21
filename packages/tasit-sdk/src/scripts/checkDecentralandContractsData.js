@@ -43,8 +43,8 @@ describe("Decentraland App pre-conditions", () => {
   });
 
   describe("Marketplace", () => {
-    it("should have at least 100 assets for sale", async () => {
-      expect(assetsForSale.length).to.be.at.least(100);
+    it("should have at least 50 assets for sale", async () => {
+      expect(assetsForSale.length).to.be.at.least(50);
     });
   });
 
@@ -68,14 +68,16 @@ describe("Decentraland App pre-conditions", () => {
       expect(price.lte(maxPrice), `${price} isn't <= ${maxPrice}`).to.be.true;
 
       // Parcels always show correct image
-      const image = await fetch(
-        `https://api.decentraland.org/v1/estates/${assetId}/map.png`
-      );
-      const imageData = (await image.buffer()).toString("base64");
-      expect(
-        imageData,
-        `The image of the estate (id: ${assetId}) is blank`
-      ).not.equals(blankImageData);
+      if (isEstate) {
+        const image = await fetch(
+          `https://api.decentraland.org/v1/estates/${assetId}/map.png`
+        );
+        const imageData = (await image.buffer()).toString("base64");
+        expect(
+          imageData,
+          `The image of the estate (id: ${assetId}) is blank`
+        ).not.equals(blankImageData);
+      }
     }
   });
 });
