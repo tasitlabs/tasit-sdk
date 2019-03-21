@@ -173,6 +173,75 @@ const placeParcelsSellOrders = async (
   }
 };
 
+const getParcels = () => {
+  const parcels = [
+    // Estate: all road adjacent parcels
+    { x: -30, y: -105, metadata: `` },
+    { x: -31, y: -105, metadata: `` },
+    { x: -29, y: -105, metadata: `` },
+    { x: -30, y: -104, metadata: `` },
+    { x: -29, y: -104, metadata: `` },
+
+    // Estate: Forest / university estate
+    { x: 3, y: 141, metadata: `` },
+    { x: 2, y: 141, metadata: `` },
+
+    // Estate: Down-Town Bridge
+    { x: -39, y: 30, metadata: `` },
+    { x: -39, y: 31, metadata: `` },
+
+    // Estate: Decentraland University Underpass
+    { x: -47, y: 124, metadata: `` },
+    { x: -48, y: 124, metadata: `` },
+
+    // Estate: Villa Beau Soleil H
+    { x: 39, y: -114, metadata: `Letter N` },
+    { x: 39, y: -113, metadata: `Letter "N"` },
+
+    // Unique parcels
+    { x: -20, y: 36, metadata: `Premium Downtown,road adjacent,central area.` },
+    { x: -61, y: 125, metadata: `Vegas/Univeristy` },
+    { x: 141, y: -122, metadata: `dePeets Place 6` },
+    { x: -150, y: 22, metadata: `Fashion District X` },
+    { x: -150, y: 23, metadata: `District X Fashion Sandwich` },
+    {
+      x: -7,
+      y: -110,
+      metadata: `On a junction right opposite two large estates :O)`,
+    },
+  ];
+
+  return parcels;
+};
+
+const getEstates = () => {
+  const allParcels = getParcels();
+  const estates = [
+    {
+      metadata: `all road adjacent parcels`,
+      parcels: allParcels.slice(0, 5),
+    },
+    {
+      metadata: `Forest / university estate`,
+      parcels: allParcels.slice(5, 7),
+    },
+    {
+      metadata: `Down-Town Bridge`,
+      parcels: allParcels.slice(7, 9),
+    },
+    {
+      metadata: `Decentraland University Underpass`,
+      parcels: allParcels.slice(9, 11),
+    },
+    {
+      metadata: `Estate: Villa Beau Soleil H`,
+      parcels: allParcels.slice(11, 13),
+    },
+  ];
+
+  return estates;
+};
+
 let network = process.env.NETWORK;
 
 (async () => {
@@ -216,65 +285,8 @@ let network = process.env.NETWORK;
   await etherFaucet(provider, minterWallet, GNOSIS_SAFE_ADDRESS, TEN);
   await erc20Faucet(manaContract, minterWallet, GNOSIS_SAFE_ADDRESS, BILLION);
 
-  const allParcels = [
-    // Estate: all road adjacent parcels
-    { x: -30, y: -105, metadata: `` },
-    { x: -31, y: -105, metadata: `` },
-    { x: -29, y: -105, metadata: `` },
-    { x: -30, y: -104, metadata: `` },
-    { x: -29, y: -104, metadata: `` },
-
-    // Estate: Forest / university estate
-    { x: 3, y: 141, metadata: `` },
-    { x: 2, y: 141, metadata: `` },
-
-    // Estate: Down-Town Bridge
-    { x: -39, y: 30, metadata: `` },
-    { x: -39, y: 31, metadata: `` },
-
-    // Estate: Decentraland University Underpass
-    { x: -47, y: 124, metadata: `` },
-    { x: -48, y: 124, metadata: `` },
-
-    // Estate: Villa Beau Soleil H
-    { x: 39, y: -114, metadata: `Letter N` },
-    { x: 39, y: -113, metadata: `Letter "N"` },
-
-    // Unique parcels
-    { x: -20, y: 36, metadata: `Premium Downtown,road adjacent,central area.` },
-    { x: -61, y: 125, metadata: `Vegas/Univeristy` },
-    { x: 141, y: -122, metadata: `dePeets Place 6` },
-    { x: -150, y: 22, metadata: `Fashion District X` },
-    { x: -150, y: 23, metadata: `District X Fashion Sandwich` },
-    {
-      x: -7,
-      y: -110,
-      metadata: `On a junction right opposite two large estates :O)`,
-    },
-  ];
-
-  const allEstates = [
-    {
-      metadata: `all road adjacent parcels`,
-      parcels: allParcels.slice(0, 5),
-    },
-    {
-      metadata: `Forest / university estate`,
-      parcels: allParcels.slice(5, 7),
-    },
-    {
-      metadata: `Down-Town Bridge`,
-      parcels: allParcels.slice(7, 9),
-    },
-    {
-      metadata: `Decentraland University Underpass`,
-      parcels: allParcels.slice(9, 11),
-    },
-    {
-      metadata: `Estate: Villa Beau Soleil H`,
-      parcels: allParcels.slice(11, 13),
-    },
-  ];
+  const allParcels = getParcels();
+  const allEstates = getEstates();
 
   try {
     console.log("Creating parcels...");
