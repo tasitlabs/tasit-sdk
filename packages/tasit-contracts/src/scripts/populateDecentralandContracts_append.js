@@ -40,13 +40,27 @@ const createMultipleParcels = async (
   });
 
   landContract.setWallet(contractOwnerWallet);
-  const assignAction = landContract.assignMultipleParcels(
-    xArray,
-    yArray,
-    beneficiaryAddress,
-    gasParams
-  );
-  await assignAction.waitForNonceToUpdate();
+
+  for (let parcel of parcels) {
+    const { x, y } = parcel;
+    console.log(`creating parcel ${x},${y}....`);
+    const assignAction = landContract.assignNewParcel(
+      `${x}`,
+      `${y}`,
+      beneficiaryAddress,
+      gasParams
+    );
+
+    await assignAction.waitForNonceToUpdate();
+  }
+
+  // const assignAction = landContract.assignMultipleParcels(
+  //   xArray,
+  //   yArray,
+  //   beneficiaryAddress,
+  //   gasParams
+  // );
+  // await assignAction.waitForNonceToUpdate();
 };
 
 const createEstate = async (estateContract, landContract, estate, wallet) => {
@@ -175,8 +189,8 @@ const placeParcelsSellOrders = async (
 
 let network = process.env.NETWORK;
 
-const getParcels = async () => {
-  let parcels = [
+const getAlreadyCreatedUniqueParcels = () => {
+  const parcels = [
     { x: -20, y: 36, metadata: `Premium Downtown,road adjacent,central area.` },
     { x: -61, y: 125, metadata: `Vegas/Univeristy` },
     { x: 141, y: -122, metadata: `dePeets Place 6` },
@@ -192,7 +206,20 @@ const getParcels = async () => {
   return parcels;
 };
 
-const getEstates = async () => {
+const getAlreadyCreatedParcels = () => {
+  const uniqueParcels = getAlreadyCreatedUniqueParcels();
+  const estates = getAlreadyCreatedEstates();
+
+  let estatesParcels = [];
+
+  estates.forEach(
+    estate => (estatesParcels = [...estatesParcels, ...estate.parcels])
+  );
+
+  return [...estatesParcels, ...uniqueParcels];
+};
+
+const getAlreadyCreatedEstates = () => {
   let estates = [
     {
       metadata: `all road adjacent parcels`,
@@ -234,6 +261,91 @@ const getEstates = async () => {
   return estates;
 };
 
+const getParcelsFromAPI = async () => {
+  const res = await fetch(
+    "https://api.decentraland.org/v1/parcels?status=open&limit=50"
+  );
+  const json = await res.json();
+  const { data: jsonData } = json;
+  const { parcels: parcelsFromAPI } = jsonData;
+
+  const parcels = parcelsFromAPI.map(parcel => {
+    const { x, y, data } = parcel;
+    let { name: metadata } = data;
+    if (!metadata) metadata = "";
+    return { x, y, metadata };
+  });
+
+  // Note: Since the current test net contract was populated with the assets, this check is necessary.
+  const createdParcels = getAlreadyCreatedParcels();
+  const withoutDuplicates = parcels.filter(
+    fromAPI => !createdParcels.find(p => p.x == fromAPI.x && p.y == fromAPI.y)
+  );
+
+  return withoutDuplicates;
+};
+
+const parcelsAreEqual = (p1, p2) => p1.x === p2.x && p1.y === p2.y;
+
+const findParcel = (parcel, listOfParcels) => {
+  return listOfParcels.find(p => parcelsAreEqual(p, parcel));
+};
+
+// Tech-debt: Move to a functional approach
+const estatesWithConflict = (estate1, estate2) => {
+  const { parcels: parcels1 } = estate1;
+  const { parcels: parcels2 } = estate2;
+  for (let p1 of parcels1) {
+    for (let p2 of parcels2) {
+      if (parcelsAreEqual(p1, p2)) return true;
+    }
+  }
+
+  return false;
+};
+
+const estateContainsParcelFromList = (estate, listOfParcels) => {
+  const { parcels: estateParcels } = estate;
+
+  for (let parcel of estateParcels)
+    if (findParcel(parcel, listOfParcels)) return true;
+
+  return false;
+};
+
+const getEstatesFromAPI = async () => {
+  const res = await fetch(
+    "https://api.decentraland.org/v1/estates?status=open&limit=50"
+  );
+  const json = await res.json();
+  const { data: jsonData } = json;
+  const { estates: estatesFromAPI } = jsonData;
+
+  let estates = estatesFromAPI.map(estate => {
+    const { data } = estate;
+    const { name: metadata, parcels } = data;
+    return { metadata, parcels };
+  });
+
+  const createdParcels = getAlreadyCreatedParcels();
+  estates = estates.filter(
+    estate => !estateContainsParcelFromList(estate, createdParcels)
+  );
+
+  const createdEstates = getAlreadyCreatedEstates();
+  let withoutDuplicates = [];
+  for (let e1 of estates) {
+    for (let e2 of createdEstates)
+      if (!estatesWithConflict(e1, e2)) {
+        withoutDuplicates = [...withoutDuplicates, e1];
+        break;
+      }
+  }
+
+  return withoutDuplicates.filter(e => e.parcels.length < 10);
+  //return [];
+};
+
 (async () => {
   const config = require(`../config/${network}.js`);
 
@@ -272,27 +384,79 @@ const getEstates = async () => {
 
   // Fund Gnosis Safe wallet with Mana tokens and ethers
   const provider = ProviderFactory.getProvider();
-  await etherFaucet(provider, minterWallet, GNOSIS_SAFE_ADDRESS, TEN);
-  await erc20Faucet(manaContract, minterWallet, GNOSIS_SAFE_ADDRESS, BILLION);
 
-  const uniqueParcels = await getParcels();
-  const allEstates = await getEstates();
-  let allParcels = [];
-  allEstates.forEach(
-    estate => (allParcels = [...allParcels, ...estate.parcels])
-  );
-  allParcels = [...allParcels, ...uniqueParcels];
+  const parcelsFromAPI = await getParcelsFromAPI();
+  const estatesFromAPI = await getEstatesFromAPI();
+
+  let parcelsToCreate = [...parcelsFromAPI];
+  //let estatesToCreate = [];
+  let allEstates = [...estatesFromAPI];
+
+  // Extract parcels from estates
+  estatesFromAPI.forEach(estate => {
+    const { parcels } = estate;
+    const withoutDup = parcels.filter(p => !findParcel(p, parcelsFromAPI));
+    parcelsToCreate = [...parcelsToCreate, ...withoutDup];
+  });
+
+  // const alreadyCreatedEstates = getAlreadyCreatedEstates();
+  // let alreadyCreatedParcels = getAlreadyCreatedParcels();
+  //
+  // alreadyCreatedEstates.forEach(
+  //   estate =>
+  //     (alreadyCreatedParcels = [...alreadyCreatedParcels, ...estate.parcels])
+  // );
+  // const createdParcels = getAlreadyCreatedParcels();
+  // console.log(`createdParcels: ${createdParcels.length}`);
+  // createdParcels.forEach(p => console.log(`${p.x}, ${p.y}`));
+  // console.log("-----------------------------------------------");
+  // console.log(`parcelsToCreate: ${parcelsToCreate.length}`);
+  // parcelsToCreate.forEach(p => console.log(`${p.x}, ${p.y}`));
+
+  //  return;
+  //console.log(`estatesFromAPI: ${estatesFromAPI.length}`);
+
+  // let newParcels = await getParcels();
+  // const newEstates = await getEstates();
+  // console.log(`newEstates: ${newEstates.length}`);
+  // console.log(`newParcels: ${newParcels.length}`);
+
+  // newEstates.forEach(
+  //   estate => (newParcels = [...newParcels, ...estate.parcels])
+  // );
+  //
+  //
+  //
+  // const estateContainsParcelFromList = (estate, listOfParcels) => {
+  //   const { parcels: estateParcels } = estate;
+  //   for (let parcel of estateParcels)
+  //     if (findParcel(parcel, listOfParcels)) return true;
+  //
+  //   return false;
+  // };
+  //
+  // const parcelsToCreate = newParcels.filter(
+  //   parcel => !findParcel(parcel, alreadyCreatedParcels)
+  // );
+  //
+  // const estatesToCreate = newEstates.filter(
+  //   estate =>
+  //     !estateContainsParcelFromList(estate, [
+  //       ...alreadyCreatedParcels,
+  //       ...parcelsToCreate,
+  //     ])
+  // );
 
   try {
     console.log("Creating parcels...");
     await createMultipleParcels(
       landContract,
-      allParcels,
+      parcelsToCreate,
       sellerAddress,
       minterWallet
     );
 
-    const allParcelsIds = allParcels.map(async parcel => {
+    const allParcelsIds = parcelsToCreate.map(async parcel => {
       const { x, y } = parcel;
       return landContract.encodeTokenId(x, y);
     });
@@ -302,8 +466,9 @@ const getEstates = async () => {
     // Update parcels with metadata
     console.log("Updating parcels with metadata...");
     landContract.setWallet(sellerWallet);
-    for (let parcel of allParcels) {
+    for (let parcel of parcelsToCreate) {
       let { x, y, metadata: parcelName } = parcel;
+      console.log(`updating parcel ${x},${y}....`);
       if (!parcelName) parcelName = "";
       const updateAction = landContract.updateLandData(x, y, parcelName);
       await updateAction.waitForNonceToUpdate();
@@ -336,14 +501,11 @@ const getEstates = async () => {
       sellerWallet
     );
 
-    // All unique parcels
-    const landIdsToSell = allParcelsIds.slice(13, 19);
-
     console.log("Placing parcels sellorders...");
     await placeParcelsSellOrders(
       marketplaceContract,
       LAND_PROXY_ADDRESS,
-      landIdsToSell,
+      allParcelsIds,
       expireAt,
       sellerWallet
     );
