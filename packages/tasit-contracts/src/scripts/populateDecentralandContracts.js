@@ -175,30 +175,6 @@ const placeParcelsSellOrders = async (
 
 const getParcels = () => {
   const parcels = [
-    // Estate: all road adjacent parcels
-    { x: -30, y: -105, metadata: `` },
-    { x: -31, y: -105, metadata: `` },
-    { x: -29, y: -105, metadata: `` },
-    { x: -30, y: -104, metadata: `` },
-    { x: -29, y: -104, metadata: `` },
-
-    // Estate: Forest / university estate
-    { x: 3, y: 141, metadata: `` },
-    { x: 2, y: 141, metadata: `` },
-
-    // Estate: Down-Town Bridge
-    { x: -39, y: 30, metadata: `` },
-    { x: -39, y: 31, metadata: `` },
-
-    // Estate: Decentraland University Underpass
-    { x: -47, y: 124, metadata: `` },
-    { x: -48, y: 124, metadata: `` },
-
-    // Estate: Villa Beau Soleil H
-    { x: 39, y: -114, metadata: `Letter N` },
-    { x: 39, y: -113, metadata: `Letter "N"` },
-
-    // Unique parcels
     { x: -20, y: 36, metadata: `Premium Downtown,road adjacent,central area.` },
     { x: -61, y: 125, metadata: `Vegas/Univeristy` },
     { x: 141, y: -122, metadata: `dePeets Place 6` },
@@ -215,27 +191,41 @@ const getParcels = () => {
 };
 
 const getEstates = () => {
-  const allParcels = getParcels();
   const estates = [
     {
       metadata: `all road adjacent parcels`,
-      parcels: allParcels.slice(0, 5),
+      parcels: [
+        { x: -30, y: -105, metadata: `` },
+        { x: -31, y: -105, metadata: `` },
+        { x: -29, y: -105, metadata: `` },
+        { x: -30, y: -104, metadata: `` },
+        { x: -29, y: -104, metadata: `` },
+      ],
     },
     {
       metadata: `Forest / university estate`,
-      parcels: allParcels.slice(5, 7),
+      parcels: [{ x: 3, y: 141, metadata: `` }, { x: 2, y: 141, metadata: `` }],
     },
     {
       metadata: `Down-Town Bridge`,
-      parcels: allParcels.slice(7, 9),
+      parcels: [
+        { x: -39, y: 30, metadata: `` },
+        { x: -39, y: 31, metadata: `` },
+      ],
     },
     {
       metadata: `Decentraland University Underpass`,
-      parcels: allParcels.slice(9, 11),
+      parcels: [
+        { x: -47, y: 124, metadata: `` },
+        { x: -48, y: 124, metadata: `` },
+      ],
     },
     {
       metadata: `Estate: Villa Beau Soleil H`,
-      parcels: allParcels.slice(11, 13),
+      parcels: [
+        { x: 39, y: -114, metadata: `Letter N` },
+        { x: 39, y: -113, metadata: `Letter "N"` },
+      ],
     },
   ];
 
@@ -285,8 +275,13 @@ let network = process.env.NETWORK;
   await etherFaucet(provider, minterWallet, GNOSIS_SAFE_ADDRESS, TEN);
   await erc20Faucet(manaContract, minterWallet, GNOSIS_SAFE_ADDRESS, BILLION);
 
-  const allParcels = getParcels();
+  const uniqueParcels = getParcels();
   const allEstates = getEstates();
+  let allParcels = [];
+  allEstates.forEach(
+    estate => (allParcels = [...allParcels, ...estate.parcels])
+  );
+  allParcels = [...allParcels, ...uniqueParcels];
 
   try {
     console.log("Creating parcels...");
