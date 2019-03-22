@@ -133,25 +133,49 @@ const getIdsFromParcels = async parcels => {
 };
 
 // Tech-debt: Use `assignMultipleParcels` to save gas cost.
-// The number of parcels per call should be short enough to avoid out-of-gas.
+// The amount of parcels per call should be short enough to avoid out-of-gas.
 const createParcels = async allParcels => {
   console.log("Creating parcels...");
 
-  landContract.setWallet(minterWallet);
-
+  let parcelIds = [];
   for (let parcel of allParcels) {
-    const { x, y } = parcel;
-    const assignAction = landContract.assignNewParcel(
-      `${x}`,
-      `${y}`,
-      sellerAddress,
-      gasParams
-    );
-    await assignAction.waitForNonceToUpdate();
+    try {
+      const id = await createParcel(parcel);
+      parcelIds.push(id);
+    } catch (error) {
+      console.log("Parcel creation failed");
+    }
   }
 
-  const parcelsIds = await getIdsFromParcels(allParcels);
-  return parcelsIds;
+  return parcelIds;
+};
+
+const createParcel = async parcel => {
+  const { x, y } = parcel;
+  landContract.setWallet(minterWallet);
+  const action = landContract.assignNewParcel(
+    `${x}`,
+    `${y}`,
+    sellerAddress,
+    gasParams
+  );
+
+  const parcelId = await new Promise((resolve, reject) => {
+    action.once("confirmation", async message => {
+      const id = await landContract.encodeTokenId(`${x}`, `${y}`);
+      resolve(id);
+    });
+
+    setTimeout(() => {
+      action.unsubscribe();
+      reject();
+    }, 1000);
+  });
+
+  await action.waitForNonceToUpdate();
+  console.log(`created id ${parcelId}`);
+
+  return parcelId;
 };
 
 const createEstate = async estate => {
@@ -183,6 +207,11 @@ const createEstate = async estate => {
       const { args } = data;
       resolve(args._estateId);
     });
+
+    setTimeout(() => {
+      estateContract.off("CreateEstate");
+      reject();
+    }, 1000);
   });
 
   await action.waitForNonceToUpdate();
@@ -196,8 +225,12 @@ const createEstates = async estates => {
 
   const estateIds = [];
   for (let estate of estates) {
-    const id = await createEstate(estate, sellerWallet);
-    estateIds.push(id);
+    try {
+      const id = await createEstate(estate);
+      estateIds.push(id);
+    } catch (error) {
+      console.log("Estate creation failed");
+    }
   }
   return estateIds;
 };
@@ -267,24 +300,6 @@ const placeAssetSellOrder = async (nftAddress, assetId) => {
   await action.waitForNonceToUpdate();
 };
 
-const getParcelsFromAPI = async () => {
-  const res = await fetch(
-    "https://api.decentraland.org/v1/parcels?status=open&limit=100"
-  );
-  const json = await res.json();
-  const { data: jsonData } = json;
-  const { parcels: parcelsFromAPI } = jsonData;
-
-  const parcels = parcelsFromAPI.map(parcel => {
-    const { x, y, data } = parcel;
-    let { name: metadata } = data;
-    if (!metadata) metadata = "";
-    return { x, y, metadata };
-  });
-
-  return parcels;
-};
-
 const parcelsAreEqual = (p1, p2) => p1.x === p2.x && p1.y === p2.y;
 
 const findParcel = (parcel, listOfParcels) => {
@@ -319,6 +334,24 @@ const getEstatesFromAPI = async () => {
   return estates;
 };
 
+const getParcelsFromAPI = async () => {
+  const res = await fetch(
+    "https://api.decentraland.org/v1/parcels?status=open&limit=100"
+  );
+  const json = await res.json();
+  const { data: jsonData } = json;
+  const { parcels: parcelsFromAPI } = jsonData;
+
+  const parcels = parcelsFromAPI.map(parcel => {
+    const { x, y, data } = parcel;
+    let { name: metadata } = data;
+    if (!metadata) metadata = "";
+    return { x, y, metadata };
+  });
+
+  return parcels;
+};
+
 (async () => {
   try {
     // Fund Gnosis Safe wallet with Mana tokens and ethers
@@ -351,10 +384,7 @@ const getEstatesFromAPI = async () => {
 
     await placeAssesOrders(estateIds, parcelIds);
 
-    // Creating an array of all estates ids
-    const estatesAmount = estatesToCreate.length;
-    const estatesIds = [...Array(estatesAmount).keys()].map(n => n + 1);
-    await cancelOrdersOfEstatesWithoutImage(estatesIds);
+    await cancelOrdersOfEstatesWithoutImage(estateIds);
   } catch (err) {
     console.error(err);
   }
