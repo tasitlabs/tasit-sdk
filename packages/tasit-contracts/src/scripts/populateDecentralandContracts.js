@@ -64,35 +64,6 @@ const gnosisSafeContract = new GnosisSafe(GNOSIS_SAFE_ADDRESS);
 
 const provider = ProviderFactory.getProvider();
 
-(async () => {
-  try {
-    // Fund Gnosis Safe wallet with Mana tokens and ethers
-    await etherFaucet(provider, minterWallet, GNOSIS_SAFE_ADDRESS, TEN);
-    await erc20Faucet(manaContract, minterWallet, GNOSIS_SAFE_ADDRESS, BILLION);
-
-    // Data created by hand and previously added to the contracts
-    await populateDecentralandContractsWithInitialData();
-
-    await cancelInitialOrders();
-
-    // Additional data created based on Decentraland API
-    await populateDecentralandContractsWithAdditionalData();
-  } catch (err) {
-    console.error(err);
-  }
-})();
-
-const cancelInitialOrders = async () => {
-  const uniqueParcels = getInitialParcels();
-  const estates = getInitialEstates();
-
-  const parcelIds = await getIdsFromParcels(uniqueParcels);
-  const estateIds = [...Array(estates.length).keys()].map(n => n + 1);
-
-  for (let id of parcelIds) await cancelSellOrder(LAND_PROXY_ADDRESS, id);
-  for (let id of estateIds) await cancelSellOrder(ESTATE_ADDRESS, id);
-};
-
 const cancelSellOrder = async (nftAddress, id) => {
   const action = marketplaceContract.cancelOrder(
     nftAddress,
@@ -135,64 +106,6 @@ const extractParcelsFromEstates = estates => {
     estatesParcels = [...estatesParcels, ...parcels];
   });
   return estatesParcels;
-};
-
-const populateDecentralandContractsWithAdditionalData = async () => {
-  const parcelsFromAPI = await getParcelsFromAPI();
-  const estatesFromAPI = await getEstatesFromAPI();
-
-  const estatesParcels = extractParcelsFromEstates(estatesFromAPI);
-
-  const estatesParcelsWithoutDuplication = estatesParcels.filter(
-    p => !findParcel(p, parcelsFromAPI)
-  );
-
-  const parcelsToCreate = [
-    ...parcelsFromAPI,
-    ...estatesParcelsWithoutDuplication,
-  ];
-
-  const estatesToCreate = [...estatesFromAPI];
-
-  await populateDecentralandContracts(parcelsToCreate, estatesToCreate);
-
-  const alreadyCreatedEstates = getInitialEstates();
-  const estatesAmount = alreadyCreatedEstates.length + estatesToCreate.length;
-
-  // Creating an array of all estates ids
-  const estatesIds = [...Array(estatesAmount).keys()].map(n => n + 1);
-
-  await cancelOrdersOfEstatesWithoutImage(estatesIds);
-  await cancelInitialOrders();
-};
-
-const getAllInitialParcels = () => {
-  const uniqueParcels = getInitialParcels();
-  const estates = getInitialEstates();
-
-  const estatesParcels = extractParcelsFromEstates(estates);
-  const allParcels = [...estatesParcels, ...uniqueParcels];
-
-  return allParcels;
-};
-
-const populateDecentralandContractsWithInitialData = async () => {
-  const allParcels = getAllInitialParcels();
-  const estates = getInitialEstates();
-
-  await populateDecentralandContracts(allParcels, estates);
-};
-
-const populateDecentralandContracts = async (parcels, estates) => {
-  const parcelIds = await createParcels(parcels);
-
-  await updateParcelsData(parcels);
-
-  const estateIds = await createEstates(estates);
-
-  await approveMarketplace();
-
-  await placeAssesOrders(estateIds, parcelIds);
 };
 
 const updateParcelsData = async parcels => {
@@ -273,7 +186,7 @@ const createEstate = async estate => {
   });
 
   await action.waitForNonceToUpdate();
-  console.log("created id =", estateId);
+  console.log(`created id ${estateId}`);
 
   return estateId;
 };
@@ -319,6 +232,7 @@ function getRandomInt(min, max) {
 }
 
 const placeAssesOrders = async (estateIds, parcelIds) => {
+  console.log(`Placing sell orders...`);
   const shuffleArray = arr => arr.sort(() => Math.random() - 0.5);
 
   const estatesToSell = estateIds.map(id => {
@@ -353,65 +267,6 @@ const placeAssetSellOrder = async (nftAddress, assetId) => {
   await action.waitForNonceToUpdate();
 };
 
-const getInitialParcels = () => {
-  let parcels = [
-    { x: -20, y: 36, metadata: `Premium Downtown,road adjacent,central area.` },
-    { x: -61, y: 125, metadata: `Vegas/Univeristy` },
-    { x: 141, y: -122, metadata: `dePeets Place 6` },
-    { x: -150, y: 22, metadata: `Fashion District X` },
-    { x: -150, y: 23, metadata: `District X Fashion Sandwich` },
-    {
-      x: -7,
-      y: -110,
-      metadata: `On a junction right opposite two large estates :O)`,
-    },
-  ];
-
-  return parcels;
-};
-
-const getInitialEstates = () => {
-  let estates = [
-    {
-      metadata: `all road adjacent parcels`,
-      parcels: [
-        { x: -30, y: -105, metadata: `` },
-        { x: -31, y: -105, metadata: `` },
-        { x: -29, y: -105, metadata: `` },
-        { x: -30, y: -104, metadata: `` },
-        { x: -29, y: -104, metadata: `` },
-      ],
-    },
-    {
-      metadata: `Forest / university estate`,
-      parcels: [{ x: 3, y: 141, metadata: `` }, { x: 2, y: 141, metadata: `` }],
-    },
-    {
-      metadata: `Down-Town Bridge`,
-      parcels: [
-        { x: -39, y: 30, metadata: `` },
-        { x: -39, y: 31, metadata: `` },
-      ],
-    },
-    {
-      metadata: `Decentraland University Underpass`,
-      parcels: [
-        { x: -47, y: 124, metadata: `` },
-        { x: -48, y: 124, metadata: `` },
-      ],
-    },
-    {
-      metadata: `Estate: Villa Beau Soleil H`,
-      parcels: [
-        { x: 39, y: -114, metadata: `Letter N` },
-        { x: 39, y: -113, metadata: `Letter "N"` },
-      ],
-    },
-  ];
-
-  return estates;
-};
-
 const getParcelsFromAPI = async () => {
   const res = await fetch(
     "https://api.decentraland.org/v1/parcels?status=open&limit=100"
@@ -427,32 +282,13 @@ const getParcelsFromAPI = async () => {
     return { x, y, metadata };
   });
 
-  // Note: Since the current testnet contract was populated with the assets, this check is necessary.
-  const createdParcels = getAllInitialParcels();
-  const withoutDuplicates = parcels.filter(
-    fromAPI => !createdParcels.find(p => p.x == fromAPI.x && p.y == fromAPI.y)
-  );
-
-  return withoutDuplicates;
+  return parcels;
 };
 
 const parcelsAreEqual = (p1, p2) => p1.x === p2.x && p1.y === p2.y;
 
 const findParcel = (parcel, listOfParcels) => {
   return listOfParcels.find(p => parcelsAreEqual(p, parcel));
-};
-
-// Tech-debt: Move to a functional approach
-const estatesWithConflict = (estate1, estate2) => {
-  const { parcels: parcels1 } = estate1;
-  const { parcels: parcels2 } = estate2;
-  for (let p1 of parcels1) {
-    for (let p2 of parcels2) {
-      if (parcelsAreEqual(p1, p2)) return true;
-    }
-  }
-
-  return false;
 };
 
 const estateContainsParcelFromList = (estate, listOfParcels) => {
@@ -472,30 +308,54 @@ const getEstatesFromAPI = async () => {
   const { data: jsonData } = json;
   const { estates: estatesFromAPI } = jsonData;
 
-  let estates = estatesFromAPI.map(estate => {
+  const allEstates = estatesFromAPI.map(estate => {
     const { data } = estate;
     const { name: metadata, parcels } = data;
     return { metadata, parcels };
   });
 
-  const createdParcels = getAllInitialParcels();
-  estates = estates.filter(
-    estate => !estateContainsParcelFromList(estate, createdParcels)
-  );
-
-  // Tech-debt: Rewrite that
-  const createdEstates = getInitialEstates();
-  let withoutDuplicates = [];
-  for (let e1 of estates) {
-    for (let e2 of createdEstates)
-      if (!estatesWithConflict(e1, e2)) {
-        withoutDuplicates = [...withoutDuplicates, e1];
-        break;
-      }
-  }
-
   // Keep estates with small number of parcels to avoid out-of-gas on creation
-  withoutDuplicates = withoutDuplicates.filter(e => e.parcels.length < 10);
-
-  return withoutDuplicates;
+  const estates = allEstates.filter(e => e.parcels.length < 10);
+  return estates;
 };
+
+(async () => {
+  try {
+    // Fund Gnosis Safe wallet with Mana tokens and ethers
+    await etherFaucet(provider, minterWallet, GNOSIS_SAFE_ADDRESS, TEN);
+    await erc20Faucet(manaContract, minterWallet, GNOSIS_SAFE_ADDRESS, BILLION);
+
+    const parcelsFromAPI = await getParcelsFromAPI();
+    const estatesFromAPI = await getEstatesFromAPI();
+
+    const estatesParcels = extractParcelsFromEstates(estatesFromAPI);
+
+    const estatesParcelsWithoutDuplication = estatesParcels.filter(
+      estateParcel => !findParcel(estateParcel, parcelsFromAPI)
+    );
+
+    const parcelsToCreate = [
+      ...parcelsFromAPI,
+      ...estatesParcelsWithoutDuplication,
+    ];
+
+    const estatesToCreate = [...estatesFromAPI];
+
+    const parcelIds = await createParcels(parcelsToCreate);
+
+    await updateParcelsData(parcelsToCreate);
+
+    const estateIds = await createEstates(estatesToCreate);
+
+    await approveMarketplace();
+
+    await placeAssesOrders(estateIds, parcelIds);
+
+    // Creating an array of all estates ids
+    const estatesAmount = estatesToCreate.length;
+    const estatesIds = [...Array(estatesAmount).keys()].map(n => n + 1);
+    await cancelOrdersOfEstatesWithoutImage(estatesIds);
+  } catch (err) {
+    console.error(err);
+  }
+})();
