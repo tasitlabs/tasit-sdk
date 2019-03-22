@@ -97,7 +97,7 @@ const cancelOrdersOfEstatesWithoutImage = async estatesIds => {
 
     if (imageData === blankImageData) {
       console.log(
-        `Removing order of estate (id: ${id}) because it's with a blank image.`
+        `Removing order of estate (id: ${id}) because it has a blank image.`
       );
 
       await cancelSellOrder(ESTATE_ADDRESS, id);
