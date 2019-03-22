@@ -1,7 +1,7 @@
 //
 // Script used to check if the target chain has the Decentraland app pre-conditions
 //
-// Note: This script is using mocha for convenince but isn't a test suite to be runned by `test` script.
+// Note: This script is using mocha for convenience but isn't a test suite to be run by the `test` script.
 // Use: npx mocha src/scripts/checkDecentralandContractsData.js  --require @babel/register --file src/testHelpers/mochaSetup.js --no-timeouts
 //
 
