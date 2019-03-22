@@ -388,7 +388,7 @@ const getParcelsFromAPI = async () => {
 
     await approveMarketplace();
 
-    await placeAssesOrders(estateIds, parcelIds);
+    await placeAssetOrders(estateIds, parcelIds);
 
     await cancelOrdersOfEstatesWithoutImage(estateIds);
   } catch (err) {
