@@ -270,7 +270,7 @@ function getRandomInt(min, max) {
   return Math.floor(Math.random() * (max - min)) + min;
 }
 
-const placeAssesOrders = async (estateIds, parcelIds) => {
+const placeAssetOrders = async (estateIds, parcelIds) => {
   console.log(`Placing sell orders...`);
   const shuffleArray = arr => arr.sort(() => Math.random() - 0.5);
 
