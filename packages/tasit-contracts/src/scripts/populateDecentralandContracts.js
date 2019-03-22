@@ -27,16 +27,22 @@ const { ONE, TEN, ONE_HUNDRED, ONE_THOUSAND, BILLION, WeiPerEther } = constants;
 
 let network = process.env.NETWORK;
 
+let EVENTS_TIMEOUT;
+
 const config = require(`../config/${network}.js`);
 
 // https://stats.goerli.net/
-if (network === "goerli")
+if (network === "goerli") {
   gasParams = {
     gasLimit: 8e6,
     gasPrice: 1e10,
   };
-else if (network === "development") {
+  EVENTS_TIMEOUT = 5 * 60 * 1000;
+} else if (network === "ropsten") {
+  EVENTS_TIMEOUT = 5 * 60 * 1000;
+} else if (network === "development") {
   network = "local";
+  EVENTS_TIMEOUT = 1000;
 }
 const {
   LANDProxy,
@@ -169,7 +175,7 @@ const createParcel = async parcel => {
     setTimeout(() => {
       action.unsubscribe();
       reject();
-    }, 1000);
+    }, EVENTS_TIMEOUT);
   });
 
   await action.waitForNonceToUpdate();
@@ -209,9 +215,9 @@ const createEstate = async estate => {
     });
 
     setTimeout(() => {
-      estateContract.off("CreateEstate");
+      estateContract.unsubscribe();
       reject();
-    }, 1000);
+    }, EVENTS_TIMEOUT);
   });
 
   await action.waitForNonceToUpdate();
