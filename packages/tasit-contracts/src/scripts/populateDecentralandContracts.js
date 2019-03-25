@@ -182,10 +182,18 @@ const createParcel = async parcel => {
     gasParams
   );
 
+  console.log(`creating parcel.... ${x},${y}`);
+
   const parcelId = await new Promise((resolve, reject) => {
-    action.once("confirmation", async message => {
+    action.on("confirmation", async message => {
       const id = await landContract.encodeTokenId(`${x}`, `${y}`);
+      action.unsubscribe();
       resolve(id);
+    });
+
+    action.on("error", message => {
+      action.unsubscribe();
+      reject();
     });
 
     setTimeout(() => {
@@ -224,14 +232,32 @@ const createEstate = async estate => {
   );
 
   const estateId = await new Promise((resolve, reject) => {
-    estateContract.once("CreateEstate", message => {
+    estateContract.on("CreateEstate", message => {
       const { data } = message;
       const { args } = data;
+      estateContract.unsubscribe();
       resolve(args._estateId);
+    });
+
+    // Some error (orphan block, failed tx) events are been trigger only from the confirmationListener
+    // See more: https://github.com/tasitlabs/TasitSDK/issues/253
+    action.on("confirmation", () => {});
+
+    action.on("error", message => {
+      estateContract.unsubscribe();
+      action.unsubscribe();
+      reject();
+    });
+
+    estateContract.on("error", message => {
+      estateContract.unsubscribe();
+      action.unsubscribe();
+      reject();
     });
 
     setTimeout(() => {
       estateContract.unsubscribe();
+      action.unsubscribe();
       reject();
     }, EVENTS_TIMEOUT);
   });
@@ -302,6 +328,7 @@ const placeAssetOrders = async (estateIds, parcelIds) => {
 
   for (let asset of assetsToSell) {
     const { nftAddress, id } = asset;
+
     await placeAssetSellOrder(nftAddress, id);
   }
 };
@@ -311,6 +338,9 @@ const placeAssetSellOrder = async (nftAddress, assetId) => {
   const expireAt = Date.now() + duration.years(5);
   const price = getRandomInt(10, 100) + "000";
   const priceInWei = bigNumberify(price).mul(WEI_PER_ETHER);
+
+  const type = nftAddress == ESTATE_ADDRESS ? "estate" : "parcel";
+  console.log(`placing sell order for the ${type} with id ${id}`);
 
   const action = marketplaceContract.createOrder(
     nftAddress,

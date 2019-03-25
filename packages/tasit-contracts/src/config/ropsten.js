@@ -5,7 +5,7 @@ const ropsten = {
     pollingInterval: 4000,
   },
   events: {
-    timeout: 2000,
+    timeout: 5 * 60 * 1000,
   },
 };
 
