@@ -84,7 +84,7 @@ describe("Decentraland App pre-conditions", () => {
           `The image of the estate (id: ${assetId}) is blank`
         ).not.equals(blankImageData);
       } else if (isParcel) {
-        // Note: Parcels assets always show correct image
+        // Note: Parcel assets always show correct image
       }
     }
   });
