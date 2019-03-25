@@ -12,7 +12,7 @@ import DecentralandUtils from "../helpers/DecentralandUtils";
 
 const fetch = require("node-fetch");
 
-const { TWO, TEN, BILLION, WEI_PER_ETHER } = constants;
+const { TWO, TEN, BILLION, TOKEN_SUBDIVISIONS } = constants;
 
 describe("Decentraland App pre-conditions", () => {
   const mana = new Mana(MANA_ADDRESS);
