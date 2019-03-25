@@ -359,7 +359,8 @@ const getEstatesFromAPI = async () => {
 };
 
 const getParcelsFromAPI = async () => {
-  // Note: In the future, we can get that same data from Decentraland contracts to move away from this point of centralization in the future
+  // Note: In the future, we can get the same data from Decentraland contracts
+  // to move away from this point of centralization
   const res = await fetch(
     "https://api.decentraland.org/v1/parcels?status=open&limit=100"
   );
