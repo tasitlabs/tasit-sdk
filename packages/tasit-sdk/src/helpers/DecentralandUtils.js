@@ -23,7 +23,9 @@ export default class DecentralandUtils {
     this.#marketplace = new ethers.Contract(address, abi, this.#provider);
   }
 
-  getOpenSellOrders = async fromBlock => {
+  getAllAssetsForSale = async () => {
+    const fromBlock = 0;
+
     const [ordersCreated, ordersCancelled, ordersExecuted] = await Promise.all([
       this.#getCreatedSellOrders(fromBlock),
       this.#getCancelledSellOrders(fromBlock),
@@ -45,7 +47,7 @@ export default class DecentralandUtils {
           )
       );
 
-    return openOrders;
+    return openOrders.map(order => order.values);
   };
 
   #getCreatedSellOrders = async fromBlock => {
