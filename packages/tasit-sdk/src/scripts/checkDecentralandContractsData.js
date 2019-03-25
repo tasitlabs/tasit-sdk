@@ -55,8 +55,8 @@ describe("Decentraland App pre-conditions", () => {
   });
 
   it("Assets for sale", async () => {
-    const minPrice = bigNumberify("10000").mul(WEI_PER_ETHER);
-    const maxPrice = bigNumberify("100000").mul(WEI_PER_ETHER);
+    const minPrice = bigNumberify("10000").mul(TOKEN_SUBDIVISIONS);
+    const maxPrice = bigNumberify("100000").mul(TOKEN_SUBDIVISIONS);
 
     const blankImage = await fetch(
       "https://api.decentraland.org/v1/estates/5/map.png"
@@ -67,13 +67,12 @@ describe("Decentraland App pre-conditions", () => {
       const { id, assetId, nftAddress, priceInWei } = asset;
       const price = bigNumberify(priceInWei);
 
-      const isLand = addressesAreEqual(nftAddress, LAND_PROXY_ADDRESS);
+      const isParcel = addressesAreEqual(nftAddress, LAND_PROXY_ADDRESS);
       const isEstate = addressesAreEqual(nftAddress, ESTATE_ADDRESS);
 
       expect(price.gte(minPrice), `${price} isn't >= ${minPrice}`).to.be.true;
       expect(price.lte(maxPrice), `${price} isn't <= ${maxPrice}`).to.be.true;
 
-      // Parcels always show correct image
       if (isEstate) {
         const image = await fetch(
           `https://api.decentraland.org/v1/estates/${assetId}/map.png`
@@ -83,6 +82,8 @@ describe("Decentraland App pre-conditions", () => {
           imageData,
           `The image of the estate (id: ${assetId}) is blank`
         ).not.equals(blankImageData);
+      } else if (isParcel) {
+        // Note: Parcels assets always show correct image
       }
     }
   });

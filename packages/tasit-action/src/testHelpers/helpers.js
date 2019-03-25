@@ -24,12 +24,13 @@ const { bigNumberify } = ethersUtils;
 // Scientific notation works if the number is small enough (< 1e21) to be converted to string properly
 // See more: https://github.com/ethers-io/ethers.js/issues/228
 const ZERO = 0;
-const ONE = bigNumberify(1).mul(WEI_PER_ETHER);
-const TWO = bigNumberify(2).mul(WEI_PER_ETHER);
-const TEN = bigNumberify(10).mul(WEI_PER_ETHER);
-const ONE_HUNDRED = bigNumberify(100).mul(WEI_PER_ETHER);
-const ONE_THOUSAND = bigNumberify(1000).mul(WEI_PER_ETHER);
-const BILLION = bigNumberify(`${1e9}`).mul(WEI_PER_ETHER);
+const TOKEN_SUBDIVISIONS = WEI_PER_ETHER;
+const ONE = bigNumberify(1).mul(TOKEN_SUBDIVISIONS);
+const TWO = bigNumberify(2).mul(TOKEN_SUBDIVISIONS);
+const TEN = bigNumberify(10).mul(TOKEN_SUBDIVISIONS);
+const ONE_HUNDRED = bigNumberify(100).mul(TOKEN_SUBDIVISIONS);
+const ONE_THOUSAND = bigNumberify(1000).mul(TOKEN_SUBDIVISIONS);
+const BILLION = bigNumberify(`${1e9}`).mul(TOKEN_SUBDIVISIONS);
 
 const constants = {
   ZERO,
@@ -40,6 +41,7 @@ const constants = {
   ONE_THOUSAND,
   BILLION,
   WEI_PER_ETHER,
+  TOKEN_SUBDIVISIONS,
 };
 
 // TODO: Go deep on gas handling.
