@@ -15,7 +15,7 @@ const {
   constants: ethersConstants,
   Contract: ethersContract,
 } = ethers;
-const { WeiPerEther } = ethersConstants;
+const { WeiPerEther: WEI_PER_ETHER } = ethersConstants;
 const { bigNumberify } = ethersUtils;
 
 // In weis
@@ -24,12 +24,12 @@ const { bigNumberify } = ethersUtils;
 // Scientific notation works if the number is small enough (< 1e21) to be converted to string properly
 // See more: https://github.com/ethers-io/ethers.js/issues/228
 const ZERO = 0;
-const ONE = bigNumberify(1).mul(WeiPerEther);
-const TWO = bigNumberify(2).mul(WeiPerEther);
-const TEN = bigNumberify(10).mul(WeiPerEther);
-const ONE_HUNDRED = bigNumberify(100).mul(WeiPerEther);
-const ONE_THOUSAND = bigNumberify(1000).mul(WeiPerEther);
-const BILLION = bigNumberify(`${1e9}`).mul(WeiPerEther);
+const ONE = bigNumberify(1).mul(WEI_PER_ETHER);
+const TWO = bigNumberify(2).mul(WEI_PER_ETHER);
+const TEN = bigNumberify(10).mul(WEI_PER_ETHER);
+const ONE_HUNDRED = bigNumberify(100).mul(WEI_PER_ETHER);
+const ONE_THOUSAND = bigNumberify(1000).mul(WEI_PER_ETHER);
+const BILLION = bigNumberify(`${1e9}`).mul(WEI_PER_ETHER);
 
 const constants = {
   ZERO,
@@ -39,7 +39,7 @@ const constants = {
   ONE_HUNDRED,
   ONE_THOUSAND,
   BILLION,
-  WeiPerEther,
+  WEI_PER_ETHER,
 };
 
 // TODO: Go deep on gas handling.

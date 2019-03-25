@@ -23,7 +23,14 @@ import fs from "fs";
 
 import { duration } from "../../../tasit-sdk/dist/testHelpers/helpers";
 
-const { ONE, TEN, ONE_HUNDRED, ONE_THOUSAND, BILLION, WeiPerEther } = constants;
+const {
+  ONE,
+  TEN,
+  ONE_HUNDRED,
+  ONE_THOUSAND,
+  BILLION,
+  WEI_PER_ETHER,
+} = constants;
 
 let network = process.env.NETWORK;
 
@@ -294,7 +301,7 @@ const placeAssetSellOrder = async (nftAddress, assetId) => {
   marketplaceContract.setWallet(sellerWallet);
   const expireAt = Date.now() + duration.years(5);
   const price = getRandomInt(10, 100) + "000";
-  const priceInWei = bigNumberify(price).mul(WeiPerEther);
+  const priceInWei = bigNumberify(price).mul(WEI_PER_ETHER);
 
   const action = marketplaceContract.createOrder(
     nftAddress,

@@ -12,7 +12,7 @@ import DecentralandUtils from "../helpers/DecentralandUtils";
 
 const fetch = require("node-fetch");
 
-const { TWO, TEN, BILLION, WeiPerEther } = constants;
+const { TWO, TEN, BILLION, WEI_PER_ETHER } = constants;
 
 describe("Decentraland App pre-conditions", () => {
   const mana = new Mana(MANA_ADDRESS);
@@ -48,8 +48,8 @@ describe("Decentraland App pre-conditions", () => {
   });
 
   it("Assets for sale", async () => {
-    const minPrice = bigNumberify("10000").mul(WeiPerEther);
-    const maxPrice = bigNumberify("100000").mul(WeiPerEther);
+    const minPrice = bigNumberify("10000").mul(WEI_PER_ETHER);
+    const maxPrice = bigNumberify("100000").mul(WEI_PER_ETHER);
 
     const blankImage = await fetch(
       "https://api.decentraland.org/v1/estates/5/map.png"
