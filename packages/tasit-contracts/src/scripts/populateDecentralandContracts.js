@@ -154,11 +154,11 @@ const getIdsFromParcels = async parcels => {
 
 // Tech-debt: Use `assignMultipleParcels` to save gas cost.
 // The amount of parcels per call should be short enough to avoid out-of-gas.
-const createParcels = async allParcels => {
+const createParcels = async parcels => {
   console.log("Creating parcels...");
 
   let parcelIds = [];
-  for (let parcel of allParcels) {
+  for (let parcel of parcels) {
     try {
       const id = await createParcel(parcel);
       parcelIds.push(id);
@@ -166,6 +166,8 @@ const createParcels = async allParcels => {
       console.log("Parcel creation failed");
     }
   }
+
+  await updateParcelsData(parcels);
 
   return parcelIds;
 };
@@ -395,8 +397,6 @@ const getParcelsFromAPI = async () => {
     const estatesToCreate = [...estatesFromAPI];
 
     const parcelIds = await createParcels(parcelsToCreate);
-
-    await updateParcelsData(parcelsToCreate);
 
     const estateIds = await createEstates(estatesToCreate);
 
