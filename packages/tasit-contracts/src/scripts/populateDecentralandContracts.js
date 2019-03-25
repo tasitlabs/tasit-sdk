@@ -33,6 +33,13 @@ const {
 } = constants;
 
 let network = process.env.NETWORK;
+if (!network) {
+  throw new Error(
+    `Use NETWORK env argument to choose which chain will be populated.`
+  );
+} else {
+  console.log(`Populating data to the '${network}' chain...`);
+}
 
 let EVENTS_TIMEOUT;
 
