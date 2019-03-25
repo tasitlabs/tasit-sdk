@@ -38,8 +38,13 @@ describe("Decentraland App pre-conditions", () => {
   });
 
   describe("Gnosis Safe wallet owner", () => {
-    it("should have at least ten ethers", async () => {
-      await expectMinimumEtherBalances(provider, [GNOSIS_SAFE_ADDRESS], [TWO]);
+    it("should have at least two ethers", async () => {
+      const { address: gnosisSafeOwnerAddress } = gnosisSafeOwner;
+      await expectMinimumEtherBalances(
+        provider,
+        [gnosisSafeOwnerAddress],
+        [TWO]
+      );
     });
   });
 
