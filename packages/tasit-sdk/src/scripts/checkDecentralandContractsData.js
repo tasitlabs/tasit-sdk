@@ -17,7 +17,8 @@ const { TWO, TEN, BILLION, WEI_PER_ETHER } = constants;
 describe("Decentraland App pre-conditions", () => {
   const mana = new Mana(MANA_ADDRESS);
   // Note: Since accounts[0] is being used as owner of all deployed contracts
-  // We are using accounts[9] for Gnosis Safe test cases to make sure that it haven't undesired extra privilege access.
+  // We are using accounts[9] for Gnosis Safe test cases to make sure that it
+  // doesn't have undesired extra privilege access.
   const gnosisSafeOwner = accounts[9];
   const decentralandUtils = new DecentralandUtils();
   const { getAllAssetsForSale } = decentralandUtils;
