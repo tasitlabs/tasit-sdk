@@ -146,6 +146,7 @@ const getIdsFromParcels = async parcels => {
   for (let parcel of parcels) {
     const { x, y } = parcel;
     const id = await landContract.encodeTokenId(`${x}`, `${y}`);
+    console.log(`${id}`);
     parcelIds.push(id);
   }
 
@@ -340,7 +341,7 @@ const placeAssetSellOrder = async (nftAddress, assetId) => {
   const priceInWei = bigNumberify(price).mul(WEI_PER_ETHER);
 
   const type = nftAddress == ESTATE_ADDRESS ? "estate" : "parcel";
-  console.log(`placing sell order for the ${type} with id ${id}`);
+  console.log(`placing sell order for the ${type} with id ${assetId}`);
 
   const action = marketplaceContract.createOrder(
     nftAddress,
@@ -417,8 +418,6 @@ const getParcelsFromAPI = async () => {
     const parcelsFromAPI = await getParcelsFromAPI();
     const estatesFromAPI = await getEstatesFromAPI();
 
-    const estatesParcels = extractParcelsFromEstates(estatesFromAPI);
-
     const estatesParcelsWithoutDuplication = estatesParcels.filter(
       estateParcel => !findParcel(estateParcel, parcelsFromAPI)
     );
@@ -435,6 +434,10 @@ const getParcelsFromAPI = async () => {
     const estateIds = await createEstates(estatesToCreate);
 
     await approveMarketplace();
+
+    // const parcelIds = await getIdsFromParcels(parcelsToCreate);
+    // let estateIds = [];
+    // for (let i = 11; i < 90; ++i) estateIds.push(i);
 
     await placeAssetOrders(estateIds, parcelIds);
 
