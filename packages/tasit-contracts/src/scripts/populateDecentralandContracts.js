@@ -418,6 +418,8 @@ const getParcelsFromAPI = async () => {
     const parcelsFromAPI = await getParcelsFromAPI();
     const estatesFromAPI = await getEstatesFromAPI();
 
+    const estatesParcels = extractParcelsFromEstates(estatesFromAPI);
+
     const estatesParcelsWithoutDuplication = estatesParcels.filter(
       estateParcel => !findParcel(estateParcel, parcelsFromAPI)
     );
