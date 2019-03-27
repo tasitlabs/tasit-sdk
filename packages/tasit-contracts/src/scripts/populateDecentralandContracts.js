@@ -239,7 +239,7 @@ const createEstate = async estate => {
       resolve(args._estateId);
     });
 
-    // Some error (orphan block, failed tx) events are been trigger only from the confirmationListener
+    // Some error (orphan block, failed tx) events are being triggered only from the confirmationListener
     // See more: https://github.com/tasitlabs/TasitSDK/issues/253
     action.on("confirmation", () => {});
 
