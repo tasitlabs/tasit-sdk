@@ -146,7 +146,6 @@ const getIdsFromParcels = async parcels => {
   for (let parcel of parcels) {
     const { x, y } = parcel;
     const id = await landContract.encodeTokenId(`${x}`, `${y}`);
-    console.log(`${id}`);
     parcelIds.push(id);
   }
 
