@@ -185,9 +185,16 @@ const createParcel = async parcel => {
   console.log(`creating parcel.... ${x},${y}`);
 
   const parcelId = await new Promise((resolve, reject) => {
+    const timeout = setTimeout(() => {
+      console.log(`Timeout reached.`);
+      action.unsubscribe();
+      reject();
+    }, EVENTS_TIMEOUT);
+
     action.on("confirmation", async message => {
       const id = await landContract.encodeTokenId(`${x}`, `${y}`);
       action.unsubscribe();
+      clearTimeout(timeout);
       resolve(id);
     });
 
@@ -197,12 +204,6 @@ const createParcel = async parcel => {
       action.unsubscribe();
       reject();
     });
-
-    setTimeout(() => {
-      console.log(`Timeout reached`);
-      action.unsubscribe();
-      reject();
-    }, EVENTS_TIMEOUT);
   });
 
   await action.waitForNonceToUpdate();
@@ -235,10 +236,18 @@ const createEstate = async estate => {
   );
 
   const estateId = await new Promise((resolve, reject) => {
+    const timeout = setTimeout(() => {
+      console.log(`Timeout reached`);
+      estateContract.unsubscribe();
+      action.unsubscribe();
+      reject();
+    }, EVENTS_TIMEOUT);
+
     estateContract.on("CreateEstate", message => {
       const { data } = message;
       const { args } = data;
       estateContract.unsubscribe();
+      clearTimeout(timeout);
       resolve(args._estateId);
     });
 
@@ -261,13 +270,6 @@ const createEstate = async estate => {
       action.unsubscribe();
       reject();
     });
-
-    setTimeout(() => {
-      console.log(`Timeout reached`);
-      estateContract.unsubscribe();
-      action.unsubscribe();
-      reject();
-    }, EVENTS_TIMEOUT);
   });
 
   await action.waitForNonceToUpdate();
