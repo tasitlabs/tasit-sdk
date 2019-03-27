@@ -192,11 +192,14 @@ const createParcel = async parcel => {
     });
 
     action.on("error", message => {
+      const { error } = message;
+      console.log(error);
       action.unsubscribe();
       reject();
     });
 
     setTimeout(() => {
+      console.log(`Timeout reached`);
       action.unsubscribe();
       reject();
     }, EVENTS_TIMEOUT);
@@ -244,18 +247,23 @@ const createEstate = async estate => {
     action.on("confirmation", () => {});
 
     action.on("error", message => {
+      const { error } = message;
+      console.log(error);
       estateContract.unsubscribe();
       action.unsubscribe();
       reject();
     });
 
     estateContract.on("error", message => {
+      const { error } = message;
+      console.log(error);
       estateContract.unsubscribe();
       action.unsubscribe();
       reject();
     });
 
     setTimeout(() => {
+      console.log(`Timeout reached`);
       estateContract.unsubscribe();
       action.unsubscribe();
       reject();
