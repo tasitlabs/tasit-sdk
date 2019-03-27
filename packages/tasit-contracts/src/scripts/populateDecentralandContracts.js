@@ -437,10 +437,6 @@ const getParcelsFromAPI = async () => {
 
     await approveMarketplace();
 
-    // const parcelIds = await getIdsFromParcels(parcelsToCreate);
-    // let estateIds = [];
-    // for (let i = 11; i < 90; ++i) estateIds.push(i);
-
     await placeAssetOrders(estateIds, parcelIds);
 
     await cancelOrdersOfEstatesWithoutImage(estateIds);
