@@ -60,7 +60,7 @@ if (network === "goerli") {
 } else if (network === "development") {
   network = "local";
   EVENTS_TIMEOUT = 1000;
-  ASSETS_TO_CREATE = 20;
+  ASSETS_TO_CREATE = 5;
 }
 const {
   LANDProxy,
@@ -230,7 +230,7 @@ const createEstate = async estate => {
 
   console.log(`creating estate.... ${xArray} - ${yArray}`);
 
-  landContract.setWallet(sellerWallet);
+  landContract.setWallet(minterWallet);
   const action = landContract.createEstateWithMetadata(
     xArray,
     yArray,
@@ -356,7 +356,6 @@ const placeAssetOrders = async (estateIds, parcelIds) => {
 };
 
 const placeAssetSellOrder = async (nftAddress, assetId) => {
-  marketplaceContract.setWallet(sellerWallet);
   const expireAt = Date.now() + duration.years(5);
   const price = getRandomInt(10, 100) + "000";
   const priceInWei = bigNumberify(price).mul(WEI_PER_ETHER);
@@ -364,6 +363,7 @@ const placeAssetSellOrder = async (nftAddress, assetId) => {
   const type = nftAddress == ESTATE_ADDRESS ? "estate" : "parcel";
   console.log(`placing sell order for the ${type} with id ${assetId}`);
 
+  marketplaceContract.setWallet(sellerWallet);
   const action = marketplaceContract.createOrder(
     nftAddress,
     assetId,
