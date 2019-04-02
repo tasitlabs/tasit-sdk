@@ -42,6 +42,7 @@ if (!network) {
 }
 
 let EVENTS_TIMEOUT;
+let ASSETS_TO_CREATE;
 
 const config = require(`../config/${network}.js`);
 
@@ -52,11 +53,14 @@ if (network === "goerli") {
     gasPrice: 1e10,
   };
   EVENTS_TIMEOUT = 5 * 60 * 1000;
+  ASSETS_TO_CREATE = 100;
 } else if (network === "ropsten") {
   EVENTS_TIMEOUT = 5 * 60 * 1000;
+  ASSETS_TO_CREATE = 100;
 } else if (network === "development") {
   network = "local";
   EVENTS_TIMEOUT = 1000;
+  ASSETS_TO_CREATE = 20;
 }
 const {
   LANDProxy,
@@ -246,6 +250,7 @@ const createEstate = async estate => {
     estateContract.on("CreateEstate", message => {
       const { data } = message;
       const { args } = data;
+      action.unsubscribe();
       estateContract.unsubscribe();
       clearTimeout(timeout);
       resolve(args._estateId);
@@ -253,7 +258,14 @@ const createEstate = async estate => {
 
     // Some error (orphan block, failed tx) events are being triggered only from the confirmationListener
     // See more: https://github.com/tasitlabs/TasitSDK/issues/253
-    action.on("confirmation", () => {});
+    action.on("confirmation", message => {
+      const { data } = message;
+      const { confirmations } = data;
+      if (confirmations >= 1) {
+        estateContract.unsubscribe();
+        action.unsubscribe();
+      }
+    });
 
     action.on("error", message => {
       const { error } = message;
@@ -380,8 +392,9 @@ const estateContainsParcelFromList = (estate, listOfParcels) => {
 const getEstatesFromAPI = async () => {
   // Note: In the future, we can get the same data from Decentraland contracts
   // to move away from this point of centralization
+  const assetsToCreate = ASSETS_TO_CREATE / 2;
   const res = await fetch(
-    "https://api.decentraland.org/v1/estates?status=open&limit=100"
+    `https://api.decentraland.org/v1/estates?status=open&limit=${assetsToCreate}`
   );
   const json = await res.json();
   const { data: jsonData } = json;
@@ -401,8 +414,9 @@ const getEstatesFromAPI = async () => {
 const getParcelsFromAPI = async () => {
   // Note: In the future, we can get the same data from Decentraland contracts
   // to move away from this point of centralization
+  const assetsToCreate = ASSETS_TO_CREATE / 2;
   const res = await fetch(
-    "https://api.decentraland.org/v1/parcels?status=open&limit=100"
+    `https://api.decentraland.org/v1/parcels?status=open&limit=${assetsToCreate}`
   );
   const json = await res.json();
   const { data: jsonData } = json;
