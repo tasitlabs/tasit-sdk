@@ -48,7 +48,7 @@ const config = require(`../config/${network}.js`);
 
 if (network === "development") {
   network = "local";
-  EVENTS_TIMEOUT = 2500;
+  EVENTS_TIMEOUT = 2500; // 2.5 seconds
   ASSETS_TO_CREATE = 20;
 } else {
   // non-local chains
