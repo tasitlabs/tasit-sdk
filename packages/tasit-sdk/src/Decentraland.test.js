@@ -6,6 +6,11 @@ const { Decentraland } = Marketplace;
 const { GnosisSafe } = ContractBasedAccount;
 import { ethers } from "ethers";
 
+import DecentralandUtils from "./helpers/DecentralandUtils";
+
+const decentralandUtils = new DecentralandUtils();
+const { getEstateIdsOf, getParcelIdsOf, getAssetsOf } = decentralandUtils;
+
 const { ONE, TEN, ONE_HUNDRED } = constants;
 const SMALL_AMOUNT = bigNumberify(`${1e17}`); // 0.1 ethers
 
@@ -311,6 +316,14 @@ describe("Decentraland", () => {
           await executeOrderAction.waitForNonceToUpdate();
 
           await expectExactTokenBalances(estate, [ephemeralAddress], [1]);
+
+          const estateIds = await getEstateIdsOf(ephemeralAddress);
+          const assetIds = await getAssetsOf(ephemeralAddress);
+          const { length: estatesBalance } = estateIds;
+          const { length: assetsBalance } = assetIds;
+
+          expect(estatesBalance).to.equal(1);
+          expect(assetsBalance).to.equal(1);
         });
 
         it("should buy a parcel of land", async () => {
@@ -340,6 +353,14 @@ describe("Decentraland", () => {
           await executeOrderAction.waitForNonceToUpdate();
 
           await expectExactTokenBalances(land, [ephemeralAddress], [1]);
+
+          const parcelIds = await getParcelIdsOf(ephemeralAddress);
+          const assetIds = await getAssetsOf(ephemeralAddress);
+          const { length: parcelsBalance } = parcelIds;
+          const { length: assetsBalance } = assetIds;
+
+          expect(parcelsBalance).to.equal(1);
+          expect(assetsBalance).to.equal(1);
         });
       });
 
