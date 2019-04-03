@@ -40,6 +40,6 @@
     "mocha": "^6.0.2",
     "node-fetch": "^2.3.0",
     "sinon": "^7.2.5",
-    "tasit-account": "^0.0.14"
+    "tasit-account": "^0.0.15"
   }
 }
