@@ -240,7 +240,7 @@ const createEstate = async estate => {
     xArray,
     yArray,
     beneficiaryAddress,
-    estateName,
+    `${estateName}`,
     gasParams
   );
 
@@ -461,7 +461,8 @@ const getParcelsFromAPI = async () => {
 
     await placeAssetOrders(estateIds, parcelIds);
 
-    await cancelOrdersOfEstatesWithoutImage(estateIds);
+    // Removing orders from non-development chains
+    if (network !== "local") await cancelOrdersOfEstatesWithoutImage(estateIds);
   } catch (err) {
     console.error(err);
   }
