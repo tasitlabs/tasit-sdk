@@ -7,7 +7,7 @@ import DecentralandUtils from "./DecentralandUtils";
 
 // Note: This test suite assumes that all parcels and estates of SellerWallet are for sale
 // See more: `TasitSDk/packages/tasit-contracts/src/script/populateDecentralandContracts.js`
-describe("DecentralandUtils", () => {
+describe.only("DecentralandUtils", () => {
   const [minterWallet, sellerWallet] = accounts;
   const { address: sellerAddress } = sellerWallet;
   let mana;
@@ -21,7 +21,6 @@ describe("DecentralandUtils", () => {
     getParcelIdsOf,
     getAssetsOf,
   } = decentralandUtils;
-  let assetsForSale;
 
   const isAssetAnEstate = asset => asset.nftAddress === estate.getAddress();
   const isAssetAParcel = asset => asset.nftAddress === land.getAddress();
@@ -31,11 +30,11 @@ describe("DecentralandUtils", () => {
     land = new Land(LAND_PROXY_ADDRESS);
     estate = new Estate(ESTATE_ADDRESS);
     marketplace = new Decentraland(MARKETPLACE_ADDRESS);
-
-    assetsForSale = await getAllAssetsForSale();
   });
 
   it("should get parcels for sale", async () => {
+    const assetsForSale = await getAllAssetsForSale();
+
     const parcelsForSale = assetsForSale.filter(isAssetAParcel);
     const { length: parcelsForSaleAmount } = parcelsForSale;
 
@@ -45,6 +44,8 @@ describe("DecentralandUtils", () => {
   });
 
   it("should get estates for sale", async () => {
+    const assetsForSale = await getAllAssetsForSale();
+
     const estatesForSale = assetsForSale.filter(isAssetAnEstate);
     const { length: estatesForSaleAmount } = estatesForSale;
 
@@ -54,6 +55,8 @@ describe("DecentralandUtils", () => {
   });
 
   it("should get assets owned by an address", async () => {
+    const assetsForSale = await getAllAssetsForSale();
+
     const estateContractAddress = estate.getAddress();
 
     const sellerEstateIds = await getEstateIdsOf(sellerAddress);
