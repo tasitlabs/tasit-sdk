@@ -179,7 +179,7 @@ export default class DecentralandUtils {
 
   #listEventLogs = async (eventABI, filter) => {
     // Note: We are using fromBlock = 0 because:
-    // - For development blockchain, ist's faster since are few blocks mined.
+    // - For development blockchain, it's faster since there are few blocks mined.
     // - For (forked from) testnet blockchain, it's made by one HTTP over RPC call
     //   (Infura/Etherscan) and it's faster too.
     const fromBlock = 0;
