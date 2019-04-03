@@ -42,22 +42,28 @@ if (!network) {
 }
 
 let EVENTS_TIMEOUT;
+let ASSETS_TO_CREATE;
 
 const config = require(`../config/${network}.js`);
 
-// https://stats.goerli.net/
-if (network === "goerli") {
-  gasParams = {
-    gasLimit: 8e6,
-    gasPrice: 1e10,
-  };
-  EVENTS_TIMEOUT = 5 * 60 * 1000;
-} else if (network === "ropsten") {
-  EVENTS_TIMEOUT = 5 * 60 * 1000;
-} else if (network === "development") {
+if (network === "development") {
   network = "local";
-  EVENTS_TIMEOUT = 1000;
+  EVENTS_TIMEOUT = 2500; // 2.5 seconds
+  ASSETS_TO_CREATE = 20;
+} else {
+  // non-local chains
+  EVENTS_TIMEOUT = 5 * 60 * 1000;
+  ASSETS_TO_CREATE = 100;
+
+  // https://stats.goerli.net/
+  if (network === "goerli") {
+    gasParams = {
+      gasLimit: 8e6,
+      gasPrice: 1e10,
+    };
+  }
 }
+
 const {
   LANDProxy,
   EstateRegistry,
@@ -134,10 +140,13 @@ const updateParcelsData = async parcels => {
   landContract.setWallet(sellerWallet);
   for (let parcel of parcels) {
     let { x, y, metadata: parcelName } = parcel;
+    console.log(`Setting metadata for parcel (${x},${y})...`);
     if (parcelName && parcelName !== "") {
       const updateAction = landContract.updateLandData(x, y, parcelName);
       await updateAction.waitForNonceToUpdate();
+      console.log("Done");
     }
+    console.log("Skipped because this parcel has no metadata.");
   }
 };
 
@@ -182,31 +191,32 @@ const createParcel = async parcel => {
     gasParams
   );
 
-  console.log(`creating parcel.... ${x},${y}`);
+  console.log(`Creating parcel (${x},${y})...`);
 
   const parcelId = await new Promise((resolve, reject) => {
+    const timeout = setTimeout(() => {
+      console.log(`Timeout reached for parcel (${x},${y}) creation.`);
+      action.unsubscribe();
+      reject();
+    }, EVENTS_TIMEOUT);
+
     action.on("confirmation", async message => {
       const id = await landContract.encodeTokenId(`${x}`, `${y}`);
       action.unsubscribe();
+      clearTimeout(timeout);
       resolve(id);
     });
 
     action.on("error", message => {
       const { error } = message;
-      console.log(error);
+      console.log(error.message);
       action.unsubscribe();
       reject();
     });
-
-    setTimeout(() => {
-      console.log(`Timeout reached`);
-      action.unsubscribe();
-      reject();
-    }, EVENTS_TIMEOUT);
   });
 
   await action.waitForNonceToUpdate();
-  console.log(`created id ${parcelId}`);
+  console.log(`Parcel ID = ${parcelId}`);
 
   return parcelId;
 };
@@ -223,55 +233,57 @@ const createEstate = async estate => {
     yArray.push(parcel.y);
   });
 
-  console.log(`creating estate.... ${xArray} - ${yArray}`);
+  console.log(`Creating estate (${xArray} - ${yArray})...`);
 
   landContract.setWallet(sellerWallet);
   const action = landContract.createEstateWithMetadata(
     xArray,
     yArray,
     beneficiaryAddress,
-    estateName,
+    `${estateName}`,
     gasParams
   );
 
   const estateId = await new Promise((resolve, reject) => {
-    estateContract.on("CreateEstate", message => {
-      const { data } = message;
-      const { args } = data;
+    const timeout = setTimeout(() => {
+      console.log(
+        `Timeout reached for estate (${xArray} - ${yArray}) creation.`
+      );
       estateContract.unsubscribe();
-      resolve(args._estateId);
-    });
+      action.unsubscribe();
+      reject();
+    }, EVENTS_TIMEOUT);
 
     // Some error (orphan block, failed tx) events are being triggered only from the confirmationListener
     // See more: https://github.com/tasitlabs/TasitSDK/issues/253
-    action.on("confirmation", () => {});
+    action.on("confirmation", message => {});
 
     action.on("error", message => {
       const { error } = message;
-      console.log(error);
-      estateContract.unsubscribe();
+      console.log(error.message);
       action.unsubscribe();
       reject();
     });
 
     estateContract.on("error", message => {
       const { error } = message;
-      console.log(error);
+      console.log(error.message);
       estateContract.unsubscribe();
-      action.unsubscribe();
       reject();
     });
 
-    setTimeout(() => {
-      console.log(`Timeout reached`);
-      estateContract.unsubscribe();
+    estateContract.on("CreateEstate", message => {
+      const { data } = message;
+      const { args } = data;
       action.unsubscribe();
-      reject();
-    }, EVENTS_TIMEOUT);
+      estateContract.unsubscribe();
+      clearTimeout(timeout);
+      resolve(args._estateId);
+    });
   });
 
   await action.waitForNonceToUpdate();
-  console.log(`created id ${estateId}`);
+  console.log(`Estate ID = ${estateId}`);
 
   return estateId;
 };
@@ -342,7 +354,6 @@ const placeAssetOrders = async (estateIds, parcelIds) => {
 };
 
 const placeAssetSellOrder = async (nftAddress, assetId) => {
-  marketplaceContract.setWallet(sellerWallet);
   const expireAt = Date.now() + duration.years(5);
   const price = getRandomInt(10, 100) + "000";
   const priceInWei = bigNumberify(price).mul(WEI_PER_ETHER);
@@ -350,6 +361,7 @@ const placeAssetSellOrder = async (nftAddress, assetId) => {
   const type = nftAddress == ESTATE_ADDRESS ? "estate" : "parcel";
   console.log(`placing sell order for the ${type} with id ${assetId}`);
 
+  marketplaceContract.setWallet(sellerWallet);
   const action = marketplaceContract.createOrder(
     nftAddress,
     assetId,
@@ -378,8 +390,9 @@ const estateContainsParcelFromList = (estate, listOfParcels) => {
 const getEstatesFromAPI = async () => {
   // Note: In the future, we can get the same data from Decentraland contracts
   // to move away from this point of centralization
+  const assetsToCreate = ASSETS_TO_CREATE / 2;
   const res = await fetch(
-    "https://api.decentraland.org/v1/estates?status=open&limit=100"
+    `https://api.decentraland.org/v1/estates?status=open&limit=${assetsToCreate}`
   );
   const json = await res.json();
   const { data: jsonData } = json;
@@ -399,8 +412,9 @@ const getEstatesFromAPI = async () => {
 const getParcelsFromAPI = async () => {
   // Note: In the future, we can get the same data from Decentraland contracts
   // to move away from this point of centralization
+  const assetsToCreate = ASSETS_TO_CREATE / 2;
   const res = await fetch(
-    "https://api.decentraland.org/v1/parcels?status=open&limit=100"
+    `https://api.decentraland.org/v1/parcels?status=open&limit=${assetsToCreate}`
   );
   const json = await res.json();
   const { data: jsonData } = json;
@@ -422,31 +436,26 @@ const getParcelsFromAPI = async () => {
     await etherFaucet(provider, minterWallet, GNOSIS_SAFE_ADDRESS, TEN);
     await erc20Faucet(manaContract, minterWallet, GNOSIS_SAFE_ADDRESS, BILLION);
 
-    const parcelsFromAPI = await getParcelsFromAPI();
-    const estatesFromAPI = await getEstatesFromAPI();
+    const [parcels, estates] = await Promise.all([
+      getParcelsFromAPI(),
+      getEstatesFromAPI(),
+    ]);
 
-    const estatesParcels = extractParcelsFromEstates(estatesFromAPI);
-
-    const estatesParcelsWithoutDuplication = estatesParcels.filter(
-      estateParcel => !findParcel(estateParcel, parcelsFromAPI)
+    const estatesParcels = extractParcelsFromEstates(estates).filter(
+      estateParcel => !findParcel(estateParcel, parcels)
     );
 
-    const parcelsToCreate = [
-      ...parcelsFromAPI,
-      ...estatesParcelsWithoutDuplication,
-    ];
+    const parcelIds = await createParcels(parcels);
 
-    const estatesToCreate = [...estatesFromAPI];
-
-    const parcelIds = await createParcels(parcelsToCreate);
-
-    const estateIds = await createEstates(estatesToCreate);
+    await createParcels(estatesParcels);
+    const estateIds = await createEstates(estates);
 
     await approveMarketplace();
 
     await placeAssetOrders(estateIds, parcelIds);
 
-    await cancelOrdersOfEstatesWithoutImage(estateIds);
+    // Removing orders from non-development chains
+    if (network !== "local") await cancelOrdersOfEstatesWithoutImage(estateIds);
   } catch (err) {
     console.error(err);
   }
