@@ -46,22 +46,24 @@ let ASSETS_TO_CREATE;
 
 const config = require(`../config/${network}.js`);
 
-// https://stats.goerli.net/
-if (network === "goerli") {
-  gasParams = {
-    gasLimit: 8e6,
-    gasPrice: 1e10,
-  };
-  EVENTS_TIMEOUT = 5 * 60 * 1000;
-  ASSETS_TO_CREATE = 100;
-} else if (network === "ropsten") {
-  EVENTS_TIMEOUT = 5 * 60 * 1000;
-  ASSETS_TO_CREATE = 100;
-} else if (network === "development") {
+if (network === "development") {
   network = "local";
-  EVENTS_TIMEOUT = 1000;
-  ASSETS_TO_CREATE = 2;
+  EVENTS_TIMEOUT = 2500;
+  ASSETS_TO_CREATE = 6;
+} else {
+  // non-local chains
+  EVENTS_TIMEOUT = 5 * 60 * 1000;
+  ASSETS_TO_CREATE = 100;
+
+  // https://stats.goerli.net/
+  if (network === "goerli") {
+    gasParams = {
+      gasLimit: 8e6,
+      gasPrice: 1e10,
+    };
+  }
 }
+
 const {
   LANDProxy,
   EstateRegistry,
@@ -138,10 +140,13 @@ const updateParcelsData = async parcels => {
   landContract.setWallet(sellerWallet);
   for (let parcel of parcels) {
     let { x, y, metadata: parcelName } = parcel;
+    console.log(`Setting metadata to parcel (${x},${y})...`);
     if (parcelName && parcelName !== "") {
       const updateAction = landContract.updateLandData(x, y, parcelName);
       await updateAction.waitForNonceToUpdate();
+      console.log("Done");
     }
+    console.log("Skipped because this parcel has no metadata.");
   }
 };
 
@@ -186,7 +191,7 @@ const createParcel = async parcel => {
     gasParams
   );
 
-  console.log(`creating parcel.... ${x},${y}`);
+  console.log(`Creating parcel (${x},${y})...`);
 
   const parcelId = await new Promise((resolve, reject) => {
     const timeout = setTimeout(() => {
@@ -204,14 +209,14 @@ const createParcel = async parcel => {
 
     action.on("error", message => {
       const { error } = message;
-      console.log(error);
+      console.log(error.message);
       action.unsubscribe();
       reject();
     });
   });
 
   await action.waitForNonceToUpdate();
-  console.log(`created id ${parcelId}`);
+  console.log(`Parcel ID = ${parcelId}`);
 
   return parcelId;
 };
@@ -247,6 +252,30 @@ const createEstate = async estate => {
       reject();
     }, EVENTS_TIMEOUT);
 
+    // Some error (orphan block, failed tx) events are being triggered only from the confirmationListener
+    // See more: https://github.com/tasitlabs/TasitSDK/issues/253
+    action.on("confirmation", message => {
+      const { data } = message;
+      const { confirmations } = data;
+      if (confirmations >= 1) {
+        action.unsubscribe();
+      }
+    });
+
+    action.on("error", message => {
+      const { error } = message;
+      console.log(error.message);
+      action.unsubscribe();
+      reject();
+    });
+
+    estateContract.on("error", message => {
+      const { error } = message;
+      console.log(error.message);
+      estateContract.unsubscribe();
+      reject();
+    });
+
     estateContract.on("CreateEstate", message => {
       const { data } = message;
       const { args } = data;
@@ -254,33 +283,6 @@ const createEstate = async estate => {
       estateContract.unsubscribe();
       clearTimeout(timeout);
       resolve(args._estateId);
-    });
-
-    // Some error (orphan block, failed tx) events are being triggered only from the confirmationListener
-    // See more: https://github.com/tasitlabs/TasitSDK/issues/253
-    action.on("confirmation", message => {
-      const { data } = message;
-      const { confirmations } = data;
-      if (confirmations >= 1) {
-        estateContract.unsubscribe();
-        action.unsubscribe();
-      }
-    });
-
-    action.on("error", message => {
-      const { error } = message;
-      console.log(error);
-      estateContract.unsubscribe();
-      action.unsubscribe();
-      reject();
-    });
-
-    estateContract.on("error", message => {
-      const { error } = message;
-      console.log(error);
-      estateContract.unsubscribe();
-      action.unsubscribe();
-      reject();
     });
   });
 
@@ -447,12 +449,10 @@ const getParcelsFromAPI = async () => {
 
     const parcelIds = await createParcels(parcels);
 
-    const estateParcelIds = await createParcels(estatesParcels);
+    await createParcels(estatesParcels);
     const estateIds = await createEstates(estates);
 
     await approveMarketplace();
-
-    console.log(estateIds, parcelIds);
 
     await placeAssetOrders(estateIds, parcelIds);
 
