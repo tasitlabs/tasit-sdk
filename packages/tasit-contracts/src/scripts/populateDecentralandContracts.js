@@ -256,13 +256,7 @@ const createEstate = async estate => {
 
     // Some error (orphan block, failed tx) events are being triggered only from the confirmationListener
     // See more: https://github.com/tasitlabs/TasitSDK/issues/253
-    action.on("confirmation", message => {
-      const { data } = message;
-      const { confirmations } = data;
-      if (confirmations >= 1) {
-        action.unsubscribe();
-      }
-    });
+    action.on("confirmation", message => {});
 
     action.on("error", message => {
       const { error } = message;
@@ -441,9 +435,6 @@ const getParcelsFromAPI = async () => {
     // Fund Gnosis Safe wallet with Mana tokens and ethers
     await etherFaucet(provider, minterWallet, GNOSIS_SAFE_ADDRESS, TEN);
     await erc20Faucet(manaContract, minterWallet, GNOSIS_SAFE_ADDRESS, BILLION);
-
-    // const parcels = await getParcelsFromAPI();
-    // const estates = await getEstatesFromAPI();
 
     const [parcels, estates] = await Promise.all([
       getParcelsFromAPI(),
