@@ -49,7 +49,7 @@ const config = require(`../config/${network}.js`);
 if (network === "development") {
   network = "local";
   EVENTS_TIMEOUT = 2500;
-  ASSETS_TO_CREATE = 6;
+  ASSETS_TO_CREATE = 20;
 } else {
   // non-local chains
   EVENTS_TIMEOUT = 5 * 60 * 1000;
@@ -440,8 +440,13 @@ const getParcelsFromAPI = async () => {
     await etherFaucet(provider, minterWallet, GNOSIS_SAFE_ADDRESS, TEN);
     await erc20Faucet(manaContract, minterWallet, GNOSIS_SAFE_ADDRESS, BILLION);
 
-    const parcels = await getParcelsFromAPI();
-    const estates = await getEstatesFromAPI();
+    // const parcels = await getParcelsFromAPI();
+    // const estates = await getEstatesFromAPI();
+
+    const [parcels, estates] = await Promise.all([
+      getParcelsFromAPI(),
+      getEstatesFromAPI(),
+    ]);
 
     const estatesParcels = extractParcelsFromEstates(estates).filter(
       estateParcel => !findParcel(estateParcel, parcels)
