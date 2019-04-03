@@ -140,7 +140,7 @@ const updateParcelsData = async parcels => {
   landContract.setWallet(sellerWallet);
   for (let parcel of parcels) {
     let { x, y, metadata: parcelName } = parcel;
-    console.log(`Setting metadata to parcel (${x},${y})...`);
+    console.log(`Setting metadata for parcel (${x},${y})...`);
     if (parcelName && parcelName !== "") {
       const updateAction = landContract.updateLandData(x, y, parcelName);
       await updateAction.waitForNonceToUpdate();
