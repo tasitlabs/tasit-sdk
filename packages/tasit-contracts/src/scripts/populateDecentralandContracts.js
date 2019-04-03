@@ -60,7 +60,7 @@ if (network === "goerli") {
 } else if (network === "development") {
   network = "local";
   EVENTS_TIMEOUT = 1000;
-  ASSETS_TO_CREATE = 5;
+  ASSETS_TO_CREATE = 6;
 }
 const {
   LANDProxy,
@@ -230,7 +230,7 @@ const createEstate = async estate => {
 
   console.log(`creating estate.... ${xArray} - ${yArray}`);
 
-  landContract.setWallet(minterWallet);
+  landContract.setWallet(sellerWallet);
   const action = landContract.createEstateWithMetadata(
     xArray,
     yArray,

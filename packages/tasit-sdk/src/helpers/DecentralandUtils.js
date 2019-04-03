@@ -6,6 +6,8 @@ import ProviderFactory from "tasit-action/dist/ProviderFactory";
 // Fetching data likely will be replaced with subgraph queries
 export default class DecentralandUtils {
   #marketplace;
+  #estate;
+  #land;
   #provider;
 
   constructor() {
@@ -18,18 +20,37 @@ export default class DecentralandUtils {
     if (networkName === "goerli" || networkName === "ropsten")
       this.#provider = ethers.getDefaultProvider(networkName);
 
-    const { Marketplace } = TasitContracts[networkName];
-    const { address, abi } = Marketplace;
-    this.#marketplace = new ethers.Contract(address, abi, this.#provider);
+    const {
+      Marketplace,
+      EstateRegistry,
+      LANDRegistry,
+      LANDProxy,
+    } = TasitContracts[networkName];
+    const { address: marketplaceAddress, abi: marketplaceABI } = Marketplace;
+    const { address: estateAddress, abi: estateABI } = EstateRegistry;
+    const { abi: landABI } = LANDRegistry;
+    const { address: landAddress } = LANDProxy;
+
+    this.#marketplace = new ethers.Contract(
+      marketplaceAddress,
+      marketplaceABI,
+      this.#provider
+    );
+
+    this.#estate = new ethers.Contract(
+      estateAddress,
+      estateABI,
+      this.#provider
+    );
+
+    this.#land = new ethers.Contract(landAddress, landABI, this.#provider);
   }
 
   getAllAssetsForSale = async () => {
-    const fromBlock = 0;
-
     const [ordersCreated, ordersCancelled, ordersExecuted] = await Promise.all([
-      this.#getCreatedSellOrders(fromBlock),
-      this.#getCancelledSellOrders(fromBlock),
-      this.#getExecutedSellOrders(fromBlock),
+      this.#getCreatedSellOrders(),
+      this.#getCancelledSellOrders(),
+      this.#getExecutedSellOrders(),
     ]);
 
     // Open = Created - Cancelled - Executed
@@ -50,19 +71,78 @@ export default class DecentralandUtils {
     return openOrders.map(order => order.values);
   };
 
-  #getCreatedSellOrders = async fromBlock => {
-    return this.#getOrders(fromBlock, "OrderCreated");
+  getAssetsOf = async address => {
+    const [estateIds, parcelIds] = await Promise.all([
+      this.getEstateIdsOf(address),
+      this.getParcelIdsOf(address),
+    ]);
+
+    const estateAddress = this.#estate.address;
+    const landAddress = this.#land.address;
+
+    const estates = estateIds.map(id => ({
+      id,
+      nftAddress: estateAddress,
+    }));
+
+    const parcels = parcelIds.map(id => ({
+      id,
+      nftAddress: landAddress,
+    }));
+
+    const assets = [...estates, ...parcels];
+
+    return assets;
   };
 
-  #getCancelledSellOrders = async fromBlock => {
-    return this.#getOrders(fromBlock, "OrderCancelled");
+  getEstateIdsOf = async address => {
+    const ids = await this.#getAssetIdsOf(this.#estate, address);
+    return ids;
   };
 
-  #getExecutedSellOrders = async fromBlock => {
-    return this.#getOrders(fromBlock, "OrderSuccessful");
+  getParcelIdsOf = async address => {
+    const ids = await this.#getAssetIdsOf(this.#land, address);
+    return ids;
   };
 
-  #getOrders = async (fromBlock, eventName) => {
+  #getAssetIdsOf = async (contract, address) => {
+    const getAssetId = transfer => `${transfer.assetId}`;
+
+    const transferEvents = await this.#getTransfers(contract);
+
+    const transfers = transferEvents.map(event => event.values);
+
+    const received = transfers
+      .filter(transfer => transfer.to === address)
+      .map(getAssetId);
+
+    const sent = transfers
+      .filter(transfer => transfer.from === address)
+      .map(getAssetId);
+
+    const receivedIds = new Set(received);
+    const sentIds = new Set(sent);
+
+    const ownedIds = [...receivedIds].filter(
+      receivedId => !sentIds.has(receivedId)
+    );
+
+    return Array.from(ownedIds);
+  };
+
+  #getCreatedSellOrders = async () => {
+    return this.#getOrders("OrderCreated");
+  };
+
+  #getCancelledSellOrders = async () => {
+    return this.#getOrders("OrderCancelled");
+  };
+
+  #getExecutedSellOrders = async () => {
+    return this.#getOrders("OrderSuccessful");
+  };
+
+  #getOrders = async eventName => {
     let eventABI;
 
     if (eventName === "OrderCreated") {
@@ -81,12 +161,33 @@ export default class DecentralandUtils {
     const { filters } = this.#marketplace;
     const orderEvent = filters[eventName];
     const filter = orderEvent();
-    return this.#listEventLogs(fromBlock, eventABI, filter);
+    return this.#listEventLogs(eventABI, filter);
   };
 
-  #listEventLogs = async (fromBlock, eventABI, filter) => {
+  #getTransfers = async contract => {
+    const eventName = "Transfer";
+    const eventABI = [
+      "event Transfer(address indexed from, address indexed to, uint256 indexed assetId)",
+    ];
+
+    const { filters } = contract;
+    const transferEvent = filters["Transfer(address,address,uint256)"];
+    const filter = transferEvent();
+
+    return this.#listEventLogs(eventABI, filter);
+  };
+
+  #listEventLogs = async (eventABI, filter) => {
+    // Note: We are using fromBlock = 0 because:
+    // - For development blockchain, ist's faster since are few blocks mined.
+    // - For (forked from) testnet blockchain, it's made by one HTTP over RPC call
+    //   (Infura/Etherscan) and it's faster too.
+    const fromBlock = 0;
     const iface = new ethers.utils.Interface(eventABI);
-    const logs = await this.#provider.getLogs({ ...filter, fromBlock });
+    const logs = await this.#provider.getLogs({
+      ...filter,
+      fromBlock,
+    });
     return logs.map(log => iface.parseLog(log));
   };
 }
