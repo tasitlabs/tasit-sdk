@@ -60,7 +60,7 @@ if (network === "goerli") {
 } else if (network === "development") {
   network = "local";
   EVENTS_TIMEOUT = 1000;
-  ASSETS_TO_CREATE = 6;
+  ASSETS_TO_CREATE = 2;
 }
 const {
   LANDProxy,
@@ -438,27 +438,21 @@ const getParcelsFromAPI = async () => {
     await etherFaucet(provider, minterWallet, GNOSIS_SAFE_ADDRESS, TEN);
     await erc20Faucet(manaContract, minterWallet, GNOSIS_SAFE_ADDRESS, BILLION);
 
-    const parcelsFromAPI = await getParcelsFromAPI();
-    const estatesFromAPI = await getEstatesFromAPI();
+    const parcels = await getParcelsFromAPI();
+    const estates = await getEstatesFromAPI();
 
-    const estatesParcels = extractParcelsFromEstates(estatesFromAPI);
-
-    const estatesParcelsWithoutDuplication = estatesParcels.filter(
-      estateParcel => !findParcel(estateParcel, parcelsFromAPI)
+    const estatesParcels = extractParcelsFromEstates(estates).filter(
+      estateParcel => !findParcel(estateParcel, parcels)
     );
 
-    const parcelsToCreate = [
-      ...parcelsFromAPI,
-      ...estatesParcelsWithoutDuplication,
-    ];
+    const parcelIds = await createParcels(parcels);
 
-    const estatesToCreate = [...estatesFromAPI];
-
-    const parcelIds = await createParcels(parcelsToCreate);
-
-    const estateIds = await createEstates(estatesToCreate);
+    const estateParcelIds = await createParcels(estatesParcels);
+    const estateIds = await createEstates(estates);
 
     await approveMarketplace();
+
+    console.log(estateIds, parcelIds);
 
     await placeAssetOrders(estateIds, parcelIds);
 
