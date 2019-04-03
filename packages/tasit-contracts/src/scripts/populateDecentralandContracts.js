@@ -195,7 +195,7 @@ const createParcel = async parcel => {
 
   const parcelId = await new Promise((resolve, reject) => {
     const timeout = setTimeout(() => {
-      console.log(`Timeout reached.`);
+      console.log(`Timeout reached for parcel (${x},${y}) creation.`);
       action.unsubscribe();
       reject();
     }, EVENTS_TIMEOUT);
@@ -233,7 +233,7 @@ const createEstate = async estate => {
     yArray.push(parcel.y);
   });
 
-  console.log(`creating estate.... ${xArray} - ${yArray}`);
+  console.log(`Creating estate (${xArray} - ${yArray})...`);
 
   landContract.setWallet(sellerWallet);
   const action = landContract.createEstateWithMetadata(
@@ -246,7 +246,9 @@ const createEstate = async estate => {
 
   const estateId = await new Promise((resolve, reject) => {
     const timeout = setTimeout(() => {
-      console.log(`Timeout reached`);
+      console.log(
+        `Timeout reached for estate (${xArray} - ${yArray}) creation.`
+      );
       estateContract.unsubscribe();
       action.unsubscribe();
       reject();
@@ -287,7 +289,7 @@ const createEstate = async estate => {
   });
 
   await action.waitForNonceToUpdate();
-  console.log(`created id ${estateId}`);
+  console.log(`Estate ID = ${estateId}`);
 
   return estateId;
 };
