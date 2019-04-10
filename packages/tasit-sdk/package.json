@@ -34,7 +34,7 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.1.5",
-    "tasit-account": "^0.0.15",
+    "tasit-account": "^0.0.16",
     "tasit-action": "^0.0.15",
     "tasit-contract-based-account": "^0.0.15",
     "tasit-contracts": "^0.0.15"
