@@ -198,6 +198,8 @@ export default class DecentralandUtils {
       fromBlock,
     });
 
+    // ethers.js helpers class for dealing with ABI
+    // transforming a { 0, 1, 2 } transfer event object to { from, to, assetId }
     const parsedLogs = logs.map(log => {
       const { transactionHash } = log;
       const parsedLog = iface.parseLog(log);
