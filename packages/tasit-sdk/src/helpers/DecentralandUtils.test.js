@@ -7,7 +7,7 @@ import DecentralandUtils from "./DecentralandUtils";
 
 // Note: This test suite assumes that all parcels and estates of SellerWallet are for sale
 // See more: `TasitSDk/packages/tasit-contracts/src/script/populateDecentralandContracts.js`
-describe.only("DecentralandUtils", () => {
+describe("DecentralandUtils", () => {
   const [minterWallet, sellerWallet] = accounts;
   let ephemeralWallet;
   let mana;
@@ -65,25 +65,22 @@ describe.only("DecentralandUtils", () => {
 
     const estateContractAddress = estate.getAddress();
 
-    const sellerEstateIds = (await _getEstatesOf(sellerAddress)).map(a => a.id);
+    const sellerEstates = await _getEstatesOf(sellerAddress);
     const sellerEstateBalance = await estate.balanceOf(sellerAddress);
-    const { length: sellerEstateIdsLength } = sellerEstateIds;
-    expect(`${sellerEstateIdsLength}`).to.equal(`${sellerEstateBalance}`);
+    expect(sellerEstates).to.have.lengthOf(sellerEstateBalance);
 
-    //expect(sellerEstateIds).to.have.lengthOf(sellerEstateBalance);
-
-    const sellerParcelIds = (await _getParcelsOf(sellerAddress)).map(a => a.id);
+    const sellerParcels = await _getParcelsOf(sellerAddress);
     const sellerParcelBalance = await land.balanceOf(sellerAddress);
-    const { length: sellerParcelIdsLength } = sellerParcelIds;
-    expect(`${sellerParcelIdsLength}`).to.equal(`${sellerParcelBalance}`);
+    expect(sellerParcels).to.have.lengthOf(sellerParcelBalance);
 
-    const estateParcelIds = await _getParcelsOf(estateContractAddress);
+    const estateParcels = await _getParcelsOf(estateContractAddress);
     const estateParcelBalance = await land.balanceOf(estateContractAddress);
-    const { length: estateParcelIdsLength } = estateParcelIds;
-    expect(`${estateParcelIdsLength}`).to.equal(`${estateParcelBalance}`);
+    expect(estateParcels).to.have.lengthOf(estateParcelBalance);
 
     const sellerAssets = await getAssetsOf(sellerAddress);
-    const sellerAssetIds = sellerAssets.map(asset => asset.id);
+    const sellerAssetIds = sellerAssets.map(a => a.id);
+    const sellerEstateIds = sellerEstates.map(e => e.id);
+    const sellerParcelIds = sellerParcels.map(p => p.id);
     expect(sellerAssetIds).to.have.members([
       ...sellerParcelIds,
       ...sellerEstateIds,

@@ -111,9 +111,12 @@ export default class DecentralandUtils {
   // Note:
   // This function is assuming that the same asset wasn't received more than one time by the owner
   #getAssetsFromContractAndOwner = async (contract, address) => {
-    const getAsset = transfer => {
+    const { address: nftAddress } = contract;
+
+    const fromTransferEventToAsset = transfer => {
       const { assetId, transactionHash } = transfer;
-      return { id: `${assetId}`, transactionHash };
+      const asset = { id: `${assetId}`, nftAddress, transactionHash };
+      return asset;
     };
 
     const getAssetId = asset => asset.id;
@@ -122,11 +125,11 @@ export default class DecentralandUtils {
 
     const receivedAssets = transfers
       .filter(transfer => transfer.to === address)
-      .map(getAsset);
+      .map(fromTransferEventToAsset);
 
     const sentAssets = transfers
       .filter(transfer => transfer.from === address)
-      .map(getAsset);
+      .map(fromTransferEventToAsset);
 
     // Owned = Received - Sent
     const ownedAssets = receivedAssets.filter(
