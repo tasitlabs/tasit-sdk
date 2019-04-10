@@ -96,20 +96,15 @@ describe("DecentralandUtils", () => {
   });
 
   it("should expose transactionHash", async () => {
+    const expectAssetHasTxHash = asset =>
+      expect(asset.transactionHash).to.be.ok;
+
     const sellerAssets = await getAssetsOf(sellerAddress);
     expect(sellerAssets).to.not.be.empty;
-
-    for (let asset of sellerAssets) {
-      let { transactionHash } = asset;
-      expect(transactionHash).to.be.ok;
-    }
+    sellerAssets.forEach(expectAssetHasTxHash);
 
     const assetsForSale = await getAllAssetsForSale();
     expect(assetsForSale).to.not.be.empty;
-
-    for (let asset of assetsForSale) {
-      let { transactionHash } = asset;
-      expect(transactionHash).to.be.ok;
-    }
+    assetsForSale.forEach(expectAssetHasTxHash);
   });
 });
