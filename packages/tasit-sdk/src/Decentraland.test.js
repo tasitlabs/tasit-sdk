@@ -322,6 +322,16 @@ describe("Decentraland", () => {
 
           expect(buyerEstates).to.have.lengthOf(1);
           expect(buyerAssets).to.have.lengthOf(1);
+
+          const tx = await executeOrderAction.getTransaction();
+          const { hash: purcharseTxHash } = tx;
+          const [buyerEstate] = buyerEstates;
+          const [buyerAsset] = buyerAssets;
+          const { transactionHash: estateTxHash } = buyerEstate;
+          const { transactionHash: assetTxHash } = buyerAsset;
+
+          expect(estateTxHash).to.equal(purcharseTxHash);
+          expect(assetTxHash).to.equal(purcharseTxHash);
         });
 
         it("should buy a parcel of land", async () => {
@@ -357,6 +367,16 @@ describe("Decentraland", () => {
 
           expect(buyerParcels).to.have.lengthOf(1);
           expect(buyerAssets).to.have.lengthOf(1);
+
+          const tx = await executeOrderAction.getTransaction();
+          const { hash: purcharseTxHash } = tx;
+          const [buyerParcel] = buyerParcels;
+          const [buyerAsset] = buyerAssets;
+          const { transactionHash: parcelTxHash } = buyerParcel;
+          const { transactionHash: assetTxHash } = buyerAsset;
+
+          expect(parcelTxHash).to.equal(purcharseTxHash);
+          expect(assetTxHash).to.equal(purcharseTxHash);
         });
       });
 
