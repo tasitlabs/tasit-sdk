@@ -57,36 +57,31 @@ export default class DecentralandUtils {
     const openOrders = ordersCreated
       .filter(
         created =>
-          !ordersCancelled.find(
-            cancelled => cancelled.values.id == created.values.id
-          )
+          !ordersCancelled.find(cancelled => cancelled.id == created.id)
       )
       .filter(
-        created =>
-          !ordersExecuted.find(
-            executed => executed.values.id == created.values.id
-          )
+        created => !ordersExecuted.find(executed => executed.id == created.id)
       );
 
-    return openOrders.map(order => order.values);
+    return openOrders;
   };
 
   getAssetsOf = async address => {
-    const [estateIds, parcelIds] = await Promise.all([
-      this.getEstateIdsOf(address),
-      this.getParcelIdsOf(address),
+    let [estates, parcels] = await Promise.all([
+      this._getEstatesOf(address),
+      this._getParcelsOf(address),
     ]);
 
     const estateAddress = this.#estate.address;
     const landAddress = this.#land.address;
 
-    const estates = estateIds.map(id => ({
-      id,
+    estates = estates.map(estate => ({
+      ...estate,
       nftAddress: estateAddress,
     }));
 
-    const parcels = parcelIds.map(id => ({
-      id,
+    parcels = parcels.map(parcel => ({
+      ...parcel,
       nftAddress: landAddress,
     }));
 
@@ -95,39 +90,53 @@ export default class DecentralandUtils {
     return assets;
   };
 
-  getEstateIdsOf = async address => {
-    const ids = await this.#getAssetIdsOf(this.#estate, address);
-    return ids;
+  // TODO: Move to private
+  _getEstatesOf = async address => {
+    const estates = await this.#getAssetsFromContractAndOwner(
+      this.#estate,
+      address
+    );
+    return estates;
   };
 
-  getParcelIdsOf = async address => {
-    const ids = await this.#getAssetIdsOf(this.#land, address);
-    return ids;
+  // TODO: Move to private
+  _getParcelsOf = async address => {
+    const parcels = await this.#getAssetsFromContractAndOwner(
+      this.#land,
+      address
+    );
+    return parcels;
   };
 
-  #getAssetIdsOf = async (contract, address) => {
-    const getAssetId = transfer => `${transfer.assetId}`;
+  // Note:
+  // This function is assuming that the same asset wasn't received more than one time by the owner
+  #getAssetsFromContractAndOwner = async (contract, address) => {
+    const { address: nftAddress } = contract;
 
-    const transferEvents = await this.#getTransfers(contract);
+    const fromTransferEventToAsset = transfer => {
+      const { assetId, transactionHash } = transfer;
+      const asset = { id: `${assetId}`, nftAddress, transactionHash };
+      return asset;
+    };
 
-    const transfers = transferEvents.map(event => event.values);
+    const getAssetId = asset => asset.id;
 
-    const received = transfers
+    const transfers = await this.#getTransfers(contract);
+
+    const receivedAssets = transfers
       .filter(transfer => transfer.to === address)
-      .map(getAssetId);
+      .map(fromTransferEventToAsset);
 
-    const sent = transfers
+    const sentAssets = transfers
       .filter(transfer => transfer.from === address)
-      .map(getAssetId);
+      .map(fromTransferEventToAsset);
 
-    const receivedIds = new Set(received);
-    const sentIds = new Set(sent);
-
-    const ownedIds = [...receivedIds].filter(
-      receivedId => !sentIds.has(receivedId)
+    // Owned = Received - Sent
+    const ownedAssets = receivedAssets.filter(
+      received => !sentAssets.map(getAssetId).includes(getAssetId(received))
     );
 
-    return Array.from(ownedIds);
+    return ownedAssets;
   };
 
   #getCreatedSellOrders = async () => {
@@ -188,6 +197,16 @@ export default class DecentralandUtils {
       ...filter,
       fromBlock,
     });
-    return logs.map(log => iface.parseLog(log));
+
+    // ethers.js helpers class for dealing with ABI
+    // transforming a { 0, 1, 2 } transfer event object to { from, to, assetId }
+    const parsedLogs = logs.map(log => {
+      const { transactionHash } = log;
+      const parsedLog = iface.parseLog(log);
+      const { values } = parsedLog;
+      return { ...values, transactionHash };
+    });
+
+    return parsedLogs;
   };
 }

@@ -9,7 +9,7 @@ import { ethers } from "ethers";
 import DecentralandUtils from "./helpers/DecentralandUtils";
 
 const decentralandUtils = new DecentralandUtils();
-const { getEstateIdsOf, getParcelIdsOf, getAssetsOf } = decentralandUtils;
+const { _getEstatesOf, _getParcelsOf, getAssetsOf } = decentralandUtils;
 
 const { ONE, TEN, ONE_HUNDRED } = constants;
 const SMALL_AMOUNT = bigNumberify(`${1e17}`); // 0.1 ethers
@@ -317,13 +317,21 @@ describe("Decentraland", () => {
 
           await expectExactTokenBalances(estate, [ephemeralAddress], [1]);
 
-          const estateIds = await getEstateIdsOf(ephemeralAddress);
-          const assetIds = await getAssetsOf(ephemeralAddress);
-          const { length: estatesBalance } = estateIds;
-          const { length: assetsBalance } = assetIds;
+          const buyerEstates = await _getEstatesOf(ephemeralAddress);
+          const buyerAssets = await getAssetsOf(ephemeralAddress);
 
-          expect(estatesBalance).to.equal(1);
-          expect(assetsBalance).to.equal(1);
+          expect(buyerEstates).to.have.lengthOf(1);
+          expect(buyerAssets).to.have.lengthOf(1);
+
+          const tx = await executeOrderAction.getTransaction();
+          const { hash: purchaseTxHash } = tx;
+          const [buyerEstate] = buyerEstates;
+          const [buyerAsset] = buyerAssets;
+          const { transactionHash: estateTxHash } = buyerEstate;
+          const { transactionHash: assetTxHash } = buyerAsset;
+
+          expect(estateTxHash).to.equal(purchaseTxHash);
+          expect(assetTxHash).to.equal(purchaseTxHash);
         });
 
         it("should buy a parcel of land", async () => {
@@ -354,13 +362,21 @@ describe("Decentraland", () => {
 
           await expectExactTokenBalances(land, [ephemeralAddress], [1]);
 
-          const parcelIds = await getParcelIdsOf(ephemeralAddress);
-          const assetIds = await getAssetsOf(ephemeralAddress);
-          const { length: parcelsBalance } = parcelIds;
-          const { length: assetsBalance } = assetIds;
+          const buyerParcels = await _getParcelsOf(ephemeralAddress);
+          const buyerAssets = await getAssetsOf(ephemeralAddress);
 
-          expect(parcelsBalance).to.equal(1);
-          expect(assetsBalance).to.equal(1);
+          expect(buyerParcels).to.have.lengthOf(1);
+          expect(buyerAssets).to.have.lengthOf(1);
+
+          const tx = await executeOrderAction.getTransaction();
+          const { hash: purchaseTxHash } = tx;
+          const [buyerParcel] = buyerParcels;
+          const [buyerAsset] = buyerAssets;
+          const { transactionHash: parcelTxHash } = buyerParcel;
+          const { transactionHash: assetTxHash } = buyerAsset;
+
+          expect(parcelTxHash).to.equal(purchaseTxHash);
+          expect(assetTxHash).to.equal(purchaseTxHash);
         });
       });
 
