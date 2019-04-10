@@ -17,8 +17,8 @@ describe("DecentralandUtils", () => {
   const decentralandUtils = new DecentralandUtils();
   const {
     getAllAssetsForSale,
-    getEstateIdsOf,
-    getParcelIdsOf,
+    _getEstateIdsOf,
+    _getParcelIdsOf,
     getAssetsOf,
   } = decentralandUtils;
 
@@ -65,17 +65,17 @@ describe("DecentralandUtils", () => {
 
     const estateContractAddress = estate.getAddress();
 
-    const sellerEstateIds = await getEstateIdsOf(sellerAddress);
+    const sellerEstateIds = await _getEstateIdsOf(sellerAddress);
     const sellerEstateBalance = await estate.balanceOf(sellerAddress);
     const { length: sellerEstateIdsLength } = sellerEstateIds;
     expect(`${sellerEstateIdsLength}`).to.equal(`${sellerEstateBalance}`);
 
-    const sellerParcelIds = await getParcelIdsOf(sellerAddress);
+    const sellerParcelIds = await _getParcelIdsOf(sellerAddress);
     const sellerParcelBalance = await land.balanceOf(sellerAddress);
     const { length: sellerParcelIdsLength } = sellerParcelIds;
     expect(`${sellerParcelIdsLength}`).to.equal(`${sellerParcelBalance}`);
 
-    const estateParcelIds = await getParcelIdsOf(estateContractAddress);
+    const estateParcelIds = await _getParcelIdsOf(estateContractAddress);
     const estateParcelBalance = await land.balanceOf(estateContractAddress);
     const { length: estateParcelIdsLength } = estateParcelIds;
     expect(`${estateParcelIdsLength}`).to.equal(`${estateParcelBalance}`);
@@ -89,10 +89,12 @@ describe("DecentralandUtils", () => {
   });
 
   it("should get empty array from an address without assets", async () => {
-    const estateIds = await getEstateIdsOf(ephemeralAddress);
-    const parcelIds = await getParcelIdsOf(ephemeralAddress);
+    const estateIds = await _getEstateIdsOf(ephemeralAddress);
+    const parcelIds = await _getParcelIdsOf(ephemeralAddress);
 
     expect(estateIds).deep.equal([]);
     expect(parcelIds).deep.equal([]);
   });
+
+  it("should get transactionHash for all public functions", async () => {});
 });

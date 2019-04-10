@@ -68,8 +68,8 @@ export default class DecentralandUtils {
 
   getAssetsOf = async address => {
     const [estateIds, parcelIds] = await Promise.all([
-      this.getEstateIdsOf(address),
-      this.getParcelIdsOf(address),
+      this._getEstateIdsOf(address),
+      this._getParcelIdsOf(address),
     ]);
 
     const estateAddress = this.#estate.address;
@@ -90,12 +90,14 @@ export default class DecentralandUtils {
     return assets;
   };
 
-  getEstateIdsOf = async address => {
+  // TODO: Move to private
+  _getEstateIdsOf = async address => {
     const ids = await this.#getAssetIdsOf(this.#estate, address);
     return ids;
   };
 
-  getParcelIdsOf = async address => {
+  // TODO: Move to private
+  _getParcelIdsOf = async address => {
     const ids = await this.#getAssetIdsOf(this.#land, address);
     return ids;
   };
