@@ -330,7 +330,7 @@ describe("Decentraland", () => {
           const { transactionHash: estateTxHash } = buyerEstate;
           const { transactionHash: assetTxHash } = buyerAsset;
 
-          expect(estateTxHash).to.equal(purcharseTxHash);
+          expect(estateTxHash).to.equal(purchaseTxHash);
           expect(assetTxHash).to.equal(purcharseTxHash);
         });
 
