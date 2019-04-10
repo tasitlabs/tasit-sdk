@@ -185,7 +185,8 @@ export default class DecentralandUtils {
     const parsedLogs = logs.map(log => {
       const { transactionHash } = log;
       const parsedLog = iface.parseLog(log);
-      return { ...parsedLog.values, transactionHash };
+      const { values } = parsedLog;
+      return { ...values, transactionHash };
     });
 
     return parsedLogs;
