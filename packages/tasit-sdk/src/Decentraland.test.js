@@ -369,7 +369,7 @@ describe("Decentraland", () => {
           expect(buyerAssets).to.have.lengthOf(1);
 
           const tx = await executeOrderAction.getTransaction();
-          const { hash: purcharseTxHash } = tx;
+          const { hash: purchaseTxHash } = tx;
           const [buyerParcel] = buyerParcels;
           const [buyerAsset] = buyerAssets;
           const { transactionHash: parcelTxHash } = buyerParcel;
