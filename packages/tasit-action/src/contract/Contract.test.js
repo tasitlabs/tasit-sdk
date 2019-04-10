@@ -499,6 +499,15 @@ describe("TasitAction.Contract", () => {
       // but the first poll after that 15 new blocks is emitting error event
       expect(errorFn.called).to.be.true;
     });
+
+    it("should get action id (transactionHash)", async () => {
+      action = sampleContract.setValue(rand);
+
+      const actionId = await action.getId();
+
+      expect(actionId).to.be.an("string");
+      expect(actionId).to.have.lengthOf(66);
+    });
   });
 
   describe("Contract Events Subscription", async () => {

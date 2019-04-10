@@ -162,6 +162,13 @@ export class Action extends Subscription {
     return this.#tx;
   };
 
+  // Note: ActionId is the same as TransactionHash
+  getId = async () => {
+    const tx = await this.#tx;
+    const { hash: id } = tx;
+    return id;
+  };
+
   // Tech debt
   // This method avoids duplicated nonce generation when several transactions happen in rapid succession
   // See: https://github.com/ethereumbook/ethereumbook/blob/04f66ae45cd9405cce04a088556144be11979699/06transactions.asciidoc#keeping-track-of-nonces
