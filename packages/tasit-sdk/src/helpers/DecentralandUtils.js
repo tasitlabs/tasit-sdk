@@ -67,21 +67,21 @@ export default class DecentralandUtils {
   };
 
   getAssetsOf = async address => {
-    const [estateIds, parcelIds] = await Promise.all([
-      this._getEstateIdsOf(address),
-      this._getParcelIdsOf(address),
+    let [estates, parcels] = await Promise.all([
+      this._getEstatesOf(address),
+      this._getParcelsOf(address),
     ]);
 
     const estateAddress = this.#estate.address;
     const landAddress = this.#land.address;
 
-    const estates = estateIds.map(id => ({
-      id,
+    estates = estates.map(estate => ({
+      ...estate,
       nftAddress: estateAddress,
     }));
 
-    const parcels = parcelIds.map(id => ({
-      id,
+    parcels = parcels.map(parcel => ({
+      ...parcel,
       nftAddress: landAddress,
     }));
 
@@ -91,38 +91,49 @@ export default class DecentralandUtils {
   };
 
   // TODO: Move to private
-  _getEstateIdsOf = async address => {
-    const ids = await this.#getAssetIdsOf(this.#estate, address);
-    return ids;
+  _getEstatesOf = async address => {
+    const estates = await this.#getAssetsFromContractAndOwner(
+      this.#estate,
+      address
+    );
+    return estates;
   };
 
   // TODO: Move to private
-  _getParcelIdsOf = async address => {
-    const ids = await this.#getAssetIdsOf(this.#land, address);
-    return ids;
+  _getParcelsOf = async address => {
+    const parcels = await this.#getAssetsFromContractAndOwner(
+      this.#land,
+      address
+    );
+    return parcels;
   };
 
-  #getAssetIdsOf = async (contract, address) => {
-    const getAssetId = transfer => `${transfer.assetId}`;
+  // Note:
+  // This function is assuming that the same asset wasn't received more than one time by the owner
+  #getAssetsFromContractAndOwner = async (contract, address) => {
+    const getAsset = transfer => {
+      const { assetId, transactionHash } = transfer;
+      return { id: `${assetId}`, transactionHash };
+    };
+
+    const getAssetId = asset => asset.id;
 
     const transfers = await this.#getTransfers(contract);
 
-    const received = transfers
+    const receivedAssets = transfers
       .filter(transfer => transfer.to === address)
-      .map(getAssetId);
+      .map(getAsset);
 
-    const sent = transfers
+    const sentAssets = transfers
       .filter(transfer => transfer.from === address)
-      .map(getAssetId);
+      .map(getAsset);
 
-    const receivedIds = new Set(received);
-    const sentIds = new Set(sent);
-
-    const ownedIds = [...receivedIds].filter(
-      receivedId => !sentIds.has(receivedId)
+    // Owned = Received - Sent
+    const ownedAssets = receivedAssets.filter(
+      received => !sentAssets.map(getAssetId).includes(getAssetId(received))
     );
 
-    return Array.from(ownedIds);
+    return ownedAssets;
   };
 
   #getCreatedSellOrders = async () => {

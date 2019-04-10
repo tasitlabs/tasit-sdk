@@ -7,7 +7,7 @@ import DecentralandUtils from "./DecentralandUtils";
 
 // Note: This test suite assumes that all parcels and estates of SellerWallet are for sale
 // See more: `TasitSDk/packages/tasit-contracts/src/script/populateDecentralandContracts.js`
-describe("DecentralandUtils", () => {
+describe.only("DecentralandUtils", () => {
   const [minterWallet, sellerWallet] = accounts;
   let ephemeralWallet;
   let mana;
@@ -17,8 +17,8 @@ describe("DecentralandUtils", () => {
   const decentralandUtils = new DecentralandUtils();
   const {
     getAllAssetsForSale,
-    _getEstateIdsOf,
-    _getParcelIdsOf,
+    _getEstatesOf,
+    _getParcelsOf,
     getAssetsOf,
   } = decentralandUtils;
 
@@ -65,23 +65,25 @@ describe("DecentralandUtils", () => {
 
     const estateContractAddress = estate.getAddress();
 
-    const sellerEstateIds = await _getEstateIdsOf(sellerAddress);
+    const sellerEstateIds = (await _getEstatesOf(sellerAddress)).map(a => a.id);
     const sellerEstateBalance = await estate.balanceOf(sellerAddress);
     const { length: sellerEstateIdsLength } = sellerEstateIds;
     expect(`${sellerEstateIdsLength}`).to.equal(`${sellerEstateBalance}`);
 
-    const sellerParcelIds = await _getParcelIdsOf(sellerAddress);
+    //expect(sellerEstateIds).to.have.lengthOf(sellerEstateBalance);
+
+    const sellerParcelIds = (await _getParcelsOf(sellerAddress)).map(a => a.id);
     const sellerParcelBalance = await land.balanceOf(sellerAddress);
     const { length: sellerParcelIdsLength } = sellerParcelIds;
     expect(`${sellerParcelIdsLength}`).to.equal(`${sellerParcelBalance}`);
 
-    const estateParcelIds = await _getParcelIdsOf(estateContractAddress);
+    const estateParcelIds = await _getParcelsOf(estateContractAddress);
     const estateParcelBalance = await land.balanceOf(estateContractAddress);
     const { length: estateParcelIdsLength } = estateParcelIds;
     expect(`${estateParcelIdsLength}`).to.equal(`${estateParcelBalance}`);
 
-    const sellerAsset = await getAssetsOf(sellerAddress);
-    const sellerAssetIds = sellerAsset.map(asset => asset.id);
+    const sellerAssets = await getAssetsOf(sellerAddress);
+    const sellerAssetIds = sellerAssets.map(asset => asset.id);
     expect(sellerAssetIds).to.have.members([
       ...sellerParcelIds,
       ...sellerEstateIds,
@@ -89,12 +91,28 @@ describe("DecentralandUtils", () => {
   });
 
   it("should get empty array from an address without assets", async () => {
-    const estateIds = await _getEstateIdsOf(ephemeralAddress);
-    const parcelIds = await _getParcelIdsOf(ephemeralAddress);
+    const estateIds = await _getEstatesOf(ephemeralAddress);
+    const parcelIds = await _getParcelsOf(ephemeralAddress);
 
     expect(estateIds).deep.equal([]);
     expect(parcelIds).deep.equal([]);
   });
 
-  it("should get transactionHash for all public functions", async () => {});
+  it("should expose transactionHash", async () => {
+    const sellerAssets = await getAssetsOf(sellerAddress);
+    expect(sellerAssets).to.not.be.empty;
+
+    for (let asset of sellerAssets) {
+      let { transactionHash } = asset;
+      expect(transactionHash).to.be.ok;
+    }
+
+    const assetsForSale = await getAllAssetsForSale();
+    expect(assetsForSale).to.not.be.empty;
+
+    for (let asset of assetsForSale) {
+      let { transactionHash } = asset;
+      expect(transactionHash).to.be.ok;
+    }
+  });
 });
