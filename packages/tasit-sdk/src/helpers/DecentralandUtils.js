@@ -57,18 +57,13 @@ export default class DecentralandUtils {
     const openOrders = ordersCreated
       .filter(
         created =>
-          !ordersCancelled.find(
-            cancelled => cancelled.values.id == created.values.id
-          )
+          !ordersCancelled.find(cancelled => cancelled.id == created.id)
       )
       .filter(
-        created =>
-          !ordersExecuted.find(
-            executed => executed.values.id == created.values.id
-          )
+        created => !ordersExecuted.find(executed => executed.id == created.id)
       );
 
-    return openOrders.map(order => order.values);
+    return openOrders;
   };
 
   getAssetsOf = async address => {
@@ -108,9 +103,7 @@ export default class DecentralandUtils {
   #getAssetIdsOf = async (contract, address) => {
     const getAssetId = transfer => `${transfer.assetId}`;
 
-    const transferEvents = await this.#getTransfers(contract);
-
-    const transfers = transferEvents.map(event => event.values);
+    const transfers = await this.#getTransfers(contract);
 
     const received = transfers
       .filter(transfer => transfer.to === address)
@@ -188,6 +181,13 @@ export default class DecentralandUtils {
       ...filter,
       fromBlock,
     });
-    return logs.map(log => iface.parseLog(log));
+
+    const parsedLogs = logs.map(log => {
+      const { transactionHash } = log;
+      const parsedLog = iface.parseLog(log);
+      return { ...parsedLog.values, transactionHash };
+    });
+
+    return parsedLogs;
   };
 }
