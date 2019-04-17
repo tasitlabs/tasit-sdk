@@ -33,7 +33,7 @@ _Disclaimer:_ The alpha version of this SDK is under active development. We enco
 
 - [A pub/sub API for Ethereum contracts perfect for optimistic updates](#a-pubsub-api-for-ethereum-contracts-perfect-for-optimistic-updates)
 - [Onboarding with ephemeral accounts, contract-based accounts, and deep-linking to and from mobile wallets](#onboarding-with-ephemeral-accounts-contract-based-accounts-and-deep-linking-to-and-from-mobile-wallets)
-- [Advanced support for popular ERC standards](#advanced-support-for-popular-erc-standards)
+- [Advanced support for popular ERC standards and heavily used contracts](#advanced-support-for-popular-erc-standards-and-heavily-used-contracts)
 - [A CLI for scaffolding a mobile dapp](#a-cli-for-scaffolding-a-mobile-dapp)
 - [A library of native mobile dapp components](#a-library-of-native-mobile-dapp-components)
 
@@ -217,7 +217,7 @@ _This means a flow that users will be used to which decreases the friction for o
 
 Have a strong opinion on which onboarding flow we should prioritize the most? Please [reach out](#contact-us)!
 
-#### Advanced support for popular ERC standards
+#### Advanced support for popular ERC standards and heavily used contracts
 
 Classes of smart contracts we support include [NFTs](http://erc721.org/), [TCRs](https://medium.com/@simondlr/city-walls-bo-taoshi-exploring-the-power-of-token-curated-registries-588f208c17d5), [DAOs](https://blog.aragon.org/bringing-daos-back-aragon-monthly-92756cb65639/), and two-sided marketplaces (like Gitcoin, CryptoCribs, Ethlance, etc.). There’s an ERC-standard-specific JavaScript API wrapping the lower-level Tasit SDK API for reading and writing and listening for data so that the function-names in the Tasit SDK are tailored to that type of dapp. As long as we’ve built the tooling to interact with that class of dapp at least once before, the Tasit SDK can “automagically” support any new dapp of that type.
 
