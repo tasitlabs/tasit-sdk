@@ -15,20 +15,6 @@ Development of the Tasit SDK is supported in part by [Gnosis](https://github.com
 
 _Disclaimer:_ The alpha version of this SDK is under active development. We encourage you to try it out today for hackathons, etc., but it's not ready for anything involving real funds on mainnet. If you'd prefer to wait for a more battle-tested release, please watch this repo with the `Releases only` setting and/or sign up to be notified about our releases on the [tasit.io](https://tasit.io) website.
 
-##### Already convinced you've been looking for something like this?
-
-You can continue right on to the [Getting started](#getting-started) section below.
-
-##### A bit skeptical about the need for mobile dapps?
-
-You might want to jump ahead to the "why" sections to start:
-
-- [Why (from the user's perspective)?](#why-from-the-users-perspective)
-
-- [Why (from a developer's / Ethereum enthusiast’s perspective)?](#why-from-a-developers--ethereum-enthusiasts-perspective)
-
-- [Why React Native?](#why-react-native)
-
 ### Table of contents
 
 [Getting started](#getting-started)
@@ -38,7 +24,11 @@ You might want to jump ahead to the "why" sections to start:
 - [Automatic scaffolding using the Tasit CLI](#automatic-scaffolding-using-the-tasit-cli)
 - [Modular](#modular)
 
-[Main features](#main-features)
+[Motivation](#motivation)
+
+- [Already convinced you have been looking for something like this?](#already-convinced-you-have-been-looking-for-something-like-this)
+- [A bit skeptical about the need for mobile dapps?](#a-bit-skeptical-about-the-need-for-mobile-dapps)
+  [Main features](#main-features)
 
 - [A pub/sub API for Ethereum contracts perfect for optimistic updates](#a-pubsub-api-for-ethereum-contracts-perfect-for-optimistic-updates)
 - [Onboarding with ephemeral accounts, contract-based accounts, and deep-linking to mobile wallets](#onboarding-with-ephemeral-accounts-contract-based-accounts-and-deep-linking-to-mobile-wallets)
@@ -139,6 +129,22 @@ npm install --save tasit-action
 import { Contract } from "tasit-action";
 // ...
 ```
+
+### Motivation
+
+##### Already convinced you have been looking for something like this?
+
+You can continue right on to the [Getting started](#getting-started) section below.
+
+##### A bit skeptical about the need for mobile dapps?
+
+You might want to jump ahead to the "why" sections to start:
+
+- [Why (from the user's perspective)?](#why-from-the-users-perspective)
+
+- [Why (from a developer's / Ethereum enthusiast’s perspective)?](#why-from-a-developers--ethereum-enthusiasts-perspective)
+
+- [Why React Native?](#why-react-native)
 
 ### Main features
 
