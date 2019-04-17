@@ -28,7 +28,8 @@ _Disclaimer:_ The alpha version of this SDK is under active development. We enco
 
 - [Already convinced you have been looking for something like this?](#already-convinced-you-have-been-looking-for-something-like-this)
 - [A bit skeptical about the need for mobile dapps?](#a-bit-skeptical-about-the-need-for-mobile-dapps)
-  [Main features](#main-features)
+
+[Main features](#main-features)
 
 - [A pub/sub API for Ethereum contracts perfect for optimistic updates](#a-pubsub-api-for-ethereum-contracts-perfect-for-optimistic-updates)
 - [Onboarding with ephemeral accounts, contract-based accounts, and deep-linking to mobile wallets](#onboarding-with-ephemeral-accounts-contract-based-accounts-and-deep-linking-to-mobile-wallets)
