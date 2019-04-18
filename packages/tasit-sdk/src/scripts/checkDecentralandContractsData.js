@@ -68,7 +68,7 @@ describe("Decentraland App pre-conditions", () => {
       expect(estatessForSale.length).to.be.at.least(1);
     });
 
-    it("shouldn't have no duplicated sell orders", async () => {
+    it("shouldn't have any duplicated sell orders", async () => {
       const assetForSaleIds = [];
       assetsForSale.forEach(assetForSale => {
         let { assetId } = assetForSale;
