@@ -50,42 +50,67 @@ describe("Decentraland App pre-conditions", () => {
   });
 
   describe("Marketplace", () => {
-    it("should have at least 100 assets for sale", async () => {
-      expect(assetsForSale.length).to.be.at.least(100);
+    it("should have at least 50 assets for sale", async () => {
+      expect(assetsForSale.length).to.be.at.least(50);
     });
-  });
 
-  it("Assets for sale", async () => {
-    const minPrice = bigNumberify("10000").mul(TOKEN_SUBDIVISIONS);
-    const maxPrice = bigNumberify("100000").mul(TOKEN_SUBDIVISIONS);
+    it("should have at least 1 parcel for sale", async () => {
+      const parcelsForSale = assetsForSale.filter(asset =>
+        addressesAreEqual(asset.nftAddress, LAND_PROXY_ADDRESS)
+      );
+      expect(parcelsForSale.length).to.be.at.least(1);
+    });
 
-    const blankImage = await fetch(
-      "https://api.decentraland.org/v1/estates/5/map.png"
-    );
-    const blankImageData = (await blankImage.buffer()).toString("base64");
+    it("should have at least 1 estate for sale", async () => {
+      const estatessForSale = assetsForSale.filter(asset =>
+        addressesAreEqual(asset.nftAddress, ESTATE_ADDRESS)
+      );
+      expect(estatessForSale.length).to.be.at.least(1);
+    });
 
-    for (let asset of assetsForSale) {
-      const { id, assetId, nftAddress, priceInWei } = asset;
-      const price = bigNumberify(priceInWei);
+    it("shouldn't have any duplicated sell orders", async () => {
+      const assetForSaleIds = [];
+      assetsForSale.forEach(assetForSale => {
+        let { assetId } = assetForSale;
+        assetId = `${assetId}`;
+        if (!assetForSaleIds.includes(assetId)) assetForSaleIds.push(assetId);
+      });
 
-      const isParcel = addressesAreEqual(nftAddress, LAND_PROXY_ADDRESS);
-      const isEstate = addressesAreEqual(nftAddress, ESTATE_ADDRESS);
+      expect(assetsForSale.length).to.equal(assetForSaleIds.length);
+    });
 
-      expect(price.gte(minPrice), `${price} isn't >= ${minPrice}`).to.be.true;
-      expect(price.lte(maxPrice), `${price} isn't <= ${maxPrice}`).to.be.true;
+    it("Assets for sale", async () => {
+      const minPrice = bigNumberify("10000").mul(TOKEN_SUBDIVISIONS);
+      const maxPrice = bigNumberify("100000").mul(TOKEN_SUBDIVISIONS);
 
-      if (isEstate) {
-        const image = await fetch(
-          `https://api.decentraland.org/v1/estates/${assetId}/map.png`
-        );
-        const imageData = (await image.buffer()).toString("base64");
-        expect(
-          imageData,
-          `The image of the estate (id: ${assetId}) is blank`
-        ).not.equals(blankImageData);
-      } else if (isParcel) {
-        // Note: Parcel assets always show correct image
+      const blankImage = await fetch(
+        "https://api.decentraland.org/v1/estates/5/map.png"
+      );
+      const blankImageData = (await blankImage.buffer()).toString("base64");
+
+      for (let asset of assetsForSale) {
+        const { id, assetId, nftAddress, priceInWei } = asset;
+        const price = bigNumberify(priceInWei);
+
+        const isParcel = addressesAreEqual(nftAddress, LAND_PROXY_ADDRESS);
+        const isEstate = addressesAreEqual(nftAddress, ESTATE_ADDRESS);
+
+        expect(price.gte(minPrice), `${price} isn't >= ${minPrice}`).to.be.true;
+        expect(price.lte(maxPrice), `${price} isn't <= ${maxPrice}`).to.be.true;
+
+        if (isEstate) {
+          const image = await fetch(
+            `https://api.decentraland.org/v1/estates/${assetId}/map.png`
+          );
+          const imageData = (await image.buffer()).toString("base64");
+          expect(
+            imageData,
+            `The image of the estate (id: ${assetId}) is blank`
+          ).not.equals(blankImageData);
+        } else if (isParcel) {
+          // Note: Parcel assets always show correct image
+        }
       }
-    }
+    });
   });
 });

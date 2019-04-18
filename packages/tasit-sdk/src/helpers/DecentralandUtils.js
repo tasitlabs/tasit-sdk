@@ -53,14 +53,26 @@ export default class DecentralandUtils {
       this.#getExecutedSellOrders(),
     ]);
 
+    const ordersAreEqual = (o1, o2) => `${o1.id}` === `${o2.id}`;
+
+    const latestOrdersCreated = [];
+
+    ordersCreated.reverse().forEach(created => {
+      const isOlder = latestOrdersCreated.find(
+        o => `${o.assetId}` === `${created.assetId}`
+      );
+      if (!isOlder) latestOrdersCreated.push(created);
+    });
+
     // Open = Created - Cancelled - Executed
-    const openOrders = ordersCreated
+    const openOrders = latestOrdersCreated
       .filter(
         created =>
-          !ordersCancelled.find(cancelled => cancelled.id == created.id)
+          !ordersCancelled.find(cancelled => ordersAreEqual(cancelled, created))
       )
       .filter(
-        created => !ordersExecuted.find(executed => executed.id == created.id)
+        created =>
+          !ordersExecuted.find(executed => ordersAreEqual(executed, created))
       );
 
     return openOrders;
