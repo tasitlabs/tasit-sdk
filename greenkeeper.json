@@ -11,5 +11,11 @@
         "packages/tasit-link-wallet/package.json"
       ]
     }
-  }
+  },
+  "ignore": [
+    "tasit-account",
+    "tasit-contracts",
+    "tasit-action",
+    "tasit-contract-based-account"
+  ]
 }
