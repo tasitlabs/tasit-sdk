@@ -1,6 +1,6 @@
 {
   "name": "tasit-contract-based-account",
-  "version": "0.0.16",
+  "version": "0.0.17",
   "description": "Library for onboarding a user using a smart-contract-based account.",
   "main": "dist/index.js",
   "keywords": [
@@ -27,8 +27,8 @@
   "dependencies": {
     "@babel/runtime": "^7.1.5",
     "ethers": "^4.0.27",
-    "tasit-action": "^0.0.16",
-    "tasit-contracts": "^0.0.16"
+    "tasit-action": "^0.0.17",
+    "tasit-contracts": "^0.0.17"
   },
   "devDependencies": {
     "@babel/cli": "^7.1.5",
