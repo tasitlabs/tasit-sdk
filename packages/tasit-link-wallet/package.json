@@ -37,6 +37,6 @@
     "@babel/register": "^7.0.0",
     "chai": "^4.2.0",
     "mocha": "^6.0.2",
-    "tasit-action": "^0.0.16"
+    "tasit-action": "^0.0.17"
   }
 }
