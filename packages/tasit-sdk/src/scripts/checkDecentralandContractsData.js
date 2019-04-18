@@ -79,7 +79,7 @@ describe("Decentraland App pre-conditions", () => {
       expect(assetsForSale.length).to.equal(assetForSaleIds.length);
     });
 
-    it.skip("Assets for sale", async () => {
+    it("Assets for sale", async () => {
       const minPrice = bigNumberify("10000").mul(TOKEN_SUBDIVISIONS);
       const maxPrice = bigNumberify("100000").mul(TOKEN_SUBDIVISIONS);
 
