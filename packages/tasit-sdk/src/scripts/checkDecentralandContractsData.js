@@ -53,6 +53,31 @@ describe("Decentraland App pre-conditions", () => {
     it("should have at least 100 assets for sale", async () => {
       expect(assetsForSale.length).to.be.at.least(100);
     });
+
+    it("should have at least 1 parcel for sale", async () => {
+      const parcelsForSale = assetsForSale.filter(asset =>
+        addressesAreEqual(asset.nftAddress, LAND_PROXY_ADDRESS)
+      );
+      expect(parcelsForSale.length).to.be.at.least(1);
+    });
+
+    it("should have at least 1 estate for sale", async () => {
+      const estatessForSale = assetsForSale.filter(asset =>
+        addressesAreEqual(asset.nftAddress, ESTATE_ADDRESS)
+      );
+      expect(estatessForSale.length).to.be.at.least(1);
+    });
+
+    it("shouldn't have no duplicated sell orders", async () => {
+      const assetForSaleIds = [];
+      assetsForSale.forEach(assetForSale => {
+        let { assetId } = assetForSale;
+        assetId = `${assetId}`;
+        if (!assetForSaleIds.includes(assetId)) assetForSaleIds.push(assetId);
+      });
+
+      expect(assetsForSale.length).to.equal(assetForSaleIds.length);
+    });
   });
 
   it("Assets for sale", async () => {
