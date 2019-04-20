@@ -32,7 +32,7 @@
     "url": "https://github.com/tasitlabs/tasitsdk/issues"
   },
   "devDependencies": {
-    "@babel/cli": "^7.1.5",
+    "@babel/cli": "^7.2.3",
     "@babel/core": "^7.1.6",
     "@babel/node": "^7.2.2",
     "@babel/preset-env": "^7.1.6",
