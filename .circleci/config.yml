@@ -20,15 +20,15 @@ jobs:
       - checkout
 
       - run:
-          name: install npm
+          name: Installing npm
           command: "sudo npm install -g npm@latest"
 
       - run:
-          name: install greenkeeper-lockfile
+          name: Installing greenkeeper-lockfile
           command: "sudo npm install -g greenkeeper-lockfile@latest"
 
       - run:
-          name: run greenkeeper-lockfile-update
+          name: Running greenkeeper-lockfile-update
           command: "greenkeeper-lockfile-update"
 
       # Download and cache dependencies
@@ -39,7 +39,7 @@ jobs:
             - dependency-cache-
 
       - run:
-          name: install npm packages
+          name: Bootstraping packages
           command: npm run bootstrap
 
       - save_cache:
@@ -48,9 +48,9 @@ jobs:
           key: dependency-cache-{{ checksum "package.json" }}
 
       - run:
-          name: run test suite
+          name: Running test suite
           command: npm test
 
       - run:
-          name: run greenkeeper-lockfile-upload
+          name: Running greenkeeper-lockfile-upload
           command: "greenkeeper-lockfile-upload"
