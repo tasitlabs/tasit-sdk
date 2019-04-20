@@ -25,7 +25,7 @@
     "url": "https://github.com/tasitlabs/tasitsdk/issues"
   },
   "dependencies": {
-    "@babel/runtime": "^7.1.5",
+    "@babel/runtime": "^7.4.0",
     "ethers": "^4.0.27",
     "tasit-contracts": "^0.0.17"
   },

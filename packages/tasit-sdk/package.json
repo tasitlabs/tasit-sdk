@@ -33,7 +33,7 @@
     "url": "https://github.com/tasitlabs/tasitsdk/issues"
   },
   "dependencies": {
-    "@babel/runtime": "^7.1.5",
+    "@babel/runtime": "^7.4.0",
     "tasit-account": "^0.0.17",
     "tasit-action": "^0.0.17",
     "tasit-contract-based-account": "^0.0.17",
