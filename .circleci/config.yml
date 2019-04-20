@@ -39,7 +39,7 @@ jobs:
             - dependency-cache-
 
       - run:
-          name: Bootstraping packages
+          name: Bootstrapping packages
           command: npm run bootstrap
 
       - save_cache:
