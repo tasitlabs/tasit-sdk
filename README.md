@@ -13,6 +13,10 @@ The Tasit SDK is a JavaScript SDK for making mobile Ethereum dapps using React N
 
 Development of the Tasit SDK is supported in part by [Gnosis](https://github.com/gnosis/) through their [GECO](https://github.com/gnosis/GECO) grant initiative.
 
+This project is open-source and in need of additional funding to sustain work on it. If you're able to contribute, please consider sending ETH or DAI to our project's vault address:
+
+[0xd25def1db4f994e2800e438ebb29eae300d56151](https://etherscan.io/address/0xd25def1db4f994e2800e438ebb29eae300d56151)
+
 _Disclaimer:_ The alpha version of this SDK is under active development. We encourage you to try it out today for hackathons, etc., but it's not ready for anything involving real funds on mainnet. If you'd prefer to wait for a more battle-tested release, please watch this repo with the `Releases only` setting and/or sign up to be notified about our releases on the [tasit.io](https://tasit.io) website.
 
 ### Table of contents
