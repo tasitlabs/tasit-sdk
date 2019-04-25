@@ -154,7 +154,11 @@ describe("TasitAction.ERC721.ERC721Full", () => {
       expect(event.to).to.equal(bob.address);
       expect(event.tokenId.toNumber()).to.equal(tokenId);
 
-      await expectExactTokenBalances(erc721, [ana.address, bob.address], [0, 1]);
+      await expectExactTokenBalances(
+        erc721,
+        [ana.address, bob.address],
+        [0, 1]
+      );
     });
 
     it("should transfer an approved token", async () => {
@@ -178,7 +182,11 @@ describe("TasitAction.ERC721.ERC721Full", () => {
 
       await action.waitForNonceToUpdate();
 
-      await expectExactTokenBalances(erc721, [ana.address, bob.address], [0, 1]);
+      await expectExactTokenBalances(
+        erc721,
+        [ana.address, bob.address],
+        [0, 1]
+      );
     });
 
     it("should trigger an error if the user is listening for errors from a contract and tries safeTransferFrom to a contract without onERC721Received", async () => {
@@ -188,9 +196,7 @@ describe("TasitAction.ERC721.ERC721Full", () => {
 
       const contractErrorListener = message => {
         const { error } = message;
-        expect(error.message).to.equal(
-          "Action with error: VM Exception while processing transaction: revert"
-        );
+        expect(error.message).to.equal("Action failed.");
         contractErrorFakeFn();
       };
 
@@ -201,7 +207,14 @@ describe("TasitAction.ERC721.ERC721Full", () => {
         SAMPLE_CONTRACT_ADDRESS,
         tokenId
       );
+
+      // Some error (orphan block, failed tx) events are being triggered only from the confirmationListener
+      // See more: https://github.com/tasitlabs/TasitSDK/issues/253
+      action.on("confirmation", () => {});
+
       await action.waitForNonceToUpdate();
+
+      await mineBlocks(provider, 1);
 
       expect(contractErrorFakeFn.called).to.be.true;
 
@@ -219,9 +232,7 @@ describe("TasitAction.ERC721.ERC721Full", () => {
 
       const actionErrorListener = message => {
         const { error } = message;
-        expect(error.message).to.equal(
-          "Action with error: VM Exception while processing transaction: revert"
-        );
+        expect(error.message).to.equal("Action failed.");
         actionErrorFakeFn();
       };
 
@@ -232,7 +243,13 @@ describe("TasitAction.ERC721.ERC721Full", () => {
       );
       action.on("error", actionErrorListener);
 
+      // Some error (orphan block, failed tx) events are being triggered only from the confirmationListener
+      // See more: https://github.com/tasitlabs/TasitSDK/issues/253
+      action.on("confirmation", () => {});
+
       await action.waitForNonceToUpdate();
+
+      await mineBlocks(provider, 1);
 
       expect(actionErrorFakeFn.called).to.be.true;
 

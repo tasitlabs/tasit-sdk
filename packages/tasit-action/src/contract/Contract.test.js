@@ -133,9 +133,16 @@ describe("TasitAction.Contract", () => {
         sampleContract.on("error", errorListener);
 
         action = sampleContract.revertWrite("some string");
+
+        // Some error (orphan block, failed tx) events are being triggered only from the confirmationListener
+        // See more: https://github.com/tasitlabs/TasitSDK/issues/253
+        action.on("confirmation", () => {});
+
         await action.waitForNonceToUpdate();
 
-        expect(errorListener.callCount).to.equal(1);
+        await mineBlocks(provider, 1);
+
+        expect(errorListener.called).to.be.true;
       });
 
       it("and Action error event on action error", async () => {
@@ -146,12 +153,18 @@ describe("TasitAction.Contract", () => {
 
         action = sampleContract.revertWrite("some string");
 
+        // Some error (orphan block, failed tx) events are being triggered only from the confirmationListener
+        // See more: https://github.com/tasitlabs/TasitSDK/issues/253
+        action.on("confirmation", () => {});
+
         action.on("error", actionErrorListener);
 
         await action.waitForNonceToUpdate();
 
-        expect(contractErrorListener.callCount).to.equal(1);
-        expect(actionErrorListener.callCount).to.equal(1);
+        await mineBlocks(provider, 1);
+
+        expect(contractErrorListener.called).to.be.true;
+        expect(actionErrorListener.called).to.be.true;
       });
 
       it("on contract event listener error", async () => {
