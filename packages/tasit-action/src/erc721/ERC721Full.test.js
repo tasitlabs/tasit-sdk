@@ -223,8 +223,6 @@ describe("TasitAction.ERC721.ERC721Full", () => {
         [ana.address, SAMPLE_CONTRACT_ADDRESS],
         [1, 0]
       );
-
-      action.off("confirmation");
     });
 
     it("should trigger an error if the user is listening for errors for an action and tries safeTransferFrom to a contract without onERC721Received", async () => {
