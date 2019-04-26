@@ -6,38 +6,50 @@ import ConfigLoader from "../ConfigLoader";
 //  and/or MetaTxAction subclasses
 export class Action extends Subscription {
   #provider;
-  #tx; // deprecated
-  #signedTx;
+  #signer;
+  #rawTx;
+  #tx;
   #txConfirmations;
   #timeout;
   #lastConfirmationTime;
 
-  constructor(signedTxPromise, provider) {
+  constructor(rawTx, signer) {
     // Provider implements EventEmitter API and it's enough
     //  to handle with transactions events
-    super(provider);
+    super(signer.provider);
 
     const { events } = ConfigLoader.getConfig();
     const { timeout } = events;
 
-    // this.#tx = txPromise.then(
-    //   tx => {
-    //     return tx;
-    //   },
-    //   error => {
-    //     this._emitErrorEvent(new Error(`Action with error: ${error.message}`));
-    //   }
-    // );
-    this.#signedTx = signedTxPromise;
-
+    this.#rawTx = rawTx;
+    this.#signer = signer;
     this.#timeout = timeout;
-    this.#provider = provider;
+    this.#provider = signer.provider;
     this.#txConfirmations = 0;
   }
 
+  #signAndSend = async () => {
+    const gasLimit = await this.#provider.estimateGas(this.#rawTx);
+    const nonce = await this.#provider.getTransactionCount(
+      this.#signer.address
+    );
+
+    this.#rawTx = { ...this.#rawTx, nonce, gasLimit };
+
+    const signedTx = await this.#signer.sign(this.#rawTx);
+
+    this.#tx = await this.#provider.sendTransaction(signedTx).then(
+      tx => {
+        return tx;
+      },
+      error => {
+        this._emitErrorEvent(new Error(`Action with error: ${error.message}`));
+      }
+    );
+  };
+
   send = async () => {
-    const signedTx = await this.#signedTx;
-    this.#tx = await this.#provider.sendTransaction(signedTx);
+    await this.#signAndSend();
   };
 
   on = (eventName, listener) => {
