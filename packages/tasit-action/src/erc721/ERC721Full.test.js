@@ -109,6 +109,7 @@ describe("TasitAction.ERC721.ERC721Full", () => {
 
     beforeEach("should mint one token to ana", async () => {
       action = erc721.mint(ana.address, tokenId);
+      await action.send();
 
       const event = await new Promise(function(resolve, reject) {
         erc721.on("Transfer", message => {
@@ -137,6 +138,7 @@ describe("TasitAction.ERC721.ERC721Full", () => {
       erc721 = new ERC721Full(ERC721_FULL_ADDRESS, ana);
 
       action = erc721.transferFrom(ana.address, bob.address, tokenId);
+      await action.send();
 
       const event = await new Promise(function(resolve, reject) {
         erc721.on("Transfer", message => {
@@ -163,12 +165,15 @@ describe("TasitAction.ERC721.ERC721Full", () => {
 
     it("should transfer an approved token", async () => {
       erc721 = new ERC721Full(ERC721_FULL_ADDRESS, ana);
+      erc721.setWallet(ana);
       action = erc721.approve(bob.address, tokenId);
+      await action.send();
 
       await action.waitForOneConfirmation();
 
       erc721.setWallet(bob);
       action = erc721.transferFrom(ana.address, bob.address, tokenId);
+      await action.send();
 
       await action.waitForOneConfirmation();
 
@@ -179,6 +184,7 @@ describe("TasitAction.ERC721.ERC721Full", () => {
       erc721 = new ERC721Full(ERC721_FULL_ADDRESS, ana);
 
       action = erc721.safeTransferFrom(ana.address, bob.address, tokenId);
+      await action.send();
 
       await action.waitForOneConfirmation();
 
@@ -207,6 +213,7 @@ describe("TasitAction.ERC721.ERC721Full", () => {
         SAMPLE_CONTRACT_ADDRESS,
         tokenId
       );
+      await action.send();
 
       // Some error (orphan block, failed tx) events are being triggered only from the confirmationListener
       // See more: https://github.com/tasitlabs/TasitSDK/issues/253
@@ -246,6 +253,8 @@ describe("TasitAction.ERC721.ERC721Full", () => {
       // Some error (orphan block, failed tx) events are being triggered only from the confirmationListener
       // See more: https://github.com/tasitlabs/TasitSDK/issues/253
       action.on("confirmation", () => {});
+
+      await action.send();
 
       await action.waitForOneConfirmation();
 

@@ -29,7 +29,11 @@ export class Action extends Subscription {
   }
 
   #signAndSend = async () => {
-    const gasLimit = await this.#provider.estimateGas(this.#rawTx);
+    // Note: Using hardcoded gas limit because using estimations isn't working right now
+    // See more: https://github.com/tasitlabs/TasitSDK/issues/173
+    //const gasLimit = await this.#provider.estimateGas(this.#rawTx);
+    const gasLimit = 7e6;
+
     const nonce = await this.#provider.getTransactionCount(
       this.#signer.address
     );
