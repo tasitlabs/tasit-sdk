@@ -169,7 +169,8 @@ describe("TasitAction.Contract", () => {
         expect(actionErrorListener.called).to.be.true;
       });
 
-      it("on contract event listener error", async () => {
+      // Non-deterministic test case
+      it.skip("on contract event listener error", async () => {
         const errorListener = sinon.fake();
         const eventListener = sinon.fake.throws(new Error());
 
