@@ -28,6 +28,10 @@ export class Action extends Subscription {
     this.#txConfirmations = 0;
   }
 
+  getRawTx = () => {
+    return this.#rawTx;
+  };
+
   #signAndSend = async () => {
     // TODO: Go deep on gas handling.
     // Without that, VM returns a revert error instead of out of gas error.
@@ -44,9 +48,11 @@ export class Action extends Subscription {
       this.#signer.address
     );
 
-    this.#rawTx = { ...this.#rawTx, nonce, ...gasParams };
+    let rawTx = await this.#rawTx;
 
-    const signedTx = await this.#signer.sign(this.#rawTx);
+    rawTx = { ...rawTx, nonce, ...gasParams };
+
+    const signedTx = await this.#signer.sign(rawTx);
 
     this.#tx = await this.#provider.sendTransaction(signedTx).then(
       tx => {

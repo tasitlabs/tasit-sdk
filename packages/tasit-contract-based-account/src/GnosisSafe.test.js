@@ -14,7 +14,7 @@ const { address: NFT_ADDRESS } = MyERC721Full;
 const { ZERO, ONE } = constants;
 const SMALL_AMOUNT = bigNumberify(`${1e17}`); // 0.1 ethers
 
-describe.only("GnosisSafe", () => {
+describe("GnosisSafe", () => {
   let minter;
   let gnosisSafeOwner;
   let ephemeralAccount;

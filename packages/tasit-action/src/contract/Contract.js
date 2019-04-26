@@ -51,6 +51,11 @@ export class Contract extends Subscription {
     this.#addFunctionsToContract();
   };
 
+  getWallet = () => {
+    const { signer: wallet } = this.#ethersContract;
+    return wallet;
+  };
+
   removeWallet = () => {
     this.#ethersContract = new ethers.Contract(
       this.#ethersContract.address,
