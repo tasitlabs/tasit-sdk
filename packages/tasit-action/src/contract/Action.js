@@ -28,8 +28,8 @@ export class Action extends Subscription {
     this.#txConfirmations = 0;
   }
 
-  getRawTx = () => {
-    return this.#rawTx;
+  _toRaw = async () => {
+    return await this.#rawTx;
   };
 
   #signAndSend = async () => {

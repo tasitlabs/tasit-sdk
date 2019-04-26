@@ -226,6 +226,8 @@ export default class GnosisSafe extends Contract {
       signatures
     );
 
-    return execTxAction.getRawTx();
+    const rawTx = await execTxAction._toRaw();
+
+    return rawTx;
   };
 }
