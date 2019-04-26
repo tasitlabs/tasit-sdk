@@ -165,7 +165,7 @@ describe("TasitAction.ERC721.ERC721Full", () => {
 
     it("should transfer an approved token", async () => {
       erc721 = new ERC721Full(ERC721_FULL_ADDRESS, ana);
-      erc721.setWallet(ana);
+
       action = erc721.approve(bob.address, tokenId);
       await action.send();
 
