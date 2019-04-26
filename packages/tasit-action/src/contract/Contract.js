@@ -168,12 +168,12 @@ export class Contract extends Subscription {
       if (!Utils.isEthersJsSigner(this.#ethersContract.signer))
         throw new Error(`Cannot write data to a Contract without a wallet`);
 
-      const { signer, address: to } = this.#ethersContract;
+      const { signer, address } = this.#ethersContract;
       const data = this.#ethersContract.interface.functions[f.name].encode(
         args
       );
 
-      const rawTx = { to, data };
+      const rawTx = { to: address, data };
 
       const action = new Action(rawTx, this.#provider, signer);
 
