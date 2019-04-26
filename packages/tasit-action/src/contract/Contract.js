@@ -153,7 +153,7 @@ export class Contract extends Subscription {
 
   #attachReadFunction = f => {
     this[f.name] = async (...args) => {
-      const value = await this.#ethersContract[f.name].apply(null, args);
+      const value = await this.#ethersContract[f.name](...args);
       return value;
     };
   };
@@ -163,7 +163,7 @@ export class Contract extends Subscription {
       if (!Utils.isEthersJsSigner(this.#ethersContract.signer))
         throw new Error(`Cannot write data to a Contract without a wallet`);
 
-      const tx = this.#ethersContract[f.name].apply(null, args);
+      const tx = this.#ethersContract[f.name](...args);
 
       const action = new Action(tx, this.#provider);
 
