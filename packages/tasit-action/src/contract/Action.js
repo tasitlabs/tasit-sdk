@@ -54,14 +54,11 @@ export class Action extends Subscription {
 
     const signedTx = await this.#signer.sign(rawTx);
 
-    this.#tx = await this.#provider.sendTransaction(signedTx).then(
-      tx => {
-        return tx;
-      },
-      error => {
-        this._emitErrorEvent(new Error(`Action with error: ${error.message}`));
-      }
-    );
+    try {
+      this.#tx = await this.#provider.sendTransaction(signedTx);
+    } catch (error) {
+      this._emitErrorEvent(new Error(`Action with error: ${error.message}`));
+    }
   };
 
   send = async () => {
