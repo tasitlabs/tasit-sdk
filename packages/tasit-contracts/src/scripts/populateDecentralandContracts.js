@@ -91,11 +91,8 @@ const gnosisSafeContract = new GnosisSafe(GNOSIS_SAFE_ADDRESS);
 const provider = ProviderFactory.getProvider();
 
 const cancelSellOrder = async (nftAddress, id) => {
-  const action = marketplaceContract.cancelOrder(
-    nftAddress,
-    `${id}`,
-    gasParams
-  );
+  const action = marketplaceContract.cancelOrder(nftAddress, `${id}`);
+  await action.send();
   await action.waitForOneConfirmation();
 };
 
@@ -143,6 +140,7 @@ const updateParcelsData = async parcels => {
     console.log(`Setting metadata for parcel (${x},${y})...`);
     if (parcelName && parcelName !== "") {
       const updateAction = landContract.updateLandData(x, y, parcelName);
+      await updateAction.send();
       await updateAction.waitForOneConfirmation();
       console.log("Done");
     }
@@ -184,12 +182,8 @@ const createParcels = async parcels => {
 const createParcel = async parcel => {
   const { x, y } = parcel;
   landContract.setWallet(minterWallet);
-  const action = landContract.assignNewParcel(
-    `${x}`,
-    `${y}`,
-    sellerAddress,
-    gasParams
-  );
+  const action = landContract.assignNewParcel(`${x}`, `${y}`, sellerAddress);
+  await action.send();
 
   console.log(`Creating parcel (${x},${y})...`);
 
@@ -240,9 +234,9 @@ const createEstate = async estate => {
     xArray,
     yArray,
     beneficiaryAddress,
-    `${estateName}`,
-    gasParams
+    `${estateName}`
   );
+  await action.send();
 
   const estateId = await new Promise((resolve, reject) => {
     const timeout = setTimeout(() => {
@@ -312,17 +306,17 @@ const approveMarketplace = async () => {
   estateContract.setWallet(sellerWallet);
   const estateApproval = estateContract.setApprovalForAll(
     MARKETPLACE_ADDRESS,
-    authorized,
-    gasParams
+    authorized
   );
+  await estateApproval.send();
   await estateApproval.waitForOneConfirmation();
 
   landContract.setWallet(sellerWallet);
   const landApproval = landContract.setApprovalForAll(
     MARKETPLACE_ADDRESS,
-    authorized,
-    gasParams
+    authorized
   );
+  await landApproval.send();
   await landApproval.waitForOneConfirmation();
 };
 
@@ -366,9 +360,9 @@ const placeAssetSellOrder = async (nftAddress, assetId) => {
     nftAddress,
     assetId,
     priceInWei,
-    expireAt,
-    gasParams
+    expireAt
   );
+  await action.send();
   await action.waitForOneConfirmation();
 };
 

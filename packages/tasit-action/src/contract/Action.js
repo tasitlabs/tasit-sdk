@@ -13,10 +13,10 @@ export class Action extends Subscription {
   #timeout;
   #lastConfirmationTime;
 
-  constructor(rawTx, signer) {
+  constructor(rawTx, provider, signer) {
     // Provider implements EventEmitter API and it's enough
     //  to handle with transactions events
-    super(signer.provider);
+    super(provider);
 
     const { events } = ConfigLoader.getConfig();
     const { timeout } = events;
@@ -24,21 +24,27 @@ export class Action extends Subscription {
     this.#rawTx = rawTx;
     this.#signer = signer;
     this.#timeout = timeout;
-    this.#provider = signer.provider;
+    this.#provider = provider;
     this.#txConfirmations = 0;
   }
 
   #signAndSend = async () => {
-    // Note: Using hardcoded gas limit because using estimations isn't working right now
-    // See more: https://github.com/tasitlabs/TasitSDK/issues/173
-    //const gasLimit = await this.#provider.estimateGas(this.#rawTx);
-    const gasLimit = 7e6;
+    // TODO: Go deep on gas handling.
+    // Without that, VM returns a revert error instead of out of gas error.
+    // See: https://github.com/tasitlabs/TasitSDK/issues/173
+    //
+    // This command isn't enough
+    // const gasLimit = await this.#provider.estimateGas(this.#rawTx);
+    const gasParams = {
+      gasLimit: 7e6,
+      gasPrice: 1e9,
+    };
 
     const nonce = await this.#provider.getTransactionCount(
       this.#signer.address
     );
 
-    this.#rawTx = { ...this.#rawTx, nonce, gasLimit };
+    this.#rawTx = { ...this.#rawTx, nonce, ...gasParams };
 
     const signedTx = await this.#signer.sign(this.#rawTx);
 

@@ -14,7 +14,7 @@ const { address: NFT_ADDRESS } = MyERC721Full;
 const { ZERO, ONE } = constants;
 const SMALL_AMOUNT = bigNumberify(`${1e17}`); // 0.1 ethers
 
-describe("GnosisSafe", () => {
+describe.only("GnosisSafe", () => {
   let minter;
   let gnosisSafeOwner;
   let ephemeralAccount;
@@ -70,6 +70,7 @@ describe("GnosisSafe", () => {
       gnosisSafe.setSigners([gnosisSafeOwner]);
       gnosisSafe.setWallet(gnosisSafeOwner);
       const action = gnosisSafe.transferEther(toAddress, ONE);
+      await action.send();
       await action.waitForOneConfirmation();
 
       await expectExactEtherBalances(provider, [toAddress], [ONE]);
@@ -96,6 +97,7 @@ describe("GnosisSafe", () => {
             newSignerAddress,
             newThreshold
           );
+          await action.send();
           await action.waitForOneConfirmation();
 
           const ownersAfter = await gnosisSafe.getOwners();
@@ -127,6 +129,7 @@ describe("GnosisSafe", () => {
         action.on("error", errorListener);
         action.on("confirmation", confirmationListener);
 
+        await action.send();
         await action.waitForOneConfirmation();
 
         await mineBlocks(provider, 1);
@@ -154,6 +157,7 @@ describe("GnosisSafe", () => {
       gnosisSafe.setSigners([gnosisSafeOwner]);
       gnosisSafe.setWallet(gnosisSafeOwner);
       const action = gnosisSafe.transferERC20(tokenAddress, toAddress, ONE);
+      await action.send();
       await action.waitForOneConfirmation();
 
       await expectExactTokenBalances(erc20, [GNOSIS_SAFE_ADDRESS], [ZERO]);
@@ -192,6 +196,8 @@ describe("GnosisSafe", () => {
         action.on("error", errorListener);
         action.on("confirmation", confirmationListener);
 
+        await action.send();
+
         await action.waitForOneConfirmation();
 
         await mineBlocks(provider, 1);
@@ -219,6 +225,8 @@ describe("GnosisSafe", () => {
               spenderAddress,
               SMALL_AMOUNT
             );
+
+            await action.send();
             await action.waitForOneConfirmation();
 
             await mineBlocks(provider, 1);
@@ -242,6 +250,8 @@ describe("GnosisSafe", () => {
             toAddress,
             SMALL_AMOUNT
           );
+
+          await action.send();
 
           await action.waitForOneConfirmation();
 
@@ -274,6 +284,7 @@ describe("GnosisSafe", () => {
       gnosisSafe.setSigners([gnosisSafeOwner]);
       gnosisSafe.setWallet(gnosisSafeOwner);
       const action = gnosisSafe.transferNFT(tokenAddress, toAddress, tokenId);
+      await action.send();
       await action.waitForOneConfirmation();
 
       await expectExactTokenBalances(nft, [GNOSIS_SAFE_ADDRESS], [ZERO]);

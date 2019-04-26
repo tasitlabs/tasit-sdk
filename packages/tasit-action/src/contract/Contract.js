@@ -170,7 +170,7 @@ export class Contract extends Subscription {
 
       const rawTx = { to, data };
 
-      const action = new Action(rawTx, signer);
+      const action = new Action(rawTx, this.#provider, signer);
 
       const errorListener = message => {
         const { error } = message;
