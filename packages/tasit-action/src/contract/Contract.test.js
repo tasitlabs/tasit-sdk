@@ -217,8 +217,9 @@ describe("TasitAction.Contract", () => {
       }).to.throw();
     });
 
-    it("should change contract state and trigger confirmation event one time", async () => {
+    it.only("should change contract state and trigger confirmation event one time", async () => {
       action = sampleContract.setValue(rand);
+      await action.send();
 
       // Waiting for 1st confirmation
       // For now ganache always mine a block after transaction creation

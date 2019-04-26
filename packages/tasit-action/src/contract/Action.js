@@ -6,12 +6,13 @@ import ConfigLoader from "../ConfigLoader";
 //  and/or MetaTxAction subclasses
 export class Action extends Subscription {
   #provider;
-  #tx;
+  #tx; // deprecated
+  #signedTx;
   #txConfirmations;
   #timeout;
   #lastConfirmationTime;
 
-  constructor(txPromise, provider) {
+  constructor(signedTxPromise, provider) {
     // Provider implements EventEmitter API and it's enough
     //  to handle with transactions events
     super(provider);
@@ -19,19 +20,25 @@ export class Action extends Subscription {
     const { events } = ConfigLoader.getConfig();
     const { timeout } = events;
 
-    this.#tx = txPromise.then(
-      tx => {
-        return tx;
-      },
-      error => {
-        this._emitErrorEvent(new Error(`Action with error: ${error.message}`));
-      }
-    );
+    // this.#tx = txPromise.then(
+    //   tx => {
+    //     return tx;
+    //   },
+    //   error => {
+    //     this._emitErrorEvent(new Error(`Action with error: ${error.message}`));
+    //   }
+    // );
+    this.#signedTx = signedTxPromise;
 
     this.#timeout = timeout;
     this.#provider = provider;
     this.#txConfirmations = 0;
   }
+
+  send = async () => {
+    const signedTx = await this.#signedTx;
+    this.#tx = await this.#provider.sendTransaction(signedTx);
+  };
 
   on = (eventName, listener) => {
     this.#addListener(eventName, listener, false);
