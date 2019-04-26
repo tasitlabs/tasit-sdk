@@ -60,7 +60,7 @@ describe("TasitAction.ERC721.ERC721Full", () => {
     }
 
     if (action) {
-      await action.waitForNonceToUpdate();
+      await action.waitForOneConfirmation();
       action.unsubscribe();
 
       expect(action.subscribedEventNames()).to.be.empty;
@@ -165,12 +165,12 @@ describe("TasitAction.ERC721.ERC721Full", () => {
       erc721 = new ERC721Full(ERC721_FULL_ADDRESS, ana);
       action = erc721.approve(bob.address, tokenId);
 
-      await action.waitForNonceToUpdate();
+      await action.waitForOneConfirmation();
 
       erc721.setWallet(bob);
       action = erc721.transferFrom(ana.address, bob.address, tokenId);
 
-      await action.waitForNonceToUpdate();
+      await action.waitForOneConfirmation();
 
       await expectExactTokenBalances(erc721, [bob.address], [1]);
     });
@@ -180,7 +180,7 @@ describe("TasitAction.ERC721.ERC721Full", () => {
 
       action = erc721.safeTransferFrom(ana.address, bob.address, tokenId);
 
-      await action.waitForNonceToUpdate();
+      await action.waitForOneConfirmation();
 
       await expectExactTokenBalances(
         erc721,
@@ -212,7 +212,7 @@ describe("TasitAction.ERC721.ERC721Full", () => {
       // See more: https://github.com/tasitlabs/TasitSDK/issues/253
       action.on("confirmation", () => {});
 
-      await action.waitForNonceToUpdate();
+      await action.waitForOneConfirmation();
 
       await mineBlocks(provider, 1);
 
@@ -247,7 +247,7 @@ describe("TasitAction.ERC721.ERC721Full", () => {
       // See more: https://github.com/tasitlabs/TasitSDK/issues/253
       action.on("confirmation", () => {});
 
-      await action.waitForNonceToUpdate();
+      await action.waitForOneConfirmation();
 
       await mineBlocks(provider, 1);
 

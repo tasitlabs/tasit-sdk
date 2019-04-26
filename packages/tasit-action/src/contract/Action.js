@@ -173,7 +173,7 @@ export class Action extends Subscription {
   // This method avoids duplicated nonce generation when several transactions happen in rapid succession
   // See: https://github.com/ethereumbook/ethereumbook/blob/04f66ae45cd9405cce04a088556144be11979699/06transactions.asciidoc#keeping-track-of-nonces
   // How should we keep track of nonces?
-  waitForNonceToUpdate = async () => {
+  waitForOneConfirmation = async () => {
     const tx = await this.#tx;
     if (tx) await this.#provider.waitForTransaction(tx.hash);
   };

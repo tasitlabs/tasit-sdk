@@ -96,7 +96,7 @@ const cancelSellOrder = async (nftAddress, id) => {
     `${id}`,
     gasParams
   );
-  await action.waitForNonceToUpdate();
+  await action.waitForOneConfirmation();
 };
 
 const cancelOrdersOfEstatesWithoutImage = async estatesIds => {
@@ -143,7 +143,7 @@ const updateParcelsData = async parcels => {
     console.log(`Setting metadata for parcel (${x},${y})...`);
     if (parcelName && parcelName !== "") {
       const updateAction = landContract.updateLandData(x, y, parcelName);
-      await updateAction.waitForNonceToUpdate();
+      await updateAction.waitForOneConfirmation();
       console.log("Done");
     }
     console.log("Skipped because this parcel has no metadata.");
@@ -215,7 +215,7 @@ const createParcel = async parcel => {
     });
   });
 
-  await action.waitForNonceToUpdate();
+  await action.waitForOneConfirmation();
   console.log(`Parcel ID = ${parcelId}`);
 
   return parcelId;
@@ -282,7 +282,7 @@ const createEstate = async estate => {
     });
   });
 
-  await action.waitForNonceToUpdate();
+  await action.waitForOneConfirmation();
   console.log(`Estate ID = ${estateId}`);
 
   return estateId;
@@ -315,7 +315,7 @@ const approveMarketplace = async () => {
     authorized,
     gasParams
   );
-  await estateApproval.waitForNonceToUpdate();
+  await estateApproval.waitForOneConfirmation();
 
   landContract.setWallet(sellerWallet);
   const landApproval = landContract.setApprovalForAll(
@@ -323,7 +323,7 @@ const approveMarketplace = async () => {
     authorized,
     gasParams
   );
-  await landApproval.waitForNonceToUpdate();
+  await landApproval.waitForOneConfirmation();
 };
 
 function getRandomInt(min, max) {
@@ -369,7 +369,7 @@ const placeAssetSellOrder = async (nftAddress, assetId) => {
     expireAt,
     gasParams
   );
-  await action.waitForNonceToUpdate();
+  await action.waitForOneConfirmation();
 };
 
 const parcelsAreEqual = (p1, p2) => p1.x === p2.x && p1.y === p2.y;

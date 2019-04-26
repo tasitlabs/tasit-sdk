@@ -44,7 +44,7 @@ describe("TasitAction.Contract", () => {
     }
 
     if (action) {
-      await action.waitForNonceToUpdate();
+      await action.waitForOneConfirmation();
       action.unsubscribe();
 
       expect(
@@ -138,7 +138,7 @@ describe("TasitAction.Contract", () => {
         // See more: https://github.com/tasitlabs/TasitSDK/issues/253
         action.on("confirmation", () => {});
 
-        await action.waitForNonceToUpdate();
+        await action.waitForOneConfirmation();
 
         await mineBlocks(provider, 1);
 
@@ -159,7 +159,7 @@ describe("TasitAction.Contract", () => {
 
         action.on("error", actionErrorListener);
 
-        await action.waitForNonceToUpdate();
+        await action.waitForOneConfirmation();
 
         await mineBlocks(provider, 1);
 
@@ -176,7 +176,7 @@ describe("TasitAction.Contract", () => {
 
         action = sampleContract.setValue("hello world");
 
-        await action.waitForNonceToUpdate();
+        await action.waitForOneConfirmation();
 
         await mineBlocks(provider, 1);
 
@@ -224,7 +224,7 @@ describe("TasitAction.Contract", () => {
       // For now ganache always mine a block after transaction creation
       // To avoid non-determinism it's recommended to wait that first confirmation if it could affect the test case result
       // See more: https://github.com/trufflesuite/ganache-core/issues/248#issuecomment-455354557
-      await action.waitForNonceToUpdate();
+      await action.waitForOneConfirmation();
 
       const confirmationFakeFn = sinon.fake();
       const errorFakeFn = sinon.fake();
@@ -261,7 +261,7 @@ describe("TasitAction.Contract", () => {
     it("should change contract state and trigger confirmation event", async () => {
       action = sampleContract.setValue(rand);
 
-      await action.waitForNonceToUpdate();
+      await action.waitForOneConfirmation();
 
       const confirmationFakeFn = sinon.fake();
       const errorFakeFn = sinon.fake();
@@ -295,7 +295,7 @@ describe("TasitAction.Contract", () => {
     it("should change contract state and trigger confirmation event - late subscription", async () => {
       action = sampleContract.setValue(rand);
 
-      await action.waitForNonceToUpdate();
+      await action.waitForOneConfirmation();
 
       await mineBlocks(provider, 5);
 
@@ -335,7 +335,7 @@ describe("TasitAction.Contract", () => {
       action = sampleContract.setValue("hello world");
       action.setEventsTimeout(100);
 
-      await action.waitForNonceToUpdate();
+      await action.waitForOneConfirmation();
 
       const errorFn = sinon.fake();
       const confirmationFn = sinon.fake();
@@ -452,7 +452,7 @@ describe("TasitAction.Contract", () => {
       await mineBlocks(provider, 2);
 
       // Note: Transaction no longer exists
-      // If it isn't unset, afterEach hook will execute waitForNonceToUpdate forever
+      // If it isn't unset, afterEach hook will execute waitForOneConfirmation forever
       action.off("confirmation");
       action = undefined;
 
@@ -485,7 +485,7 @@ describe("TasitAction.Contract", () => {
 
       action = sampleContract.setValue("hello world");
 
-      await action.waitForNonceToUpdate();
+      await action.waitForOneConfirmation();
 
       action.on("error", errorListener);
 
