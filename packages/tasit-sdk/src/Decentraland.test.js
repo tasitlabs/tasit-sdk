@@ -169,7 +169,7 @@ describe("Decentraland", () => {
             manaAmountForShopping,
             gasParams
           );
-          await approvalAction.waitForNonceToUpdate();
+          await approvalAction.waitForOneConfirmation();
 
           const allowance = await mana.allowance(
             ephemeralAddress,
@@ -203,7 +203,7 @@ describe("Decentraland", () => {
             gasParams
           );
 
-          await executeOrderAction.waitForNonceToUpdate();
+          await executeOrderAction.waitForOneConfirmation();
 
           await expectExactTokenBalances(estate, [ephemeralAddress], [1]);
         });
@@ -232,7 +232,7 @@ describe("Decentraland", () => {
             gasParams
           );
 
-          await executeOrderAction.waitForNonceToUpdate();
+          await executeOrderAction.waitForOneConfirmation();
 
           await expectExactTokenBalances(land, [ephemeralAddress], [1]);
         });
@@ -258,7 +258,7 @@ describe("Decentraland", () => {
             toAddress,
             SMALL_AMOUNT
           );
-          await transferEthersAction.waitForNonceToUpdate();
+          await transferEthersAction.waitForOneConfirmation();
           await expectExactEtherBalances(provider, [toAddress], [SMALL_AMOUNT]);
 
           const transferManaAction = gnosisSafe.transferERC20(
@@ -266,7 +266,7 @@ describe("Decentraland", () => {
             toAddress,
             manaAmountForShopping
           );
-          await transferManaAction.waitForNonceToUpdate();
+          await transferManaAction.waitForOneConfirmation();
           await expectExactTokenBalances(
             mana,
             [toAddress],
@@ -279,7 +279,7 @@ describe("Decentraland", () => {
             manaAmountForShopping,
             gasParams
           );
-          await approvalAction.waitForNonceToUpdate();
+          await approvalAction.waitForOneConfirmation();
 
           const allowance = await mana.allowance(
             ephemeralAddress,
@@ -313,7 +313,7 @@ describe("Decentraland", () => {
             gasParams
           );
 
-          await executeOrderAction.waitForNonceToUpdate();
+          await executeOrderAction.waitForOneConfirmation();
 
           await expectExactTokenBalances(estate, [ephemeralAddress], [1]);
 
@@ -358,7 +358,7 @@ describe("Decentraland", () => {
             gasParams
           );
 
-          await executeOrderAction.waitForNonceToUpdate();
+          await executeOrderAction.waitForOneConfirmation();
 
           await expectExactTokenBalances(land, [ephemeralAddress], [1]);
 
@@ -392,7 +392,7 @@ describe("Decentraland", () => {
             toAddress,
             SMALL_AMOUNT
           );
-          await transferEthersAction.waitForNonceToUpdate();
+          await transferEthersAction.waitForOneConfirmation();
           await expectExactEtherBalances(provider, [toAddress], [SMALL_AMOUNT]);
 
           // Gnosis Safe should approve Marketplace to spend its MANA Tokens
@@ -409,7 +409,7 @@ describe("Decentraland", () => {
             functionName,
             argsArray
           );
-          await approvalAction.waitForNonceToUpdate();
+          await approvalAction.waitForOneConfirmation();
 
           const owner = GNOSIS_SAFE_ADDRESS;
           const spender = MARKETPLACE_ADDRESS;
@@ -460,7 +460,7 @@ describe("Decentraland", () => {
           };
           gnosisSafe.once("ExecutionFailed", onFailed);
 
-          await executeOrderAction.waitForNonceToUpdate();
+          await executeOrderAction.waitForOneConfirmation();
 
           await mineBlocks(provider, 1);
 
@@ -511,11 +511,11 @@ describe("Decentraland", () => {
           };
           gnosisSafe.once("ExecutionFailed", onFailed);
 
-          await executeOrderAction.waitForNonceToUpdate();
+          await executeOrderAction.waitForOneConfirmation();
 
           await mineBlocks(provider, 1);
 
-          await executeOrderAction.waitForNonceToUpdate();
+          await executeOrderAction.waitForOneConfirmation();
 
           await expectExactTokenBalances(land, [GNOSIS_SAFE_ADDRESS], [1]);
         });
@@ -534,7 +534,7 @@ describe("Decentraland", () => {
             toAddress,
             SMALL_AMOUNT
           );
-          await transferEthersAction.waitForNonceToUpdate();
+          await transferEthersAction.waitForOneConfirmation();
           await expectExactEtherBalances(provider, [toAddress], [SMALL_AMOUNT]);
 
           // Gnosis Safe should approve ephemeral account to spend its MANA Tokens
@@ -552,7 +552,7 @@ describe("Decentraland", () => {
             functionName,
             argsArray
           );
-          await ephemeralApprovalAction.waitForNonceToUpdate();
+          await ephemeralApprovalAction.waitForOneConfirmation();
           const owner = GNOSIS_SAFE_ADDRESS;
           const ephemeralAllowance = await mana.allowance(owner, spender);
           expect(`${ephemeralAllowance}`).to.equal(`${manaAmountForShopping}`);
@@ -564,7 +564,7 @@ describe("Decentraland", () => {
             manaAmountForShopping,
             gasParams
           );
-          await marketplaceApprovalAction.waitForNonceToUpdate();
+          await marketplaceApprovalAction.waitForOneConfirmation();
           const marketplaceAllowance = await mana.allowance(
             ephemeralAddress,
             MARKETPLACE_ADDRESS
@@ -597,7 +597,7 @@ describe("Decentraland", () => {
             gasParams
           );
 
-          await executeOrderAction.waitForNonceToUpdate();
+          await executeOrderAction.waitForOneConfirmation();
 
           await expectExactTokenBalances(estate, [ephemeralAddress], [1]);
         });
@@ -626,7 +626,7 @@ describe("Decentraland", () => {
             gasParams
           );
 
-          await executeOrderAction.waitForNonceToUpdate();
+          await executeOrderAction.waitForOneConfirmation();
 
           await expectExactTokenBalances(land, [ephemeralAddress], [1]);
         });
