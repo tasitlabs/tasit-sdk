@@ -127,8 +127,7 @@ describe("TasitAction.Contract", () => {
     });
 
     describe("should trigger Contract error event", async () => {
-      // Non-deterministic test case
-      it.skip("on action error", async () => {
+      it("on action error", async () => {
         const errorListener = sinon.fake();
 
         sampleContract.on("error", errorListener);
@@ -144,7 +143,7 @@ describe("TasitAction.Contract", () => {
 
         await mineBlocks(provider, 1);
 
-        expect(errorListener.called).to.be.true;
+        expect(errorListener.callCount).to.equal(1);
       });
 
       it("and Action error event on action error", async () => {
@@ -166,12 +165,11 @@ describe("TasitAction.Contract", () => {
 
         await mineBlocks(provider, 1);
 
-        expect(contractErrorListener.called).to.be.true;
-        expect(actionErrorListener.called).to.be.true;
+        expect(contractErrorListener.callCount).to.equal(1);
+        expect(actionErrorListener.callCount).to.equal(1);
       });
 
-      // Non-deterministic test case
-      it.skip("on contract event listener error", async () => {
+      it("on contract event listener error", async () => {
         const errorListener = sinon.fake();
         const eventListener = sinon.fake.throws(new Error());
 
@@ -336,13 +334,13 @@ describe("TasitAction.Contract", () => {
 
       await mineBlocks(provider, 2);
 
-      expect(confirmationFakeFn.called).to.be.true;
-      expect(confirmationFakeFn.callCount).to.equal(1);
+      // Non-deterministic
+      expect(confirmationFakeFn.callCount).to.be.at.least(1);
       expect(errorFakeFn.called).to.be.false;
     });
 
     // Non-deterministic test case
-    it.skip("should call error listener after timeout", async () => {
+    it("should call error listener after timeout", async () => {
       action = sampleContract.setValue("hello world");
       action.setEventsTimeout(100);
       await action.send();
@@ -367,7 +365,7 @@ describe("TasitAction.Contract", () => {
 
       action.on("error", errorListener);
 
-      await mineBlocks(provider, 1);
+      await mineBlocks(provider, 2);
 
       // TODO: Use fake timer when Sinon/Lolex supports it.
       // See more:
@@ -376,8 +374,9 @@ describe("TasitAction.Contract", () => {
       //  https://stackoverflow.com/a/50785284
       await wait(action.getEventsTimeout() * 3);
 
-      expect(errorFn.called).to.be.true;
-      expect(confirmationFn.called).to.be.true;
+      // Non-deterministic
+      expect(errorFn.callCount).to.be.at.least(1);
+      expect(confirmationFn.callCount).to.be.at.least(1);
       expect(action.subscribedEventNames()).to.deep.equal([
         "error",
         "confirmation",
@@ -460,7 +459,8 @@ describe("TasitAction.Contract", () => {
 
       await mineBlocks(provider, 2);
 
-      expect(confirmationFn.called).to.be.true;
+      // Non-deterministic
+      expect(confirmationFn.callCount).to.be.at.least(1);
 
       await revertFromSnapshot(provider, snapshotId);
 
@@ -471,7 +471,8 @@ describe("TasitAction.Contract", () => {
       action.off("confirmation");
       action = undefined;
 
-      expect(errorFn.called).to.be.true;
+      // Non-deterministic
+      expect(errorFn.callCount).to.be.at.least(1);
     });
 
     // Note: Block reorganization is the situation where a client discovers a
@@ -513,7 +514,8 @@ describe("TasitAction.Contract", () => {
 
       await mineBlocks(provider, 2);
 
-      expect(confirmationFn.called).to.be.true;
+      // Non-deterministic
+      expect(confirmationFn.callCount).to.be.at.least(1);
 
       await revertFromSnapshot(provider, snapshotId);
 
@@ -526,7 +528,8 @@ describe("TasitAction.Contract", () => {
 
       // not always on the first new block because of pollingInterval vs blockTime issue
       // but the first poll after that 15 new blocks is emitting error event
-      expect(errorFn.called).to.be.true;
+      // // Non-deterministic
+      expect(errorFn.callCount).to.be.at.least(1);
     });
 
     it("should get action id (transactionHash)", async () => {
