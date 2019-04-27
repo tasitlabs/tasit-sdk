@@ -120,7 +120,7 @@ describe("TasitAction.ERC721.ERC721Full", () => {
 
         setTimeout(() => {
           reject(new Error("timeout"));
-        }, 1000);
+        }, 2000);
       });
 
       erc721.off("Transfer");
