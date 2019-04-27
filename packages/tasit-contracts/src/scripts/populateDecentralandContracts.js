@@ -428,7 +428,13 @@ const getParcelsFromAPI = async () => {
   try {
     // Fund Gnosis Safe wallet with Mana tokens and ethers
     await etherFaucet(provider, minterWallet, GNOSIS_SAFE_ADDRESS, TEN);
+    await expectExactEtherBalances(provider, [GNOSIS_SAFE_ADDRESS], [TEN]);
     await erc20Faucet(manaContract, minterWallet, GNOSIS_SAFE_ADDRESS, BILLION);
+    await expectExactTokenBalances(
+      manaContract,
+      [GNOSIS_SAFE_ADDRESS],
+      [BILLION]
+    );
 
     const [parcels, estates] = await Promise.all([
       getParcelsFromAPI(),

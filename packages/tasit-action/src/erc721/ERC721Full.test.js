@@ -221,7 +221,7 @@ describe("TasitAction.ERC721.ERC721Full", () => {
 
       await action.waitForOneConfirmation();
 
-      await mineBlocks(provider, 1);
+      await mineBlocks(provider, 2);
 
       expect(contractErrorFakeFn.called).to.be.true;
 
