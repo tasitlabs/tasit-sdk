@@ -128,7 +128,10 @@ describe("TasitAction.Contract", () => {
 
     describe("should trigger Contract error event", async () => {
       it("on action error", async () => {
-        const errorListener = sinon.fake();
+        const errorListener = sinon.fake(() => {
+          // Note: Forcing listener to be called once
+          sampleContract.off("error");
+        });
 
         sampleContract.on("error", errorListener);
 
@@ -141,25 +144,31 @@ describe("TasitAction.Contract", () => {
 
         await action.waitForOneConfirmation();
 
-        await mineBlocks(provider, 1);
+        await mineBlocks(provider, 2);
 
         expect(errorListener.callCount).to.equal(1);
       });
 
       it("and Action error event on action error", async () => {
-        const contractErrorListener = sinon.fake();
-        const actionErrorListener = sinon.fake();
+        const contractErrorListener = sinon.fake(() => {
+          sampleContract.off("error");
+        });
 
         sampleContract.on("error", contractErrorListener);
 
         action = sampleContract.revertWrite("some string");
-        await action.send();
 
         // Some error (orphan block, failed tx) events are being triggered only from the confirmationListener
         // See more: https://github.com/tasitlabs/TasitSDK/issues/253
         action.on("confirmation", () => {});
 
+        const actionErrorListener = sinon.fake(() => {
+          action.off("error");
+        });
+
         action.on("error", actionErrorListener);
+
+        await action.send();
 
         await action.waitForOneConfirmation();
 
@@ -232,23 +241,17 @@ describe("TasitAction.Contract", () => {
       // See more: https://github.com/trufflesuite/ganache-core/issues/248#issuecomment-455354557
       await action.waitForOneConfirmation();
 
-      const confirmationFakeFn = sinon.fake();
-      const errorFakeFn = sinon.fake();
+      const errorListener = sinon.fake();
 
-      const errorListener = message => {
-        const { error } = message;
-        errorFakeFn();
-      };
-
-      const confirmationListener = async message => {
+      const confirmationListener = sinon.fake(async message => {
         const { data } = message;
         const { confirmations } = data;
 
-        confirmationFakeFn();
-
         const value = await sampleContract.getValue();
         expect(value).to.equal(rand);
-      };
+
+        action.off("confirmation");
+      });
 
       action.on("error", errorListener);
 
@@ -256,9 +259,8 @@ describe("TasitAction.Contract", () => {
 
       await mineBlocks(provider, 2);
 
-      // Non-deterministic
-      expect(confirmationFakeFn.callCount).to.be.at.least(1);
-      expect(errorFakeFn.called).to.be.false;
+      expect(confirmationListener.callCount).to.equal(1);
+      expect(errorListener.called).to.be.false;
 
       action.off("error");
 
@@ -271,14 +273,7 @@ describe("TasitAction.Contract", () => {
 
       await action.waitForOneConfirmation();
 
-      const confirmationFakeFn = sinon.fake();
-      const errorFakeFn = sinon.fake();
-
-      const errorListener = message => {
-        errorFakeFn();
-      };
-
-      const confirmationListener = async message => {
+      const confirmationListener = sinon.fake(async message => {
         const { data } = message;
         const { confirmations } = data;
 
@@ -288,82 +283,72 @@ describe("TasitAction.Contract", () => {
           const value = await sampleContract.getValue();
           expect(value).to.equal(rand);
         }
-        confirmationFakeFn();
-      };
+      });
+
+      const errorListener = sinon.fake();
 
       action.on("error", errorListener);
       action.on("confirmation", confirmationListener);
 
       await mineBlocks(provider, 7);
 
-      expect(confirmationFakeFn.callCount).to.equal(6);
-      expect(errorFakeFn.called).to.be.false;
+      expect(confirmationListener.callCount).to.equal(6);
+      expect(errorListener.called).to.be.false;
     });
 
     it("should change contract state and trigger confirmation event - late subscription", async () => {
       action = sampleContract.setValue(rand);
       await action.send();
-
       await action.waitForOneConfirmation();
 
       await mineBlocks(provider, 5);
 
-      const confirmationFakeFn = sinon.fake();
-      const errorFakeFn = sinon.fake();
+      const errorListener = sinon.fake();
 
-      const errorListener = message => {
-        errorFakeFn();
-      };
-
-      const confirmationListener = async message => {
+      const confirmationListener = sinon.fake(async message => {
         const { data } = message;
         const { confirmations } = data;
 
-        if (confirmations == 7) {
+        if (confirmations >= 7) {
           action.off("confirmation");
 
           const value = await sampleContract.getValue();
           expect(value).to.equal(rand);
-
-          confirmationFakeFn();
         }
-      };
+      });
 
       action.on("error", errorListener);
       action.on("confirmation", confirmationListener);
 
-      await mineBlocks(provider, 2);
+      await mineBlocks(provider, 1);
 
       // Non-deterministic
-      expect(confirmationFakeFn.callCount).to.be.at.least(1);
-      expect(errorFakeFn.called).to.be.false;
+      expect(confirmationListener.callCount).to.be.at.least(1);
+      expect(errorListener.called).to.be.false;
     });
 
     // Non-deterministic test case
-    it("should call error listener after timeout", async () => {
+    it.skip("should call error listener after timeout", async () => {
       action = sampleContract.setValue("hello world");
       action.setEventsTimeout(100);
-      await action.send();
 
-      await action.waitForOneConfirmation();
-
-      const errorFn = sinon.fake();
-      const confirmationFn = sinon.fake();
-
-      const foreverListener = message => {
-        confirmationFn();
-      };
-
-      action.on("confirmation", foreverListener);
-
-      const errorListener = message => {
+      const errorListener = sinon.fake(message => {
         const { error } = message;
         expect(error.eventName).to.equal("confirmation");
         expect(error.message).to.equal("Event confirmation reached timeout.");
-        errorFn();
-      };
+        action.off("error");
+      });
+
+      const confirmationListener = sinon.fake(() => {
+        action.off("confirmation");
+      });
+
+      action.on("confirmation", confirmationListener);
 
       action.on("error", errorListener);
+
+      await action.send();
+      await action.waitForOneConfirmation();
 
       await mineBlocks(provider, 2);
 
@@ -372,11 +357,12 @@ describe("TasitAction.Contract", () => {
       //  https://github.com/sinonjs/sinon/issues/1739
       //  https://github.com/sinonjs/lolex/issues/114
       //  https://stackoverflow.com/a/50785284
-      await wait(action.getEventsTimeout() * 3);
+      await wait(action.getEventsTimeout() * 5);
 
-      // Non-deterministic
-      expect(errorFn.callCount).to.be.at.least(1);
-      expect(confirmationFn.callCount).to.be.at.least(1);
+      await mineBlocks(provider, 2);
+
+      expect(errorListener.callCount).to.equal(1);
+      expect(confirmationListener.callCount).to.equal(1);
       expect(action.subscribedEventNames()).to.deep.equal([
         "error",
         "confirmation",

@@ -108,6 +108,7 @@ export class Action extends Subscription {
     const baseEthersListener = async blockNumber => {
       try {
         const tx = await this.#tx;
+        if (!tx) return;
 
         const receipt = await this.#provider.getTransactionReceipt(tx.hash);
 
