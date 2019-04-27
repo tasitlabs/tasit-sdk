@@ -12,11 +12,11 @@
   "scripts": {
     "clean:all": "npx lerna run clean --stream && npx lerna clean --yes && rm -rf ./node_modules",
     "publish": "npm run clean:all && npm run bootstrap && npm test && npx lerna publish",
-    "bootstrap": "npm run clean:all && npx lerna bootstrap --hoist",
+    "bootstrap": "npx lerna bootstrap --hoist",
     "ganache:start:forked-ropsten": "npx ganache-cli --fork https://ropsten.infura.io --noVMErrorsOnRPCResponse true -m 'canal warfare equip auction crystal fossil helmet cash account joy inherit tank' --gasLimit 1000000000000 --host 0.0.0.0 > /dev/null 2>&1 &",
     "ganache:start:forked-goerli": "npx ganache-cli --fork https://goerli.infura.io/v3/974bd2e667b246f29d2589a59600530e --noVMErrorsOnRPCResponse true -m 'canal warfare equip auction crystal fossil helmet cash account joy inherit tank' --gasLimit 1000000000000 --host 0.0.0.0 > /dev/null 2>&1 &",
     "ganache:start": "npx ganache-cli --noVMErrorsOnRPCResponse true -m 'canal warfare equip auction crystal fossil helmet cash account joy inherit tank' --gasLimit 1000000000 --host 0.0.0.0 > /dev/null 2>&1 &",
-    "ganache:stop": "kill `ps ax | grep ganache-cli | grep -v grep | awk '{print $1}'` 2> /dev/null; exit 0",
+    "ganache:stop": "kill `ps ax|grep ganache-cli|grep -v grep| awk '{print $1}'` 2> /dev/null; exit 0",
     "truffle:migrate": "npx lerna run migrate --scope tasit-contracts --stream",
     "prepare:blockchain": "npm run ganache:stop && npm run ganache:start && npm run truffle:migrate",
     "pretest": "npm run prepare:blockchain",
