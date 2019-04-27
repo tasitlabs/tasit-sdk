@@ -166,9 +166,9 @@ describe("Decentraland", () => {
           mana.setWallet(ephemeralWallet);
           const approvalAction = mana.approve(
             MARKETPLACE_ADDRESS,
-            manaAmountForShopping,
-            gasParams
+            manaAmountForShopping
           );
+          await approvalAction.send();
           await approvalAction.waitForOneConfirmation();
 
           const allowance = await mana.allowance(
@@ -199,10 +199,9 @@ describe("Decentraland", () => {
             nftAddress,
             `${assetId}`,
             `${priceInWei}`,
-            `${fingerprint}`,
-            gasParams
+            `${fingerprint}`
           );
-
+          await executeOrderAction.send();
           await executeOrderAction.waitForOneConfirmation();
 
           await expectExactTokenBalances(estate, [ephemeralAddress], [1]);
@@ -228,10 +227,9 @@ describe("Decentraland", () => {
             nftAddress,
             `${assetId}`,
             `${priceInWei}`,
-            `${fingerprint}`,
-            gasParams
+            `${fingerprint}`
           );
-
+          await executeOrderAction.send();
           await executeOrderAction.waitForOneConfirmation();
 
           await expectExactTokenBalances(land, [ephemeralAddress], [1]);
@@ -258,6 +256,7 @@ describe("Decentraland", () => {
             toAddress,
             SMALL_AMOUNT
           );
+          await transferEthersAction.send();
           await transferEthersAction.waitForOneConfirmation();
           await expectExactEtherBalances(provider, [toAddress], [SMALL_AMOUNT]);
 
@@ -266,6 +265,7 @@ describe("Decentraland", () => {
             toAddress,
             manaAmountForShopping
           );
+          await transferManaAction.send();
           await transferManaAction.waitForOneConfirmation();
           await expectExactTokenBalances(
             mana,
@@ -276,9 +276,9 @@ describe("Decentraland", () => {
           mana.setWallet(ephemeralWallet);
           const approvalAction = mana.approve(
             MARKETPLACE_ADDRESS,
-            manaAmountForShopping,
-            gasParams
+            manaAmountForShopping
           );
+          await approvalAction.send();
           await approvalAction.waitForOneConfirmation();
 
           const allowance = await mana.allowance(
@@ -309,10 +309,10 @@ describe("Decentraland", () => {
             nftAddress,
             `${assetId}`,
             `${priceInWei}`,
-            `${fingerprint}`,
-            gasParams
+            `${fingerprint}`
           );
 
+          await executeOrderAction.send();
           await executeOrderAction.waitForOneConfirmation();
 
           await expectExactTokenBalances(estate, [ephemeralAddress], [1]);
@@ -354,10 +354,10 @@ describe("Decentraland", () => {
             nftAddress,
             `${assetId}`,
             `${priceInWei}`,
-            `${fingerprint}`,
-            gasParams
+            `${fingerprint}`
           );
 
+          await executeOrderAction.send();
           await executeOrderAction.waitForOneConfirmation();
 
           await expectExactTokenBalances(land, [ephemeralAddress], [1]);
@@ -392,6 +392,7 @@ describe("Decentraland", () => {
             toAddress,
             SMALL_AMOUNT
           );
+          await transferEthersAction.send();
           await transferEthersAction.waitForOneConfirmation();
           await expectExactEtherBalances(provider, [toAddress], [SMALL_AMOUNT]);
 
@@ -409,6 +410,7 @@ describe("Decentraland", () => {
             functionName,
             argsArray
           );
+          await approvalAction.send();
           await approvalAction.waitForOneConfirmation();
 
           const owner = GNOSIS_SAFE_ADDRESS;
@@ -460,6 +462,7 @@ describe("Decentraland", () => {
           };
           gnosisSafe.once("ExecutionFailed", onFailed);
 
+          await executeOrderAction.send();
           await executeOrderAction.waitForOneConfirmation();
 
           await mineBlocks(provider, 1);
@@ -511,10 +514,12 @@ describe("Decentraland", () => {
           };
           gnosisSafe.once("ExecutionFailed", onFailed);
 
+          await executeOrderAction.send();
           await executeOrderAction.waitForOneConfirmation();
 
           await mineBlocks(provider, 1);
 
+          await executeOrderAction.send();
           await executeOrderAction.waitForOneConfirmation();
 
           await expectExactTokenBalances(land, [GNOSIS_SAFE_ADDRESS], [1]);
@@ -534,6 +539,7 @@ describe("Decentraland", () => {
             toAddress,
             SMALL_AMOUNT
           );
+          await transferEthersAction.send();
           await transferEthersAction.waitForOneConfirmation();
           await expectExactEtherBalances(provider, [toAddress], [SMALL_AMOUNT]);
 
@@ -552,6 +558,7 @@ describe("Decentraland", () => {
             functionName,
             argsArray
           );
+          await ephemeralApprovalAction.send();
           await ephemeralApprovalAction.waitForOneConfirmation();
           const owner = GNOSIS_SAFE_ADDRESS;
           const ephemeralAllowance = await mana.allowance(owner, spender);
@@ -561,9 +568,9 @@ describe("Decentraland", () => {
           mana.setWallet(ephemeralWallet);
           const marketplaceApprovalAction = mana.approve(
             MARKETPLACE_ADDRESS,
-            manaAmountForShopping,
-            gasParams
+            manaAmountForShopping
           );
+          await marketplaceApprovalAction.send();
           await marketplaceApprovalAction.waitForOneConfirmation();
           const marketplaceAllowance = await mana.allowance(
             ephemeralAddress,
@@ -593,10 +600,10 @@ describe("Decentraland", () => {
             nftAddress,
             `${assetId}`,
             `${priceInWei}`,
-            `${fingerprint}`,
-            gasParams
+            `${fingerprint}`
           );
 
+          await executeOrderAction.send();
           await executeOrderAction.waitForOneConfirmation();
 
           await expectExactTokenBalances(estate, [ephemeralAddress], [1]);
@@ -622,10 +629,10 @@ describe("Decentraland", () => {
             nftAddress,
             `${assetId}`,
             `${priceInWei}`,
-            `${fingerprint}`,
-            gasParams
+            `${fingerprint}`
           );
 
+          await executeOrderAction.send();
           await executeOrderAction.waitForOneConfirmation();
 
           await expectExactTokenBalances(land, [ephemeralAddress], [1]);

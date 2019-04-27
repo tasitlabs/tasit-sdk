@@ -11,14 +11,6 @@ const { abi: gnosisSafeABI } = GnosisSafeInfo;
 const { abi: erc20ABI } = MyERC20Full;
 const { abi: erc721ABI } = MyERC721Full;
 
-// TODO: Go deep on gas handling.
-// Without that, VM returns a revert error instead of out of gas error.
-// See: https://github.com/tasitlabs/TasitSDK/issues/173
-const gasParams = {
-  gasLimit: 7e6,
-  gasPrice: 1e9,
-};
-
 // Possible Gnosis Safe wallet operations
 const operations = {
   CALL: 0,
@@ -154,9 +146,11 @@ export default class GnosisSafe extends Contract {
   };
 
   #executeTransaction = (data, toAddress, etherValue) => {
-    const tx = this.#prepareTransaction(data, toAddress, etherValue);
+    const rawTxPromise = this.#prepareTransaction(data, toAddress, etherValue);
     const provider = this._getProvider();
-    const action = new Action(tx, provider);
+    const signer = this.getWallet();
+
+    const action = new Action(rawTxPromise, provider, signer);
     return action;
   };
 
@@ -229,10 +223,11 @@ export default class GnosisSafe extends Contract {
       gasPrice,
       gasToken,
       refundReceiver,
-      signatures,
-      gasParams
+      signatures
     );
 
-    return execTxAction.getTransaction();
+    const rawTx = await execTxAction._toRaw();
+
+    return rawTx;
   };
 }

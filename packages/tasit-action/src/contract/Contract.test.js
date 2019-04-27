@@ -133,6 +133,7 @@ describe("TasitAction.Contract", () => {
         sampleContract.on("error", errorListener);
 
         action = sampleContract.revertWrite("some string");
+        await action.send();
 
         // Some error (orphan block, failed tx) events are being triggered only from the confirmationListener
         // See more: https://github.com/tasitlabs/TasitSDK/issues/253
@@ -152,6 +153,7 @@ describe("TasitAction.Contract", () => {
         sampleContract.on("error", contractErrorListener);
 
         action = sampleContract.revertWrite("some string");
+        await action.send();
 
         // Some error (orphan block, failed tx) events are being triggered only from the confirmationListener
         // See more: https://github.com/tasitlabs/TasitSDK/issues/253
@@ -167,7 +169,8 @@ describe("TasitAction.Contract", () => {
         expect(actionErrorListener.called).to.be.true;
       });
 
-      it("on contract event listener error", async () => {
+      // Non-deterministic test case
+      it.skip("on contract event listener error", async () => {
         const errorListener = sinon.fake();
         const eventListener = sinon.fake.throws(new Error());
 
@@ -175,6 +178,7 @@ describe("TasitAction.Contract", () => {
         sampleContract.on("ValueChanged", eventListener);
 
         action = sampleContract.setValue("hello world");
+        await action.send();
 
         await action.waitForOneConfirmation();
 
@@ -203,6 +207,7 @@ describe("TasitAction.Contract", () => {
 
     it("should throw when subscribing with invalid event name", async () => {
       action = sampleContract.setValue("hello world");
+      await action.send();
 
       expect(() => {
         action.on("invalid", () => {});
@@ -211,6 +216,7 @@ describe("TasitAction.Contract", () => {
 
     it("should throw when subscribing without listener", async () => {
       action = sampleContract.setValue("hello world");
+      await action.send();
 
       expect(() => {
         action.on("confirmation");
@@ -219,6 +225,7 @@ describe("TasitAction.Contract", () => {
 
     it("should change contract state and trigger confirmation event one time", async () => {
       action = sampleContract.setValue(rand);
+      await action.send();
 
       // Waiting for 1st confirmation
       // For now ganache always mine a block after transaction creation
@@ -260,6 +267,7 @@ describe("TasitAction.Contract", () => {
 
     it("should change contract state and trigger confirmation event", async () => {
       action = sampleContract.setValue(rand);
+      await action.send();
 
       await action.waitForOneConfirmation();
 
@@ -294,6 +302,7 @@ describe("TasitAction.Contract", () => {
 
     it("should change contract state and trigger confirmation event - late subscription", async () => {
       action = sampleContract.setValue(rand);
+      await action.send();
 
       await action.waitForOneConfirmation();
 
@@ -334,6 +343,7 @@ describe("TasitAction.Contract", () => {
     it.skip("should call error listener after timeout", async () => {
       action = sampleContract.setValue("hello world");
       action.setEventsTimeout(100);
+      await action.send();
 
       await action.waitForOneConfirmation();
 
@@ -374,6 +384,7 @@ describe("TasitAction.Contract", () => {
 
     it("subscription should have one listener per event", async () => {
       action = sampleContract.setValue("hello world");
+      await action.send();
 
       const listener1 = message => {};
       const listener2 = message => {};
@@ -394,6 +405,7 @@ describe("TasitAction.Contract", () => {
 
     it("should remove an event", async () => {
       action = sampleContract.setValue("hello world");
+      await action.send();
 
       const listener1 = message => {};
 
@@ -438,6 +450,7 @@ describe("TasitAction.Contract", () => {
       const snapshotId = await createSnapshot(provider);
 
       action = sampleContract.setValue("hello world");
+      await action.send();
 
       action.on("confirmation", confirmationListener);
 
@@ -484,6 +497,7 @@ describe("TasitAction.Contract", () => {
       };
 
       action = sampleContract.setValue("hello world");
+      await action.send();
 
       await action.waitForOneConfirmation();
 
@@ -515,6 +529,7 @@ describe("TasitAction.Contract", () => {
 
     it("should get action id (transactionHash)", async () => {
       action = sampleContract.setValue(rand);
+      await action.send();
 
       const actionId = await action.getId();
 
@@ -542,6 +557,7 @@ describe("TasitAction.Contract", () => {
       sampleContract.on("error", errorListener);
 
       action = sampleContract.setValue("hello world");
+      await action.send();
 
       // Is possible do that using async/await?
       // If not, TODO: Make a function
@@ -575,6 +591,7 @@ describe("TasitAction.Contract", () => {
       sampleContract.on("error", errorListener);
 
       action = sampleContract.setValue("hello world");
+      await action.send();
 
       // Is possible do that using async/await?
       // If not, TODO: Make a function

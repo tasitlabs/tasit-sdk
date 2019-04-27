@@ -6,12 +6,14 @@ import ConfigLoader from "../ConfigLoader";
 //  and/or MetaTxAction subclasses
 export class Action extends Subscription {
   #provider;
+  #signer;
+  #rawTx;
   #tx;
   #txConfirmations;
   #timeout;
   #lastConfirmationTime;
 
-  constructor(txPromise, provider) {
+  constructor(rawTx, provider, signer) {
     // Provider implements EventEmitter API and it's enough
     //  to handle with transactions events
     super(provider);
@@ -19,19 +21,49 @@ export class Action extends Subscription {
     const { events } = ConfigLoader.getConfig();
     const { timeout } = events;
 
-    this.#tx = txPromise.then(
-      tx => {
-        return tx;
-      },
-      error => {
-        this._emitErrorEvent(new Error(`Action with error: ${error.message}`));
-      }
-    );
-
+    this.#rawTx = rawTx;
+    this.#signer = signer;
     this.#timeout = timeout;
     this.#provider = provider;
     this.#txConfirmations = 0;
   }
+
+  _toRaw = async () => {
+    return await this.#rawTx;
+  };
+
+  #signAndSend = async () => {
+    // TODO: Go deep on gas handling.
+    // Without that, VM returns a revert error instead of out of gas error.
+    // See: https://github.com/tasitlabs/TasitSDK/issues/173
+    //
+    // This command isn't enough
+    // const gasLimit = await this.#provider.estimateGas(this.#rawTx);
+    const gasParams = {
+      gasLimit: 7e6,
+      gasPrice: 1e9,
+    };
+
+    const nonce = await this.#provider.getTransactionCount(
+      this.#signer.address
+    );
+
+    let rawTx = await this.#rawTx;
+
+    rawTx = { ...rawTx, nonce, ...gasParams };
+
+    const signedTx = await this.#signer.sign(rawTx);
+
+    try {
+      this.#tx = await this.#provider.sendTransaction(signedTx);
+    } catch (error) {
+      this._emitErrorEvent(new Error(`Action with error: ${error.message}`));
+    }
+  };
+
+  send = async () => {
+    await this.#signAndSend();
+  };
 
   on = (eventName, listener) => {
     this.#addListener(eventName, listener, false);
