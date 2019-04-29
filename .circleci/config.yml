@@ -32,20 +32,20 @@ jobs:
           command: "greenkeeper-lockfile-update"
 
       # Download and cache dependencies
-      #- restore_cache:
-      #    keys:
-      #      - dependency-cache-{{ checksum "package.json" }}
-      # fallback to using the latest cache if no exact match is found
-      #      - dependency-cache-
+      - restore_cache:
+          keys:
+            - dependency-cache-{{ checksum "package.json" }}
+            # fallback to using the latest cache if no exact match is found
+            - dependency-cache-
 
       - run:
           name: Bootstrapping packages
           command: npm run bootstrap
 
-      #- save_cache:
-      #    paths:
-      #      - ./node_modules
-      #    key: dependency-cache-{{ checksum "package.json" }}
+      - save_cache:
+          paths:
+            - ./node_modules
+          key: dependency-cache-{{ checksum "package.json" }}
 
       - run:
           name: Running test suite
