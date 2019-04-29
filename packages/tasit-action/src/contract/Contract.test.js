@@ -190,7 +190,7 @@ describe("TasitAction.Contract", () => {
 
         await action.waitForOneConfirmation();
 
-        await mineBlocks(provider, 2);
+        await mineBlocks(provider, 4);
 
         // Non-deterministic
         expect(eventListener.callCount).to.be.at.least(1);
