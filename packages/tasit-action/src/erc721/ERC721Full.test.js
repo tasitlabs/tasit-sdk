@@ -132,29 +132,31 @@ describe("TasitAction.ERC721.ERC721Full", () => {
       await expectExactTokenBalances(erc721, [ana.address], [1]);
     });
 
-    // Non-deterministic
-    // Note: This test failed recently on CI
-    it.skip("should transfer an owned token", async () => {
+    it("should transfer an owned token", async () => {
       erc721 = new ERC721Full(ERC721_FULL_ADDRESS, ana);
 
-      action = erc721.transferFrom(ana.address, bob.address, tokenId);
-      await action.send();
+      const transferListener = sinon.fake(message => {
+        const { data } = message;
+        const { args } = data;
 
-      const event = await new Promise(function(resolve, reject) {
-        erc721.on("Transfer", message => {
-          const { data } = message;
-          const { args } = data;
-          resolve(args);
-        });
-
-        setTimeout(() => {
-          reject(new Error("timeout"));
-        }, 2000);
+        expect(args.from).to.equal(ana.address);
+        expect(args.to).to.equal(bob.address);
+        expect(args.tokenId.toNumber()).to.equal(tokenId);
       });
 
-      expect(event.from).to.equal(ana.address);
-      expect(event.to).to.equal(bob.address);
-      expect(event.tokenId.toNumber()).to.equal(tokenId);
+      const errorListener = sinon.fake();
+
+      erc721.on("error", errorListener);
+      erc721.on("Transfer", transferListener);
+
+      action = erc721.transferFrom(ana.address, bob.address, tokenId);
+
+      await action.send();
+      await action.waitForOneConfirmation();
+
+      await mineBlocks(provider, 2);
+
+      expect(errorListener.called).to.be.false;
 
       await expectExactTokenBalances(
         erc721,
