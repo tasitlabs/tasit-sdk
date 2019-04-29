@@ -93,7 +93,7 @@ const mineBlocks = async (provider, n) => {
     // Without that some undesired behavior occurs
     // E.g.: Same listener receiving tx confirmation several times
     // See more: https://github.com/ethers-io/ethers.js/issues/393
-    await wait(provider.pollingInterval * 3);
+    await wait(provider.pollingInterval * 2);
   }
 };
 
