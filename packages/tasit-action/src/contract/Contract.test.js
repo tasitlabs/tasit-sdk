@@ -190,10 +190,11 @@ describe("TasitAction.Contract", () => {
 
         await action.waitForOneConfirmation();
 
-        await mineBlocks(provider, 1);
+        await mineBlocks(provider, 2);
 
-        expect(eventListener.callCount).to.equal(1);
-        expect(errorListener.callCount).to.equal(1);
+        // Non-deterministic
+        expect(eventListener.callCount).to.be.at.least(1);
+        expect(errorListener.callCount).to.be.at.least(1);
       });
     });
 
@@ -320,7 +321,7 @@ describe("TasitAction.Contract", () => {
       action.on("error", errorListener);
       action.on("confirmation", confirmationListener);
 
-      await mineBlocks(provider, 1);
+      await mineBlocks(provider, 2);
 
       // Non-deterministic
       expect(confirmationListener.callCount).to.be.at.least(1);
@@ -466,12 +467,8 @@ describe("TasitAction.Contract", () => {
     //  the client previously thought were part of the difficultywise-longest well-formed blockchain.
     //  These excluded blocks become orphans.
     it("should emit error event when block reorganization occurs - tx confirmed twice", async () => {
-      const confirmationFn = sinon.fake();
+      const confirmationListener = sinon.fake();
       const errorFn = sinon.fake();
-
-      const confirmationListener = message => {
-        confirmationFn();
-      };
 
       const errorListener = message => {
         const { error } = message;
@@ -501,7 +498,7 @@ describe("TasitAction.Contract", () => {
       await mineBlocks(provider, 2);
 
       // Non-deterministic
-      expect(confirmationFn.callCount).to.be.at.least(1);
+      expect(confirmationListener.callCount).to.be.at.least(1);
 
       await revertFromSnapshot(provider, snapshotId);
 
@@ -514,7 +511,7 @@ describe("TasitAction.Contract", () => {
 
       // not always on the first new block because of pollingInterval vs blockTime issue
       // but the first poll after that 15 new blocks is emitting error event
-      // // Non-deterministic
+      // Non-deterministic
       expect(errorFn.callCount).to.be.at.least(1);
     });
 
