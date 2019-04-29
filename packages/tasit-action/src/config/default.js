@@ -9,7 +9,7 @@ const development = {
     },
   },
   events: {
-    timeout: 2000,
+    timeout: 4000,
   },
 };
 
