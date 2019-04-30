@@ -541,7 +541,8 @@ describe("TasitAction.Contract", () => {
 
       await mineBlocks(provider, 2);
 
-      expect(confirmationListener.callCount).to.equal(1);
+      // Non-determinitic
+      expect(confirmationListener.callCount).to.be.at.least(1);
       expect(errorListener.called).to.be.false;
     });
   });
