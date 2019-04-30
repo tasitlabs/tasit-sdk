@@ -525,7 +525,8 @@ describe("TasitAction.Contract", () => {
       expect(actionId).to.have.lengthOf(66);
     });
 
-    it("should be able to listen to an event before sending", async () => {
+    // Non-deterministic
+    it.skip("should be able to listen to an event before sending", async () => {
       const confirmationListener = sinon.fake(async message => {
         action.off("confirmation");
       });
@@ -543,7 +544,6 @@ describe("TasitAction.Contract", () => {
 
       await mineBlocks(provider, 2);
 
-      // Non-deterministic
       expect(confirmationListener.callCount).to.be.at.least(1);
       expect(errorListener.called).to.be.false;
     });
