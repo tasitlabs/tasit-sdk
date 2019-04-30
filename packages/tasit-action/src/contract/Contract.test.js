@@ -128,10 +128,7 @@ describe("TasitAction.Contract", () => {
 
     describe("should trigger Contract error event", async () => {
       it("on action error", async () => {
-        const errorListener = sinon.fake(() => {
-          // Note: Forcing listener to be called once
-          sampleContract.off("error");
-        });
+        const errorListener = sinon.fake();
 
         sampleContract.on("error", errorListener);
 
@@ -146,7 +143,7 @@ describe("TasitAction.Contract", () => {
 
         await mineBlocks(provider, 2);
 
-        expect(errorListener.callCount).to.equal(1);
+        expect(errorListener.callCount).to.be.at.least(1);
       });
 
       it("and Action error event on action error", async () => {
