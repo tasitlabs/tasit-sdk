@@ -28,8 +28,8 @@ export class Action extends Subscription {
     this.#txConfirmations = 0;
   }
 
-  _toRaw = async () => {
-    return await this.#rawTx;
+  _toRaw = () => {
+    return this.#rawTx;
   };
 
   #signAndSend = async () => {
@@ -48,11 +48,12 @@ export class Action extends Subscription {
       this.#signer.address
     );
 
-    let rawTx = await this.#rawTx;
+    // Note: Resolving promise if the Action was created using a async rawTx
+    const rawTx = await this.#rawTx;
 
-    rawTx = { ...rawTx, nonce, ...gasParams };
+    this.#rawTx = { ...rawTx, nonce, ...gasParams };
 
-    const signedTx = await this.#signer.sign(rawTx);
+    const signedTx = await this.#signer.sign(this.#rawTx);
 
     try {
       this.#tx = await this.#provider.sendTransaction(signedTx);
