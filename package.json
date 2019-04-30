@@ -5,7 +5,7 @@
   "devDependencies": {
     "@babel/preset-env": "^7.4.1",
     "ganache-cli": "^6.4.3",
-    "lerna": "^3.13.2",
+    "lerna": "^3.13.4",
     "prettier": "^1.17.0",
     "prettier-plugin-solidity": "^1.0.0-alpha.22"
   },
@@ -41,7 +41,7 @@
   },
   "homepage": "https://github.com/tasitlabs/TasitSDK#readme",
   "engines": {
-    "node": ">=10.13.0",
+    "node": ">=10.15.0",
     "npm": ">=6.4.1"
   }
 }

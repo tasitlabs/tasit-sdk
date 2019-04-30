@@ -18,7 +18,7 @@
   },
   "scripts": {
     "prepare": "rm -rf dist/* && npx babel src --out-dir dist --ignore src/*.test.js,src/**/*.test.js",
-    "test": "npm run lint && npx mocha \"src/**/*.test.js\" --recursive --require @babel/register --file src/testHelpers/mochaSetup.js",
+    "test": "npm run lint && npx mocha \"src/**/*.test.js\" --recursive --require @babel/register --file src/testHelpers/mochaSetup.js --timeout 8000",
     "lint": "npx prettier src/* --write"
   },
   "bugs": {
