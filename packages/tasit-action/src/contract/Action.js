@@ -33,29 +33,33 @@ export class Action extends Subscription {
   };
 
   #signAndSend = async () => {
-    // TODO: Go deep on gas handling.
-    // Without that, VM returns a revert error instead of out of gas error.
-    // See: https://github.com/tasitlabs/TasitSDK/issues/173
-    //
-    // This command isn't enough
-    // const gasLimit = await this.#provider.estimateGas(this.#rawTx);
-    const gasParams = {
-      gasLimit: 7e6,
-      gasPrice: 1e9,
-    };
-
-    const nonce = await this.#provider.getTransactionCount(
-      this.#signer.address
-    );
-
-    // Note: Resolving promise if the Action was created using a async rawTx
-    const rawTx = await this.#rawAction;
-
-    this.#rawAction = { ...rawTx, nonce, ...gasParams };
-
-    const signedTx = await this.#signer.sign(this.#rawAction);
-
     try {
+      // Note: Resolving promise if the Action was created using a async rawTx
+      let rawTx = await this.#rawAction;
+
+      const nonce = await this.#provider.getTransactionCount(
+        this.#signer.address
+      );
+      const gasPrice = await this.#provider.getGasPrice();
+      const network = await this.#provider.getNetwork();
+      const chainId = network.chainId;
+      let { value } = rawTx;
+      value = !value ? 0 : value;
+
+      rawTx = { ...rawTx, nonce, gasPrice, chainId, value };
+
+      // TODO: Go deep on gas handling.
+      // Without that, VM returns a revert error instead of out of gas error.
+      // See: https://github.com/tasitlabs/TasitSDK/issues/173
+      //
+      // This command isn't enough
+      //const gasLimit = await this.#provider.estimateGas(rawTx);
+      const gasLimit = 7e6;
+
+      this.#rawAction = { ...rawTx, gasLimit };
+
+      const signedTx = await this.#signer.sign(this.#rawAction);
+
       this.#tx = await this.#provider.sendTransaction(signedTx);
     } catch (error) {
       this._emitErrorEvent(new Error(`Action with error: ${error.message}`));
