@@ -7,13 +7,13 @@ import ConfigLoader from "../ConfigLoader";
 export class Action extends Subscription {
   #provider;
   #signer;
-  #rawTx;
+  #rawAction;
   #tx;
   #txConfirmations;
   #timeout;
   #lastConfirmationTime;
 
-  constructor(rawTx, provider, signer) {
+  constructor(rawAction, provider, signer) {
     // Provider implements EventEmitter API and it's enough
     //  to handle with transactions events
     super(provider);
@@ -21,7 +21,7 @@ export class Action extends Subscription {
     const { events } = ConfigLoader.getConfig();
     const { timeout } = events;
 
-    this.#rawTx = rawTx;
+    this.#rawAction = rawAction;
     this.#signer = signer;
     this.#timeout = timeout;
     this.#provider = provider;
@@ -29,7 +29,7 @@ export class Action extends Subscription {
   }
 
   _toRaw = () => {
-    return this.#rawTx;
+    return this.#rawAction;
   };
 
   #signAndSend = async () => {
@@ -49,11 +49,11 @@ export class Action extends Subscription {
     );
 
     // Note: Resolving promise if the Action was created using a async rawTx
-    const rawTx = await this.#rawTx;
+    const rawTx = await this.#rawAction;
 
-    this.#rawTx = { ...rawTx, nonce, ...gasParams };
+    this.#rawAction = { ...rawTx, nonce, ...gasParams };
 
-    const signedTx = await this.#signer.sign(this.#rawTx);
+    const signedTx = await this.#signer.sign(this.#rawAction);
 
     try {
       this.#tx = await this.#provider.sendTransaction(signedTx);
