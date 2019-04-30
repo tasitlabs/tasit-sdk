@@ -14,7 +14,7 @@ const { _getEstatesOf, _getParcelsOf, getAssetsOf } = decentralandUtils;
 const { ONE, TEN, ONE_HUNDRED } = constants;
 const SMALL_AMOUNT = bigNumberify(`${1e17}`); // 0.1 ethers
 
-describe("Decentraland", () => {
+describe.only("Decentraland", () => {
   let minterWallet;
   let ephemeralWallet;
   let ephemeralAddress;
@@ -179,7 +179,7 @@ describe("Decentraland", () => {
           expect(`${allowance}`).to.equal(`${manaAmountForShopping}`);
         });
 
-        it("should buy an estate", async () => {
+        it.only("should buy an estate", async () => {
           const {
             assetId,
             nftAddress,
@@ -201,10 +201,31 @@ describe("Decentraland", () => {
             `${priceInWei}`,
             `${fingerprint}`
           );
-          await executeOrderAction.send();
-          await executeOrderAction.waitForOneConfirmation();
 
-          await expectExactTokenBalances(estate, [ephemeralAddress], [1]);
+          return new Promise((resolve, reject) => {
+            const successfulListener = async message => {
+              const { data } = message;
+              const { args } = data;
+              const { buyer } = args;
+
+              marketplace.off("OrderSuccessful");
+
+              expect(buyer).to.equal(ephemeralAddress);
+              await expectExactTokenBalances(estate, [ephemeralAddress], [1]);
+
+              resolve();
+            };
+
+            const errorListener = message => {
+              const { error } = message;
+              reject(error);
+            };
+
+            marketplace.on("OrderSuccessful", successfulListener);
+            marketplace.on("error", errorListener);
+
+            executeOrderAction.send();
+          });
         });
 
         it("should buy a parcel of land", async () => {
