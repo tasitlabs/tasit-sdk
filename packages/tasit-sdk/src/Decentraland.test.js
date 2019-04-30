@@ -202,6 +202,8 @@ describe.only("Decentraland", () => {
             `${fingerprint}`
           );
 
+          executeOrderAction.send();
+
           return new Promise((resolve, reject) => {
             const successfulListener = async message => {
               const { data } = message;
@@ -223,8 +225,6 @@ describe.only("Decentraland", () => {
 
             marketplace.on("OrderSuccessful", successfulListener);
             marketplace.on("error", errorListener);
-
-            executeOrderAction.send();
           });
         });
 
