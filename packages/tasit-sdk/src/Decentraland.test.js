@@ -179,33 +179,31 @@ describe.only("Decentraland", () => {
           expect(`${allowance}`).to.equal(`${manaAmountForShopping}`);
         });
 
-        it.only("should buy an estate", async () => {
-          const {
-            assetId,
-            nftAddress,
-            seller,
-            priceInWei,
-            expiresAt,
-          } = estateForSale;
+        it.only("should buy an estate", done => {
+          (async () => {
+            const {
+              assetId,
+              nftAddress,
+              seller,
+              priceInWei,
+              expiresAt,
+            } = estateForSale;
 
-          await checkAsset(estate, mana, estateForSale, ephemeralAddress);
+            await checkAsset(estate, mana, estateForSale, ephemeralAddress);
 
-          await expectExactTokenBalances(estate, [ephemeralAddress], [0]);
+            await expectExactTokenBalances(estate, [ephemeralAddress], [0]);
 
-          const fingerprint = await estate.getFingerprint(`${assetId}`);
+            const fingerprint = await estate.getFingerprint(`${assetId}`);
 
-          marketplace.setWallet(ephemeralWallet);
-          const executeOrderAction = marketplace.safeExecuteOrder(
-            nftAddress,
-            `${assetId}`,
-            `${priceInWei}`,
-            `${fingerprint}`
-          );
+            marketplace.setWallet(ephemeralWallet);
+            const executeOrderAction = marketplace.safeExecuteOrder(
+              nftAddress,
+              `${assetId}`,
+              `${priceInWei}`,
+              `${fingerprint}`
+            );
 
-          executeOrderAction.send();
-
-          return new Promise((resolve, reject) => {
-            const successfulListener = async message => {
+            const successfulListener = sinon.fake(async message => {
               const { data } = message;
               const { args } = data;
               const { buyer } = args;
@@ -215,17 +213,19 @@ describe.only("Decentraland", () => {
               expect(buyer).to.equal(ephemeralAddress);
               await expectExactTokenBalances(estate, [ephemeralAddress], [1]);
 
-              resolve();
-            };
+              done();
+            });
 
-            const errorListener = message => {
+            const errorListener = sinon.fake(message => {
               const { error } = message;
-              reject(error);
-            };
+              done(error);
+            });
 
             marketplace.on("OrderSuccessful", successfulListener);
             marketplace.on("error", errorListener);
-          });
+
+            executeOrderAction.send();
+          })();
         });
 
         it("should buy a parcel of land", async () => {
