@@ -525,6 +525,28 @@ describe("TasitAction.Contract", () => {
       expect(actionId).to.be.an("string");
       expect(actionId).to.have.lengthOf(66);
     });
+
+    it("should be able to listen to an event before sending", async () => {
+      const confirmationListener = sinon.fake(async message => {
+        action.off("confirmation");
+      });
+
+      const errorListener = sinon.fake();
+
+      action = sampleContract.setValue(rand);
+      action.on("error", errorListener);
+      action.on("confirmation", confirmationListener);
+
+      await mineBlocks(provider, 2);
+
+      await action.send();
+      await action.waitForOneConfirmation();
+
+      await mineBlocks(provider, 2);
+
+      expect(confirmationListener.callCount).to.equal(1);
+      expect(errorListener.called).to.be.false;
+    });
   });
 
   describe("Contract Events Subscription", async () => {

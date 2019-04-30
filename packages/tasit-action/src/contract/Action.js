@@ -109,7 +109,7 @@ export class Action extends Subscription {
       try {
         const tx = await this.#tx;
         if (!tx) {
-          console.log(`The action wasn't sent yet.`);
+          console.warn(`The action wasn't sent yet.`);
           return;
         }
 
