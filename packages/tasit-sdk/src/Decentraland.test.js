@@ -14,7 +14,7 @@ const { _getEstatesOf, _getParcelsOf, getAssetsOf } = decentralandUtils;
 const { ONE, TEN, ONE_HUNDRED } = constants;
 const SMALL_AMOUNT = bigNumberify(`${1e17}`); // 0.1 ethers
 
-describe.only("Decentraland", () => {
+describe("Decentraland", () => {
   let minterWallet;
   let ephemeralWallet;
   let ephemeralAddress;
@@ -136,50 +136,61 @@ describe.only("Decentraland", () => {
       });
 
       describe("Using an ephemeral wallet funded by faucets", () => {
-        beforeEach("onboarding", async () => {
-          const toAddress = ephemeralAddress;
+        beforeEach("onboarding", done => {
+          (async () => {
+            const toAddress = ephemeralAddress;
 
-          await etherFaucet(
-            provider,
-            minterWallet,
-            ephemeralAddress,
-            SMALL_AMOUNT
-          );
-          await expectExactEtherBalances(
-            provider,
-            [ephemeralAddress],
-            [SMALL_AMOUNT]
-          );
+            await etherFaucet(
+              provider,
+              minterWallet,
+              ephemeralAddress,
+              SMALL_AMOUNT
+            );
+            await expectExactEtherBalances(
+              provider,
+              [ephemeralAddress],
+              [SMALL_AMOUNT]
+            );
+            await erc20Faucet(
+              mana,
+              minterWallet,
+              ephemeralAddress,
+              manaAmountForShopping
+            );
+            await expectExactTokenBalances(
+              mana,
+              [ephemeralAddress],
+              [manaAmountForShopping]
+            );
 
-          await erc20Faucet(
-            mana,
-            minterWallet,
-            ephemeralAddress,
-            manaAmountForShopping
-          );
-          await expectExactTokenBalances(
-            mana,
-            [ephemeralAddress],
-            [manaAmountForShopping]
-          );
+            mana.setWallet(ephemeralWallet);
+            const approvalAction = mana.approve(
+              MARKETPLACE_ADDRESS,
+              manaAmountForShopping
+            );
 
-          mana.setWallet(ephemeralWallet);
-          const approvalAction = mana.approve(
-            MARKETPLACE_ADDRESS,
-            manaAmountForShopping
-          );
-          await approvalAction.send();
-          await approvalAction.waitForOneConfirmation();
+            const errorListener = message => {
+              const { error } = message;
+              done(error);
+            };
 
-          const allowance = await mana.allowance(
-            ephemeralAddress,
-            MARKETPLACE_ADDRESS
-          );
+            const successfulListener = async message => {
+              const allowance = await mana.allowance(
+                ephemeralAddress,
+                MARKETPLACE_ADDRESS
+              );
+              expect(`${allowance}`).to.equal(`${manaAmountForShopping}`);
+              done();
+            };
 
-          expect(`${allowance}`).to.equal(`${manaAmountForShopping}`);
+            mana.once("Approval", successfulListener);
+            mana.on("error", errorListener);
+
+            approvalAction.send();
+          })();
         });
 
-        it.only("should buy an estate", done => {
+        it("should buy an estate", done => {
           (async () => {
             const {
               assetId,
@@ -203,15 +214,60 @@ describe.only("Decentraland", () => {
               `${fingerprint}`
             );
 
+            const successfulListener = async message => {
+              const { data } = message;
+              const { args } = data;
+              const { buyer } = args;
+
+              expect(buyer).to.equal(ephemeralAddress);
+              await expectExactTokenBalances(estate, [ephemeralAddress], [1]);
+
+              done();
+            };
+
+            const errorListener = message => {
+              const { error } = message;
+              done(error);
+            };
+
+            marketplace.once("OrderSuccessful", successfulListener);
+            marketplace.on("error", errorListener);
+
+            executeOrderAction.send();
+          })();
+        });
+
+        it("should buy a parcel of land", done => {
+          (async () => {
+            const {
+              assetId,
+              nftAddress,
+              seller,
+              priceInWei,
+              expiresAt,
+            } = landForSale;
+
+            await checkAsset(land, mana, landForSale, ephemeralAddress);
+
+            await expectExactTokenBalances(land, [ephemeralAddress], [0]);
+
+            // LANDRegistry contract doesn't implement getFingerprint function
+            const fingerprint = "0x";
+            marketplace.setWallet(ephemeralWallet);
+            const executeOrderAction = marketplace.safeExecuteOrder(
+              nftAddress,
+              `${assetId}`,
+              `${priceInWei}`,
+              `${fingerprint}`
+            );
+
             const successfulListener = sinon.fake(async message => {
               const { data } = message;
               const { args } = data;
               const { buyer } = args;
 
-              marketplace.off("OrderSuccessful");
-
               expect(buyer).to.equal(ephemeralAddress);
-              await expectExactTokenBalances(estate, [ephemeralAddress], [1]);
+              await expectExactTokenBalances(land, [ephemeralAddress], [1]);
 
               done();
             });
@@ -221,39 +277,11 @@ describe.only("Decentraland", () => {
               done(error);
             });
 
-            marketplace.on("OrderSuccessful", successfulListener);
+            marketplace.once("OrderSuccessful", successfulListener);
             marketplace.on("error", errorListener);
 
             executeOrderAction.send();
           })();
-        });
-
-        it("should buy a parcel of land", async () => {
-          const {
-            assetId,
-            nftAddress,
-            seller,
-            priceInWei,
-            expiresAt,
-          } = landForSale;
-
-          await checkAsset(land, mana, landForSale, ephemeralAddress);
-
-          await expectExactTokenBalances(land, [ephemeralAddress], [0]);
-
-          // LANDRegistry contract doesn't implement getFingerprint function
-          const fingerprint = "0x";
-          marketplace.setWallet(ephemeralWallet);
-          const executeOrderAction = marketplace.safeExecuteOrder(
-            nftAddress,
-            `${assetId}`,
-            `${priceInWei}`,
-            `${fingerprint}`
-          );
-          await executeOrderAction.send();
-          await executeOrderAction.waitForOneConfirmation();
-
-          await expectExactTokenBalances(land, [ephemeralAddress], [1]);
         });
       });
 
