@@ -286,10 +286,8 @@ describe("Decentraland", () => {
       });
 
       describe("Using an ephemeral wallet funded by a Gnosis Safe wallet", () => {
-        beforeEach("onboarding", async () => {
+        beforeEach("onboarding - check Gnosis Safe balance", async () => {
           const { address: gnosisSafeOwnerAddress } = gnosisSafeOwner;
-          gnosisSafe.setSigners([gnosisSafeOwner]);
-          gnosisSafe.setWallet(gnosisSafeOwner);
 
           // Gnosis Safe owner should have enough ethers to pay for the transaction's gas
           await expectMinimumEtherBalances(
@@ -298,45 +296,100 @@ describe("Decentraland", () => {
             [SMALL_AMOUNT]
           );
 
+          // Set wallet and signers
+          gnosisSafe.setSigners([gnosisSafeOwner]);
+          gnosisSafe.setWallet(gnosisSafeOwner);
+        });
+
+        // Transfer a small amount of ethers to ephemeral account to pay for gas
+        beforeEach("onboarding - funding ephemeral wallet with ETH", done => {
           const toAddress = ephemeralAddress;
 
-          // Transfer a small amount of ethers to ephemeral account to pay for gas
-          const transferEthersAction = gnosisSafe.transferEther(
-            toAddress,
-            SMALL_AMOUNT
-          );
-          await transferEthersAction.send();
-          await transferEthersAction.waitForOneConfirmation();
-          await expectExactEtherBalances(provider, [toAddress], [SMALL_AMOUNT]);
+          const action = gnosisSafe.transferEther(toAddress, SMALL_AMOUNT);
 
-          const transferManaAction = gnosisSafe.transferERC20(
-            MANA_ADDRESS,
-            toAddress,
-            manaAmountForShopping
-          );
-          await transferManaAction.send();
-          await transferManaAction.waitForOneConfirmation();
-          await expectExactTokenBalances(
-            mana,
-            [toAddress],
-            [manaAmountForShopping]
-          );
+          const confirmationListener = async message => {
+            const { data } = message;
+            const { confirmations } = data;
 
-          mana.setWallet(ephemeralWallet);
-          const approvalAction = mana.approve(
-            MARKETPLACE_ADDRESS,
-            manaAmountForShopping
-          );
-          await approvalAction.send();
-          await approvalAction.waitForOneConfirmation();
+            await expectExactEtherBalances(
+              provider,
+              [toAddress],
+              [SMALL_AMOUNT]
+            );
 
-          const allowance = await mana.allowance(
-            ephemeralAddress,
-            MARKETPLACE_ADDRESS
-          );
+            done();
+          };
 
-          expect(`${allowance}`).to.equal(`${manaAmountForShopping}`);
+          const errorListener = message => {
+            const { error } = message;
+            done(error);
+          };
+
+          action.once("confirmation", confirmationListener);
+          action.on("error", errorListener);
+
+          action.send();
         });
+
+        // Stopped from here
+        beforeEach("onboarding - funding ephemeral wallet with MANA", done => {
+          (async () => {
+            try {
+              const toAddress = ephemeralAddress;
+
+              const action = gnosisSafe.transferERC20(
+                MANA_ADDRESS,
+                toAddress,
+                manaAmountForShopping
+              );
+
+              const confirmationListener = async message => {
+                const { data } = message;
+                const { confirmations } = data;
+
+                await expectExactTokenBalances(
+                  mana,
+                  [toAddress],
+                  [manaAmountForShopping]
+                );
+
+                done();
+              };
+
+              const errorListener = message => {
+                const { error } = message;
+                done(error);
+              };
+
+              action.once("confirmation", confirmationListener);
+              action.on("error", errorListener);
+
+              action.send();
+            } catch (error) {
+              done(error);
+            }
+          })();
+        });
+
+        beforeEach(
+          "onboarding - approving Marketplace to spend MANA",
+          async () => {
+            mana.setWallet(ephemeralWallet);
+            const approvalAction = mana.approve(
+              MARKETPLACE_ADDRESS,
+              manaAmountForShopping
+            );
+            await approvalAction.send();
+            await approvalAction.waitForOneConfirmation();
+
+            const allowance = await mana.allowance(
+              ephemeralAddress,
+              MARKETPLACE_ADDRESS
+            );
+
+            expect(`${allowance}`).to.equal(`${manaAmountForShopping}`);
+          }
+        );
 
         it("should buy an estate", async () => {
           const {
