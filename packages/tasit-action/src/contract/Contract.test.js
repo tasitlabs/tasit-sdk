@@ -554,7 +554,7 @@ describe("TasitAction.Contract", () => {
       action.on("error", errorListener);
       action.once("confirmation", confirmationListener);
 
-      // Forcing internal (block) listener be called before the transaction be sent
+      // Forcing internal (block) listener to be called before the transaction is sent
       await mineBlocks(provider, 2);
 
       await action.send();
