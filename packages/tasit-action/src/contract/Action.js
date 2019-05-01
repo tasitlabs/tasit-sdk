@@ -9,7 +9,7 @@ export class Action extends Subscription {
   #signer;
   #rawTx;
   #tx;
-  #txConfirmations;
+  #txConfirmations = 0;
   #timeout;
   #lastConfirmationTime;
 
@@ -33,28 +33,28 @@ export class Action extends Subscription {
   };
 
   #signAndSend = async () => {
-    // TODO: Go deep on gas handling.
-    // Without that, VM returns a revert error instead of out of gas error.
-    // See: https://github.com/tasitlabs/TasitSDK/issues/173
-    //
-    // This command isn't enough
-    // const gasLimit = await this.#provider.estimateGas(this.#rawTx);
-    const gasParams = {
-      gasLimit: 7e6,
-      gasPrice: 1e9,
-    };
-
-    const nonce = await this.#provider.getTransactionCount(
-      this.#signer.address
-    );
-
-    let rawTx = await this.#rawTx;
-
-    rawTx = { ...rawTx, nonce, ...gasParams };
-
-    const signedTx = await this.#signer.sign(rawTx);
-
     try {
+      // TODO: Go deep on gas handling.
+      // Without that, VM returns a revert error instead of out of gas error.
+      // See: https://github.com/tasitlabs/TasitSDK/issues/173
+      //
+      // This command isn't enough
+      // const gasLimit = await this.#provider.estimateGas(this.#rawTx);
+      const gasParams = {
+        gasLimit: 7e6,
+        gasPrice: 1e9,
+      };
+
+      const nonce = await this.#provider.getTransactionCount(
+        this.#signer.address
+      );
+
+      let rawTx = await this.#rawTx;
+
+      rawTx = { ...rawTx, nonce, ...gasParams };
+
+      const signedTx = await this.#signer.sign(rawTx);
+
       this.#tx = await this.#provider.sendTransaction(signedTx);
     } catch (error) {
       this._emitErrorEvent(new Error(`Action with error: ${error.message}`));
@@ -109,7 +109,7 @@ export class Action extends Subscription {
       try {
         const tx = await this.#tx;
         if (!tx) {
-          console.warn(`The action wasn't sent yet.`);
+          console.info(`The action wasn't sent yet.`);
           return;
         }
 
@@ -128,10 +128,7 @@ export class Action extends Subscription {
           );
         }
 
-        if (receipt === null) {
-          this.#txConfirmations = 0;
-          return;
-        }
+        if (!receipt) return;
 
         const txFailed = receipt.status == 0;
         if (txFailed) {

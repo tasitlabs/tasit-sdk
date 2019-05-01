@@ -170,6 +170,7 @@ describe("Decentraland", () => {
             );
 
             const errorListener = error => {
+              marketplace.off("error");
               done(error);
             };
 
@@ -225,6 +226,7 @@ describe("Decentraland", () => {
             };
 
             const errorListener = error => {
+              marketplace.off("error");
               done(error);
             };
 
@@ -271,6 +273,7 @@ describe("Decentraland", () => {
             });
 
             const errorListener = sinon.fake(error => {
+              marketplace.off("error");
               done(error);
             });
 
@@ -300,36 +303,41 @@ describe("Decentraland", () => {
 
         // Transfer a small amount of ethers to ephemeral account to pay for gas
         beforeEach("onboarding - funding ephemeral wallet with ETH", done => {
-          (async () => {
-            const toAddress = ephemeralAddress;
+          const toAddress = ephemeralAddress;
 
-            const action = gnosisSafe.transferEther(toAddress, SMALL_AMOUNT);
+          const action = gnosisSafe.transferEther(toAddress, SMALL_AMOUNT);
 
-            const confirmationListener = async () => {
-              await expectExactEtherBalances(
-                provider,
-                [toAddress],
-                [SMALL_AMOUNT]
-              );
+          const confirmationListener = async () => {
+            console.log("1 confimation listener called");
+            action.off("confirmation");
 
-              done();
-            };
+            await expectExactEtherBalances(
+              provider,
+              [toAddress],
+              [SMALL_AMOUNT]
+            );
 
-            const errorListener = error => {
-              done(error);
-            };
+            done();
+          };
 
-            action.once("confirmation", confirmationListener);
-            action.on("error", errorListener);
+          const errorListener = error => {
+            console.log("1 error called!");
+            action.off("error");
+            done(error);
+          };
 
-            action.send();
-          })();
+          action.on("confirmation", confirmationListener);
+          action.on("error", errorListener);
+
+          action.send();
         });
 
         // Stopped from here
-        beforeEach(
-          "onboarding - funding ephemeral wallet with MANA",
-          async () => {
+        it.only("onboarding - funding ephemeral wallet with MANA", done => {
+          (async () => {
+            // Note: Without that confirmationListener is being called twice
+            await mineBlocks(provider, 1);
+
             const toAddress = ephemeralAddress;
 
             const transferManaAction = gnosisSafe.transferERC20(
@@ -338,30 +346,29 @@ describe("Decentraland", () => {
               manaAmountForShopping
             );
 
-            const confirmationListener = message => {
-              console.log("confimation");
+            const confirmationListener = async message => {
+              transferManaAction.off("confirmation");
+              await expectExactTokenBalances(
+                mana,
+                [toAddress],
+                [manaAmountForShopping]
+              );
+              done();
             };
 
             const errorListener = error => {
-              console.log(error);
+              transferManaAction.off("error");
+              done(error);
             };
 
-            transferManaAction.on("confirmation", confirmationListener);
+            transferManaAction.once("confirmation", confirmationListener);
             transferManaAction.on("error", errorListener);
-            gnosisSafe.on("error", errorListener);
 
-            await transferManaAction.send();
-            await transferManaAction.waitForOneConfirmation();
+            transferManaAction.send();
 
-            await mineBlocks(provider, 2);
-
-            await expectExactTokenBalances(
-              mana,
-              [toAddress],
-              [manaAmountForShopping]
-            );
-          }
-        );
+            //await mineBlocks(provider, 2);
+          })(); //.then(() => done(), done);
+        });
 
         beforeEach(
           "onboarding - approving Marketplace to spend MANA",
