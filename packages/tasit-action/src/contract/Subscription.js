@@ -80,8 +80,7 @@ export class Subscription {
       return;
     }
 
-    const message = { error };
-    errorEventListener.listener(message);
+    errorEventListener.listener(error);
   };
 
   // TODO: Make protected

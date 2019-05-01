@@ -177,9 +177,8 @@ export class Contract extends Subscription {
 
       const action = new Action(rawTx, this.#provider, signer);
 
-      const errorListener = message => {
-        const { error } = message;
-        this._emitErrorEvent(new Error(`${error.message}`));
+      const errorListener = error => {
+        this._emitErrorEvent(error);
       };
 
       action.on("error", errorListener);

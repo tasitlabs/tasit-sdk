@@ -169,8 +169,7 @@ describe("Decentraland", () => {
               manaAmountForShopping
             );
 
-            const errorListener = message => {
-              const { error } = message;
+            const errorListener = error => {
               done(error);
             };
 
@@ -225,8 +224,7 @@ describe("Decentraland", () => {
               done();
             };
 
-            const errorListener = message => {
-              const { error } = message;
+            const errorListener = error => {
               done(error);
             };
 
@@ -272,8 +270,7 @@ describe("Decentraland", () => {
               done();
             });
 
-            const errorListener = sinon.fake(message => {
-              const { error } = message;
+            const errorListener = sinon.fake(error => {
               done(error);
             });
 
@@ -318,8 +315,7 @@ describe("Decentraland", () => {
               done();
             };
 
-            const errorListener = message => {
-              const { error } = message;
+            const errorListener = error => {
               done(error);
             };
 
@@ -346,8 +342,8 @@ describe("Decentraland", () => {
               console.log("confimation");
             };
 
-            const errorListener = message => {
-              console.log("error");
+            const errorListener = error => {
+              console.log(error);
             };
 
             transferManaAction.on("confirmation", confirmationListener);
