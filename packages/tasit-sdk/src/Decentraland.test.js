@@ -364,69 +364,95 @@ describe("Decentraland", () => {
           })();
         });
 
-        beforeEach(
-          "onboarding - approving Marketplace to spend MANA",
-          async () => {
+        beforeEach("onboarding - approving Marketplace to spend MANA", done => {
+          (async () => {
+            // Global hooks don't run between same level hooks
+            await mineBlocks(provider, 1);
+
             mana.setWallet(ephemeralWallet);
-            const approvalAction = mana.approve(
+            const action = mana.approve(
               MARKETPLACE_ADDRESS,
               manaAmountForShopping
             );
-            await approvalAction.send();
-            await approvalAction.waitForOneConfirmation();
 
-            const allowance = await mana.allowance(
-              ephemeralAddress,
-              MARKETPLACE_ADDRESS
+            const confirmationListener = async message => {
+              const allowance = await mana.allowance(
+                ephemeralAddress,
+                MARKETPLACE_ADDRESS
+              );
+
+              expect(`${allowance}`).to.equal(`${manaAmountForShopping}`);
+              done();
+            };
+
+            const errorListener = error => {
+              action.off("error");
+              done(error);
+            };
+
+            action.once("confirmation", confirmationListener);
+            action.on("error", errorListener);
+
+            action.send();
+          })();
+        });
+
+        it("should buy an estate", done => {
+          (async () => {
+            const {
+              assetId,
+              nftAddress,
+              seller,
+              priceInWei,
+              expiresAt,
+            } = estateForSale;
+
+            await checkAsset(estate, mana, estateForSale, ephemeralAddress);
+
+            await expectExactTokenBalances(estate, [ephemeralAddress], [0]);
+
+            const fingerprint = await estate.getFingerprint(`${assetId}`);
+
+            marketplace.setWallet(ephemeralWallet);
+            const action = marketplace.safeExecuteOrder(
+              nftAddress,
+              `${assetId}`,
+              `${priceInWei}`,
+              `${fingerprint}`
             );
 
-            expect(`${allowance}`).to.equal(`${manaAmountForShopping}`);
-          }
-        );
+            const confirmationListener = async message => {
+              await expectExactTokenBalances(estate, [ephemeralAddress], [1]);
 
-        it("should buy an estate", async () => {
-          const {
-            assetId,
-            nftAddress,
-            seller,
-            priceInWei,
-            expiresAt,
-          } = estateForSale;
+              const buyerEstates = await _getEstatesOf(ephemeralAddress);
+              const buyerAssets = await getAssetsOf(ephemeralAddress);
 
-          await checkAsset(estate, mana, estateForSale, ephemeralAddress);
+              expect(buyerEstates).to.have.lengthOf(1);
+              expect(buyerAssets).to.have.lengthOf(1);
 
-          await expectExactTokenBalances(estate, [ephemeralAddress], [0]);
+              const tx = await action.getTransaction();
+              const { hash: purchaseTxHash } = tx;
+              const [buyerEstate] = buyerEstates;
+              const [buyerAsset] = buyerAssets;
+              const { transactionHash: estateTxHash } = buyerEstate;
+              const { transactionHash: assetTxHash } = buyerAsset;
 
-          const fingerprint = await estate.getFingerprint(`${assetId}`);
+              expect(estateTxHash).to.equal(purchaseTxHash);
+              expect(assetTxHash).to.equal(purchaseTxHash);
 
-          marketplace.setWallet(ephemeralWallet);
-          const executeOrderAction = marketplace.safeExecuteOrder(
-            nftAddress,
-            `${assetId}`,
-            `${priceInWei}`,
-            `${fingerprint}`
-          );
+              done();
+            };
 
-          await executeOrderAction.send();
-          await executeOrderAction.waitForOneConfirmation();
+            const errorListener = error => {
+              action.off("error");
+              done(error);
+            };
 
-          await expectExactTokenBalances(estate, [ephemeralAddress], [1]);
+            action.once("confirmation", confirmationListener);
+            action.on("error", errorListener);
 
-          const buyerEstates = await _getEstatesOf(ephemeralAddress);
-          const buyerAssets = await getAssetsOf(ephemeralAddress);
-
-          expect(buyerEstates).to.have.lengthOf(1);
-          expect(buyerAssets).to.have.lengthOf(1);
-
-          const tx = await executeOrderAction.getTransaction();
-          const { hash: purchaseTxHash } = tx;
-          const [buyerEstate] = buyerEstates;
-          const [buyerAsset] = buyerAssets;
-          const { transactionHash: estateTxHash } = buyerEstate;
-          const { transactionHash: assetTxHash } = buyerAsset;
-
-          expect(estateTxHash).to.equal(purchaseTxHash);
-          expect(assetTxHash).to.equal(purchaseTxHash);
+            action.send();
+          })();
         });
 
         it("should buy a parcel of land", async () => {
