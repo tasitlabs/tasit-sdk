@@ -307,10 +307,7 @@ describe("Decentraland", () => {
 
           const action = gnosisSafe.transferEther(toAddress, SMALL_AMOUNT);
 
-          const confirmationListener = async message => {
-            const { data } = message;
-            const { confirmations } = data;
-
+          const confirmationListener = async () => {
             await expectExactEtherBalances(
               provider,
               [toAddress],
@@ -332,44 +329,25 @@ describe("Decentraland", () => {
         });
 
         // Stopped from here
-        beforeEach("onboarding - funding ephemeral wallet with MANA", done => {
-          (async () => {
-            try {
-              const toAddress = ephemeralAddress;
+        beforeEach(
+          "onboarding - funding ephemeral wallet with MANA",
+          async () => {
+            const toAddress = ephemeralAddress;
 
-              const action = gnosisSafe.transferERC20(
-                MANA_ADDRESS,
-                toAddress,
-                manaAmountForShopping
-              );
-
-              const confirmationListener = async message => {
-                const { data } = message;
-                const { confirmations } = data;
-
-                await expectExactTokenBalances(
-                  mana,
-                  [toAddress],
-                  [manaAmountForShopping]
-                );
-
-                done();
-              };
-
-              const errorListener = message => {
-                const { error } = message;
-                done(error);
-              };
-
-              action.once("confirmation", confirmationListener);
-              action.on("error", errorListener);
-
-              action.send();
-            } catch (error) {
-              done(error);
-            }
-          })();
-        });
+            const transferManaAction = gnosisSafe.transferERC20(
+              MANA_ADDRESS,
+              toAddress,
+              manaAmountForShopping
+            );
+            await transferManaAction.send();
+            await transferManaAction.waitForOneConfirmation();
+            await expectExactTokenBalances(
+              mana,
+              [toAddress],
+              [manaAmountForShopping]
+            );
+          }
+        );
 
         beforeEach(
           "onboarding - approving Marketplace to spend MANA",
