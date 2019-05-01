@@ -105,8 +105,10 @@ export class Action extends Subscription {
   #addConfirmationListener = (listener, once) => {
     const eventName = "confirmation";
 
-    const baseEthersListener = async blockNumber => {
+    const ethersListener = async blockNumber => {
       try {
+        console.log(`blockNumber-> ${blockNumber}`);
+
         const tx = await this.#tx;
         if (!tx) {
           console.warn(`The action wasn't sent yet.`);
@@ -171,7 +173,9 @@ export class Action extends Subscription {
           },
         };
 
+        // Note: Unsubscription should be done after the user's listener function be called
         await listener(message);
+        if (once) this.off(eventName);
       } catch (error) {
         this._emitErrorEventFromEventListener(
           new Error(`Listener function with error: ${error.message}`),
@@ -179,17 +183,6 @@ export class Action extends Subscription {
         );
       }
     };
-
-    let ethersListener;
-
-    if (once) {
-      ethersListener = async blockNumber => {
-        await baseEthersListener(blockNumber);
-        this.off(eventName);
-      };
-    } else {
-      ethersListener = baseEthersListener;
-    }
 
     this._addEventListener(eventName, ethersListener);
   };

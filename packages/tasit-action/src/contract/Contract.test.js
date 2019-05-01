@@ -545,6 +545,33 @@ describe("TasitAction.Contract", () => {
       expect(confirmationListener.callCount).to.be.at.least(1);
       expect(errorListener.called).to.be.false;
     });
+
+    it("once listener should be unsubscribed only after user listener function be called", async () => {
+      action = sampleContract.setValue(rand);
+
+      const errorListener = sinon.fake(message => {
+        console.log(message);
+        action.off("error");
+      });
+
+      const confirmationListener = sinon.fake(message => {
+        console.log(message);
+      });
+
+      action.on("error", errorListener);
+      action.once("confirmation", confirmationListener);
+
+      // Forcing internal (block) listener be called before the transaction be sent
+      await mineBlocks(provider, 2);
+
+      await action.send();
+      await action.waitForOneConfirmation();
+
+      await mineBlocks(provider, 2);
+
+      expect(confirmationListener.called).to.be.true;
+      expect(errorListener.called).to.be.false;
+    });
   });
 
   describe("Contract Events Subscription", async () => {
