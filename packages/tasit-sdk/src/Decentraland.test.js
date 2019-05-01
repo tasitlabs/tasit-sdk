@@ -660,61 +660,72 @@ describe("Decentraland", () => {
           })();
         });
 
-        it("should buy a parcel of land", async () => {
-          const {
-            assetId,
-            nftAddress,
-            seller,
-            priceInWei,
-            expiresAt,
-          } = landForSale;
+        it("should buy a parcel of land", done => {
+          (async () => {
+            const {
+              assetId,
+              nftAddress,
+              seller,
+              priceInWei,
+              expiresAt,
+            } = landForSale;
 
-          await checkAsset(land, mana, landForSale, GNOSIS_SAFE_ADDRESS);
+            await checkAsset(land, mana, landForSale, GNOSIS_SAFE_ADDRESS);
 
-          await expectExactTokenBalances(land, [GNOSIS_SAFE_ADDRESS], [0]);
+            await expectExactTokenBalances(land, [GNOSIS_SAFE_ADDRESS], [0]);
 
-          // Gnosis Safe should execute an open order
-          // TODO: ephemeralWallet should broadcast this action
-          const contractAddress = marketplace.getAddress();
-          const contractABI = marketplace.getABI();
-          const functionName = "safeExecuteOrder";
-          // LANDRegistry contract doesn't implement getFingerprint function
-          const fingerprint = "0x";
-          const argsArray = [
-            nftAddress,
-            `${assetId}`,
-            `${priceInWei}`,
-            `${fingerprint}`,
-          ];
-          const ethersAmount = "0";
-          gnosisSafe.setSigners([gnosisSafeOwner]);
-          gnosisSafe.setWallet(gnosisSafeOwner);
-          const executeOrderAction = gnosisSafe.customContractAction(
-            contractAddress,
-            contractABI,
-            functionName,
-            argsArray,
-            ethersAmount
-          );
+            // Gnosis Safe should execute an open order
+            // TODO: ephemeralWallet should broadcast this action
+            const contractAddress = marketplace.getAddress();
+            const contractABI = marketplace.getABI();
+            const functionName = "safeExecuteOrder";
+            // LANDRegistry contract doesn't implement getFingerprint function
+            const fingerprint = "0x";
+            const argsArray = [
+              nftAddress,
+              `${assetId}`,
+              `${priceInWei}`,
+              `${fingerprint}`,
+            ];
+            const ethersAmount = "0";
 
-          const onFailed = message => {
-            const { data } = message;
-            const { args } = data;
-            const { txHash } = args;
-          };
-          gnosisSafe.once("ExecutionFailed", onFailed);
+            const action = gnosisSafe.customContractAction(
+              contractAddress,
+              contractABI,
+              functionName,
+              argsArray,
+              ethersAmount
+            );
 
-          await executeOrderAction.send();
-          await executeOrderAction.waitForOneConfirmation();
+            const onFailed = message => {
+              const { data } = message;
+              const { args } = data;
+              const { txHash } = args;
+              done(new Error(`ExecutionFailed event emitted`));
+            };
 
-          await mineBlocks(provider, 1);
+            const confirmationListener = async message => {
+              // WIP: Not working because of gas issue on Marketplace.safeExecuteOrder() call
+              //await expectExactTokenBalances(land, [GNOSIS_SAFE_ADDRESS], [1]);
+              await expectExactTokenBalances(land, [GNOSIS_SAFE_ADDRESS], [0]);
+              done();
+            };
 
-          await executeOrderAction.send();
-          await executeOrderAction.waitForOneConfirmation();
+            const errorListener = error => {
+              action.off("error");
+              done(error);
+            };
 
-          // WIP: Not working because of gas issue on Marketplace.safeExecuteOrder() call
-          //await expectExactTokenBalances(land, [GNOSIS_SAFE_ADDRESS], [1]);
-          await expectExactTokenBalances(land, [GNOSIS_SAFE_ADDRESS], [0]);
+            action.once("confirmation", confirmationListener);
+            action.on("error", errorListener);
+
+            // Tech-debt:
+            // Listen to the contract event that error will be thrown:  Error: done() called multiple times
+            // See more: https://github.com/tasitlabs/TasitSDK/issues/366
+            //gnosisSafe.once("ExecutionFailed", onFailed);
+
+            action.send();
+          })();
         });
       });
 
