@@ -585,57 +585,79 @@ describe("Decentraland", () => {
           })();
         });
 
-        it("should buy an estate", async () => {
-          const {
-            assetId,
-            nftAddress,
-            seller,
-            priceInWei,
-            expiresAt,
-          } = estateForSale;
+        it("should buy an estate", done => {
+          (async () => {
+            // Global hooks don't run between same level hooks
+            await mineBlocks(provider, 1);
 
-          const buyerAddress = GNOSIS_SAFE_ADDRESS;
-          await checkAsset(estate, mana, estateForSale, buyerAddress);
+            const {
+              assetId,
+              nftAddress,
+              seller,
+              priceInWei,
+              expiresAt,
+            } = estateForSale;
 
-          await expectExactTokenBalances(estate, [GNOSIS_SAFE_ADDRESS], [0]);
+            const buyerAddress = GNOSIS_SAFE_ADDRESS;
+            await checkAsset(estate, mana, estateForSale, buyerAddress);
 
-          // Gnosis Safe should execute an open order
-          // TODO: ephemeralWallet should broadcast this action
-          const contractAddress = marketplace.getAddress();
-          const contractABI = marketplace.getABI();
-          const functionName = "safeExecuteOrder";
-          const fingerprint = await estate.getFingerprint(`${assetId}`);
-          const argsArray = [
-            nftAddress,
-            `${assetId}`,
-            `${priceInWei}`,
-            `${fingerprint}`,
-          ];
+            await expectExactTokenBalances(estate, [GNOSIS_SAFE_ADDRESS], [0]);
 
-          gnosisSafe.setSigners([gnosisSafeOwner]);
-          gnosisSafe.setWallet(gnosisSafeOwner);
-          const executeOrderAction = gnosisSafe.customContractAction(
-            contractAddress,
-            contractABI,
-            functionName,
-            argsArray
-          );
+            // Gnosis Safe should execute an open order
+            // TODO: ephemeralWallet should broadcast this action
+            const contractAddress = marketplace.getAddress();
+            const contractABI = marketplace.getABI();
+            const functionName = "safeExecuteOrder";
+            const fingerprint = await estate.getFingerprint(`${assetId}`);
+            const argsArray = [
+              nftAddress,
+              `${assetId}`,
+              `${priceInWei}`,
+              `${fingerprint}`,
+            ];
 
-          const onFailed = message => {
-            const { data } = message;
-            const { args } = data;
-            const { txHash } = args;
-          };
-          gnosisSafe.once("ExecutionFailed", onFailed);
+            gnosisSafe.setSigners([gnosisSafeOwner]);
+            gnosisSafe.setWallet(gnosisSafeOwner);
+            const action = gnosisSafe.customContractAction(
+              contractAddress,
+              contractABI,
+              functionName,
+              argsArray
+            );
 
-          await executeOrderAction.send();
-          await executeOrderAction.waitForOneConfirmation();
+            const onFailed = message => {
+              const { data } = message;
+              const { args } = data;
+              const { txHash } = args;
+              done(new Error(`ExecutionFailed event emitted`));
+            };
 
-          await mineBlocks(provider, 1);
+            const confirmationListener = async message => {
+              // WIP: Not working because of gas issue on Marketplace.safeExecuteOrder() call
+              //await expectExactTokenBalances(estate, [GNOSIS_SAFE_ADDRESS], [1]);
+              await expectExactTokenBalances(
+                estate,
+                [GNOSIS_SAFE_ADDRESS],
+                [0]
+              );
+              done();
+            };
 
-          // WIP: Not working because of gas issue on Marketplace.safeExecuteOrder() call
-          //await expectExactTokenBalances(estate, [GNOSIS_SAFE_ADDRESS], [1]);
-          await expectExactTokenBalances(estate, [GNOSIS_SAFE_ADDRESS], [0]);
+            const errorListener = error => {
+              action.off("error");
+              done(error);
+            };
+
+            action.once("confirmation", confirmationListener);
+            action.on("error", errorListener);
+
+            // Tech-debt:
+            // Listen to the contract event that error will be thrown:  Error: done() called multiple times
+            // See more: https://github.com/tasitlabs/TasitSDK/issues/366
+            //gnosisSafe.once("ExecutionFailed", onFailed);
+
+            action.send();
+          })();
         });
 
         it("should buy a parcel of land", async () => {
