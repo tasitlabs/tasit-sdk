@@ -190,7 +190,7 @@ describe("Decentraland", () => {
           })();
         });
 
-        it.skip("should buy an estate", done => {
+        it("should buy an estate", done => {
           (async () => {
             const {
               assetId,
@@ -214,7 +214,7 @@ describe("Decentraland", () => {
               `${fingerprint}`
             );
 
-            const successfulListener = async message => {
+            const orderSuccessfulListener = async message => {
               const { data } = message;
               const { args } = data;
               const { buyer } = args;
@@ -225,19 +225,28 @@ describe("Decentraland", () => {
               done();
             };
 
+            const confirmationListener = async message => {
+              await expectExactTokenBalances(estate, [ephemeralAddress], [1]);
+              done();
+            };
+
             const errorListener = error => {
               marketplace.off("error");
               done(error);
             };
 
-            marketplace.once("OrderSuccessful", successfulListener);
-            marketplace.on("error", errorListener);
+            // Note: These listener aren't working properly
+            // See more: https://github.com/tasitlabs/TasitSDK/issues/367
+            //marketplace.once("OrderSuccessful", orderSuccessfulListener);
+            //marketplace.on("error", errorListener);
+            executeOrderAction.once("confirmation", confirmationListener);
+            executeOrderAction.on("error", errorListener);
 
             executeOrderAction.send();
           })();
         });
 
-        it.skip("should buy a parcel of land", done => {
+        it("should buy a parcel of land", done => {
           (async () => {
             const {
               assetId,
@@ -261,7 +270,7 @@ describe("Decentraland", () => {
               `${fingerprint}`
             );
 
-            const successfulListener = sinon.fake(async message => {
+            const orderSuccessfulListener = sinon.fake(async message => {
               const { data } = message;
               const { args } = data;
               const { buyer } = args;
@@ -272,13 +281,22 @@ describe("Decentraland", () => {
               done();
             });
 
+            const confirmationListener = async message => {
+              await expectExactTokenBalances(land, [ephemeralAddress], [1]);
+              done();
+            };
+
             const errorListener = sinon.fake(error => {
               marketplace.off("error");
               done(error);
             });
 
-            marketplace.once("OrderSuccessful", successfulListener);
-            marketplace.on("error", errorListener);
+            // Note: These listener aren't working properly
+            // See more: https://github.com/tasitlabs/TasitSDK/issues/367
+            // marketplace.once("OrderSuccessful", orderSuccessfulListener);
+            // marketplace.on("error", errorListener);
+            executeOrderAction.once("confirmation", confirmationListener);
+            executeOrderAction.on("error", errorListener);
 
             executeOrderAction.send();
           })();
