@@ -514,7 +514,7 @@ describe("Decentraland", () => {
         });
       });
 
-      describe.only("Using funds from a Gnosis Safe wallet", () => {
+      describe("Using funds from a Gnosis Safe wallet", () => {
         beforeEach("onboarding - funding ephemeral account with ETH", done => {
           gnosisSafe.setSigners([gnosisSafeOwner]);
           gnosisSafe.setWallet(gnosisSafeOwner);
