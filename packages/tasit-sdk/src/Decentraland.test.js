@@ -235,7 +235,7 @@ describe("Decentraland", () => {
               done(error);
             };
 
-            // Note: These listener aren't working properly
+            // Note: These listeners aren't working properly
             // See more: https://github.com/tasitlabs/TasitSDK/issues/367
             //marketplace.once("OrderSuccessful", orderSuccessfulListener);
             //marketplace.on("error", errorListener);
