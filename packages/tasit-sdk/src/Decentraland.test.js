@@ -303,34 +303,36 @@ describe("Decentraland", () => {
 
         // Transfer a small amount of ethers to ephemeral account to pay for gas
         beforeEach("onboarding - funding ephemeral wallet with ETH", done => {
-          const toAddress = ephemeralAddress;
+          (async () => {
+            const toAddress = ephemeralAddress;
 
-          const action = gnosisSafe.transferEther(toAddress, SMALL_AMOUNT);
+            const action = gnosisSafe.transferEther(toAddress, SMALL_AMOUNT);
 
-          const confirmationListener = async () => {
-            await expectExactEtherBalances(
-              provider,
-              [toAddress],
-              [SMALL_AMOUNT]
-            );
+            const confirmationListener = async () => {
+              await expectExactEtherBalances(
+                provider,
+                [toAddress],
+                [SMALL_AMOUNT]
+              );
 
-            done();
-          };
+              done();
+            };
 
-          const errorListener = error => {
-            action.off("error");
-            done(error);
-          };
+            const errorListener = error => {
+              action.off("error");
+              done(error);
+            };
 
-          action.once("confirmation", confirmationListener);
-          action.on("error", errorListener);
+            action.once("confirmation", confirmationListener);
+            action.on("error", errorListener);
 
-          action.send();
+            action.send();
+          })();
         });
 
         beforeEach("onboarding - funding ephemeral wallet with MANA", done => {
           (async () => {
-            // Note: Without that confirmationListener is being called twice
+            // Global hooks don't run between same level hooks
             await mineBlocks(provider, 1);
 
             const toAddress = ephemeralAddress;
