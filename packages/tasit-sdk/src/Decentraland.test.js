@@ -270,7 +270,7 @@ describe("Decentraland", () => {
               `${fingerprint}`
             );
 
-            const orderSuccessfulListener = sinon.fake(async message => {
+            const orderSuccessfulListener = async message => {
               const { data } = message;
               const { args } = data;
               const { buyer } = args;
@@ -279,17 +279,17 @@ describe("Decentraland", () => {
               await expectExactTokenBalances(land, [ephemeralAddress], [1]);
 
               done();
-            });
+            };
 
             const confirmationListener = async message => {
               await expectExactTokenBalances(land, [ephemeralAddress], [1]);
               done();
             };
 
-            const errorListener = sinon.fake(error => {
+            const errorListener = error => {
               marketplace.off("error");
               done(error);
-            });
+            };
 
             // Note: These listener aren't working properly
             // See more: https://github.com/tasitlabs/TasitSDK/issues/367

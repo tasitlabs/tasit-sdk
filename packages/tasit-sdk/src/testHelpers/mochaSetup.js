@@ -2,10 +2,6 @@
 import { expect } from "chai";
 global.expect = expect;
 
-// Sinon
-import sinon from "sinon";
-global.sinon = sinon;
-
 // Helpers
 import helpers from "./helpers";
 global = Object.assign(global, helpers);
