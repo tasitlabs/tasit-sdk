@@ -308,9 +308,6 @@ describe("Decentraland", () => {
           const action = gnosisSafe.transferEther(toAddress, SMALL_AMOUNT);
 
           const confirmationListener = async () => {
-            console.log("1 confimation listener called");
-            action.off("confirmation");
-
             await expectExactEtherBalances(
               provider,
               [toAddress],
@@ -321,33 +318,30 @@ describe("Decentraland", () => {
           };
 
           const errorListener = error => {
-            console.log("1 error called!");
             action.off("error");
             done(error);
           };
 
-          action.on("confirmation", confirmationListener);
+          action.once("confirmation", confirmationListener);
           action.on("error", errorListener);
 
           action.send();
         });
 
-        // Stopped from here
-        it.only("onboarding - funding ephemeral wallet with MANA", done => {
+        beforeEach("onboarding - funding ephemeral wallet with MANA", done => {
           (async () => {
             // Note: Without that confirmationListener is being called twice
             await mineBlocks(provider, 1);
 
             const toAddress = ephemeralAddress;
 
-            const transferManaAction = gnosisSafe.transferERC20(
+            const action = gnosisSafe.transferERC20(
               MANA_ADDRESS,
               toAddress,
               manaAmountForShopping
             );
 
             const confirmationListener = async message => {
-              transferManaAction.off("confirmation");
               await expectExactTokenBalances(
                 mana,
                 [toAddress],
@@ -357,17 +351,15 @@ describe("Decentraland", () => {
             };
 
             const errorListener = error => {
-              transferManaAction.off("error");
+              action.off("error");
               done(error);
             };
 
-            transferManaAction.once("confirmation", confirmationListener);
-            transferManaAction.on("error", errorListener);
+            action.once("confirmation", confirmationListener);
+            action.on("error", errorListener);
 
-            transferManaAction.send();
-
-            //await mineBlocks(provider, 2);
-          })(); //.then(() => done(), done);
+            action.send();
+          })();
         });
 
         beforeEach(
