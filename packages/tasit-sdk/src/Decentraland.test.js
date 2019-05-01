@@ -323,16 +323,10 @@ describe("Decentraland", () => {
               done(error);
             };
 
-            // Note: The test is failing (silent quit) if lister is being triggered before action send
-            // Message: The action wasn't sent yet.
-            // TODO: Try activating blocktime on ganache-cli
-            //
-            // action.once("confirmation", confirmationListener);
-            // action.on("error", errorListener);
-            // action.send();
-            await action.send();
             action.once("confirmation", confirmationListener);
             action.on("error", errorListener);
+
+            action.send();
           })();
         });
 

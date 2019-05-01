@@ -107,8 +107,6 @@ export class Action extends Subscription {
 
     const ethersListener = async blockNumber => {
       try {
-        console.log(`blockNumber-> ${blockNumber}`);
-
         const tx = await this.#tx;
         if (!tx) {
           console.warn(`The action wasn't sent yet.`);
