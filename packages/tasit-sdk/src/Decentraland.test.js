@@ -303,29 +303,37 @@ describe("Decentraland", () => {
 
         // Transfer a small amount of ethers to ephemeral account to pay for gas
         beforeEach("onboarding - funding ephemeral wallet with ETH", done => {
-          const toAddress = ephemeralAddress;
+          (async () => {
+            const toAddress = ephemeralAddress;
 
-          const action = gnosisSafe.transferEther(toAddress, SMALL_AMOUNT);
+            const action = gnosisSafe.transferEther(toAddress, SMALL_AMOUNT);
 
-          const confirmationListener = async () => {
-            await expectExactEtherBalances(
-              provider,
-              [toAddress],
-              [SMALL_AMOUNT]
-            );
+            const confirmationListener = async () => {
+              await expectExactEtherBalances(
+                provider,
+                [toAddress],
+                [SMALL_AMOUNT]
+              );
 
-            done();
-          };
+              done();
+            };
 
-          const errorListener = message => {
-            const { error } = message;
-            done(error);
-          };
+            const errorListener = message => {
+              const { error } = message;
+              done(error);
+            };
 
-          action.once("confirmation", confirmationListener);
-          action.on("error", errorListener);
-
-          action.send();
+            // Note: The test is failing (silent quit) if lister is being triggered before action send
+            // Message: The action wasn't sent yet.
+            // TODO: Try activating blocktime on ganache-cli
+            //
+            // action.once("confirmation", confirmationListener);
+            // action.on("error", errorListener);
+            // action.send();
+            await action.send();
+            action.once("confirmation", confirmationListener);
+            action.on("error", errorListener);
+          })();
         });
 
         // Stopped from here
@@ -339,8 +347,24 @@ describe("Decentraland", () => {
               toAddress,
               manaAmountForShopping
             );
+
+            const confirmationListener = message => {
+              console.log("confimation");
+            };
+
+            const errorListener = message => {
+              console.log("error");
+            };
+
+            transferManaAction.on("confirmation", confirmationListener);
+            transferManaAction.on("error", errorListener);
+            gnosisSafe.on("error", errorListener);
+
             await transferManaAction.send();
             await transferManaAction.waitForOneConfirmation();
+
+            await mineBlocks(provider, 2);
+
             await expectExactTokenBalances(
               mana,
               [toAddress],
