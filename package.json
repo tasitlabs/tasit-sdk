@@ -1,0 +1,47 @@
+{
+  "name": "root",
+  "private": true,
+  "description": "A monorepo for all npm packages in the Tasit ecosystem",
+  "devDependencies": {
+    "@babel/preset-env": "^7.4.1",
+    "ganache-cli": "^6.4.3",
+    "lerna": "^3.13.4",
+    "prettier": "^1.17.0",
+    "prettier-plugin-solidity": "^1.0.0-alpha.22"
+  },
+  "scripts": {
+    "clean:all": "npx lerna run clean --stream && npx lerna clean --yes && rm -rf ./node_modules",
+    "publish": "npm run clean:all && npm run bootstrap && npm test && npx lerna publish",
+    "bootstrap": "npx lerna bootstrap --hoist",
+    "ganache:start:forked-ropsten": "npx ganache-cli --fork https://ropsten.infura.io --noVMErrorsOnRPCResponse true -m 'canal warfare equip auction crystal fossil helmet cash account joy inherit tank' --gasLimit 1000000000000 --host 0.0.0.0 > /dev/null 2>&1 &",
+    "ganache:start:forked-goerli": "npx ganache-cli --fork https://goerli.infura.io/v3/974bd2e667b246f29d2589a59600530e --noVMErrorsOnRPCResponse true -m 'canal warfare equip auction crystal fossil helmet cash account joy inherit tank' --gasLimit 1000000000000 --host 0.0.0.0 > /dev/null 2>&1 &",
+    "ganache:start": "npx ganache-cli --noVMErrorsOnRPCResponse true -m 'canal warfare equip auction crystal fossil helmet cash account joy inherit tank' --gasLimit 1000000000 --host 0.0.0.0 > /dev/null 2>&1 &",
+    "ganache:stop": "kill `ps ax|grep ganache-cli|grep -v grep| awk '{print $1}'` 2> /dev/null; exit 0",
+    "truffle:migrate": "npx lerna run migrate --scope tasit-contracts --stream",
+    "prepare:blockchain": "npm run ganache:stop && npm run ganache:start && npm run truffle:migrate",
+    "pretest": "npm run prepare:blockchain",
+    "test": "npx lerna run test --stream --concurrency 1",
+    "posttest": "npm run ganache:stop",
+    "start": "npm run clean:all && npm run bootstrap && npm run prepare:blockchain"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tasitlabs/TasitSDK.git"
+  },
+  "keywords": [
+    "dapp",
+    "ethereum",
+    "react",
+    "native"
+  ],
+  "author": "Tasit Labs",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/tasitlabs/TasitSDK/issues"
+  },
+  "homepage": "https://github.com/tasitlabs/TasitSDK#readme",
+  "engines": {
+    "node": ">=10.15.0",
+    "npm": ">=6.4.1"
+  }
+}

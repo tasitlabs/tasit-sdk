@@ -1,0 +1,21 @@
+{
+  "groups": {
+    "default": {
+      "packages": [
+        "package.json",
+        "packages/tasit-account/package.json",
+        "packages/tasit-action/package.json",
+        "packages/tasit-contracts/package.json",
+        "packages/tasit-sdk/package.json",
+        "packages/tasit-contract-based-account/package.json",
+        "packages/tasit-link-wallet/package.json"
+      ]
+    }
+  },
+  "ignore": [
+    "tasit-account",
+    "tasit-contracts",
+    "tasit-action",
+    "tasit-contract-based-account"
+  ]
+}
