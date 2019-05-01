@@ -539,7 +539,7 @@ describe("TasitAction.Contract", () => {
       expect(errorListener.called).to.be.false;
     });
 
-    it("once listener should be unsubscribed only after user listener function be called", async () => {
+    it("'once' listener should be unsubscribed only after user listener function was called", async () => {
       action = sampleContract.setValue(rand);
 
       const errorListener = sinon.fake(error => {
