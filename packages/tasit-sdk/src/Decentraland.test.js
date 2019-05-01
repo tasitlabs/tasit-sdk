@@ -455,49 +455,62 @@ describe("Decentraland", () => {
           })();
         });
 
-        it("should buy a parcel of land", async () => {
-          const {
-            assetId,
-            nftAddress,
-            seller,
-            priceInWei,
-            expiresAt,
-          } = landForSale;
+        it("should buy a parcel of land", done => {
+          (async () => {
+            const {
+              assetId,
+              nftAddress,
+              seller,
+              priceInWei,
+              expiresAt,
+            } = landForSale;
 
-          await checkAsset(land, mana, landForSale, ephemeralAddress);
+            await checkAsset(land, mana, landForSale, ephemeralAddress);
 
-          await expectExactTokenBalances(land, [ephemeralAddress], [0]);
+            await expectExactTokenBalances(land, [ephemeralAddress], [0]);
 
-          // LANDRegistry contract doesn't implement getFingerprint function
-          const fingerprint = "0x";
-          marketplace.setWallet(ephemeralWallet);
-          const executeOrderAction = marketplace.safeExecuteOrder(
-            nftAddress,
-            `${assetId}`,
-            `${priceInWei}`,
-            `${fingerprint}`
-          );
+            // LANDRegistry contract doesn't implement getFingerprint function
+            const fingerprint = "0x";
+            marketplace.setWallet(ephemeralWallet);
+            const action = marketplace.safeExecuteOrder(
+              nftAddress,
+              `${assetId}`,
+              `${priceInWei}`,
+              `${fingerprint}`
+            );
 
-          await executeOrderAction.send();
-          await executeOrderAction.waitForOneConfirmation();
+            const confirmationListener = async message => {
+              await expectExactTokenBalances(land, [ephemeralAddress], [1]);
 
-          await expectExactTokenBalances(land, [ephemeralAddress], [1]);
+              const buyerParcels = await _getParcelsOf(ephemeralAddress);
+              const buyerAssets = await getAssetsOf(ephemeralAddress);
 
-          const buyerParcels = await _getParcelsOf(ephemeralAddress);
-          const buyerAssets = await getAssetsOf(ephemeralAddress);
+              expect(buyerParcels).to.have.lengthOf(1);
+              expect(buyerAssets).to.have.lengthOf(1);
 
-          expect(buyerParcels).to.have.lengthOf(1);
-          expect(buyerAssets).to.have.lengthOf(1);
+              const tx = await action.getTransaction();
+              const { hash: purchaseTxHash } = tx;
+              const [buyerParcel] = buyerParcels;
+              const [buyerAsset] = buyerAssets;
+              const { transactionHash: parcelTxHash } = buyerParcel;
+              const { transactionHash: assetTxHash } = buyerAsset;
 
-          const tx = await executeOrderAction.getTransaction();
-          const { hash: purchaseTxHash } = tx;
-          const [buyerParcel] = buyerParcels;
-          const [buyerAsset] = buyerAssets;
-          const { transactionHash: parcelTxHash } = buyerParcel;
-          const { transactionHash: assetTxHash } = buyerAsset;
+              expect(parcelTxHash).to.equal(purchaseTxHash);
+              expect(assetTxHash).to.equal(purchaseTxHash);
 
-          expect(parcelTxHash).to.equal(purchaseTxHash);
-          expect(assetTxHash).to.equal(purchaseTxHash);
+              done();
+            };
+
+            const errorListener = error => {
+              action.off("error");
+              done(error);
+            };
+
+            action.once("confirmation", confirmationListener);
+            action.on("error", errorListener);
+
+            action.send();
+          })();
         });
       });
 
