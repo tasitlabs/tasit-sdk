@@ -175,24 +175,19 @@ describe("TasitAction.Contract", () => {
         expect(actionErrorListener.callCount).to.equal(1);
       });
 
-      // Non-deterministic
-      it.skip("on contract event listener error", async () => {
-        const errorListener = sinon.fake();
+      it("on contract event listener error", done => {
+        action = sampleContract.setValue("hello world");
+
+        const errorListener = sinon.fake(error => {
+          expect(eventListener.callCount).to.be.at.least(1);
+          done();
+        });
         const eventListener = sinon.fake.throws(new Error());
 
         sampleContract.on("error", errorListener);
         sampleContract.on("ValueChanged", eventListener);
 
-        action = sampleContract.setValue("hello world");
-        await action.send();
-
-        await action.waitForOneConfirmation();
-
-        await mineBlocks(provider, 4);
-
-        // Non-deterministic
-        expect(eventListener.callCount).to.be.at.least(1);
-        expect(errorListener.callCount).to.be.at.least(1);
+        action.send();
       });
     });
 

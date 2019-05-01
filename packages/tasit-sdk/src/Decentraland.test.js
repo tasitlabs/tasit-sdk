@@ -897,7 +897,11 @@ describe("Decentraland", () => {
 
             const errorListener = error => {
               action.off("error");
+
+              // Note: once('confirmation') isn't unsubscribing after error emission
+              // See more: https://github.com/tasitlabs/TasitSDK/issues/368
               action.off("confirmation");
+
               // Allowance-of-allowance doesn't work
               // See more: https://github.com/tasitlabs/TasitSDK/issues/273
               //done(error);
@@ -945,7 +949,11 @@ describe("Decentraland", () => {
 
             const errorListener = error => {
               action.off("error");
+
+              // Note: once('confirmation') isn't unsubscribing after error emission
+              // See more: https://github.com/tasitlabs/TasitSDK/issues/368
               action.off("confirmation");
+
               // Allowance-of-allowance doesn't work
               // See more: https://github.com/tasitlabs/TasitSDK/issues/273
               //done(error);
