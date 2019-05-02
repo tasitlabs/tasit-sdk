@@ -18,8 +18,7 @@
   },
   "scripts": {
     "prepare": "npx babel src --out-dir dist --ignore **/*.test.js",
-    "test": "npm run lint && npx mocha src/*.test.js --require @babel/register --file src/testHelpers/mochaSetup.js",
-    "lint": "npx prettier src/* --write"
+    "test": "npx mocha src/*.test.js --require @babel/register --file src/testHelpers/mochaSetup.js"
   },
   "bugs": {
     "url": "https://github.com/tasitlabs/tasitsdk/issues"
