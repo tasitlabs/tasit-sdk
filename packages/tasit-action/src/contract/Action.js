@@ -43,7 +43,7 @@ export class Action extends Subscription {
       );
 
       const network = await this.#provider.getNetwork();
-      const chainId = network.chainId;
+      const { chainId } = network;
 
       let { value } = rawTx;
       value = !value ? 0 : value;
