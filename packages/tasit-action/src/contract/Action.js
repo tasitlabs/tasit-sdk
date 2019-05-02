@@ -38,45 +38,34 @@ export class Action extends Subscription {
       // Note: Resolving promise if the Action was created using a async rawTx
       let rawTx = await this.#rawAction;
 
-      // TODO: Go deep on gas handling.
-      // Without that, VM returns a revert error instead of out of gas error.
-      // See: https://github.com/tasitlabs/TasitSDK/issues/173
-      //
-      // This command isn't enough
-      // const gasLimit = await this.#provider.estimateGas(this.#rawTx);
-      const gasParams = {
-        gasLimit: 7e6,
-        gasPrice: 1e9,
-      };
-
       const nonce = await this.#provider.getTransactionCount(
         this.#signer.address
       );
-      const gasPrice = await this.#provider.getGasPrice();
+
       const network = await this.#provider.getNetwork();
       const chainId = network.chainId;
+
       let { value } = rawTx;
       value = !value ? 0 : value;
 
-      rawTx = { ...rawTx, nonce, chainId, value };
-
-      // TODO: Go deep on gas handling.
-      // Without that, VM returns a revert error instead of out of gas error.
+      // Note: Gas estimation should be improved
       // See: https://github.com/tasitlabs/TasitSDK/issues/173
       //
-      // This command isn't enough
+      // This command isn't working
+      const gasPrice = 1e9;
+
+      rawTx = { ...rawTx, nonce, chainId, value, gasPrice };
+
+      // Note: Gas estimation should be improved
+      // See: https://github.com/tasitlabs/TasitSDK/issues/173
+      //
+      // This command isn't working
       //const gasLimit = await this.#provider.estimateGas(rawTx);
       const gasLimit = 7e6;
 
-      this.#rawAction = { ...rawTx, ...gasParams };
+      this.#rawAction = { ...rawTx, gasLimit };
 
       const signedTx = await this.#signer.sign(this.#rawAction);
-
-      // let rawTx = await this.#rawTx;
-      //
-      // rawTx = { ...rawTx, nonce, ...gasParams };
-      //
-      // const signedTx = await this.#signer.sign(rawTx);
 
       this.#tx = await this.#provider.sendTransaction(signedTx);
     } catch (error) {
