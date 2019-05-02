@@ -117,7 +117,7 @@ describe("GnosisSafe", () => {
         gnosisSafe.setWallet(gnosisSafeOwner);
         const action = gnosisSafe.transferEther(toAddress, ONE);
 
-        const errorListener = async message => {
+        const errorListener = async error => {
           onError();
           action.unsubscribe();
         };
@@ -184,7 +184,7 @@ describe("GnosisSafe", () => {
         gnosisSafe.setWallet(ephemeralAccount);
         const action = erc20.transferFrom(GNOSIS_SAFE_ADDRESS, toAddress, ONE);
 
-        const errorListener = async message => {
+        const errorListener = async error => {
           onError();
           action.unsubscribe();
         };

@@ -201,9 +201,9 @@ const createParcel = async parcel => {
       resolve(id);
     });
 
-    action.on("error", message => {
-      const { error } = message;
-      console.log(error.message);
+    action.on("error", error => {
+      const { message } = error;
+      console.log(message);
       action.unsubscribe();
       reject();
     });
@@ -252,16 +252,16 @@ const createEstate = async estate => {
     // See more: https://github.com/tasitlabs/TasitSDK/issues/253
     action.on("confirmation", message => {});
 
-    action.on("error", message => {
-      const { error } = message;
-      console.log(error.message);
+    action.on("error", error => {
+      const { message } = error;
+      console.log(message);
       action.unsubscribe();
       reject();
     });
 
-    estateContract.on("error", message => {
-      const { error } = message;
-      console.log(error.message);
+    estateContract.on("error", error => {
+      const { message } = error;
+      console.log(message);
       estateContract.unsubscribe();
       reject();
     });
