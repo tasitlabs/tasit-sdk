@@ -58,7 +58,7 @@ export class Action extends Subscription {
       let { value } = rawTx;
       value = !value ? 0 : value;
 
-      rawTx = { ...rawTx, nonce, gasPrice, chainId, value };
+      rawTx = { ...rawTx, nonce, chainId, value };
 
       // TODO: Go deep on gas handling.
       // Without that, VM returns a revert error instead of out of gas error.
@@ -68,15 +68,15 @@ export class Action extends Subscription {
       //const gasLimit = await this.#provider.estimateGas(rawTx);
       const gasLimit = 7e6;
 
-      this.#rawAction = { ...rawTx, gasLimit };
+      this.#rawAction = { ...rawTx, ...gasParams };
 
       const signedTx = await this.#signer.sign(this.#rawAction);
 
-      let rawTx = await this.#rawTx;
-
-      rawTx = { ...rawTx, nonce, ...gasParams };
-
-      const signedTx = await this.#signer.sign(rawTx);
+      // let rawTx = await this.#rawTx;
+      //
+      // rawTx = { ...rawTx, nonce, ...gasParams };
+      //
+      // const signedTx = await this.#signer.sign(rawTx);
 
       this.#tx = await this.#provider.sendTransaction(signedTx);
     } catch (error) {
