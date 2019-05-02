@@ -9,9 +9,10 @@ export class Action extends Subscription {
   #signer;
   #rawAction;
   #tx;
-  #txConfirmations;
+  #txConfirmations = 0;
   #timeout;
   #lastConfirmationTime;
+  #isRunning = false;
 
   constructor(rawAction, provider, signer) {
     // Provider implements EventEmitter API and it's enough
@@ -37,6 +38,17 @@ export class Action extends Subscription {
       // Note: Resolving promise if the Action was created using a async rawTx
       let rawTx = await this.#rawAction;
 
+      // TODO: Go deep on gas handling.
+      // Without that, VM returns a revert error instead of out of gas error.
+      // See: https://github.com/tasitlabs/TasitSDK/issues/173
+      //
+      // This command isn't enough
+      // const gasLimit = await this.#provider.estimateGas(this.#rawTx);
+      const gasParams = {
+        gasLimit: 7e6,
+        gasPrice: 1e9,
+      };
+
       const nonce = await this.#provider.getTransactionCount(
         this.#signer.address
       );
@@ -59,6 +71,12 @@ export class Action extends Subscription {
       this.#rawAction = { ...rawTx, gasLimit };
 
       const signedTx = await this.#signer.sign(this.#rawAction);
+
+      let rawTx = await this.#rawTx;
+
+      rawTx = { ...rawTx, nonce, ...gasParams };
+
+      const signedTx = await this.#signer.sign(rawTx);
 
       this.#tx = await this.#provider.sendTransaction(signedTx);
     } catch (error) {
@@ -114,7 +132,7 @@ export class Action extends Subscription {
       try {
         const tx = await this.#tx;
         if (!tx) {
-          console.warn(`The action wasn't sent yet.`);
+          console.info(`The action wasn't sent yet.`);
           return;
         }
 
@@ -133,12 +151,11 @@ export class Action extends Subscription {
           );
         }
 
-        if (receipt === null) {
-          this.#txConfirmations = 0;
-          return;
-        }
+        if (!receipt) return;
 
-        const txFailed = receipt.status == 0;
+        const { confirmations, status } = receipt;
+        const txFailed = status === 0;
+
         if (txFailed) {
           this._emitErrorEventFromEventListener(
             new Error(`Action failed.`),
@@ -166,8 +183,6 @@ export class Action extends Subscription {
 
         this._setEventTimer(eventName, timer);
 
-        const { confirmations } = receipt;
-
         this.#txConfirmations = confirmations;
 
         const message = {
@@ -176,7 +191,9 @@ export class Action extends Subscription {
           },
         };
 
+        // Note: Unsubscribing should be done after the user's listener function is called
         await listener(message);
+        if (once) this.off(eventName);
       } catch (error) {
         this._emitErrorEventFromEventListener(
           new Error(`Listener function with error: ${error.message}`),
@@ -185,16 +202,29 @@ export class Action extends Subscription {
       }
     };
 
-    let ethersListener;
-
-    if (once) {
-      ethersListener = async blockNumber => {
-        await baseEthersListener(blockNumber);
-        this.off(eventName);
-      };
-    } else {
-      ethersListener = baseEthersListener;
-    }
+    // Note:
+    // On the development env (using ganache-cli)
+    // Blocks are being mined simultaneously and generating a sort of unexpected behaviors like:
+    // - once listeners called many times
+    // - sequential blocks giving same confirmation to a transaction
+    // - false-positive reorg event emission
+    // - collaborating for tests non-determinism
+    //
+    // Tech debt:
+    // See if there is another way to avoid these problems, if not
+    // this solution should be improved with a state structure identifying state per event
+    //
+    // Question:
+    // Is possible that behavior (listener concurrency calls for the same event) be desirable?
+    const ethersListener = async blockNumber => {
+      if (this.#isRunning) {
+        console.info(`Listener is already running`);
+        return;
+      }
+      this.#isRunning = true;
+      await baseEthersListener(blockNumber);
+      this.#isRunning = false;
+    };
 
     this._addEventListener(eventName, ethersListener);
   };

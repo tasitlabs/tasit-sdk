@@ -202,8 +202,7 @@ describe("TasitAction.ERC721.ERC721Full", () => {
 
       erc721 = new ERC721Full(ERC721_FULL_ADDRESS, ana);
 
-      const contractErrorListener = errorMessage => {
-        const { error } = errorMessage;
+      const contractErrorListener = error => {
         const { message } = error;
         expect(message).to.equal("Action failed.");
         contractErrorFakeFn();
@@ -240,8 +239,7 @@ describe("TasitAction.ERC721.ERC721Full", () => {
 
       erc721 = new ERC721Full(ERC721_FULL_ADDRESS, ana);
 
-      const actionErrorListener = errorMessage => {
-        const { error } = errorMessage;
+      const actionErrorListener = error => {
         const { message } = error;
         expect(message).to.equal("Action failed.");
         actionErrorFakeFn();
