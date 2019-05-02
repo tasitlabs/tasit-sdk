@@ -33,37 +33,43 @@ export class Action extends Subscription {
     return this.#rawAction;
   };
 
+  #fillRawAction = async rawTx => {
+    const nonce = await this.#provider.getTransactionCount(
+      this.#signer.address
+    );
+
+    const network = await this.#provider.getNetwork();
+    const { chainId } = network;
+
+    let { value } = rawTx;
+    value = !value ? 0 : value;
+
+    // Note: Gas estimation should be improved
+    // See: https://github.com/tasitlabs/TasitSDK/issues/173
+    //
+    // This command isn't working
+    const gasPrice = 1e9;
+
+    rawTx = { ...rawTx, nonce, chainId, value, gasPrice };
+
+    // Note: Gas estimation should be improved
+    // See: https://github.com/tasitlabs/TasitSDK/issues/173
+    //
+    // This command isn't working
+    //const gasLimit = await this.#provider.estimateGas(rawTx);
+    const gasLimit = 7e6;
+
+    rawTx = { ...rawTx, gasLimit };
+
+    return rawTx;
+  };
+
   #signAndSend = async () => {
     try {
       // Note: Resolving promise if the Action was created using a async rawTx
-      let rawTx = await this.#rawAction;
+      const rawAction = await this.#rawAction;
 
-      const nonce = await this.#provider.getTransactionCount(
-        this.#signer.address
-      );
-
-      const network = await this.#provider.getNetwork();
-      const { chainId } = network;
-
-      let { value } = rawTx;
-      value = !value ? 0 : value;
-
-      // Note: Gas estimation should be improved
-      // See: https://github.com/tasitlabs/TasitSDK/issues/173
-      //
-      // This command isn't working
-      const gasPrice = 1e9;
-
-      rawTx = { ...rawTx, nonce, chainId, value, gasPrice };
-
-      // Note: Gas estimation should be improved
-      // See: https://github.com/tasitlabs/TasitSDK/issues/173
-      //
-      // This command isn't working
-      //const gasLimit = await this.#provider.estimateGas(rawTx);
-      const gasLimit = 7e6;
-
-      this.#rawAction = { ...rawTx, gasLimit };
+      this.#rawAction = await this.#fillRawAction(rawAction);
 
       const signedTx = await this.#signer.sign(this.#rawAction);
 
