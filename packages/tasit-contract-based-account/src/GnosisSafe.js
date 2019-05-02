@@ -146,11 +146,15 @@ export default class GnosisSafe extends Contract {
   };
 
   #executeTransaction = (data, toAddress, etherValue) => {
-    const rawTxPromise = this.#prepareTransaction(data, toAddress, etherValue);
+    const rawActionPromise = this.#prepareTransaction(
+      data,
+      toAddress,
+      etherValue
+    );
     const provider = this._getProvider();
     const signer = this.getWallet();
 
-    const action = new Action(rawTxPromise, provider, signer);
+    const action = new Action(rawActionPromise, provider, signer);
     return action;
   };
 
@@ -226,8 +230,8 @@ export default class GnosisSafe extends Contract {
       signatures
     );
 
-    const rawTx = await execTxAction._toRaw();
+    const rawAction = await execTxAction._toRaw();
 
-    return rawTx;
+    return rawAction;
   };
 }

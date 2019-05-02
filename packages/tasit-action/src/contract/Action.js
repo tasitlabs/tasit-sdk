@@ -7,14 +7,14 @@ import ConfigLoader from "../ConfigLoader";
 export class Action extends Subscription {
   #provider;
   #signer;
-  #rawTx;
+  #rawAction;
   #tx;
   #txConfirmations = 0;
   #timeout;
   #lastConfirmationTime;
   #isRunning = false;
 
-  constructor(rawTx, provider, signer) {
+  constructor(rawAction, provider, signer) {
     // Provider implements EventEmitter API and it's enough
     //  to handle with transactions events
     super(provider);
@@ -22,39 +22,56 @@ export class Action extends Subscription {
     const { events } = ConfigLoader.getConfig();
     const { timeout } = events;
 
-    this.#rawTx = rawTx;
+    this.#rawAction = rawAction;
     this.#signer = signer;
     this.#timeout = timeout;
     this.#provider = provider;
     this.#txConfirmations = 0;
   }
 
-  _toRaw = async () => {
-    return await this.#rawTx;
+  _toRaw = () => {
+    return this.#rawAction;
+  };
+
+  #fillRawAction = async rawTx => {
+    const nonce = await this.#provider.getTransactionCount(
+      this.#signer.address
+    );
+
+    const network = await this.#provider.getNetwork();
+    const { chainId } = network;
+
+    let { value } = rawTx;
+    value = !value ? 0 : value;
+
+    // Note: Gas estimation should be improved
+    // See: https://github.com/tasitlabs/TasitSDK/issues/173
+    //
+    // This command isn't working
+    const gasPrice = 1e9;
+
+    rawTx = { ...rawTx, nonce, chainId, value, gasPrice };
+
+    // Note: Gas estimation should be improved
+    // See: https://github.com/tasitlabs/TasitSDK/issues/173
+    //
+    // This command isn't working
+    //const gasLimit = await this.#provider.estimateGas(rawTx);
+    const gasLimit = 7e6;
+
+    rawTx = { ...rawTx, gasLimit };
+
+    return rawTx;
   };
 
   #signAndSend = async () => {
     try {
-      // TODO: Go deep on gas handling.
-      // Without that, VM returns a revert error instead of out of gas error.
-      // See: https://github.com/tasitlabs/TasitSDK/issues/173
-      //
-      // This command isn't enough
-      // const gasLimit = await this.#provider.estimateGas(this.#rawTx);
-      const gasParams = {
-        gasLimit: 7e6,
-        gasPrice: 1e9,
-      };
+      // Note: Resolving promise if the Action was created using a async rawTx
+      const rawAction = await this.#rawAction;
 
-      const nonce = await this.#provider.getTransactionCount(
-        this.#signer.address
-      );
+      this.#rawAction = await this.#fillRawAction(rawAction);
 
-      let rawTx = await this.#rawTx;
-
-      rawTx = { ...rawTx, nonce, ...gasParams };
-
-      const signedTx = await this.#signer.sign(rawTx);
+      const signedTx = await this.#signer.sign(this.#rawAction);
 
       this.#tx = await this.#provider.sendTransaction(signedTx);
     } catch (error) {
