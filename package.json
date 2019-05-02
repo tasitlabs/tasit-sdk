@@ -27,7 +27,7 @@
     "test": "npx lerna run test --stream --concurrency 1",
     "posttest": "npm run ganache:stop",
     "start": "npm run clean:all && npm run bootstrap && npm run prepare:blockchain",
-    "lint": "npx prettier --write '{packages/*/src/*.js,packages/*/src/**/*.js}'"
+    "lint": "npx prettier --write './packages/*/src/{*.js,**/*.js}' && npx eslint './packages/*/src/{*.js,**/*.js}'"
   },
   "repository": {
     "type": "git",
