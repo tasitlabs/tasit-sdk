@@ -1,21 +1,21 @@
 import { ethers } from "ethers";
 
 // Chai
-import { expect, assert } from "chai";
+import { expect } from "chai";
 global.expect = expect;
-//global.assert = assert;
 
 // Helpers
 import actionHelpers from "../../../tasit-action/dist/testHelpers/helpers";
-global = Object.assign(global, actionHelpers);
+const { createSnapshot, revertFromSnapshot, mineBlocks } = actionHelpers;
 
 // Global hooks
 let snapshotId;
 
+const provider = new ethers.providers.JsonRpcProvider();
+provider.pollingInterval = 50;
+global.provider = provider;
+
 beforeEach("global beforeEach() hook", async () => {
-  const provider = new ethers.providers.JsonRpcProvider();
-  provider.pollingInterval = 50;
-  global.provider = provider;
   snapshotId = await createSnapshot(provider);
 
   while (snapshotId > 1) {
