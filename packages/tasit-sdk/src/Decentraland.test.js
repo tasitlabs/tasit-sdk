@@ -1,18 +1,45 @@
 import { Account, Action, ContractBasedAccount } from "./TasitSdk";
-const { ConfigLoader, ERC20, ERC721, Marketplace } = Action;
+const { ERC20, ERC721, Marketplace } = Action;
 const { Mana } = ERC20;
 const { Estate, Land } = ERC721;
 const { Decentraland } = Marketplace;
 const { GnosisSafe } = ContractBasedAccount;
-import { ethers } from "ethers";
 
 import DecentralandUtils from "./helpers/DecentralandUtils";
 
 const decentralandUtils = new DecentralandUtils();
 const { _getEstatesOf, _getParcelsOf, getAssetsOf } = decentralandUtils;
 
-const { ONE, TEN, ONE_HUNDRED } = constants;
+import helpers from "./testHelpers/helpers";
+const {
+  accounts,
+  bigNumberify,
+  constants,
+  expectExactTokenBalances,
+  expectMinimumEtherBalances,
+  checkAsset,
+  ProviderFactory,
+  expectExactEtherBalances,
+  etherFaucet,
+  erc20Faucet,
+  mineBlocks,
+  pickAssetsForSale,
+  expectMinimumTokenBalances,
+  getContractsAddresses,
+} = helpers;
+
+const provider = ProviderFactory.getProvider();
+
+const { ONE, ONE_HUNDRED } = constants;
 const SMALL_AMOUNT = bigNumberify(`${1e17}`); // 0.1 ethers
+
+const {
+  MANA_ADDRESS,
+  LAND_ADDRESS,
+  ESTATE_ADDRESS,
+  MARKETPLACE_ADDRESS,
+  GNOSIS_SAFE_ADDRESS,
+} = getContractsAddresses();
 
 describe("Decentraland", () => {
   let minterWallet;
@@ -33,7 +60,7 @@ describe("Decentraland", () => {
 
     // Note: In future we can have other ERC20 than Mana to test the Marketplace orders
     mana = new Mana(MANA_ADDRESS);
-    land = new Land(LAND_PROXY_ADDRESS);
+    land = new Land(LAND_ADDRESS);
     estate = new Estate(ESTATE_ADDRESS);
     marketplace = new Decentraland(MARKETPLACE_ADDRESS);
 
@@ -71,7 +98,7 @@ describe("Decentraland", () => {
         // Note: Metadata could be an empty string
         expect(metadata).to.not.be.null;
         if (metadata === "")
-          console.log(`Land parcel id ${assetId} with empty metadata.`);
+          console.info(`Land parcel id ${assetId} with empty metadata.`);
 
         const [x, y] = coords;
         expect(coords).to.not.include(null);
@@ -94,7 +121,7 @@ describe("Decentraland", () => {
         // Note: Metadata could be an empty string
         expect(metadata).to.not.be.null;
         if (metadata === "")
-          console.log(`Estate id ${assetId} with empty metadata.`);
+          console.info(`Estate id ${assetId} with empty metadata.`);
 
         expect(size.toNumber()).to.be.a("number");
         expect(size.toNumber()).to.be.at.least(0);
@@ -138,8 +165,6 @@ describe("Decentraland", () => {
       describe("Using an ephemeral wallet funded by faucets", () => {
         beforeEach("onboarding", done => {
           (async () => {
-            const toAddress = ephemeralAddress;
-
             await etherFaucet(
               provider,
               minterWallet,
@@ -174,7 +199,7 @@ describe("Decentraland", () => {
               done(error);
             };
 
-            const successfulListener = async message => {
+            const successfulListener = async () => {
               const allowance = await mana.allowance(
                 ephemeralAddress,
                 MARKETPLACE_ADDRESS
@@ -192,13 +217,7 @@ describe("Decentraland", () => {
 
         it("should buy an estate", done => {
           (async () => {
-            const {
-              assetId,
-              nftAddress,
-              seller,
-              priceInWei,
-              expiresAt,
-            } = estateForSale;
+            const { assetId, nftAddress, priceInWei } = estateForSale;
 
             await checkAsset(estate, mana, estateForSale, ephemeralAddress);
 
@@ -214,6 +233,7 @@ describe("Decentraland", () => {
               `${fingerprint}`
             );
 
+            // eslint-disable-next-line no-unused-vars
             const orderSuccessfulListener = async message => {
               const { data } = message;
               const { args } = data;
@@ -225,7 +245,7 @@ describe("Decentraland", () => {
               done();
             };
 
-            const confirmationListener = async message => {
+            const confirmationListener = async () => {
               await expectExactTokenBalances(estate, [ephemeralAddress], [1]);
               done();
             };
@@ -248,13 +268,7 @@ describe("Decentraland", () => {
 
         it("should buy a parcel of land", done => {
           (async () => {
-            const {
-              assetId,
-              nftAddress,
-              seller,
-              priceInWei,
-              expiresAt,
-            } = landForSale;
+            const { assetId, nftAddress, priceInWei } = landForSale;
 
             await checkAsset(land, mana, landForSale, ephemeralAddress);
 
@@ -270,6 +284,7 @@ describe("Decentraland", () => {
               `${fingerprint}`
             );
 
+            // eslint-disable-next-line no-unused-vars
             const orderSuccessfulListener = async message => {
               const { data } = message;
               const { args } = data;
@@ -281,7 +296,7 @@ describe("Decentraland", () => {
               done();
             };
 
-            const confirmationListener = async message => {
+            const confirmationListener = async () => {
               await expectExactTokenBalances(land, [ephemeralAddress], [1]);
               done();
             };
@@ -361,7 +376,7 @@ describe("Decentraland", () => {
               manaAmountForShopping
             );
 
-            const confirmationListener = async message => {
+            const confirmationListener = async () => {
               await expectExactTokenBalances(
                 mana,
                 [toAddress],
@@ -393,7 +408,7 @@ describe("Decentraland", () => {
               manaAmountForShopping
             );
 
-            const confirmationListener = async message => {
+            const confirmationListener = async () => {
               const allowance = await mana.allowance(
                 ephemeralAddress,
                 MARKETPLACE_ADDRESS
@@ -417,13 +432,7 @@ describe("Decentraland", () => {
 
         it("should buy an estate", done => {
           (async () => {
-            const {
-              assetId,
-              nftAddress,
-              seller,
-              priceInWei,
-              expiresAt,
-            } = estateForSale;
+            const { assetId, nftAddress, priceInWei } = estateForSale;
 
             await checkAsset(estate, mana, estateForSale, ephemeralAddress);
 
@@ -439,7 +448,7 @@ describe("Decentraland", () => {
               `${fingerprint}`
             );
 
-            const confirmationListener = async message => {
+            const confirmationListener = async () => {
               await expectExactTokenBalances(estate, [ephemeralAddress], [1]);
 
               const buyerEstates = await _getEstatesOf(ephemeralAddress);
@@ -475,13 +484,7 @@ describe("Decentraland", () => {
 
         it("should buy a parcel of land", done => {
           (async () => {
-            const {
-              assetId,
-              nftAddress,
-              seller,
-              priceInWei,
-              expiresAt,
-            } = landForSale;
+            const { assetId, nftAddress, priceInWei } = landForSale;
 
             await checkAsset(land, mana, landForSale, ephemeralAddress);
 
@@ -497,7 +500,7 @@ describe("Decentraland", () => {
               `${fingerprint}`
             );
 
-            const confirmationListener = async message => {
+            const confirmationListener = async () => {
               await expectExactTokenBalances(land, [ephemeralAddress], [1]);
 
               const buyerParcels = await _getParcelsOf(ephemeralAddress);
@@ -543,7 +546,7 @@ describe("Decentraland", () => {
           // TODO: ephemeralWallet should broadcast this action
           const action = gnosisSafe.transferEther(toAddress, SMALL_AMOUNT);
 
-          const confirmationListener = async message => {
+          const confirmationListener = async () => {
             await expectExactEtherBalances(
               provider,
               [toAddress],
@@ -568,7 +571,6 @@ describe("Decentraland", () => {
           (async () => {
             // Global hooks don't run between same level hooks
             await mineBlocks(provider, 1);
-            const toAddress = ephemeralAddress;
 
             // Gnosis Safe should approve Marketplace to spend its MANA Tokens
             // TODO: ephemeralWallet should broadcast this action
@@ -583,7 +585,7 @@ describe("Decentraland", () => {
               argsArray
             );
 
-            const confirmationListener = async message => {
+            const confirmationListener = async () => {
               const owner = GNOSIS_SAFE_ADDRESS;
               const spender = MARKETPLACE_ADDRESS;
               const allowance = await mana.allowance(owner, spender);
@@ -609,13 +611,7 @@ describe("Decentraland", () => {
             // Global hooks don't run between same level hooks
             await mineBlocks(provider, 1);
 
-            const {
-              assetId,
-              nftAddress,
-              seller,
-              priceInWei,
-              expiresAt,
-            } = estateForSale;
+            const { assetId, nftAddress, priceInWei } = estateForSale;
 
             const buyerAddress = GNOSIS_SAFE_ADDRESS;
             await checkAsset(estate, mana, estateForSale, buyerAddress);
@@ -644,14 +640,16 @@ describe("Decentraland", () => {
               argsArray
             );
 
+            // eslint-disable-next-line no-unused-vars
             const onFailed = message => {
               const { data } = message;
               const { args } = data;
               const { txHash } = args;
+              console.warn(`Action ID: ${txHash}`);
               done(new Error(`ExecutionFailed event emitted`));
             };
 
-            const confirmationListener = async message => {
+            const confirmationListener = async () => {
               // WIP: Not working because of gas issue on Marketplace.safeExecuteOrder() call
               //await expectExactTokenBalances(estate, [GNOSIS_SAFE_ADDRESS], [1]);
               await expectExactTokenBalances(
@@ -681,13 +679,7 @@ describe("Decentraland", () => {
 
         it("should buy a parcel of land", done => {
           (async () => {
-            const {
-              assetId,
-              nftAddress,
-              seller,
-              priceInWei,
-              expiresAt,
-            } = landForSale;
+            const { assetId, nftAddress, priceInWei } = landForSale;
 
             await checkAsset(land, mana, landForSale, GNOSIS_SAFE_ADDRESS);
 
@@ -716,14 +708,16 @@ describe("Decentraland", () => {
               ethersAmount
             );
 
+            // eslint-disable-next-line no-unused-vars
             const onFailed = message => {
               const { data } = message;
               const { args } = data;
               const { txHash } = args;
+              console.warn(`Action ID: ${txHash}`);
               done(new Error(`ExecutionFailed event emitted`));
             };
 
-            const confirmationListener = async message => {
+            const confirmationListener = async () => {
               // WIP: Not working because of gas issue on Marketplace.safeExecuteOrder() call
               //await expectExactTokenBalances(land, [GNOSIS_SAFE_ADDRESS], [1]);
               await expectExactTokenBalances(land, [GNOSIS_SAFE_ADDRESS], [0]);
@@ -760,7 +754,7 @@ describe("Decentraland", () => {
             // TODO: ephemeralWallet should broadcast this action
             const action = gnosisSafe.transferEther(toAddress, SMALL_AMOUNT);
 
-            const confirmationListener = async message => {
+            const confirmationListener = async () => {
               await expectExactEtherBalances(
                 provider,
                 [toAddress],
@@ -804,7 +798,7 @@ describe("Decentraland", () => {
                 argsArray
               );
 
-              const confirmationListener = async message => {
+              const confirmationListener = async () => {
                 const owner = GNOSIS_SAFE_ADDRESS;
                 const ephemeralAllowance = await mana.allowance(owner, spender);
                 expect(`${ephemeralAllowance}`).to.equal(
@@ -840,7 +834,7 @@ describe("Decentraland", () => {
                 manaAmountForShopping
               );
 
-              const confirmationListener = async message => {
+              const confirmationListener = async () => {
                 const marketplaceAllowance = await mana.allowance(
                   ephemeralAddress,
                   MARKETPLACE_ADDRESS
@@ -866,13 +860,7 @@ describe("Decentraland", () => {
 
         it("should buy an estate", done => {
           (async () => {
-            const {
-              assetId,
-              nftAddress,
-              seller,
-              priceInWei,
-              expiresAt,
-            } = estateForSale;
+            const { assetId, nftAddress, priceInWei } = estateForSale;
 
             await checkAsset(estate, mana, estateForSale, GNOSIS_SAFE_ADDRESS);
             await expectExactTokenBalances(estate, [ephemeralAddress], [0]);
@@ -887,7 +875,7 @@ describe("Decentraland", () => {
               `${fingerprint}`
             );
 
-            const confirmationListener = async message => {
+            const confirmationListener = async () => {
               // Allowance-of-allowance doesn't work
               // See more: https://github.com/tasitlabs/TasitSDK/issues/273
               //await expectExactTokenBalances(estate, [ephemeralAddress], [1]);
@@ -896,6 +884,9 @@ describe("Decentraland", () => {
             };
 
             const errorListener = error => {
+              const { message } = error;
+              console.info(message);
+
               action.off("error");
 
               // Note: once('confirmation') isn't unsubscribing after error emission
@@ -917,13 +908,7 @@ describe("Decentraland", () => {
 
         it("should buy a parcel of land", done => {
           (async () => {
-            const {
-              assetId,
-              nftAddress,
-              seller,
-              priceInWei,
-              expiresAt,
-            } = landForSale;
+            const { assetId, nftAddress, priceInWei } = landForSale;
 
             await checkAsset(land, mana, landForSale, GNOSIS_SAFE_ADDRESS);
 
@@ -939,7 +924,7 @@ describe("Decentraland", () => {
               `${fingerprint}`
             );
 
-            const confirmationListener = async message => {
+            const confirmationListener = async () => {
               // Allowance-of-allowance doesn't work
               // See more: https://github.com/tasitlabs/TasitSDK/issues/273
               //await expectExactTokenBalances(land, [ephemeralAddress], [1]);
@@ -948,6 +933,9 @@ describe("Decentraland", () => {
             };
 
             const errorListener = error => {
+              const { message } = error;
+              console.info(message);
+
               action.off("error");
 
               // Note: once('confirmation') isn't unsubscribing after error emission

@@ -24,8 +24,6 @@ const extractProviderConfig = async provider => {
     apiAccessToken: infuraApiKey,
     apiKey: etherscanApiKey,
     connection,
-    providers,
-    path,
   } = provider;
 
   let config = {

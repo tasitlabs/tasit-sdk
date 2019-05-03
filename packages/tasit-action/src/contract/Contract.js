@@ -117,9 +117,9 @@ export class Contract extends Subscription {
           },
         };
 
-        // Note: Unsubscribing should be done after the user's listener function is called
-        await listener(message);
+        // Note: Unsubscribing should be done only if the user's listener function will be called
         if (once) this.off(eventName);
+        await listener(message);
       } catch (error) {
         this._emitErrorEventFromEventListener(
           new Error(`Listener function with error: ${error.message}`),

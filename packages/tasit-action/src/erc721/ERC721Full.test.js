@@ -1,10 +1,17 @@
 import ERC721Full from "./ERC721Full";
-
 import TasitContracts from "tasit-contracts";
+import ProviderFactory from "../ProviderFactory";
+import {
+  accounts,
+  mineBlocks,
+  expectExactTokenBalances,
+} from "../testHelpers/helpers";
+
 const { local: localContracts } = TasitContracts;
 const { MyERC721Full, SampleContract } = localContracts;
 const { address: ERC721_FULL_ADDRESS } = MyERC721Full;
 const { address: SAMPLE_CONTRACT_ADDRESS } = SampleContract;
+const provider = ProviderFactory.getProvider();
 
 describe("TasitAction.ERC721.ERC721Full", () => {
   let owner;
@@ -86,13 +93,13 @@ describe("TasitAction.ERC721.ERC721Full", () => {
   describe("should throw error when instantiated with invalid args", () => {
     it("constructor without address", async () => {
       expect(() => {
-        new Contract();
+        new ERC721Full();
       }).to.throw();
     });
 
     it("constructor with invalid address", async () => {
       expect(() => {
-        new Contract("invalid address");
+        new ERC721Full("invalid address");
       }).to.throw();
     });
   });

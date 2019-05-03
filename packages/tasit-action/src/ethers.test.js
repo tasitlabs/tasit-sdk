@@ -8,6 +8,11 @@ const {
   address: SAMPLE_CONTRACT_ADDRESS,
 } = SampleContract;
 
+import ProviderFactory from "./ProviderFactory";
+import { accounts, waitForEthersEvent } from "./testHelpers/helpers";
+
+const provider = ProviderFactory.getProvider();
+
 let wallet;
 let sampleContract;
 
@@ -86,7 +91,7 @@ describe("ethers.js", () => {
       eventFakeFn();
     };
 
-    const sentTx = await sampleContract.setValue(newValue);
+    await sampleContract.setValue(newValue);
 
     await waitForEthersEvent(sampleContract, "ValueChanged", listener);
 
@@ -102,7 +107,7 @@ describe("ethers.js", () => {
       eventFakeFn();
     };
 
-    const sentTx = await sampleContract.setValue("hello world");
+    await sampleContract.setValue("hello world");
 
     await waitForEthersEvent(sampleContract, "ValueChanged", listener);
 

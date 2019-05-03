@@ -45,27 +45,27 @@ export class ProviderFactory {
     let ethersProvider;
 
     switch (provider) {
-      case "default":
+      case "default": {
         ethersProvider = ethers.getDefaultProvider(network);
         break;
-
-      case "infura":
+      }
+      case "infura": {
         const infuraApiKey = !infura ? null : infura.apiKey;
         ethersProvider = new ethers.providers.InfuraProvider(
           network,
           infuraApiKey
         );
         break;
-
-      case "etherscan":
+      }
+      case "etherscan": {
         const etherscanApiKey = !etherscan ? null : etherscan.apiKey;
         ethersProvider = new ethers.providers.EtherscanProvider(
           network,
           etherscanApiKey
         );
         break;
-
-      case "jsonrpc":
+      }
+      case "jsonrpc": {
         let { url, port, user, password, allowInsecure } = jsonRpc;
         if (url === undefined) url = defaultConfig.jsonRpc.url;
         if (port === undefined) port = defaultConfig.jsonRpc.port;
@@ -77,6 +77,7 @@ export class ProviderFactory {
           network
         );
         break;
+      }
     }
 
     if (pollingInterval) ethersProvider.pollingInterval = pollingInterval;

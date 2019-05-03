@@ -186,7 +186,6 @@ export default class DecentralandUtils {
   };
 
   #getTransfers = async contract => {
-    const eventName = "Transfer";
     const eventABI = [
       "event Transfer(address indexed from, address indexed to, uint256 indexed assetId)",
     ];

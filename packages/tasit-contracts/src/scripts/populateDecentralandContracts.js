@@ -14,23 +14,20 @@ const { Decentraland } = MarketplaceContracts;
 
 import ProviderFactory from "../../../tasit-action/dist/ProviderFactory";
 
-import TasitContractBasedAccount from "../../../tasit-contract-based-account/dist/";
-const { GnosisSafe } = TasitContractBasedAccount;
-
 import TasitContracts from "..";
 
-import fs from "fs";
+import {
+  duration,
+  constants,
+  accounts,
+  etherFaucet,
+  expectExactEtherBalances,
+  erc20Faucet,
+  expectExactTokenBalances,
+  bigNumberify,
+} from "../../../tasit-action/dist/testHelpers/helpers";
 
-import { duration } from "../../../tasit-sdk/dist/testHelpers/helpers";
-
-const {
-  ONE,
-  TEN,
-  ONE_HUNDRED,
-  ONE_THOUSAND,
-  BILLION,
-  WEI_PER_ETHER,
-} = constants;
+const { TEN, BILLION, WEI_PER_ETHER } = constants;
 
 let network = process.env.NETWORK;
 if (!network) {
@@ -38,7 +35,7 @@ if (!network) {
     `Use NETWORK env argument to choose which chain will be populated.`
   );
 } else {
-  console.log(`Populating data to the '${network}' chain...`);
+  console.info(`Populating data to the '${network}' chain...`);
 }
 
 let EVENTS_TIMEOUT;
@@ -54,14 +51,6 @@ if (network === "development") {
   // non-local chains
   EVENTS_TIMEOUT = 5 * 60 * 1000;
   ASSETS_TO_CREATE = 100;
-
-  // https://stats.goerli.net/
-  if (network === "goerli") {
-    gasParams = {
-      gasLimit: 8e6,
-      gasPrice: 1e10,
-    };
-  }
 }
 
 const {
@@ -86,7 +75,6 @@ const manaContract = new Mana(MANA_ADDRESS);
 const landContract = new Land(LAND_PROXY_ADDRESS);
 const estateContract = new Estate(ESTATE_ADDRESS);
 const marketplaceContract = new Decentraland(MARKETPLACE_ADDRESS);
-const gnosisSafeContract = new GnosisSafe(GNOSIS_SAFE_ADDRESS);
 
 const provider = ProviderFactory.getProvider();
 
@@ -113,7 +101,7 @@ const cancelOrdersOfEstatesWithoutImage = async estatesIds => {
     const imageData = await getImageDataFromEstateId(id);
 
     if (imageData === blankImageData) {
-      console.log(
+      console.info(
         `Removing order of estate (id: ${id}) because it has a blank image.`
       );
 
@@ -132,37 +120,26 @@ const extractParcelsFromEstates = estates => {
 };
 
 const updateParcelsData = async parcels => {
-  console.log("Updating parcels with metadata...");
+  console.info("Updating parcels with metadata...");
 
   landContract.setWallet(sellerWallet);
   for (let parcel of parcels) {
     let { x, y, metadata: parcelName } = parcel;
-    console.log(`Setting metadata for parcel (${x},${y})...`);
+    console.info(`Setting metadata for parcel (${x},${y})...`);
     if (parcelName && parcelName !== "") {
       const updateAction = landContract.updateLandData(x, y, parcelName);
       await updateAction.send();
       await updateAction.waitForOneConfirmation();
-      console.log("Done");
+      console.info("Done");
     }
-    console.log("Skipped because this parcel has no metadata.");
+    console.info("Skipped because this parcel has no metadata.");
   }
-};
-
-const getIdsFromParcels = async parcels => {
-  const parcelIds = [];
-  for (let parcel of parcels) {
-    const { x, y } = parcel;
-    const id = await landContract.encodeTokenId(`${x}`, `${y}`);
-    parcelIds.push(id);
-  }
-
-  return parcelIds;
 };
 
 // Tech-debt: Use `assignMultipleParcels` to save gas cost.
 // The amount of parcels per call should be short enough to avoid out-of-gas.
 const createParcels = async parcels => {
-  console.log("Creating parcels...");
+  console.info("Creating parcels...");
 
   let parcelIds = [];
   for (let parcel of parcels) {
@@ -170,7 +147,7 @@ const createParcels = async parcels => {
       const id = await createParcel(parcel);
       parcelIds.push(id);
     } catch (error) {
-      console.log("Parcel creation failed");
+      console.info("Parcel creation failed");
     }
   }
 
@@ -185,16 +162,16 @@ const createParcel = async parcel => {
   const action = landContract.assignNewParcel(`${x}`, `${y}`, sellerAddress);
   await action.send();
 
-  console.log(`Creating parcel (${x},${y})...`);
+  console.info(`Creating parcel (${x},${y})...`);
 
   const parcelId = await new Promise((resolve, reject) => {
     const timeout = setTimeout(() => {
-      console.log(`Timeout reached for parcel (${x},${y}) creation.`);
+      console.info(`Timeout reached for parcel (${x},${y}) creation.`);
       action.unsubscribe();
       reject();
     }, EVENTS_TIMEOUT);
 
-    action.on("confirmation", async message => {
+    action.on("confirmation", async () => {
       const id = await landContract.encodeTokenId(`${x}`, `${y}`);
       action.unsubscribe();
       clearTimeout(timeout);
@@ -203,14 +180,14 @@ const createParcel = async parcel => {
 
     action.on("error", error => {
       const { message } = error;
-      console.log(message);
+      console.warn(message);
       action.unsubscribe();
       reject();
     });
   });
 
   await action.waitForOneConfirmation();
-  console.log(`Parcel ID = ${parcelId}`);
+  console.info(`Parcel ID = ${parcelId}`);
 
   return parcelId;
 };
@@ -227,7 +204,7 @@ const createEstate = async estate => {
     yArray.push(parcel.y);
   });
 
-  console.log(`Creating estate (${xArray} - ${yArray})...`);
+  console.info(`Creating estate (${xArray} - ${yArray})...`);
 
   landContract.setWallet(sellerWallet);
   const action = landContract.createEstateWithMetadata(
@@ -240,7 +217,7 @@ const createEstate = async estate => {
 
   const estateId = await new Promise((resolve, reject) => {
     const timeout = setTimeout(() => {
-      console.log(
+      console.warn(
         `Timeout reached for estate (${xArray} - ${yArray}) creation.`
       );
       estateContract.unsubscribe();
@@ -250,18 +227,18 @@ const createEstate = async estate => {
 
     // Some error (orphan block, failed tx) events are being triggered only from the confirmationListener
     // See more: https://github.com/tasitlabs/TasitSDK/issues/253
-    action.on("confirmation", message => {});
+    action.on("confirmation", () => {});
 
     action.on("error", error => {
       const { message } = error;
-      console.log(message);
+      console.warn(message);
       action.unsubscribe();
       reject();
     });
 
     estateContract.on("error", error => {
       const { message } = error;
-      console.log(message);
+      console.warn(message);
       estateContract.unsubscribe();
       reject();
     });
@@ -277,13 +254,13 @@ const createEstate = async estate => {
   });
 
   await action.waitForOneConfirmation();
-  console.log(`Estate ID = ${estateId}`);
+  console.info(`Estate ID = ${estateId}`);
 
   return estateId;
 };
 
 const createEstates = async estates => {
-  console.log("Creating estates...");
+  console.info("Creating estates...");
 
   const estateIds = [];
   for (let estate of estates) {
@@ -291,14 +268,14 @@ const createEstates = async estates => {
       const id = await createEstate(estate);
       estateIds.push(id);
     } catch (error) {
-      console.log("Estate creation failed");
+      console.warn("Estate creation failed");
     }
   }
   return estateIds;
 };
 
 const approveMarketplace = async () => {
-  console.log("Approving Marketplace...");
+  console.info("Approving Marketplace...");
 
   // Set false to remove approval
   const authorized = true;
@@ -327,7 +304,7 @@ function getRandomInt(min, max) {
 }
 
 const placeAssetOrders = async (estateIds, parcelIds) => {
-  console.log(`Placing sell orders...`);
+  console.info(`Placing sell orders...`);
   const shuffleArray = arr => arr.sort(() => Math.random() - 0.5);
 
   const estatesToSell = estateIds.map(id => {
@@ -353,7 +330,7 @@ const placeAssetSellOrder = async (nftAddress, assetId) => {
   const priceInWei = bigNumberify(price).mul(WEI_PER_ETHER);
 
   const type = nftAddress == ESTATE_ADDRESS ? "estate" : "parcel";
-  console.log(`placing sell order for the ${type} with id ${assetId}`);
+  console.info(`placing sell order for the ${type} with id ${assetId}`);
 
   marketplaceContract.setWallet(sellerWallet);
   const action = marketplaceContract.createOrder(
@@ -370,15 +347,6 @@ const parcelsAreEqual = (p1, p2) => p1.x === p2.x && p1.y === p2.y;
 
 const findParcel = (parcel, listOfParcels) => {
   return listOfParcels.find(p => parcelsAreEqual(p, parcel));
-};
-
-const estateContainsParcelFromList = (estate, listOfParcels) => {
-  const { parcels: estateParcels } = estate;
-
-  for (let parcel of estateParcels)
-    if (findParcel(parcel, listOfParcels)) return true;
-
-  return false;
 };
 
 const getEstatesFromAPI = async () => {

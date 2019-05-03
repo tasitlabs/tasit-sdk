@@ -26,8 +26,7 @@
     "test:forked-testnet": "npm run setup:forked-ropsten && npm run mocha",
     "test:testnet": "npm run setup:ropsten && npm run mocha",
     "mocha": "npx mocha \"src/**/*.test.js\"  --require @babel/register --file src/testHelpers/mochaSetup.js --timeouts 10000",
-    "check:decentraland-data": "npx mocha src/scripts/checkDecentralandContractsData.js  --require @babel/register --file src/testHelpers/mochaSetup.js --no-timeouts",
-    "lint": "npx prettier src/* --write"
+    "check:decentraland-data": "npx mocha src/scripts/checkDecentralandContractsData.js  --require @babel/register --file src/testHelpers/mochaSetup.js --no-timeouts"
   },
   "bugs": {
     "url": "https://github.com/tasitlabs/tasitsdk/issues"

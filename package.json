@@ -4,6 +4,10 @@
   "description": "A monorepo for all npm packages in the Tasit ecosystem",
   "devDependencies": {
     "@babel/preset-env": "^7.4.1",
+    "babel-eslint": "^10.0.1",
+    "eslint": "^5.16.0",
+    "eslint-config-prettier": "^4.2.0",
+    "eslint-plugin-prettier": "^3.0.1",
     "ganache-cli": "^6.4.3",
     "lerna": "^3.13.4",
     "prettier": "^1.17.0",
@@ -20,9 +24,10 @@
     "truffle:migrate": "npx lerna run migrate --scope tasit-contracts --stream",
     "prepare:blockchain": "npm run ganache:stop && npm run ganache:start && npm run truffle:migrate",
     "pretest": "npm run prepare:blockchain",
-    "test": "npx lerna run test --stream --concurrency 1",
+    "test": "npm run lint && npx lerna run test --stream --concurrency 1",
     "posttest": "npm run ganache:stop",
-    "start": "npm run clean:all && npm run bootstrap && npm run prepare:blockchain"
+    "start": "npm run clean:all && npm run bootstrap && npm run prepare:blockchain",
+    "lint": "npx prettier --write './packages/*/src/{*.js,**/*.js}' && npx eslint './packages/*/src/{*.js,**/*.js}'"
   },
   "repository": {
     "type": "git",

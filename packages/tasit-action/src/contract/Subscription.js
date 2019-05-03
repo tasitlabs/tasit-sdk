@@ -20,8 +20,6 @@ export class Subscription {
     }
 
     if (eventName !== "error") {
-      const { listener } = eventListener;
-
       this._clearEventTimerIfExists(eventName);
 
       this.#ethersEventEmitter.removeAllListeners(

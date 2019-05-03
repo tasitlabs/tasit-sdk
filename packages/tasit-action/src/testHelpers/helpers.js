@@ -1,5 +1,6 @@
 import { expect } from "chai";
 import { ethers } from "ethers";
+import ConfigLoader from "../ConfigLoader";
 import ProviderFactory from "../ProviderFactory";
 import developmentConfig from "../config/default";
 
@@ -10,13 +11,9 @@ import developmentConfig from "../config/default";
 // Refs: https://github.com/lerna/lerna/tree/master/commands/bootstrap
 import { createFromPrivateKey } from "tasit-account/dist/testHelpers/helpers";
 
-const {
-  utils: ethersUtils,
-  constants: ethersConstants,
-  Contract: ethersContract,
-} = ethers;
+const { utils: ethersUtils, constants: ethersConstants } = ethers;
 const { WeiPerEther: WEI_PER_ETHER } = ethersConstants;
-const { bigNumberify } = ethersUtils;
+export const { bigNumberify } = ethersUtils;
 
 // In weis
 // Note: ethers.js uses BigNumber internally
@@ -32,7 +29,7 @@ const ONE_HUNDRED = bigNumberify(100).mul(TOKEN_SUBDIVISIONS);
 const ONE_THOUSAND = bigNumberify(1000).mul(TOKEN_SUBDIVISIONS);
 const BILLION = bigNumberify(`${1e9}`).mul(TOKEN_SUBDIVISIONS);
 
-const constants = {
+export const constants = {
   ZERO,
   ONE,
   TWO,
@@ -42,14 +39,6 @@ const constants = {
   BILLION,
   WEI_PER_ETHER,
   TOKEN_SUBDIVISIONS,
-};
-
-// TODO: Go deep on gas handling.
-// Without that, VM returns a revert error instead of out of gas error.
-// See: https://github.com/tasitlabs/TasitSDK/issues/173
-const gasParams = {
-  gasLimit: 7e6,
-  gasPrice: 1e9,
 };
 
 const privateKeys = [
@@ -64,13 +53,22 @@ const privateKeys = [
   "0xda1a8c477afeb99ae2c2300b22ad612ccf4c184564e332ae9a32f784bbca8d6b",
   "0x633a290bcdabb9075c5a4b3885c69ce64b4b0e6079eb929abb2ac9427c49733b",
 ];
-const accounts = privateKeys.map(createFromPrivateKey);
+export const accounts = privateKeys.map(createFromPrivateKey);
 
-const waitForEthersEvent = async (eventEmitter, eventName, callback) => {
-  return new Promise(function(resolve, reject) {
+export const waitForEthersEvent = async (eventEmitter, eventName, callback) => {
+  return new Promise((resolve, reject) => {
+    const config = ConfigLoader.getConfig();
+    const { events } = config;
+    const { timeout: EVENT_TIMEOUT } = events;
+
+    const timeout = setTimeout(() => {
+      reject(new Error("timeout"));
+    }, EVENT_TIMEOUT);
+
     eventEmitter.on(eventName, (...args) => {
       const event = args.pop();
       callback(event);
+      clearTimeout(timeout);
       resolve();
     });
   });
@@ -81,7 +79,7 @@ const mineOneBlock = async provider => {
   await provider.send("evm_mine", []);
 };
 
-const mineBlocks = async (provider, n) => {
+export const mineBlocks = async (provider, n) => {
   // Do nothing if provider isn't a JSON-RPC
   // (Infura uses RPC calls over HTTP as opposed to JSON-RPC directly)
   if (!provider.send) return;
@@ -97,24 +95,28 @@ const mineBlocks = async (provider, n) => {
   }
 };
 
-const createSnapshot = async provider => {
+export const createSnapshot = async provider => {
   // Do nothing if provider isn't a JSON-RPC
   if (!provider.send) return 1;
   const id = await provider.send("evm_snapshot", []);
   return Number(id);
 };
 
-const revertFromSnapshot = async (provider, snapshotId) => {
+export const revertFromSnapshot = async (provider, snapshotId) => {
   // Do nothing if provider isn't a JSON-RPC
   if (!provider.send) return true;
   return await provider.send("evm_revert", [snapshotId]);
 };
 
-const wait = async ms => {
+export const wait = async ms => {
   return new Promise(resolve => setTimeout(resolve, ms));
 };
 
-const expectExactEtherBalances = async (provider, addresses, balances) => {
+export const expectExactEtherBalances = async (
+  provider,
+  addresses,
+  balances
+) => {
   expect(addresses.length).to.equal(balances.length);
   let index = 0;
   for (let address of addresses) {
@@ -124,7 +126,11 @@ const expectExactEtherBalances = async (provider, addresses, balances) => {
   }
 };
 
-const expectMinimumEtherBalances = async (provider, addresses, balances) => {
+export const expectMinimumEtherBalances = async (
+  provider,
+  addresses,
+  balances
+) => {
   expect(addresses.length).to.equal(balances.length);
   let index = 0;
   for (let address of addresses) {
@@ -135,7 +141,11 @@ const expectMinimumEtherBalances = async (provider, addresses, balances) => {
   }
 };
 
-const expectMinimumTokenBalances = async (token, addresses, balances) => {
+export const expectMinimumTokenBalances = async (
+  token,
+  addresses,
+  balances
+) => {
   expect(addresses.length).to.equal(balances.length);
   let index = 0;
   for (let address of addresses) {
@@ -146,7 +156,7 @@ const expectMinimumTokenBalances = async (token, addresses, balances) => {
   }
 };
 
-const expectExactTokenBalances = async (token, addresses, balances) => {
+export const expectExactTokenBalances = async (token, addresses, balances) => {
   expect(addresses.length).to.equal(balances.length);
   let index = 0;
   for (let address of addresses) {
@@ -158,7 +168,7 @@ const expectExactTokenBalances = async (token, addresses, balances) => {
 
 // TODO: Doing it using Account/Action in future
 // See more: https://github.com/tasitlabs/TasitSDK/issues/220
-const etherFaucet = async (
+export const etherFaucet = async (
   provider,
   fromWallet,
   beneficiaryAddress,
@@ -172,7 +182,7 @@ const etherFaucet = async (
   await provider.waitForTransaction(tx.hash);
 };
 
-const erc20Faucet = async (
+export const erc20Faucet = async (
   tokenContract,
   ownerWallet,
   toAddress,
@@ -191,8 +201,29 @@ const erc721Faucet = async (tokenContract, ownerWallet, toAddress, tokenId) => {
   await mintAction.waitForOneConfirmation();
 };
 
-const addressesAreEqual = (address1, address2) => {
+export const addressesAreEqual = (address1, address2) => {
   return address1.toUpperCase() === address2.toUpperCase();
+};
+
+export const duration = {
+  seconds: function(val) {
+    return val;
+  },
+  minutes: function(val) {
+    return val * this.seconds(60);
+  },
+  hours: function(val) {
+    return val * this.minutes(60);
+  },
+  days: function(val) {
+    return val * this.hours(24);
+  },
+  weeks: function(val) {
+    return val * this.days(7);
+  },
+  years: function(val) {
+    return val * this.days(365);
+  },
 };
 
 export const helpers = {
@@ -211,10 +242,10 @@ export const helpers = {
   addressesAreEqual,
   constants,
   bigNumberify,
-  gasParams,
   ProviderFactory,
   accounts,
   developmentConfig,
+  duration,
 };
 
 export default helpers;

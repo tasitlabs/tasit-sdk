@@ -5,6 +5,20 @@ const { ERC721Full } = ERC721;
 import GnosisSafe from "./GnosisSafe";
 import Account from "../../tasit-account/dist";
 import TasitContracts from "tasit-contracts";
+import actionHelpers from "tasit-action/dist/testHelpers/helpers";
+const {
+  constants,
+  mineBlocks,
+  accounts,
+  bigNumberify,
+  expectMinimumEtherBalances,
+  expectExactTokenBalances,
+  expectExactEtherBalances,
+  ProviderFactory,
+  erc20Faucet,
+  erc721Faucet,
+  etherFaucet,
+} = actionHelpers;
 const { local } = TasitContracts;
 const { GnosisSafe: GnosisSafeInfo, MyERC20Full, MyERC721Full } = local;
 const { address: GNOSIS_SAFE_ADDRESS } = GnosisSafeInfo;
@@ -13,6 +27,8 @@ const { address: NFT_ADDRESS } = MyERC721Full;
 
 const { ZERO, ONE } = constants;
 const SMALL_AMOUNT = bigNumberify(`${1e17}`); // 0.1 ethers
+
+const provider = ProviderFactory.getProvider();
 
 describe("GnosisSafe", () => {
   let minter;
@@ -109,7 +125,6 @@ describe("GnosisSafe", () => {
       );
 
       it("shouldn't be able to execute transfer with insufficient signers", async () => {
-        const onError = sinon.fake();
         const balanceBefore = await provider.getBalance(GNOSIS_SAFE_ADDRESS);
         const { address: toAddress } = someone;
 
@@ -117,10 +132,12 @@ describe("GnosisSafe", () => {
         gnosisSafe.setWallet(gnosisSafeOwner);
         const action = gnosisSafe.transferEther(toAddress, ONE);
 
-        const errorListener = async error => {
-          onError();
+        const errorListener = sinon.fake(error => {
+          const { message } = error;
+          console.info(message);
+
           action.unsubscribe();
-        };
+        });
 
         // Note: Some error events are being triggered only from the confirmationListener
         // See more: https://github.com/tasitlabs/TasitSDK/issues/253
@@ -134,7 +151,7 @@ describe("GnosisSafe", () => {
 
         await mineBlocks(provider, 1);
 
-        expect(onError.callCount).to.equal(1);
+        expect(errorListener.callCount).to.equal(1);
         await expectExactEtherBalances(
           provider,
           [GNOSIS_SAFE_ADDRESS],
@@ -175,39 +192,43 @@ describe("GnosisSafe", () => {
         );
       });
 
-      it("ephemeral account shouldn't be able to transfer funds from contract-based account without allowance", async () => {
-        const onError = sinon.fake();
-        const balanceBefore = await erc20.balanceOf(GNOSIS_SAFE_ADDRESS);
+      it("ephemeral account shouldn't be able to transfer funds from contract-based account without allowance", done => {
+        (async () => {
+          const balanceBefore = await erc20.balanceOf(GNOSIS_SAFE_ADDRESS);
 
-        const { address: toAddress } = someone;
+          const { address: toAddress } = someone;
 
-        gnosisSafe.setWallet(ephemeralAccount);
-        const action = erc20.transferFrom(GNOSIS_SAFE_ADDRESS, toAddress, ONE);
+          gnosisSafe.setWallet(ephemeralAccount);
+          const action = erc20.transferFrom(
+            GNOSIS_SAFE_ADDRESS,
+            toAddress,
+            ONE
+          );
 
-        const errorListener = async error => {
-          onError();
-          action.unsubscribe();
-        };
+          const errorListener = sinon.fake(async error => {
+            const { message } = error;
+            console.info(message);
 
-        // Note: Some error events are been trigger only from the confirmationListener
-        // See more: https://github.com/tasitlabs/TasitSDK/issues/253
-        const confirmationListener = () => {};
+            action.unsubscribe();
 
-        action.on("error", errorListener);
-        action.on("confirmation", confirmationListener);
+            await expectExactTokenBalances(
+              erc20,
+              [GNOSIS_SAFE_ADDRESS],
+              [balanceBefore]
+            );
 
-        await action.send();
+            done();
+          });
 
-        await action.waitForOneConfirmation();
+          const confirmationListener = () => {
+            done(new Error());
+          };
 
-        await mineBlocks(provider, 1);
+          action.on("error", errorListener);
+          action.on("confirmation", confirmationListener);
 
-        expect(onError.callCount).to.equal(1);
-        await expectExactTokenBalances(
-          erc20,
-          [GNOSIS_SAFE_ADDRESS],
-          [balanceBefore]
-        );
+          action.send();
+        })();
       });
 
       describe("test cases that need ERC20 spending approval for ephemeral account", () => {
