@@ -13,7 +13,7 @@ import { createFromPrivateKey } from "tasit-account/dist/testHelpers/helpers";
 
 const { utils: ethersUtils, constants: ethersConstants } = ethers;
 const { WeiPerEther: WEI_PER_ETHER } = ethersConstants;
-const { bigNumberify } = ethersUtils;
+export const { bigNumberify } = ethersUtils;
 
 // In weis
 // Note: ethers.js uses BigNumber internally
@@ -205,6 +205,27 @@ export const addressesAreEqual = (address1, address2) => {
   return address1.toUpperCase() === address2.toUpperCase();
 };
 
+export const duration = {
+  seconds: function(val) {
+    return val;
+  },
+  minutes: function(val) {
+    return val * this.seconds(60);
+  },
+  hours: function(val) {
+    return val * this.minutes(60);
+  },
+  days: function(val) {
+    return val * this.hours(24);
+  },
+  weeks: function(val) {
+    return val * this.days(7);
+  },
+  years: function(val) {
+    return val * this.days(365);
+  },
+};
+
 export const helpers = {
   waitForEthersEvent,
   mineBlocks,
@@ -224,6 +245,7 @@ export const helpers = {
   ProviderFactory,
   accounts,
   developmentConfig,
+  duration,
 };
 
 export default helpers;

@@ -20,6 +20,7 @@ const removeFunctionsFromABI = (contractJsonPath, removalCondition) => {
   fs.writeFileSync(contractJsonPath, data);
 };
 
+// eslint-disable-next-line no-unused-vars
 const removeFromEstateRegistry = () => {
   const filePath = "../land/build/contracts/EstateRegistry.json";
 
@@ -31,6 +32,7 @@ const removeFromEstateRegistry = () => {
   removeFunctionsFromABI(filePath, removalCondition);
 };
 
+// eslint-disable-next-line no-unused-vars
 const removeFromMarketplace = () => {
   const filePath = "../marketplace-contracts/build/contracts/Marketplace.json";
 
