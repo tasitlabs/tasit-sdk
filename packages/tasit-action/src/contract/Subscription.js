@@ -39,9 +39,7 @@ export class Subscription {
       return;
     }
 
-    const { listener } = eventListener;
-
-    this.#eventListeners.set(eventName, { listener, timer });
+    this.#eventListeners.set(eventName, { ...eventListener, timer });
   };
 
   // TODO: Make protected
@@ -145,9 +143,10 @@ export class Subscription {
       this.#isRunning = false;
     };
 
-    this.#eventListeners.set(eventName, {
-      listener,
-    });
+    console.log("Important TODO: Use map to store isRunning state");
+    const eventListener = { listener, isRunning: false };
+
+    this.#eventListeners.set(eventName, eventListener);
 
     this.#ethersEventEmitter.on(this._toEthersEventName(eventName), listener);
   };
