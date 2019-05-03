@@ -1,6 +1,39 @@
 // Helpers
 import actionHelpers from "tasit-action/dist/testHelpers/helpers";
+const {
+  addressesAreEqual,
+  expectMinimumTokenBalances,
+  ProviderFactory,
+  duration,
+  createSnapshot,
+  revertFromSnapshot,
+  mineBlocks,
+  constants,
+  expectMinimumEtherBalances,
+  accounts,
+  bigNumberify,
+  etherFaucet,
+  erc20Faucet,
+  expectExactEtherBalances,
+  expectExactTokenBalances,
+} = actionHelpers;
 global = Object.assign(global, actionHelpers);
+
+import { Action } from "../TasitSdk";
+const { ConfigLoader } = Action;
+import config from "../config/default";
+ConfigLoader.setConfig(config);
+
+const provider = ProviderFactory.getProvider();
+
+// TODO: Create a getContracts function
+const { _network: network } = provider;
+const networkName = !network ? "local" : network.name;
+import TasitContracts from "tasit-contracts";
+const { LANDProxy, EstateRegistry, Marketplace } = TasitContracts[networkName];
+const { address: LAND_PROXY_ADDRESS } = LANDProxy;
+const { address: ESTATE_ADDRESS } = EstateRegistry;
+const { address: MARKETPLACE_ADDRESS } = Marketplace;
 
 import DecentralandUtils from "../helpers/DecentralandUtils";
 
@@ -76,6 +109,20 @@ export const helpers = {
   duration,
   pickAssetsForSale,
   checkAsset,
+  ProviderFactory,
+  createSnapshot,
+  revertFromSnapshot,
+  mineBlocks,
+  constants,
+  expectMinimumEtherBalances,
+  expectMinimumTokenBalances,
+  accounts,
+  addressesAreEqual,
+  bigNumberify,
+  expectExactTokenBalances,
+  etherFaucet,
+  erc20Faucet,
+  expectExactEtherBalances,
 };
 
 export default helpers;

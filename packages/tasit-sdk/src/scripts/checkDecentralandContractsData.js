@@ -4,15 +4,40 @@
 // Note: This script is using mocha for convenience but isn't a test suite to be run by the `test` script.
 //
 
-import { Action, ContractBasedAccount } from "../TasitSdk";
+import { Action } from "../TasitSdk";
 const { ERC20 } = Action;
 const { Mana } = ERC20;
+
+import helpers from "../testHelpers/helpers";
+const {
+  constants,
+  expectMinimumEtherBalances,
+  expectMinimumTokenBalances,
+  addressesAreEqual,
+  accounts,
+  bigNumberify,
+  ProviderFactory,
+} = helpers;
 
 import DecentralandUtils from "../helpers/DecentralandUtils";
 
 const fetch = require("node-fetch");
 
 const { TWO, TEN, BILLION, TOKEN_SUBDIVISIONS } = constants;
+
+const provider = ProviderFactory.getProvider();
+
+// TODO: Create a getContracts function
+const { _network: network } = provider;
+const networkName = !network ? "local" : network.name;
+import TasitContracts from "tasit-contracts";
+const { LANDProxy, EstateRegistry, MANAToken, GnosisSafe } = TasitContracts[
+  networkName
+];
+const { address: LAND_PROXY_ADDRESS } = LANDProxy;
+const { address: ESTATE_ADDRESS } = EstateRegistry;
+const { address: MANA_ADDRESS } = MANAToken;
+const { address: GNOSIS_SAFE_ADDRESS } = GnosisSafe;
 
 describe("Decentraland App pre-conditions", () => {
   const mana = new Mana(MANA_ADDRESS);
@@ -89,7 +114,7 @@ describe("Decentraland App pre-conditions", () => {
       const blankImageData = (await blankImage.buffer()).toString("base64");
 
       for (let asset of assetsForSale) {
-        const { id, assetId, nftAddress, priceInWei } = asset;
+        const { assetId, nftAddress, priceInWei } = asset;
         const price = bigNumberify(priceInWei);
 
         const isParcel = addressesAreEqual(nftAddress, LAND_PROXY_ADDRESS);

@@ -1,17 +1,33 @@
 import { Account, Action, ContractBasedAccount } from "./TasitSdk";
-const { ConfigLoader, ERC20, ERC721, Marketplace } = Action;
+const { ERC20, ERC721, Marketplace } = Action;
 const { Mana } = ERC20;
 const { Estate, Land } = ERC721;
 const { Decentraland } = Marketplace;
 const { GnosisSafe } = ContractBasedAccount;
-import { ethers } from "ethers";
 
 import DecentralandUtils from "./helpers/DecentralandUtils";
 
 const decentralandUtils = new DecentralandUtils();
 const { _getEstatesOf, _getParcelsOf, getAssetsOf } = decentralandUtils;
 
-const { ONE, TEN, ONE_HUNDRED } = constants;
+import helpers from "./testHelpers/helpers";
+const {
+  accounts,
+  bigNumberify,
+  constants,
+  expectExactTokenBalances,
+  expectMinimumEtherBalances,
+  checkAsset,
+  ProviderFactory,
+  expectExactEtherBalances,
+  etherFaucet,
+  erc20Faucet,
+  mineBlocks,
+} = helpers;
+
+const provider = ProviderFactory.getProvider();
+
+const { ONE, ONE_HUNDRED } = constants;
 const SMALL_AMOUNT = bigNumberify(`${1e17}`); // 0.1 ethers
 
 describe("Decentraland", () => {
@@ -71,7 +87,7 @@ describe("Decentraland", () => {
         // Note: Metadata could be an empty string
         expect(metadata).to.not.be.null;
         if (metadata === "")
-          console.log(`Land parcel id ${assetId} with empty metadata.`);
+          console.info(`Land parcel id ${assetId} with empty metadata.`);
 
         const [x, y] = coords;
         expect(coords).to.not.include(null);
@@ -94,7 +110,7 @@ describe("Decentraland", () => {
         // Note: Metadata could be an empty string
         expect(metadata).to.not.be.null;
         if (metadata === "")
-          console.log(`Estate id ${assetId} with empty metadata.`);
+          console.info(`Estate id ${assetId} with empty metadata.`);
 
         expect(size.toNumber()).to.be.a("number");
         expect(size.toNumber()).to.be.at.least(0);
@@ -192,13 +208,7 @@ describe("Decentraland", () => {
 
         it("should buy an estate", done => {
           (async () => {
-            const {
-              assetId,
-              nftAddress,
-              seller,
-              priceInWei,
-              expiresAt,
-            } = estateForSale;
+            const { assetId, nftAddress, priceInWei } = estateForSale;
 
             await checkAsset(estate, mana, estateForSale, ephemeralAddress);
 
@@ -248,13 +258,7 @@ describe("Decentraland", () => {
 
         it("should buy a parcel of land", done => {
           (async () => {
-            const {
-              assetId,
-              nftAddress,
-              seller,
-              priceInWei,
-              expiresAt,
-            } = landForSale;
+            const { assetId, nftAddress, priceInWei } = landForSale;
 
             await checkAsset(land, mana, landForSale, ephemeralAddress);
 

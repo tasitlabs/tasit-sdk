@@ -2,14 +2,20 @@
 import { expect } from "chai";
 global.expect = expect;
 
-// Helpers
-import helpers from "./helpers";
-global = Object.assign(global, helpers);
-
 import { Action } from "../TasitSdk";
 const { ConfigLoader } = Action;
 import config from "../config/default";
 ConfigLoader.setConfig(config);
+
+// Helpers
+import helpers from "./helpers";
+const {
+  ProviderFactory,
+  createSnapshot,
+  revertFromSnapshot,
+  mineBlocks,
+} = helpers;
+global = Object.assign(global, helpers);
 
 const provider = ProviderFactory.getProvider();
 
