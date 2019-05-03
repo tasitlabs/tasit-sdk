@@ -159,8 +159,6 @@ describe("TasitAction.Contract", () => {
         const contractErrorListener = sinon.fake(error => {
           const { message } = error;
           console.info(message);
-
-          sampleContract.off("error");
         });
 
         sampleContract.on("error", contractErrorListener);
