@@ -25,29 +25,21 @@ const {
   mineBlocks,
   pickAssetsForSale,
   expectMinimumTokenBalances,
+  getContractsAddresses,
 } = helpers;
 
 const provider = ProviderFactory.getProvider();
 
-// TODO: Create a getContracts function
-const { _network: network } = provider;
-const networkName = !network ? "local" : network.name;
-import TasitContracts from "tasit-contracts";
-const {
-  MANAToken,
-  LANDProxy,
-  EstateRegistry,
-  GnosisSafe: GnosisSafeInfo,
-  Marketplace: MarketplaceInfo,
-} = TasitContracts[networkName];
-const { address: MANA_ADDRESS } = MANAToken;
-const { address: LAND_PROXY_ADDRESS } = LANDProxy;
-const { address: ESTATE_ADDRESS } = EstateRegistry;
-const { address: MARKETPLACE_ADDRESS } = MarketplaceInfo;
-const { address: GNOSIS_SAFE_ADDRESS } = GnosisSafeInfo;
-
 const { ONE, ONE_HUNDRED } = constants;
 const SMALL_AMOUNT = bigNumberify(`${1e17}`); // 0.1 ethers
+
+const {
+  MANA_ADDRESS,
+  LAND_ADDRESS,
+  ESTATE_ADDRESS,
+  MARKETPLACE_ADDRESS,
+  GNOSIS_SAFE_ADDRESS,
+} = getContractsAddresses();
 
 describe("Decentraland", () => {
   let minterWallet;
@@ -68,7 +60,7 @@ describe("Decentraland", () => {
 
     // Note: In future we can have other ERC20 than Mana to test the Marketplace orders
     mana = new Mana(MANA_ADDRESS);
-    land = new Land(LAND_PROXY_ADDRESS);
+    land = new Land(LAND_ADDRESS);
     estate = new Estate(ESTATE_ADDRESS);
     marketplace = new Decentraland(MARKETPLACE_ADDRESS);
 

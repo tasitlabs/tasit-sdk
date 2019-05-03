@@ -1,20 +1,13 @@
 import { Account, Action } from "../TasitSdk";
-const { ERC721 } = Action;
-const { Estate, Land } = ERC721;
+import helpers from "../testHelpers/helpers";
 import DecentralandUtils from "./DecentralandUtils";
 
-import helpers from "../testHelpers/helpers";
-const { accounts, ProviderFactory } = helpers;
+const { ERC721 } = Action;
+const { Estate, Land } = ERC721;
 
-const provider = ProviderFactory.getProvider();
+const { accounts, getContractsAddresses } = helpers;
 
-// TODO: Create a getContracts function
-const { _network: network } = provider;
-const networkName = !network ? "local" : network.name;
-import TasitContracts from "tasit-contracts";
-const { LANDProxy, EstateRegistry } = TasitContracts[networkName];
-const { address: LAND_PROXY_ADDRESS } = LANDProxy;
-const { address: ESTATE_ADDRESS } = EstateRegistry;
+const { LAND_ADDRESS, ESTATE_ADDRESS } = getContractsAddresses();
 
 // Note: This test suite assumes that all parcels and estates of SellerWallet are for sale
 // See more: `TasitSDk/packages/tasit-contracts/src/script/populateDecentralandContracts.js`
@@ -39,7 +32,7 @@ describe("DecentralandUtils", () => {
   const isAssetAParcel = asset => asset.nftAddress === land.getAddress();
 
   beforeEach("", async () => {
-    land = new Land(LAND_PROXY_ADDRESS);
+    land = new Land(LAND_ADDRESS);
     estate = new Estate(ESTATE_ADDRESS);
 
     ephemeralWallet = Account.create();

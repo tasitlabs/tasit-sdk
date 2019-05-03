@@ -1,42 +1,49 @@
-// Helpers
+import { TasitContracts } from "../TasitSdk";
+import DecentralandUtils from "../helpers/DecentralandUtils";
 import actionHelpers from "tasit-action/dist/testHelpers/helpers";
 const {
   addressesAreEqual,
   expectMinimumTokenBalances,
   ProviderFactory,
-  duration,
-  createSnapshot,
-  revertFromSnapshot,
-  mineBlocks,
-  constants,
-  expectMinimumEtherBalances,
-  accounts,
-  bigNumberify,
-  etherFaucet,
-  erc20Faucet,
-  expectExactEtherBalances,
-  expectExactTokenBalances,
 } = actionHelpers;
 
-import { Action } from "../TasitSdk";
-const { ConfigLoader } = Action;
-import config from "../config/default";
-ConfigLoader.setConfig(config);
+const getNetworkName = () => {
+  const provider = ProviderFactory.getProvider();
+  const { _network: network } = provider;
+  const networkName = !network ? "local" : network.name;
+  return networkName;
+};
 
-const provider = ProviderFactory.getProvider();
+export const getContractsAddresses = () => {
+  const networkName = getNetworkName();
+  const {
+    MANAToken,
+    LANDProxy,
+    EstateRegistry,
+    Marketplace,
 
-// TODO: Create a getContracts function
-const { _network: network } = provider;
-const networkName = !network ? "local" : network.name;
-import TasitContracts from "tasit-contracts";
-const { LANDProxy, EstateRegistry, Marketplace } = TasitContracts[networkName];
-const { address: LAND_PROXY_ADDRESS } = LANDProxy;
-const { address: ESTATE_ADDRESS } = EstateRegistry;
-const { address: MARKETPLACE_ADDRESS } = Marketplace;
+    GnosisSafe: GnosisSafeInfo,
+  } = TasitContracts[networkName];
+  const { address: MANA_ADDRESS } = MANAToken;
+  const { address: LAND_ADDRESS } = LANDProxy;
+  const { address: ESTATE_ADDRESS } = EstateRegistry;
+  const { address: MARKETPLACE_ADDRESS } = Marketplace;
+  const { address: GNOSIS_SAFE_ADDRESS } = GnosisSafeInfo;
 
-import DecentralandUtils from "../helpers/DecentralandUtils";
+  const addresses = {
+    ESTATE_ADDRESS,
+    LAND_ADDRESS,
+    MARKETPLACE_ADDRESS,
+    MANA_ADDRESS,
+    GNOSIS_SAFE_ADDRESS,
+  };
+
+  return addresses;
+};
 
 export const pickAssetsForSale = async () => {
+  const { LAND_ADDRESS, ESTATE_ADDRESS } = getContractsAddresses();
+
   let landForSale;
   let estateForSale;
 
@@ -52,7 +59,7 @@ export const pickAssetsForSale = async () => {
   for (let order of openSellOrders) {
     const { nftAddress, expiresAt } = order;
 
-    const isLand = addressesAreEqual(nftAddress, LAND_PROXY_ADDRESS);
+    const isLand = addressesAreEqual(nftAddress, LAND_ADDRESS);
     const isEstate = addressesAreEqual(nftAddress, ESTATE_ADDRESS);
 
     const nowInSeconds = Date.now() / 1000;
@@ -79,6 +86,8 @@ export const checkAsset = async (
   assetForSale,
   buyerAddress
 ) => {
+  const { MARKETPLACE_ADDRESS } = getContractsAddresses();
+
   const { assetId, nftAddress, seller, priceInWei, expiresAt } = assetForSale;
 
   // Asset is the same as expected
@@ -105,23 +114,10 @@ export const checkAsset = async (
 };
 
 export const helpers = {
-  duration,
+  ...actionHelpers,
   pickAssetsForSale,
   checkAsset,
-  ProviderFactory,
-  createSnapshot,
-  revertFromSnapshot,
-  mineBlocks,
-  constants,
-  expectMinimumEtherBalances,
-  expectMinimumTokenBalances,
-  accounts,
-  addressesAreEqual,
-  bigNumberify,
-  expectExactTokenBalances,
-  etherFaucet,
-  erc20Faucet,
-  expectExactEtherBalances,
+  getContractsAddresses,
 };
 
 export default helpers;
