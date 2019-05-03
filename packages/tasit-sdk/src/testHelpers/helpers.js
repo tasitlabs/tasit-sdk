@@ -17,7 +17,6 @@ const {
   expectExactEtherBalances,
   expectExactTokenBalances,
 } = actionHelpers;
-global = Object.assign(global, actionHelpers);
 
 import { Action } from "../TasitSdk";
 const { ConfigLoader } = Action;
