@@ -15,10 +15,8 @@ import config from "../config/default";
 ConfigLoader.setConfig(config);
 
 // Global hooks
-let snapshotId;
-
 const provider = ProviderFactory.getProvider();
-global.provider = provider;
+let snapshotId;
 
 beforeEach("global beforeEach() hook", async () => {
   snapshotId = await createSnapshot(provider);

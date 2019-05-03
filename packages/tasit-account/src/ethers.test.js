@@ -7,7 +7,6 @@ const { ZERO } = constants;
 
 const provider = new ethers.providers.JsonRpcProvider();
 provider.pollingInterval = 50;
-global.provider = provider;
 
 // Note: We're intentionally not testing the `fromEncryptedJson` or `encrypt` functions
 // from `ethers.js` because we don't plan to expose that functionality in the Tasit SDK.

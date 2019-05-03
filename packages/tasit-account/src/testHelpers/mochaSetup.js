@@ -13,7 +13,6 @@ let snapshotId;
 
 const provider = new ethers.providers.JsonRpcProvider();
 provider.pollingInterval = 50;
-global.provider = provider;
 
 beforeEach("global beforeEach() hook", async () => {
   snapshotId = await createSnapshot(provider);
