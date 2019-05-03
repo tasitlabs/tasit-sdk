@@ -611,38 +611,23 @@ describe("TasitAction.Contract", () => {
       action.send();
     });
 
-    it("should be able to listen to an event triggered by the contract", async () => {
-      const fakeFn = sinon.fake();
-      const errorFakeFn = sinon.fake();
-
-      const errorListener = error => {
-        const { message } = error;
-        console.info(message);
-
-        errorFakeFn();
-      };
-
-      sampleContract.on("error", errorListener);
-
+    it("should be able to listen to an event triggered by the contract", done => {
       action = sampleContract.setValue("hello world");
-      await action.send();
 
-      // Is possible do that using async/await?
-      // If not, TODO: Make a function
-      await new Promise(function(resolve, reject) {
-        sampleContract.on("ValueChanged", message => {
-          const { data } = message;
-          const { args } = data;
-
-          fakeFn();
-          resolve();
-        });
+      const errorListener = sinon.fake(error => {
+        done(error);
       });
 
-      sampleContract.off("error");
+      const valueChangedListener = sinon.fake(() => {
+        sampleContract.off("ValueChanged");
+        sampleContract.off("error");
+        done();
+      });
 
-      expect(errorFakeFn.called).to.be.false;
-      expect(fakeFn.callCount).to.equal(1);
+      sampleContract.on("error", errorListener);
+      sampleContract.on("ValueChanged", valueChangedListener);
+
+      action.send();
     });
 
     it("should throw error when listening on invalid event", async () => {

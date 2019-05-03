@@ -8,14 +8,7 @@ import sinon from "sinon";
 global.sinon = sinon;
 
 // Helpers
-import actionHelpers, {
-  createSnapshot,
-  revertFromSnapshot,
-  mineBlocks,
-} from "./helpers";
-
-global = Object.assign(global, actionHelpers);
-
+import { createSnapshot, revertFromSnapshot, mineBlocks } from "./helpers";
 import ProviderFactory from "../ProviderFactory";
 import ConfigLoader from "../ConfigLoader";
 import config from "../config/default";

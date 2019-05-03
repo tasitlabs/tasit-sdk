@@ -123,6 +123,7 @@ export class Action extends Subscription {
   #addConfirmationListener = (listener, once) => {
     const eventName = "confirmation";
 
+    // eslint-disable-next-line no-unused-vars
     const baseEthersListener = async blockNumber => {
       try {
         const tx = await this.#tx;
