@@ -215,7 +215,7 @@ describe("Decentraland", () => {
           })();
         });
 
-        it("should buy an estate", done => {
+        it("should buy an estate - using action events", done => {
           (async () => {
             const { assetId, nftAddress, priceInWei } = estateForSale;
 
@@ -233,18 +233,6 @@ describe("Decentraland", () => {
               `${fingerprint}`
             );
 
-            // eslint-disable-next-line no-unused-vars
-            const orderSuccessfulListener = async message => {
-              const { data } = message;
-              const { args } = data;
-              const { buyer } = args;
-
-              expect(buyer).to.equal(ephemeralAddress);
-              await expectExactTokenBalances(estate, [ephemeralAddress], [1]);
-
-              done();
-            };
-
             const confirmationListener = async () => {
               await expectExactTokenBalances(estate, [ephemeralAddress], [1]);
               done();
@@ -255,12 +243,50 @@ describe("Decentraland", () => {
               done(error);
             };
 
-            // Note: These listeners aren't working properly
-            // See more: https://github.com/tasitlabs/TasitSDK/issues/367
-            //marketplace.once("OrderSuccessful", orderSuccessfulListener);
-            //marketplace.on("error", errorListener);
             executeOrderAction.once("confirmation", confirmationListener);
             executeOrderAction.on("error", errorListener);
+
+            executeOrderAction.send();
+          })();
+        });
+
+        it("should buy an estate - using contract events", done => {
+          (async () => {
+            const { assetId, nftAddress, priceInWei } = estateForSale;
+
+            await checkAsset(estate, mana, estateForSale, ephemeralAddress);
+
+            await expectExactTokenBalances(estate, [ephemeralAddress], [0]);
+
+            const fingerprint = await estate.getFingerprint(`${assetId}`);
+
+            marketplace.setWallet(ephemeralWallet);
+            const executeOrderAction = marketplace.safeExecuteOrder(
+              nftAddress,
+              `${assetId}`,
+              `${priceInWei}`,
+              `${fingerprint}`
+            );
+
+            const orderSuccessfulListener = async message => {
+              const { data } = message;
+              const { args } = data;
+              const { buyer } = args;
+              marketplace.off("error");
+              expect(buyer).to.equal(ephemeralAddress);
+              await expectExactTokenBalances(estate, [ephemeralAddress], [1]);
+              done();
+            };
+
+            const errorListener = error => {
+              const { message } = error;
+              console.warn(message);
+              marketplace.off("error");
+              done(error);
+            };
+
+            marketplace.once("OrderSuccessful", orderSuccessfulListener);
+            marketplace.on("error", errorListener);
 
             executeOrderAction.send();
           })();
