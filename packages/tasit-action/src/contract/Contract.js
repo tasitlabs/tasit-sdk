@@ -14,7 +14,6 @@ ethers.errors.setLogLevel("error");
 export class Contract extends Subscription {
   #provider;
   #ethersContract;
-  #isRunning = false;
 
   constructor(address, abi, wallet) {
     if (!Utils.isAddress(address) || !Utils.isABI(abi))
@@ -102,7 +101,7 @@ export class Contract extends Subscription {
   };
 
   #addContractEventListener = (eventName, listener, once) => {
-    const baseEthersListener = async (...args) => {
+    const ethersListener = async (...args) => {
       try {
         // Note: This depends on the current ethers.js specification of ethersContract events to work:
         // "All event callbacks receive the parameters specified in the ABI as well as
@@ -127,30 +126,6 @@ export class Contract extends Subscription {
           eventName
         );
       }
-    };
-
-    // Note:
-    // On the development env (using ganache-cli)
-    // Blocks are being mined simultaneously and generating a sort of unexpected behaviors like:
-    // - once listeners called many times
-    // - sequential blocks giving same confirmation to a transaction
-    // - false-positive reorg event emission
-    // - collaborating for tests non-determinism
-    //
-    // Tech debt:
-    // See if there is another way to avoid these problems, if not
-    // this solution should be improved with a state structure identifying state per event
-    //
-    // Question:
-    // Is it possible that that behavior (listener concurrent calls for the same event) is desirable?
-    const ethersListener = async (...args) => {
-      if (this.#isRunning) {
-        console.info(`Listener is already running`);
-        return;
-      }
-      this.#isRunning = true;
-      await baseEthersListener(...args);
-      this.#isRunning = false;
     };
 
     this._addEventListener(eventName, ethersListener);

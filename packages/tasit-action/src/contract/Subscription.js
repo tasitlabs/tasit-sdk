@@ -1,6 +1,7 @@
 export class Subscription {
   #ethersEventEmitter;
   #eventListeners = new Map();
+  #isRunning = false;
 
   constructor(eventEmitter) {
     this.#ethersEventEmitter = eventEmitter;
@@ -109,7 +110,7 @@ export class Subscription {
   };
 
   // TODO: Make protected
-  _addEventListener = (eventName, listener) => {
+  _addEventListener = (eventName, baseListener) => {
     if (eventName === "error")
       throw new Error(
         `Use _addErrorListener function to subscribe to an error event.`
@@ -119,6 +120,30 @@ export class Subscription {
       throw new Error(
         `A listener for event '${eventName}' is already registered.`
       );
+
+    // Note:
+    // On the development env (using ganache-cli)
+    // Blocks are being mined simultaneously and generating a sort of unexpected behaviors like:
+    // - once listeners called many times
+    // - sequential blocks giving same confirmation to a transaction
+    // - false-positive reorg event emission
+    // - collaborating for tests non-determinism
+    //
+    // Tech debt:
+    // See if there is another way to avoid these problems, if not
+    // this solution should be improved with a state structure identifying state per event
+    //
+    // Question:
+    // Is it possible that that behavior (listener concurrent calls for the same event) is desirable?
+    const listener = async (...args) => {
+      if (this.#isRunning) {
+        console.info(`Listener is already running`);
+        return;
+      }
+      this.#isRunning = true;
+      await baseListener(...args);
+      this.#isRunning = false;
+    };
 
     this.#eventListeners.set(eventName, {
       listener,
