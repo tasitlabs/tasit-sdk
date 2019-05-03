@@ -1,7 +1,5 @@
 import TasitAction from "tasit-action";
-const { Action, Contract, ERC20, ERC721 } = TasitAction;
-const { ERC20Detailed } = ERC20;
-const { ERC721Full } = ERC721;
+const { Action, Contract } = TasitAction;
 import GnosisSafeUtils from "./GnosisSafeUtils";
 import ActionUtils from "tasit-action/dist/contract/Utils.js";
 import TasitContracts from "tasit-contracts";

@@ -1,5 +1,3 @@
-import Action from "tasit-action";
-const { Contract } = Action;
 import { ethers } from "ethers";
 
 const { utils: ethersUtils } = ethers;
