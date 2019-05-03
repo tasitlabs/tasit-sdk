@@ -9,8 +9,7 @@ const {
 } = SampleContract;
 
 import ProviderFactory from "./ProviderFactory";
-import actionHelpers from "./testHelpers/helpers";
-const { accounts, waitForEthersEvent } = actionHelpers;
+import { accounts, waitForEthersEvent } from "./testHelpers/helpers";
 
 const provider = ProviderFactory.getProvider();
 

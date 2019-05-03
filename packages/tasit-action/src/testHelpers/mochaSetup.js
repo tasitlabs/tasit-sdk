@@ -8,8 +8,12 @@ import sinon from "sinon";
 global.sinon = sinon;
 
 // Helpers
-import actionHelpers from "./helpers";
-const { createSnapshot, revertFromSnapshot, mineBlocks } = actionHelpers;
+import actionHelpers, {
+  createSnapshot,
+  revertFromSnapshot,
+  mineBlocks,
+} from "./helpers";
+
 global = Object.assign(global, actionHelpers);
 
 import ProviderFactory from "../ProviderFactory";

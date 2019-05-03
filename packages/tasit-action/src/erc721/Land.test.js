@@ -3,6 +3,7 @@ import TasitContracts from "tasit-contracts";
 const { local: localContracts } = TasitContracts;
 const { LANDProxy } = localContracts;
 const { address: LAND_PROXY_ADDRESS } = LANDProxy;
+import { accounts } from "../testHelpers/helpers";
 
 describe("TasitAction.ERC721.Land", () => {
   const [contractOwnerWallet] = accounts;
