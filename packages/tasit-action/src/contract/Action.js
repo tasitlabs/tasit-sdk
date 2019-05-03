@@ -211,7 +211,7 @@ export class Action extends Subscription {
     // this solution should be improved with a state structure identifying state per event
     //
     // Question:
-    // Is possible that behavior (listener concurrency calls for the same event) be desirable?
+    // Is it possible that that behavior (listener concurrent calls for the same event) is desirable?
     const ethersListener = async blockNumber => {
       if (this.#isRunning) {
         console.info(`Listener is already running`);
