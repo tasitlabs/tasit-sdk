@@ -3,6 +3,7 @@ import TasitContracts from "tasit-contracts";
 const { local: localContracts } = TasitContracts;
 const { EstateRegistry } = localContracts;
 const { address: ESTATE_ADDRESS } = EstateRegistry;
+import { accounts } from "../testHelpers/helpers";
 
 describe("TasitAction.ERC721.Estate", () => {
   const [ownerWallet] = accounts;

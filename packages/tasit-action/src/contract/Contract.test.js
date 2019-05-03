@@ -1,12 +1,21 @@
 import Contract from "./Contract";
-import Account from "tasit-account";
 import TasitContracts from "tasit-contracts";
+import ProviderFactory from "../ProviderFactory";
+import {
+  accounts,
+  mineBlocks,
+  wait,
+  createSnapshot,
+  revertFromSnapshot,
+} from "../testHelpers/helpers";
+
 const { local: localContracts } = TasitContracts;
 const { SampleContract } = localContracts;
 const {
   abi: sampleContractABI,
   address: SAMPLE_CONTRACT_ADDRESS,
 } = SampleContract;
+const provider = ProviderFactory.getProvider();
 
 describe("TasitAction.Contract", () => {
   let sampleContract;
@@ -148,6 +157,9 @@ describe("TasitAction.Contract", () => {
 
       it("and Action error event on action error", async () => {
         const contractErrorListener = sinon.fake(error => {
+          const { message } = error;
+          console.info(message);
+
           sampleContract.off("error");
         });
 
@@ -160,6 +172,9 @@ describe("TasitAction.Contract", () => {
         action.on("confirmation", () => {});
 
         const actionErrorListener = sinon.fake(error => {
+          const { message } = error;
+          console.info(message);
+
           action.off("error");
         });
 
@@ -179,6 +194,9 @@ describe("TasitAction.Contract", () => {
         action = sampleContract.setValue("hello world");
 
         const errorListener = sinon.fake(error => {
+          const { message } = error;
+          console.info(message);
+
           expect(eventListener.callCount).to.be.at.least(1);
           done();
         });
@@ -237,10 +255,7 @@ describe("TasitAction.Contract", () => {
 
       const errorListener = sinon.fake();
 
-      const confirmationListener = sinon.fake(async message => {
-        const { data } = message;
-        const { confirmations } = data;
-
+      const confirmationListener = sinon.fake(async () => {
         const value = await sampleContract.getValue();
         expect(value).to.equal(rand);
 
@@ -366,8 +381,8 @@ describe("TasitAction.Contract", () => {
       action = sampleContract.setValue("hello world");
       await action.send();
 
-      const listener1 = message => {};
-      const listener2 = message => {};
+      const listener1 = () => {};
+      const listener2 = () => {};
 
       expect(action.subscribedEventNames()).to.deep.equal(["error"]);
 
@@ -387,7 +402,7 @@ describe("TasitAction.Contract", () => {
       action = sampleContract.setValue("hello world");
       await action.send();
 
-      const listener1 = message => {};
+      const listener1 = () => {};
 
       expect(action.subscribedEventNames()).to.deep.equal(["error"]);
 
@@ -411,7 +426,7 @@ describe("TasitAction.Contract", () => {
       const confirmationFn = sinon.fake();
       const errorFn = sinon.fake();
 
-      const confirmationListener = message => {
+      const confirmationListener = () => {
         confirmationFn();
       };
 
@@ -520,7 +535,7 @@ describe("TasitAction.Contract", () => {
 
     // Non-deterministic
     it.skip("should be able to listen to an event before sending", async () => {
-      const confirmationListener = sinon.fake(async message => {
+      const confirmationListener = sinon.fake(async () => {
         action.off("confirmation");
       });
 
@@ -546,13 +561,13 @@ describe("TasitAction.Contract", () => {
       action = sampleContract.setValue(rand);
 
       const errorListener = sinon.fake(error => {
-        console.log(error);
+        const { message } = error;
+        console.info(message);
+
         action.off("error");
       });
 
-      const confirmationListener = sinon.fake(message => {
-        console.log(message);
-      });
+      const confirmationListener = sinon.fake();
 
       action.on("error", errorListener);
       action.once("confirmation", confirmationListener);
@@ -579,11 +594,11 @@ describe("TasitAction.Contract", () => {
 
     it("should trigger an event one time when you're listening to that event and the contract triggers it", async () => {
       const fakeFn = sinon.fake();
-      const errorFakeFn = sinon.fake();
 
-      const errorListener = error => {
-        errorFakeFn();
-      };
+      const errorListener = sinon.fake(error => {
+        const { message } = error;
+        console.info(message);
+      });
 
       sampleContract.on("error", errorListener);
 
@@ -605,7 +620,7 @@ describe("TasitAction.Contract", () => {
 
       sampleContract.off("error");
 
-      expect(errorFakeFn.called).to.be.false;
+      expect(errorListener.called).to.be.false;
       expect(fakeFn.callCount).to.equal(1);
       expect(sampleContract.subscribedEventNames()).to.be.empty;
     });
@@ -615,6 +630,9 @@ describe("TasitAction.Contract", () => {
       const errorFakeFn = sinon.fake();
 
       const errorListener = error => {
+        const { message } = error;
+        console.info(message);
+
         errorFakeFn();
       };
 
@@ -648,8 +666,8 @@ describe("TasitAction.Contract", () => {
     });
 
     it("subscription should have one listener per event", async () => {
-      const listener1 = message => {};
-      const listener2 = message => {};
+      const listener1 = () => {};
+      const listener2 = () => {};
 
       expect(sampleContract.subscribedEventNames()).to.be.empty;
 
@@ -665,7 +683,7 @@ describe("TasitAction.Contract", () => {
     });
 
     it("should remove an event", async () => {
-      const listener1 = message => {};
+      const listener1 = () => {};
 
       expect(sampleContract.subscribedEventNames()).to.be.empty;
 
@@ -681,9 +699,9 @@ describe("TasitAction.Contract", () => {
     });
 
     it("should manage many listeners", async () => {
-      const listener1 = message => {};
-      const listener2 = message => {};
-      const listener3 = message => {};
+      const listener1 = () => {};
+      const listener2 = () => {};
+      const listener3 = () => {};
 
       expect(sampleContract.subscribedEventNames()).to.be.empty;
 
