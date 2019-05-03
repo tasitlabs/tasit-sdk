@@ -9,8 +9,10 @@ global.sinon = sinon;
 
 // Helpers
 import actionHelpers from "./helpers";
+const { createSnapshot, revertFromSnapshot, mineBlocks } = actionHelpers;
 global = Object.assign(global, actionHelpers);
 
+import ProviderFactory from "../ProviderFactory";
 import ConfigLoader from "../ConfigLoader";
 import config from "../config/default";
 ConfigLoader.setConfig(config);
@@ -18,9 +20,10 @@ ConfigLoader.setConfig(config);
 // Global hooks
 let snapshotId;
 
+const provider = ProviderFactory.getProvider();
+global.provider = provider;
+
 beforeEach("global beforeEach() hook", async () => {
-  const provider = ProviderFactory.getProvider();
-  global.provider = provider;
   snapshotId = await createSnapshot(provider);
 
   while (snapshotId > 1) {

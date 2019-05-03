@@ -10,11 +10,7 @@ import developmentConfig from "../config/default";
 // Refs: https://github.com/lerna/lerna/tree/master/commands/bootstrap
 import { createFromPrivateKey } from "tasit-account/dist/testHelpers/helpers";
 
-const {
-  utils: ethersUtils,
-  constants: ethersConstants,
-  Contract: ethersContract,
-} = ethers;
+const { utils: ethersUtils, constants: ethersConstants } = ethers;
 const { WeiPerEther: WEI_PER_ETHER } = ethersConstants;
 const { bigNumberify } = ethersUtils;
 
@@ -73,6 +69,10 @@ const waitForEthersEvent = async (eventEmitter, eventName, callback) => {
       callback(event);
       resolve();
     });
+
+    setTimeout(() => {
+      reject(new Error("timeout"));
+    }, 2000);
   });
 };
 
