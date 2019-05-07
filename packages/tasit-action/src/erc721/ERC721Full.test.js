@@ -139,10 +139,7 @@ describe("TasitAction.ERC721.ERC721Full", () => {
       await expectExactTokenBalances(erc721, [ana.address], [1]);
     });
 
-    // Non-deterministic
-    // Enable again after solve this isse:
-    // https://github.com/tasitlabs/TasitSDK/issues/367
-    it.skip("should transfer an owned token", async () => {
+    it("should transfer an owned token", async () => {
       erc721 = new ERC721Full(ERC721_FULL_ADDRESS, ana);
 
       const transferListener = sinon.fake(message => {

@@ -292,7 +292,7 @@ describe("Decentraland", () => {
           })();
         });
 
-        it("should buy a parcel of land", done => {
+        it("should buy a parcel of land - using action events", done => {
           (async () => {
             const { assetId, nftAddress, priceInWei } = landForSale;
 
@@ -310,7 +310,41 @@ describe("Decentraland", () => {
               `${fingerprint}`
             );
 
-            // eslint-disable-next-line no-unused-vars
+            const confirmationListener = async () => {
+              await expectExactTokenBalances(land, [ephemeralAddress], [1]);
+              done();
+            };
+
+            const errorListener = error => {
+              marketplace.off("error");
+              done(error);
+            };
+
+            executeOrderAction.once("confirmation", confirmationListener);
+            executeOrderAction.on("error", errorListener);
+
+            executeOrderAction.send();
+          })();
+        });
+
+        it("should buy a parcel of land - using contract events", done => {
+          (async () => {
+            const { assetId, nftAddress, priceInWei } = landForSale;
+
+            await checkAsset(land, mana, landForSale, ephemeralAddress);
+
+            await expectExactTokenBalances(land, [ephemeralAddress], [0]);
+
+            // LANDRegistry contract doesn't implement getFingerprint function
+            const fingerprint = "0x";
+            marketplace.setWallet(ephemeralWallet);
+            const executeOrderAction = marketplace.safeExecuteOrder(
+              nftAddress,
+              `${assetId}`,
+              `${priceInWei}`,
+              `${fingerprint}`
+            );
+
             const orderSuccessfulListener = async message => {
               const { data } = message;
               const { args } = data;
@@ -322,22 +356,13 @@ describe("Decentraland", () => {
               done();
             };
 
-            const confirmationListener = async () => {
-              await expectExactTokenBalances(land, [ephemeralAddress], [1]);
-              done();
-            };
-
             const errorListener = error => {
               marketplace.off("error");
               done(error);
             };
 
-            // Note: These listeners aren't working properly
-            // See more: https://github.com/tasitlabs/TasitSDK/issues/367
-            // marketplace.once("OrderSuccessful", orderSuccessfulListener);
-            // marketplace.on("error", errorListener);
-            executeOrderAction.once("confirmation", confirmationListener);
-            executeOrderAction.on("error", errorListener);
+            marketplace.once("OrderSuccessful", orderSuccessfulListener);
+            marketplace.on("error", errorListener);
 
             executeOrderAction.send();
           })();
