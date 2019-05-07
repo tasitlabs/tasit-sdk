@@ -705,7 +705,7 @@ describe("Decentraland", () => {
             const confirmationListener = async () => {
               // WIP: Not working because of gas issue on Marketplace.safeExecuteOrder() call
               //
-              // When that issue was solved, the correct expectation is having balance equals 1 instead of 0
+              // When that issue was solved, the correct expectation is having balance equal 1 instead of 0
               //await expectExactTokenBalances(estate, [GNOSIS_SAFE_ADDRESS], [1]);
               await expectExactTokenBalances(
                 estate,
