@@ -1,6 +1,5 @@
 import { expect } from "chai";
 import { ethers } from "ethers";
-import ConfigLoader from "../ConfigLoader";
 import ProviderFactory from "../ProviderFactory";
 import developmentConfig from "../config/default";
 
@@ -54,25 +53,6 @@ const privateKeys = [
   "0x633a290bcdabb9075c5a4b3885c69ce64b4b0e6079eb929abb2ac9427c49733b",
 ];
 export const accounts = privateKeys.map(createFromPrivateKey);
-
-export const waitForEthersEvent = async (eventEmitter, eventName, callback) => {
-  return new Promise((resolve, reject) => {
-    const config = ConfigLoader.getConfig();
-    const { events } = config;
-    const { timeout: EVENT_TIMEOUT } = events;
-
-    const timeout = setTimeout(() => {
-      reject(new Error("timeout"));
-    }, EVENT_TIMEOUT);
-
-    eventEmitter.on(eventName, (...args) => {
-      const event = args.pop();
-      callback(event);
-      clearTimeout(timeout);
-      resolve();
-    });
-  });
-};
 
 const mineOneBlock = async provider => {
   await provider.send("evm_increaseTime", [1]);
@@ -227,7 +207,6 @@ export const duration = {
 };
 
 export const helpers = {
-  waitForEthersEvent,
   mineBlocks,
   createSnapshot,
   revertFromSnapshot,
