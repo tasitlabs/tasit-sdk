@@ -4,7 +4,6 @@ import ProviderFactory from "../ProviderFactory";
 import {
   accounts,
   mineBlocks,
-  wait,
   createSnapshot,
   revertFromSnapshot,
 } from "../testHelpers/helpers";
