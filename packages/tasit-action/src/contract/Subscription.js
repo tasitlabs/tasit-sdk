@@ -1,7 +1,6 @@
 export class Subscription {
   #ethersEventEmitter;
   #eventListeners = new Map();
-  #isRunning = false;
 
   constructor(eventEmitter) {
     this.#ethersEventEmitter = eventEmitter;
@@ -32,14 +31,7 @@ export class Subscription {
 
   // TODO: Make protected
   _setEventTimer = (eventName, timer) => {
-    const eventListener = this.#eventListeners.get(eventName);
-
-    if (!eventListener) {
-      console.warn(`A listener for event '${eventName}' isn't registered.`);
-      return;
-    }
-
-    this.#eventListeners.set(eventName, { ...eventListener, timer });
+    this.#decorateEventListener(eventName, { timer });
   };
 
   // TODO: Make protected
@@ -92,8 +84,9 @@ export class Subscription {
   // If there is a error event already, it will be replaced by new listener function
   // that will call both new and old functions
   _addErrorListener = newListener => {
+    const eventName = "error";
     let listener = newListener;
-    const oldErrorEventListener = this.#eventListeners.get("error");
+    const oldErrorEventListener = this.#eventListeners.get(eventName);
 
     if (oldErrorEventListener) {
       listener = error => {
@@ -102,7 +95,7 @@ export class Subscription {
       };
     }
 
-    this.#eventListeners.set("error", {
+    this.#eventListeners.set(eventName, {
       listener,
     });
   };
@@ -128,22 +121,24 @@ export class Subscription {
     // - collaborating for tests non-determinism
     //
     // Tech debt:
-    // See if there is another way to avoid these problems, if not
-    // this solution should be improved with a state structure identifying state per event
+    // See if there is another way to avoid these problems
     //
     // Question:
     // Is it possible that that behavior (listener concurrent calls for the same event) is desirable?
     const listener = async (...args) => {
-      if (this.#isRunning) {
+      const eventListener = this.#eventListeners.get(eventName);
+      const { isRunning } = eventListener;
+
+      if (isRunning) {
         console.info(`Listener is already running`);
         return;
       }
-      this.#isRunning = true;
+
+      this.#decorateEventListener(eventName, { isRunning: true });
       await baseListener(...args);
-      this.#isRunning = false;
+      this.#decorateEventListener(eventName, { isRunning: false });
     };
 
-    console.log("Important TODO: Use map to store isRunning state");
     const eventListener = { listener, isRunning: false };
 
     this.#eventListeners.set(eventName, eventListener);
@@ -154,6 +149,19 @@ export class Subscription {
   // For testing purposes
   getEmitter = () => {
     return this.#ethersEventEmitter;
+  };
+
+  #decorateEventListener = (eventName, newArgs) => {
+    let eventListener = this.#eventListeners.get(eventName);
+
+    if (!eventListener) {
+      console.warn(`A listener for event '${eventName}' isn't registered.`);
+      return;
+    }
+
+    eventListener = { ...eventListener, ...newArgs };
+
+    this.#eventListeners.set(eventName, eventListener);
   };
 }
 
