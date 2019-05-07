@@ -234,12 +234,13 @@ describe("Decentraland", () => {
             );
 
             const confirmationListener = async () => {
+              executeOrderAction.off("error");
               await expectExactTokenBalances(estate, [ephemeralAddress], [1]);
               done();
             };
 
             const errorListener = error => {
-              marketplace.off("error");
+              executeOrderAction.off("error");
               done(error);
             };
 
@@ -311,12 +312,13 @@ describe("Decentraland", () => {
             );
 
             const confirmationListener = async () => {
+              executeOrderAction.off("error");
               await expectExactTokenBalances(land, [ephemeralAddress], [1]);
               done();
             };
 
             const errorListener = error => {
-              marketplace.off("error");
+              executeOrderAction.off("error");
               done(error);
             };
 
@@ -352,7 +354,7 @@ describe("Decentraland", () => {
 
               expect(buyer).to.equal(ephemeralAddress);
               await expectExactTokenBalances(land, [ephemeralAddress], [1]);
-
+              marketplace.off("error");
               done();
             };
 
