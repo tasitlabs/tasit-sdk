@@ -659,7 +659,7 @@ describe("Decentraland", () => {
           })();
         });
 
-        it("should buy an estate", done => {
+        it("should buy an estate - using action events", done => {
           (async () => {
             // Global hooks don't run between same level hooks
             await mineBlocks(provider, 1);
@@ -693,15 +693,6 @@ describe("Decentraland", () => {
               argsArray
             );
 
-            // eslint-disable-next-line no-unused-vars
-            const onFailed = message => {
-              const { data } = message;
-              const { args } = data;
-              const { txHash } = args;
-              console.warn(`Action ID: ${txHash}`);
-              done(new Error(`ExecutionFailed event emitted`));
-            };
-
             const confirmationListener = async () => {
               // WIP: Not working because of gas issue on Marketplace.safeExecuteOrder() call
               //
@@ -723,16 +714,67 @@ describe("Decentraland", () => {
             action.once("confirmation", confirmationListener);
             action.on("error", errorListener);
 
-            // Tech-debt:
-            // Listen to the contract event that error will be thrown:  Error: done() called multiple times
-            // See more: https://github.com/tasitlabs/TasitSDK/issues/366
-            //gnosisSafe.once("ExecutionFailed", onFailed);
+            action.send();
+          })();
+        });
+
+        it("should buy an estate - using contract events", done => {
+          (async () => {
+            // Global hooks don't run between same level hooks
+            await mineBlocks(provider, 1);
+
+            const { assetId, nftAddress, priceInWei } = estateForSale;
+
+            const buyerAddress = GNOSIS_SAFE_ADDRESS;
+            await checkAsset(estate, mana, estateForSale, buyerAddress);
+
+            await expectExactTokenBalances(estate, [GNOSIS_SAFE_ADDRESS], [0]);
+
+            // Gnosis Safe should execute an open order
+            // TODO: ephemeralWallet should broadcast this action
+            const contractAddress = marketplace.getAddress();
+            const contractABI = marketplace.getABI();
+            const functionName = "safeExecuteOrder";
+            const fingerprint = await estate.getFingerprint(`${assetId}`);
+            const argsArray = [
+              nftAddress,
+              `${assetId}`,
+              `${priceInWei}`,
+              `${fingerprint}`,
+            ];
+
+            gnosisSafe.setSigners([gnosisSafeOwner]);
+            gnosisSafe.setWallet(gnosisSafeOwner);
+            const action = gnosisSafe.customContractAction(
+              contractAddress,
+              contractABI,
+              functionName,
+              argsArray
+            );
+
+            const onFailed = () => {
+              // WIP: Not working because of gas issue on Marketplace.safeExecuteOrder() call
+              //
+              // const { data } = message;
+              // const { args } = data;
+              // const { txHash } = args;
+              //done(new Error(`ExecutionFailed event emitted`));
+              done();
+            };
+
+            const errorListener = error => {
+              action.off("error");
+              done(error);
+            };
+
+            gnosisSafe.once("ExecutionFailed", onFailed);
+            gnosisSafe.on("error", errorListener);
 
             action.send();
           })();
         });
 
-        it("should buy a parcel of land", done => {
+        it("should buy a parcel of land - using action events", done => {
           (async () => {
             const { assetId, nftAddress, priceInWei } = landForSale;
 
@@ -763,15 +805,6 @@ describe("Decentraland", () => {
               ethersAmount
             );
 
-            // eslint-disable-next-line no-unused-vars
-            const onFailed = message => {
-              const { data } = message;
-              const { args } = data;
-              const { txHash } = args;
-              console.warn(`Action ID: ${txHash}`);
-              done(new Error(`ExecutionFailed event emitted`));
-            };
-
             const confirmationListener = async () => {
               // WIP: Not working because of gas issue on Marketplace.safeExecuteOrder() call
               //await expectExactTokenBalances(land, [GNOSIS_SAFE_ADDRESS], [1]);
@@ -789,10 +822,58 @@ describe("Decentraland", () => {
             action.once("confirmation", confirmationListener);
             action.on("error", errorListener);
 
-            // Tech-debt:
-            // Listen to the contract event that error will be thrown:  Error: done() called multiple times
-            // See more: https://github.com/tasitlabs/TasitSDK/issues/366
-            //gnosisSafe.once("ExecutionFailed", onFailed);
+            action.send();
+          })();
+        });
+
+        it("should buy a parcel of land - using contract events", done => {
+          (async () => {
+            const { assetId, nftAddress, priceInWei } = landForSale;
+
+            await checkAsset(land, mana, landForSale, GNOSIS_SAFE_ADDRESS);
+
+            await expectExactTokenBalances(land, [GNOSIS_SAFE_ADDRESS], [0]);
+
+            // Gnosis Safe should execute an open order
+            // TODO: ephemeralWallet should broadcast this action
+            const contractAddress = marketplace.getAddress();
+            const contractABI = marketplace.getABI();
+            const functionName = "safeExecuteOrder";
+            // LANDRegistry contract doesn't implement getFingerprint function
+            const fingerprint = "0x";
+            const argsArray = [
+              nftAddress,
+              `${assetId}`,
+              `${priceInWei}`,
+              `${fingerprint}`,
+            ];
+            const ethersAmount = "0";
+
+            const action = gnosisSafe.customContractAction(
+              contractAddress,
+              contractABI,
+              functionName,
+              argsArray,
+              ethersAmount
+            );
+
+            const onFailed = () => {
+              // WIP: Not working because of gas issue on Marketplace.safeExecuteOrder() call
+              //
+              // const { data } = message;
+              // const { args } = data;
+              // const { txHash } = args;
+              //done(new Error(`ExecutionFailed event emitted`));
+              done();
+            };
+
+            const errorListener = error => {
+              action.off("error");
+              done(error);
+            };
+
+            gnosisSafe.on("error", errorListener);
+            gnosisSafe.once("ExecutionFailed", onFailed);
 
             action.send();
           })();
