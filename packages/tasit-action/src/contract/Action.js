@@ -1,6 +1,5 @@
 import Subscription from "./Subscription";
 import ProviderFactory from "../ProviderFactory";
-import ConfigLoader from "../ConfigLoader";
 
 // If necessary, we can create TransactionAction
 //  and/or MetaTxAction subclasses
@@ -10,20 +9,14 @@ export class Action extends Subscription {
   #rawAction;
   #tx;
   #txConfirmations = 0;
-  #timeout;
-  #lastConfirmationTime;
 
   constructor(rawAction, provider, signer) {
     // Provider implements EventEmitter API and it's enough
     //  to handle with transactions events
     super(provider);
 
-    const { events } = ConfigLoader.getConfig();
-    const { timeout } = events;
-
     this.#rawAction = rawAction;
     this.#signer = signer;
-    this.#timeout = timeout;
     this.#provider = provider;
     this.#txConfirmations = 0;
   }
@@ -90,14 +83,6 @@ export class Action extends Subscription {
     this.#addListener(eventName, listener, true);
   };
 
-  getEventsTimeout = () => {
-    return this.#timeout;
-  };
-
-  setEventsTimeout = timeout => {
-    this.#timeout = timeout;
-  };
-
   #addListener = (eventName, listener, once) => {
     const events = ["confirmation", "error"];
 
@@ -158,25 +143,6 @@ export class Action extends Subscription {
           );
           return;
         }
-
-        this._clearEventTimerIfExists(eventName);
-
-        this.#lastConfirmationTime = Date.now();
-
-        const timer = setTimeout(() => {
-          const currentTime = Date.now();
-          const timedOut =
-            currentTime - this.#lastConfirmationTime >= this.getEventsTimeout();
-
-          if (timedOut) {
-            this._emitErrorEventFromEventListener(
-              new Error(`Event ${eventName} reached timeout.`),
-              eventName
-            );
-          }
-        }, this.getEventsTimeout());
-
-        this._setEventTimer(eventName, timer);
 
         this.#txConfirmations = confirmations;
 

@@ -1,8 +1,15 @@
+import ConfigLoader from "../ConfigLoader";
+
 export class Subscription {
   #ethersEventEmitter;
   #eventListeners = new Map();
+  #timeout;
 
   constructor(eventEmitter) {
+    const { events } = ConfigLoader.getConfig();
+    const { timeout } = events;
+
+    this.#timeout = timeout;
     this.#ethersEventEmitter = eventEmitter;
   }
 
@@ -27,6 +34,14 @@ export class Subscription {
       );
     }
     this.#eventListeners.delete(eventName);
+  };
+
+  getEventsTimeout = () => {
+    return this.#timeout;
+  };
+
+  setEventsTimeout = timeout => {
+    this.#timeout = timeout;
   };
 
   // TODO: Make protected
@@ -134,7 +149,30 @@ export class Subscription {
         return;
       }
 
-      this.#decorateEventListener(eventName, { isRunning: true });
+      this.#decorateEventListener(eventName, {
+        isRunning: true,
+        lastEmissionTime: Date.now(),
+      });
+
+      this._clearEventTimerIfExists(eventName);
+
+      const timer = setTimeout(() => {
+        const eventListener = this.#eventListeners.get(eventName);
+        const { lastEmissionTime } = eventListener;
+        const currentTime = Date.now();
+        const timedOut =
+          currentTime - lastEmissionTime >= this.getEventsTimeout();
+
+        if (timedOut) {
+          this._emitErrorEventFromEventListener(
+            new Error(`Event ${eventName} reached timeout.`),
+            eventName
+          );
+        }
+      }, this.getEventsTimeout());
+
+      this._setEventTimer(eventName, timer);
+
       await baseListener(...args);
       this.#decorateEventListener(eventName, { isRunning: false });
     };
