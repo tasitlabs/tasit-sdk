@@ -776,7 +776,7 @@ describe("Decentraland", () => {
               // WIP: Not working because of gas issue on Marketplace.safeExecuteOrder() call
               //await expectExactTokenBalances(land, [GNOSIS_SAFE_ADDRESS], [1]);
               //
-              // When that issue was solved, the correct expectation is having balance equals 1 instead of 0
+              // When that issue was solved, the correct expectation is having balance equal 1 instead of 0
               await expectExactTokenBalances(land, [GNOSIS_SAFE_ADDRESS], [0]);
               done();
             };
