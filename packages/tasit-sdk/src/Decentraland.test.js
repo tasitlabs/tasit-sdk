@@ -704,6 +704,8 @@ describe("Decentraland", () => {
 
             const confirmationListener = async () => {
               // WIP: Not working because of gas issue on Marketplace.safeExecuteOrder() call
+              //
+              // When that issue was solved, the correct expectation is having balance equals 1 instead of 0
               //await expectExactTokenBalances(estate, [GNOSIS_SAFE_ADDRESS], [1]);
               await expectExactTokenBalances(
                 estate,
@@ -773,6 +775,8 @@ describe("Decentraland", () => {
             const confirmationListener = async () => {
               // WIP: Not working because of gas issue on Marketplace.safeExecuteOrder() call
               //await expectExactTokenBalances(land, [GNOSIS_SAFE_ADDRESS], [1]);
+              //
+              // When that issue was solved, the correct expectation is having balance equals 1 instead of 0
               await expectExactTokenBalances(land, [GNOSIS_SAFE_ADDRESS], [0]);
               done();
             };
@@ -933,7 +937,6 @@ describe("Decentraland", () => {
               // See more: https://github.com/tasitlabs/TasitSDK/issues/273
               //await expectExactTokenBalances(estate, [ephemeralAddress], [1]);
               await expectExactTokenBalances(estate, [ephemeralAddress], [0]);
-              done();
             };
 
             const errorListener = error => {
@@ -982,7 +985,6 @@ describe("Decentraland", () => {
               // See more: https://github.com/tasitlabs/TasitSDK/issues/273
               //await expectExactTokenBalances(land, [ephemeralAddress], [1]);
               await expectExactTokenBalances(land, [ephemeralAddress], [0]);
-              done();
             };
 
             const errorListener = error => {
