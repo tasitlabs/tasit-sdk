@@ -1,6 +1,5 @@
 import { expect } from "chai";
 import { ethers } from "ethers";
-import ConfigLoader from "../ConfigLoader";
 import ProviderFactory from "../ProviderFactory";
 import developmentConfig from "../config/default";
 
