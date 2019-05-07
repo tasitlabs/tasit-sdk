@@ -12,7 +12,6 @@ export class Action extends Subscription {
   #txConfirmations = 0;
   #timeout;
   #lastConfirmationTime;
-  #isRunning = false;
 
   constructor(rawAction, provider, signer) {
     // Provider implements EventEmitter API and it's enough
@@ -124,7 +123,7 @@ export class Action extends Subscription {
     const eventName = "confirmation";
 
     // eslint-disable-next-line no-unused-vars
-    const baseEthersListener = async blockNumber => {
+    const ethersListener = async blockNumber => {
       try {
         const tx = await this.#tx;
         if (!tx) {
@@ -196,30 +195,6 @@ export class Action extends Subscription {
           eventName
         );
       }
-    };
-
-    // Note:
-    // On the development env (using ganache-cli)
-    // Blocks are being mined simultaneously and generating a sort of unexpected behaviors like:
-    // - once listeners called many times
-    // - sequential blocks giving same confirmation to a transaction
-    // - false-positive reorg event emission
-    // - collaborating for tests non-determinism
-    //
-    // Tech debt:
-    // See if there is another way to avoid these problems, if not
-    // this solution should be improved with a state structure identifying state per event
-    //
-    // Question:
-    // Is possible that behavior (listener concurrency calls for the same event) be desirable?
-    const ethersListener = async blockNumber => {
-      if (this.#isRunning) {
-        console.info(`Listener is already running`);
-        return;
-      }
-      this.#isRunning = true;
-      await baseEthersListener(blockNumber);
-      this.#isRunning = false;
     };
 
     this._addEventListener(eventName, ethersListener);

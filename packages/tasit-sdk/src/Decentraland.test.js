@@ -215,7 +215,7 @@ describe("Decentraland", () => {
           })();
         });
 
-        it("should buy an estate", done => {
+        it("should buy an estate - using action events", done => {
           (async () => {
             const { assetId, nftAddress, priceInWei } = estateForSale;
 
@@ -233,32 +233,17 @@ describe("Decentraland", () => {
               `${fingerprint}`
             );
 
-            // eslint-disable-next-line no-unused-vars
-            const orderSuccessfulListener = async message => {
-              const { data } = message;
-              const { args } = data;
-              const { buyer } = args;
-
-              expect(buyer).to.equal(ephemeralAddress);
-              await expectExactTokenBalances(estate, [ephemeralAddress], [1]);
-
-              done();
-            };
-
             const confirmationListener = async () => {
+              executeOrderAction.off("error");
               await expectExactTokenBalances(estate, [ephemeralAddress], [1]);
               done();
             };
 
             const errorListener = error => {
-              marketplace.off("error");
+              executeOrderAction.off("error");
               done(error);
             };
 
-            // Note: These listeners aren't working properly
-            // See more: https://github.com/tasitlabs/TasitSDK/issues/367
-            //marketplace.once("OrderSuccessful", orderSuccessfulListener);
-            //marketplace.on("error", errorListener);
             executeOrderAction.once("confirmation", confirmationListener);
             executeOrderAction.on("error", errorListener);
 
@@ -266,7 +251,49 @@ describe("Decentraland", () => {
           })();
         });
 
-        it("should buy a parcel of land", done => {
+        it("should buy an estate - using contract events", done => {
+          (async () => {
+            const { assetId, nftAddress, priceInWei } = estateForSale;
+
+            await checkAsset(estate, mana, estateForSale, ephemeralAddress);
+
+            await expectExactTokenBalances(estate, [ephemeralAddress], [0]);
+
+            const fingerprint = await estate.getFingerprint(`${assetId}`);
+
+            marketplace.setWallet(ephemeralWallet);
+            const executeOrderAction = marketplace.safeExecuteOrder(
+              nftAddress,
+              `${assetId}`,
+              `${priceInWei}`,
+              `${fingerprint}`
+            );
+
+            const orderSuccessfulListener = async message => {
+              const { data } = message;
+              const { args } = data;
+              const { buyer } = args;
+              marketplace.off("error");
+              expect(buyer).to.equal(ephemeralAddress);
+              await expectExactTokenBalances(estate, [ephemeralAddress], [1]);
+              done();
+            };
+
+            const errorListener = error => {
+              const { message } = error;
+              console.warn(message);
+              marketplace.off("error");
+              done(error);
+            };
+
+            marketplace.once("OrderSuccessful", orderSuccessfulListener);
+            marketplace.on("error", errorListener);
+
+            executeOrderAction.send();
+          })();
+        });
+
+        it("should buy a parcel of land - using action events", done => {
           (async () => {
             const { assetId, nftAddress, priceInWei } = landForSale;
 
@@ -284,7 +311,42 @@ describe("Decentraland", () => {
               `${fingerprint}`
             );
 
-            // eslint-disable-next-line no-unused-vars
+            const confirmationListener = async () => {
+              executeOrderAction.off("error");
+              await expectExactTokenBalances(land, [ephemeralAddress], [1]);
+              done();
+            };
+
+            const errorListener = error => {
+              executeOrderAction.off("error");
+              done(error);
+            };
+
+            executeOrderAction.once("confirmation", confirmationListener);
+            executeOrderAction.on("error", errorListener);
+
+            executeOrderAction.send();
+          })();
+        });
+
+        it("should buy a parcel of land - using contract events", done => {
+          (async () => {
+            const { assetId, nftAddress, priceInWei } = landForSale;
+
+            await checkAsset(land, mana, landForSale, ephemeralAddress);
+
+            await expectExactTokenBalances(land, [ephemeralAddress], [0]);
+
+            // LANDRegistry contract doesn't implement getFingerprint function
+            const fingerprint = "0x";
+            marketplace.setWallet(ephemeralWallet);
+            const executeOrderAction = marketplace.safeExecuteOrder(
+              nftAddress,
+              `${assetId}`,
+              `${priceInWei}`,
+              `${fingerprint}`
+            );
+
             const orderSuccessfulListener = async message => {
               const { data } = message;
               const { args } = data;
@@ -292,12 +354,7 @@ describe("Decentraland", () => {
 
               expect(buyer).to.equal(ephemeralAddress);
               await expectExactTokenBalances(land, [ephemeralAddress], [1]);
-
-              done();
-            };
-
-            const confirmationListener = async () => {
-              await expectExactTokenBalances(land, [ephemeralAddress], [1]);
+              marketplace.off("error");
               done();
             };
 
@@ -306,12 +363,8 @@ describe("Decentraland", () => {
               done(error);
             };
 
-            // Note: These listeners aren't working properly
-            // See more: https://github.com/tasitlabs/TasitSDK/issues/367
-            // marketplace.once("OrderSuccessful", orderSuccessfulListener);
-            // marketplace.on("error", errorListener);
-            executeOrderAction.once("confirmation", confirmationListener);
-            executeOrderAction.on("error", errorListener);
+            marketplace.once("OrderSuccessful", orderSuccessfulListener);
+            marketplace.on("error", errorListener);
 
             executeOrderAction.send();
           })();
@@ -651,6 +704,8 @@ describe("Decentraland", () => {
 
             const confirmationListener = async () => {
               // WIP: Not working because of gas issue on Marketplace.safeExecuteOrder() call
+              //
+              // When that issue was solved, the correct expectation is having balance equal 1 instead of 0
               //await expectExactTokenBalances(estate, [GNOSIS_SAFE_ADDRESS], [1]);
               await expectExactTokenBalances(
                 estate,
@@ -720,6 +775,8 @@ describe("Decentraland", () => {
             const confirmationListener = async () => {
               // WIP: Not working because of gas issue on Marketplace.safeExecuteOrder() call
               //await expectExactTokenBalances(land, [GNOSIS_SAFE_ADDRESS], [1]);
+              //
+              // When that issue was solved, the correct expectation is having balance equal 1 instead of 0
               await expectExactTokenBalances(land, [GNOSIS_SAFE_ADDRESS], [0]);
               done();
             };
@@ -880,7 +937,6 @@ describe("Decentraland", () => {
               // See more: https://github.com/tasitlabs/TasitSDK/issues/273
               //await expectExactTokenBalances(estate, [ephemeralAddress], [1]);
               await expectExactTokenBalances(estate, [ephemeralAddress], [0]);
-              done();
             };
 
             const errorListener = error => {
@@ -929,7 +985,6 @@ describe("Decentraland", () => {
               // See more: https://github.com/tasitlabs/TasitSDK/issues/273
               //await expectExactTokenBalances(land, [ephemeralAddress], [1]);
               await expectExactTokenBalances(land, [ephemeralAddress], [0]);
-              done();
             };
 
             const errorListener = error => {

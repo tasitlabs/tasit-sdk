@@ -31,16 +31,7 @@ export class Subscription {
 
   // TODO: Make protected
   _setEventTimer = (eventName, timer) => {
-    const eventListener = this.#eventListeners.get(eventName);
-
-    if (!eventListener) {
-      console.warn(`A listener for event '${eventName}' isn't registered.`);
-      return;
-    }
-
-    const { listener } = eventListener;
-
-    this.#eventListeners.set(eventName, { listener, timer });
+    this.#decorateEventListener(eventName, { timer });
   };
 
   // TODO: Make protected
@@ -93,8 +84,9 @@ export class Subscription {
   // If there is a error event already, it will be replaced by new listener function
   // that will call both new and old functions
   _addErrorListener = newListener => {
+    const eventName = "error";
     let listener = newListener;
-    const oldErrorEventListener = this.#eventListeners.get("error");
+    const oldErrorEventListener = this.#eventListeners.get(eventName);
 
     if (oldErrorEventListener) {
       listener = error => {
@@ -103,13 +95,13 @@ export class Subscription {
       };
     }
 
-    this.#eventListeners.set("error", {
+    this.#eventListeners.set(eventName, {
       listener,
     });
   };
 
   // TODO: Make protected
-  _addEventListener = (eventName, listener) => {
+  _addEventListener = (eventName, baseListener) => {
     if (eventName === "error")
       throw new Error(
         `Use _addErrorListener function to subscribe to an error event.`
@@ -120,9 +112,36 @@ export class Subscription {
         `A listener for event '${eventName}' is already registered.`
       );
 
-    this.#eventListeners.set(eventName, {
-      listener,
-    });
+    // Note:
+    // On the development env (using ganache-cli)
+    // Blocks are being mined simultaneously and generating a sort of unexpected behaviors like:
+    // - once listeners called many times
+    // - sequential blocks giving same confirmation to a transaction
+    // - false-positive reorg event emission
+    // - collaborating for tests non-determinism
+    //
+    // Tech debt:
+    // See if there is another way to avoid these problems
+    //
+    // Question:
+    // Is it possible that that behavior (listener concurrent calls for the same event) is desirable?
+    const listener = async (...args) => {
+      const eventListener = this.#eventListeners.get(eventName);
+      const { isRunning } = eventListener;
+
+      if (isRunning) {
+        console.info(`Listener is already running`);
+        return;
+      }
+
+      this.#decorateEventListener(eventName, { isRunning: true });
+      await baseListener(...args);
+      this.#decorateEventListener(eventName, { isRunning: false });
+    };
+
+    const eventListener = { listener, isRunning: false };
+
+    this.#eventListeners.set(eventName, eventListener);
 
     this.#ethersEventEmitter.on(this._toEthersEventName(eventName), listener);
   };
@@ -130,6 +149,19 @@ export class Subscription {
   // For testing purposes
   getEmitter = () => {
     return this.#ethersEventEmitter;
+  };
+
+  #decorateEventListener = (eventName, newArgs) => {
+    let eventListener = this.#eventListeners.get(eventName);
+
+    if (!eventListener) {
+      console.warn(`A listener for event '${eventName}' isn't registered.`);
+      return;
+    }
+
+    eventListener = { ...eventListener, ...newArgs };
+
+    this.#eventListeners.set(eventName, eventListener);
   };
 }
 

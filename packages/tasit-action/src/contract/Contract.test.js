@@ -159,8 +159,6 @@ describe("TasitAction.Contract", () => {
         const contractErrorListener = sinon.fake(error => {
           const { message } = error;
           console.info(message);
-
-          sampleContract.off("error");
         });
 
         sampleContract.on("error", contractErrorListener);
@@ -472,9 +470,7 @@ describe("TasitAction.Contract", () => {
     //  new difficultywise-longest well-formed blockchain which excludes one or more blocks that
     //  the client previously thought were part of the difficultywise-longest well-formed blockchain.
     //  These excluded blocks become orphans.
-    //
-    // Non-deterministic
-    it.skip("should emit error event when block reorganization occurs - tx confirmed twice", async () => {
+    it("should emit error event when block reorganization occurs - tx confirmed twice", async () => {
       const confirmationListener = sinon.fake();
       const errorFn = sinon.fake();
 
@@ -533,8 +529,7 @@ describe("TasitAction.Contract", () => {
       expect(actionId).to.have.lengthOf(66);
     });
 
-    // Non-deterministic
-    it.skip("should be able to listen to an event before sending", async () => {
+    it("should be able to listen to an event before sending", async () => {
       const confirmationListener = sinon.fake(async () => {
         action.off("confirmation");
       });
