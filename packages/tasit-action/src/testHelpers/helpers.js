@@ -55,25 +55,6 @@ const privateKeys = [
 ];
 export const accounts = privateKeys.map(createFromPrivateKey);
 
-export const waitForEthersEvent = async (eventEmitter, eventName, callback) => {
-  return new Promise((resolve, reject) => {
-    const config = ConfigLoader.getConfig();
-    const { events } = config;
-    const { timeout: EVENT_TIMEOUT } = events;
-
-    const timeout = setTimeout(() => {
-      reject(new Error("timeout"));
-    }, EVENT_TIMEOUT);
-
-    eventEmitter.on(eventName, (...args) => {
-      const event = args.pop();
-      callback(event);
-      clearTimeout(timeout);
-      resolve();
-    });
-  });
-};
-
 const mineOneBlock = async provider => {
   await provider.send("evm_increaseTime", [1]);
   await provider.send("evm_mine", []);
@@ -227,7 +208,6 @@ export const duration = {
 };
 
 export const helpers = {
-  waitForEthersEvent,
   mineBlocks,
   createSnapshot,
   revertFromSnapshot,

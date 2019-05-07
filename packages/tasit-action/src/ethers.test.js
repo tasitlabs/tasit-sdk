@@ -9,7 +9,7 @@ const {
 } = SampleContract;
 
 import ProviderFactory from "./ProviderFactory";
-import { accounts, waitForEthersEvent } from "./testHelpers/helpers";
+import { accounts } from "./testHelpers/helpers";
 
 const provider = ProviderFactory.getProvider();
 
@@ -67,55 +67,60 @@ describe("ethers.js", () => {
     expect(value).to.equal(rand);
   });
 
-  it("should watch contract's ValueChanged event", async () => {
-    const eventFakeFn = sinon.fake();
+  it("should watch contract's ValueChanged event", done => {
+    (async () => {
+      const oldValue = await sampleContract.getValue();
+      const newValue = `I like cats`;
 
-    const oldValue = await sampleContract.getValue();
-    const newValue = `I like cats`;
+      const timeout = setTimeout(() => {
+        done(new Error("timeout"));
+      }, 2000);
 
-    const listener = event => {
-      const {
-        author: eventAuthor,
-        oldValue: eventOldValue,
-        newValue: eventNewValue,
-      } = event.args;
+      const listener = (...args) => {
+        const event = args.pop();
+        const {
+          author: eventAuthor,
+          oldValue: eventOldValue,
+          newValue: eventNewValue,
+        } = event.args;
 
-      expect([eventAuthor, eventOldValue, eventNewValue]).to.deep.equal([
-        wallet.address,
-        oldValue,
-        newValue,
-      ]);
+        expect([eventAuthor, eventOldValue, eventNewValue]).to.deep.equal([
+          wallet.address,
+          oldValue,
+          newValue,
+        ]);
 
-      event.removeListener();
+        event.removeListener();
+        expect(sampleContract.listenerCount("ValueChanged")).to.equal(0);
+        expect(sampleContract.provider._events).to.be.empty;
+        clearTimeout(timeout);
+        done();
+      };
 
-      eventFakeFn();
-    };
+      sampleContract.on("ValueChanged", listener);
 
-    await sampleContract.setValue(newValue);
-
-    await waitForEthersEvent(sampleContract, "ValueChanged", listener);
-
-    expect(eventFakeFn.called).to.be.true;
-    expect(sampleContract.listenerCount("ValueChanged")).to.equal(0);
-    expect(sampleContract.provider._events).to.be.empty;
+      await sampleContract.setValue(newValue);
+    })();
   });
 
-  it("should remove listener using removeAllListeners function", async () => {
-    const eventFakeFn = sinon.fake();
+  it("should remove listener using removeAllListeners function", done => {
+    (async () => {
+      const timeout = setTimeout(() => {
+        done(new Error("timeout"));
+      }, 2000);
 
-    const listener = () => {
-      eventFakeFn();
-    };
+      const listener = () => {
+        sampleContract.removeAllListeners("ValueChanged");
+        expect(sampleContract.listenerCount("ValueChanged")).to.equal(0);
+        expect(sampleContract.provider._events).to.be.empty;
+        clearTimeout(timeout);
+        done();
+      };
 
-    await sampleContract.setValue("hello world");
+      sampleContract.on("ValueChanged", listener);
 
-    await waitForEthersEvent(sampleContract, "ValueChanged", listener);
-
-    sampleContract.removeAllListeners("ValueChanged");
-
-    expect(eventFakeFn.called).to.be.true;
-    expect(sampleContract.listenerCount("ValueChanged")).to.equal(0);
-    expect(sampleContract.provider._events).to.be.empty;
+      await sampleContract.setValue("hello world");
+    })();
   });
 
   describe("message signing", () => {
