@@ -334,45 +334,30 @@ describe("TasitAction.Contract", () => {
       expect(errorListener.called).to.be.false;
     });
 
-    // Non-deterministic test case
-    it.skip("should call error listener after timeout", async () => {
+    it("action should call error listener after timeout", done => {
       action = sampleContract.setValue("hello world");
       action.setEventsTimeout(100);
 
       const errorListener = sinon.fake(error => {
-        expect(error.eventName).to.equal("confirmation");
-        expect(error.message).to.equal("Event confirmation reached timeout.");
+        const { eventName, message } = error;
+        expect(eventName).to.equal("confirmation");
+        expect(message).to.equal("Event confirmation reached timeout.");
+        expect(action.subscribedEventNames()).to.deep.equal([
+          "error",
+          "confirmation",
+        ]);
         action.off("error");
+        action.off("confirmation");
+        done();
       });
 
-      const confirmationListener = sinon.fake(() => {
-        action.off("confirmation");
-      });
+      const confirmationListener = sinon.fake(() => {});
 
       action.on("confirmation", confirmationListener);
-
       action.on("error", errorListener);
 
-      await action.send();
-      await action.waitForOneConfirmation();
-
-      await mineBlocks(provider, 2);
-
-      // TODO: Use fake timer when Sinon/Lolex supports it.
-      // See more:
-      //  https://github.com/sinonjs/sinon/issues/1739
-      //  https://github.com/sinonjs/lolex/issues/114
-      //  https://stackoverflow.com/a/50785284
-      await wait(action.getEventsTimeout() * 5);
-
-      await mineBlocks(provider, 2);
-
-      expect(errorListener.callCount).to.equal(1);
-      expect(confirmationListener.callCount).to.equal(1);
-      expect(action.subscribedEventNames()).to.deep.equal([
-        "error",
-        "confirmation",
-      ]);
+      // Note: No time is necessary because no additional block will be mined
+      action.send();
     });
 
     it("subscription should have one listener per event", async () => {
@@ -622,6 +607,32 @@ describe("TasitAction.Contract", () => {
       sampleContract.on("error", errorListener);
       sampleContract.on("ValueChanged", valueChangedListener);
 
+      action.send();
+    });
+
+    it("contract should call error listener after timeout", done => {
+      sampleContract.setEventsTimeout(100);
+      action = sampleContract.setValue("hello world");
+
+      const errorListener = sinon.fake(error => {
+        const { eventName, message } = error;
+        expect(eventName).to.equal("ValueChanged");
+        expect(message).to.equal("Event ValueChanged reached timeout.");
+        expect(sampleContract.subscribedEventNames()).to.deep.equal([
+          "ValueChanged",
+          "error",
+        ]);
+        sampleContract.off("error");
+        sampleContract.off("ValueChanged");
+        done();
+      });
+
+      const confirmationListener = sinon.fake(() => {});
+
+      sampleContract.on("ValueChanged", confirmationListener);
+      sampleContract.on("error", errorListener);
+
+      // Note: No time is necessary because no additional block will be mined
       action.send();
     });
 
