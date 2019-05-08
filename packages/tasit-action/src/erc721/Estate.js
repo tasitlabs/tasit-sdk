@@ -5,7 +5,7 @@ const { EstateRegistry } = local;
 const { abi } = EstateRegistry;
 
 export default class DecentralandEstate extends Contract {
-  constructor(address, wallet) {
-    super(address, abi, wallet);
+  constructor(address, account) {
+    super(address, abi, account);
   }
 }

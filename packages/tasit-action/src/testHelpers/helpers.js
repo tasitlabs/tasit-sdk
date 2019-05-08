@@ -164,18 +164,23 @@ export const etherFaucet = async (
 
 export const erc20Faucet = async (
   tokenContract,
-  ownerWallet,
+  ownerAccount,
   toAddress,
   amountInWei
 ) => {
-  tokenContract.setWallet(ownerWallet);
+  tokenContract.setAccount(ownerAccount);
   const mintAction = tokenContract.mint(toAddress, `${amountInWei}`);
   await mintAction.send();
   await mintAction.waitForOneConfirmation();
 };
 
-const erc721Faucet = async (tokenContract, ownerWallet, toAddress, tokenId) => {
-  tokenContract.setWallet(ownerWallet);
+const erc721Faucet = async (
+  tokenContract,
+  ownerAccount,
+  toAddress,
+  tokenId
+) => {
+  tokenContract.setAccount(ownerAccount);
   const mintAction = tokenContract.mint(toAddress, tokenId);
   await mintAction.send();
   await mintAction.waitForOneConfirmation();

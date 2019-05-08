@@ -68,8 +68,8 @@ const { address: GNOSIS_SAFE_ADDRESS } = GnosisSafeInfo;
 
 ConfigLoader.setConfig(config);
 
-const [minterWallet, sellerWallet] = accounts;
-const { address: sellerAddress } = sellerWallet;
+const [minterAccount, sellerAccount] = accounts;
+const { address: sellerAddress } = sellerAccount;
 
 const manaContract = new Mana(MANA_ADDRESS);
 const landContract = new Land(LAND_PROXY_ADDRESS);
@@ -96,7 +96,7 @@ const cancelOrdersOfEstatesWithoutImage = async estatesIds => {
   // Note: Estate with 5 is one of the estates with blank image
   const blankImageData = await getImageDataFromEstateId(5);
 
-  marketplaceContract.setWallet(sellerWallet);
+  marketplaceContract.setAccount(sellerAccount);
   for (let id of estatesIds) {
     const imageData = await getImageDataFromEstateId(id);
 
@@ -122,7 +122,7 @@ const extractParcelsFromEstates = estates => {
 const updateParcelsData = async parcels => {
   console.info("Updating parcels with metadata...");
 
-  landContract.setWallet(sellerWallet);
+  landContract.setAccount(sellerAccount);
   for (let parcel of parcels) {
     let { x, y, metadata: parcelName } = parcel;
     console.info(`Setting metadata for parcel (${x},${y})...`);
@@ -158,7 +158,7 @@ const createParcels = async parcels => {
 
 const createParcel = async parcel => {
   const { x, y } = parcel;
-  landContract.setWallet(minterWallet);
+  landContract.setAccount(minterAccount);
   const action = landContract.assignNewParcel(`${x}`, `${y}`, sellerAddress);
   await action.send();
 
@@ -194,7 +194,7 @@ const createParcel = async parcel => {
 
 const createEstate = async estate => {
   const { metadata: estateName, parcels } = estate;
-  const { address: beneficiaryAddress } = sellerWallet;
+  const { address: beneficiaryAddress } = sellerAccount;
 
   let xArray = [];
   let yArray = [];
@@ -206,7 +206,7 @@ const createEstate = async estate => {
 
   console.info(`Creating estate (${xArray} - ${yArray})...`);
 
-  landContract.setWallet(sellerWallet);
+  landContract.setAccount(sellerAccount);
   const action = landContract.createEstateWithMetadata(
     xArray,
     yArray,
@@ -280,7 +280,7 @@ const approveMarketplace = async () => {
   // Set false to remove approval
   const authorized = true;
 
-  estateContract.setWallet(sellerWallet);
+  estateContract.setAccount(sellerAccount);
   const estateApproval = estateContract.setApprovalForAll(
     MARKETPLACE_ADDRESS,
     authorized
@@ -288,7 +288,7 @@ const approveMarketplace = async () => {
   await estateApproval.send();
   await estateApproval.waitForOneConfirmation();
 
-  landContract.setWallet(sellerWallet);
+  landContract.setAccount(sellerAccount);
   const landApproval = landContract.setApprovalForAll(
     MARKETPLACE_ADDRESS,
     authorized
@@ -332,7 +332,7 @@ const placeAssetSellOrder = async (nftAddress, assetId) => {
   const type = nftAddress == ESTATE_ADDRESS ? "estate" : "parcel";
   console.info(`placing sell order for the ${type} with id ${assetId}`);
 
-  marketplaceContract.setWallet(sellerWallet);
+  marketplaceContract.setAccount(sellerAccount);
   const action = marketplaceContract.createOrder(
     nftAddress,
     assetId,
@@ -394,10 +394,15 @@ const getParcelsFromAPI = async () => {
 
 (async () => {
   try {
-    // Fund Gnosis Safe wallet with Mana tokens and ethers
-    await etherFaucet(provider, minterWallet, GNOSIS_SAFE_ADDRESS, TEN);
+    // Fund Gnosis Safe account with Mana tokens and ethers
+    await etherFaucet(provider, minterAccount, GNOSIS_SAFE_ADDRESS, TEN);
     await expectExactEtherBalances(provider, [GNOSIS_SAFE_ADDRESS], [TEN]);
-    await erc20Faucet(manaContract, minterWallet, GNOSIS_SAFE_ADDRESS, BILLION);
+    await erc20Faucet(
+      manaContract,
+      minterAccount,
+      GNOSIS_SAFE_ADDRESS,
+      BILLION
+    );
     await expectExactTokenBalances(
       manaContract,
       [GNOSIS_SAFE_ADDRESS],

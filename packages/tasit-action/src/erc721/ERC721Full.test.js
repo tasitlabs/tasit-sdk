@@ -180,7 +180,7 @@ describe("TasitAction.ERC721.ERC721Full", () => {
 
       await action.waitForOneConfirmation();
 
-      erc721.setWallet(bob);
+      erc721.setAccount(bob);
       action = erc721.transferFrom(ana.address, bob.address, tokenId);
       await action.send();
 

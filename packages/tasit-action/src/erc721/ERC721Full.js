@@ -5,7 +5,7 @@ const { MyERC721Full } = local;
 const { abi } = MyERC721Full;
 
 export default class ERC721Full extends Contract {
-  constructor(address, wallet) {
-    super(address, abi, wallet);
+  constructor(address, account) {
+    super(address, abi, account);
   }
 }

@@ -192,10 +192,7 @@ export class Subscription {
   #decorateEventListener = (eventName, newArgs) => {
     let eventListener = this.#eventListeners.get(eventName);
 
-    if (!eventListener) {
-      console.warn(`A listener for event '${eventName}' isn't registered.`);
-      return;
-    }
+    if (!eventListener) return;
 
     eventListener = { ...eventListener, ...newArgs };
 
