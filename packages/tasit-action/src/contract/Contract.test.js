@@ -609,7 +609,8 @@ describe("TasitAction.Contract", () => {
       action.send();
     });
 
-    it("contract should call error listener after timeout", done => {
+    // Non-deterministic test
+    it.skip("contract should call error listener after timeout", done => {
       sampleContract.setEventsTimeout(100);
       action = sampleContract.setValue("hello world");
 
