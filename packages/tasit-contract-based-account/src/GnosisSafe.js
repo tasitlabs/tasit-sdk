@@ -150,7 +150,7 @@ export default class GnosisSafe extends Contract {
       etherValue
     );
     const provider = this._getProvider();
-    const signer = this.getWallet();
+    const signer = this.getAccount();
 
     const action = new Action(rawActionPromise, provider, signer);
     return action;

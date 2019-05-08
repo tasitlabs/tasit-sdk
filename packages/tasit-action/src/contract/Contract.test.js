@@ -18,7 +18,7 @@ const provider = ProviderFactory.getProvider();
 
 describe("TasitAction.Contract", () => {
   let sampleContract;
-  let wallet;
+  let account;
   let action;
 
   beforeEach("should connect to an existing contract", async () => {
@@ -27,10 +27,10 @@ describe("TasitAction.Contract", () => {
     }
 
     sampleContract = undefined;
-    wallet = undefined;
+    account = undefined;
     action = undefined;
 
-    [wallet] = accounts;
+    [account] = accounts;
 
     sampleContract = new Contract(SAMPLE_CONTRACT_ADDRESS, sampleContractABI);
     expect(sampleContract).to.exist;
@@ -99,28 +99,28 @@ describe("TasitAction.Contract", () => {
     expect(value).to.exist;
   });
 
-  describe("wallet/account setup tests", async () => {
-    it("should throw error when setting a wallet with no wallet argument", async () => {
+  describe("account setup tests", async () => {
+    it("should throw error when setting an account without argument", async () => {
       expect(() => {
-        sampleContract.setWallet();
+        sampleContract.setAccount();
       }).to.throw();
     });
 
-    it("should throw error when setting invalid wallet", async () => {
+    it("should throw error when setting invalid account", async () => {
       expect(() => {
-        sampleContract.setWallet("invalid wallet");
+        sampleContract.setAccount("invalid account");
       }).to.throw();
     });
 
-    it("should throw error when calling write method without account/wallet", async () => {
+    it("should throw error when calling write method without account", async () => {
       expect(() => {
         sampleContract.setValue("hello world");
       }).to.throw();
     });
 
-    it("should throw error when calling write method after account/wallet removal", async () => {
-      sampleContract.setWallet(wallet);
-      sampleContract.removeWallet();
+    it("should throw error when calling write method after account removal", async () => {
+      sampleContract.setAccount(account);
+      sampleContract.removeAccount();
       expect(() => {
         sampleContract.setValue("hello world");
       }).to.throw();
@@ -128,9 +128,9 @@ describe("TasitAction.Contract", () => {
   });
 
   describe("Contract errors behavior", async () => {
-    beforeEach("assign a wallet to the contract", () => {
+    beforeEach("assign an account to the contract", () => {
       expect(() => {
-        sampleContract.setWallet(wallet);
+        sampleContract.setAccount(account);
       }).not.to.throw();
     });
 
@@ -214,9 +214,9 @@ describe("TasitAction.Contract", () => {
   describe("Transactions (Actions) Subscription", async () => {
     let rand;
 
-    beforeEach("assign a wallet to the contract", () => {
+    beforeEach("assign an account to the contract", () => {
       expect(() => {
-        sampleContract.setWallet(wallet);
+        sampleContract.setAccount(account);
       }).not.to.throw();
 
       rand = Math.floor(Math.random() * Math.floor(1000)).toString();
@@ -565,9 +565,9 @@ describe("TasitAction.Contract", () => {
   });
 
   describe("Contract Events Subscription", async () => {
-    beforeEach("assign a wallet to the contract", () => {
+    beforeEach("assign an account to the contract", () => {
       expect(() => {
-        sampleContract.setWallet(wallet);
+        sampleContract.setAccount(account);
       }).not.to.throw();
     });
 

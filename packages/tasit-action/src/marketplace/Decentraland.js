@@ -5,7 +5,7 @@ const { Marketplace } = local;
 const { abi } = Marketplace;
 
 export default class Decentraland extends Contract {
-  constructor(address, wallet) {
-    super(address, abi, wallet);
+  constructor(address, account) {
+    super(address, abi, account);
   }
 }

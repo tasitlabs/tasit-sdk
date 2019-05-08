@@ -68,9 +68,9 @@ describe("GnosisSafe", () => {
     await expectExactTokenBalances(nft, [someoneAddress], [ZERO]);
 
     gnosisSafe.setSigners([]);
-    gnosisSafe.removeWallet();
-    erc20.removeWallet();
-    nft.removeWallet();
+    gnosisSafe.removeAccount();
+    erc20.removeAccount();
+    nft.removeAccount();
   });
 
   afterEach("", async () => {
@@ -84,7 +84,7 @@ describe("GnosisSafe", () => {
       const { address: toAddress } = someone;
 
       gnosisSafe.setSigners([gnosisSafeOwner]);
-      gnosisSafe.setWallet(gnosisSafeOwner);
+      gnosisSafe.setAccount(gnosisSafeOwner);
       const action = gnosisSafe.transferEther(toAddress, ONE);
       await action.send();
       await action.waitForOneConfirmation();
@@ -108,7 +108,7 @@ describe("GnosisSafe", () => {
           const newThreshold = `2`;
 
           gnosisSafe.setSigners([gnosisSafeOwner]);
-          gnosisSafe.setWallet(gnosisSafeOwner);
+          gnosisSafe.setAccount(gnosisSafeOwner);
           const action = gnosisSafe.addSignerWithThreshold(
             newSignerAddress,
             newThreshold
@@ -129,7 +129,7 @@ describe("GnosisSafe", () => {
         const { address: toAddress } = someone;
 
         gnosisSafe.setSigners([gnosisSafeOwner]);
-        gnosisSafe.setWallet(gnosisSafeOwner);
+        gnosisSafe.setAccount(gnosisSafeOwner);
         const action = gnosisSafe.transferEther(toAddress, ONE);
 
         const errorListener = sinon.fake(error => {
@@ -172,7 +172,7 @@ describe("GnosisSafe", () => {
       const { address: toAddress } = someone;
 
       gnosisSafe.setSigners([gnosisSafeOwner]);
-      gnosisSafe.setWallet(gnosisSafeOwner);
+      gnosisSafe.setAccount(gnosisSafeOwner);
       const action = gnosisSafe.transferERC20(tokenAddress, toAddress, ONE);
       await action.send();
       await action.waitForOneConfirmation();
@@ -198,7 +198,7 @@ describe("GnosisSafe", () => {
 
           const { address: toAddress } = someone;
 
-          gnosisSafe.setWallet(ephemeralAccount);
+          gnosisSafe.setAccount(ephemeralAccount);
           const action = erc20.transferFrom(
             GNOSIS_SAFE_ADDRESS,
             toAddress,
@@ -240,7 +240,7 @@ describe("GnosisSafe", () => {
             const { address: spenderAddress } = ephemeralAccount;
 
             gnosisSafe.setSigners([gnosisSafeOwner]);
-            gnosisSafe.setWallet(gnosisSafeOwner);
+            gnosisSafe.setAccount(gnosisSafeOwner);
             const action = gnosisSafe.approveERC20(
               tokenAddress,
               spenderAddress,
@@ -265,7 +265,7 @@ describe("GnosisSafe", () => {
           const balanceBefore = await erc20.balanceOf(GNOSIS_SAFE_ADDRESS);
           const { address: toAddress } = someone;
 
-          erc20.setWallet(ephemeralAccount);
+          erc20.setAccount(ephemeralAccount);
           const action = erc20.transferFrom(
             GNOSIS_SAFE_ADDRESS,
             toAddress,
@@ -303,7 +303,7 @@ describe("GnosisSafe", () => {
       const { address: toAddress } = someone;
 
       gnosisSafe.setSigners([gnosisSafeOwner]);
-      gnosisSafe.setWallet(gnosisSafeOwner);
+      gnosisSafe.setAccount(gnosisSafeOwner);
       const action = gnosisSafe.transferNFT(tokenAddress, toAddress, tokenId);
       await action.send();
       await action.waitForOneConfirmation();

@@ -5,7 +5,7 @@ const { MANAToken } = local;
 const { abi } = MANAToken;
 
 export default class Mana extends Contract {
-  constructor(address, wallet) {
-    super(address, abi, wallet);
+  constructor(address, account) {
+    super(address, abi, account);
   }
 }

@@ -49,7 +49,7 @@ describe("Decentraland App pre-conditions", () => {
     assetsForSale = await getAllAssetsForSale();
   });
 
-  describe("Gnosis Safe wallet", () => {
+  describe("Gnosis Safe account", () => {
     it("should have at least ten ethers", async () => {
       await expectMinimumEtherBalances(provider, [GNOSIS_SAFE_ADDRESS], [TEN]);
     });
@@ -59,7 +59,7 @@ describe("Decentraland App pre-conditions", () => {
     });
   });
 
-  describe("Gnosis Safe wallet owner", () => {
+  describe("Gnosis Safe account owner", () => {
     it("should have at least two ethers", async () => {
       const { address: gnosisSafeOwnerAddress } = gnosisSafeOwner;
       await expectMinimumEtherBalances(
