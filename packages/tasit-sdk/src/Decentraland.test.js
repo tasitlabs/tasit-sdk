@@ -973,6 +973,16 @@ describe("Decentraland", () => {
               );
 
               const confirmationListener = async () => {
+                // gnosisSafe approved ephemeral account
+                const ephemeralAllowance = await mana.allowance(
+                  GNOSIS_SAFE_ADDRESS,
+                  ephemeralAddress
+                );
+                expect(`${ephemeralAllowance}`).to.equal(
+                  `${manaAmountForShopping}`
+                );
+
+                // ephemeral account approved marketplace
                 const marketplaceAllowance = await mana.allowance(
                   ephemeralAddress,
                   MARKETPLACE_ADDRESS

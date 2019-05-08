@@ -84,7 +84,7 @@ export const checkAsset = async (
   nftContract,
   erc20Contract,
   assetForSale,
-  buyerAddress
+  ownerOfFunds
 ) => {
   const { MARKETPLACE_ADDRESS } = getContractsAddresses();
 
@@ -99,8 +99,8 @@ export const checkAsset = async (
   const nowInSeconds = Date.now() / 1000;
   expect(nowInSeconds).to.be.below(expiresTime);
 
-  // Buyer has enough MANA
-  await expectMinimumTokenBalances(erc20Contract, [buyerAddress], [priceInWei]);
+  // Buyer (or Owner of funds if buyer is approved) has enough MANA
+  await expectMinimumTokenBalances(erc20Contract, [ownerOfFunds], [priceInWei]);
 
   // Marketplace is approved to transfer Estate or Parcel asset owned by the seller
   const approvedForAsset = await nftContract.getApproved(assetId);

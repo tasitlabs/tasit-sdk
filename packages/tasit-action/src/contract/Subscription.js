@@ -36,17 +36,12 @@ export class Subscription {
     this.#eventListeners.delete(eventName);
   };
 
-  getEventsTimeout = () => {
+  getTimeout = () => {
     return this.#timeout;
   };
 
-  setEventsTimeout = timeout => {
+  setTimeout = timeout => {
     this.#timeout = timeout;
-  };
-
-  // TODO: Make protected
-  _setEventTimer = (eventName, timer) => {
-    this.#decorateEventListener(eventName, { timer });
   };
 
   // TODO: Make protected
@@ -160,8 +155,7 @@ export class Subscription {
         const eventListener = this.#eventListeners.get(eventName);
         const { lastEmissionTime } = eventListener;
         const currentTime = Date.now();
-        const timedOut =
-          currentTime - lastEmissionTime >= this.getEventsTimeout();
+        const timedOut = currentTime - lastEmissionTime >= this.getTimeout();
 
         if (timedOut) {
           this._emitErrorEventFromEventListener(
@@ -169,10 +163,9 @@ export class Subscription {
             eventName
           );
         }
-      }, this.getEventsTimeout());
+      }, this.getTimeout());
 
-      this._setEventTimer(eventName, timer);
-
+      this.#decorateEventListener(eventName, { timer });
       await baseListener(...args);
       this.#decorateEventListener(eventName, { isRunning: false });
     };
