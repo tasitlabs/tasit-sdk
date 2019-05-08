@@ -335,7 +335,7 @@ describe("TasitAction.Contract", () => {
 
     it("action should call error listener after timeout", done => {
       action = sampleContract.setValue("hello world");
-      action.setEventsTimeout(100);
+      action.setTimeout(100);
 
       const errorListener = sinon.fake(error => {
         const { eventName, message } = error;
@@ -611,7 +611,7 @@ describe("TasitAction.Contract", () => {
 
     // Non-deterministic test
     it.skip("contract should call error listener after timeout", done => {
-      sampleContract.setEventsTimeout(100);
+      sampleContract.setTimeout(100);
       action = sampleContract.setValue("hello world");
 
       const errorListener = sinon.fake(error => {
