@@ -1,6 +1,6 @@
 {
   "name": "tasit-link-wallet",
-  "version": "0.0.17",
+  "version": "0.0.18",
   "description": "Library for onboarding a user by linking a dapp with a wallet of their choosing.",
   "main": "dist/index.js",
   "keywords": [
@@ -35,6 +35,6 @@
     "@babel/register": "^7.4.0",
     "chai": "^4.2.0",
     "mocha": "^6.1.4",
-    "tasit-action": "^0.0.17"
+    "tasit-action": "^0.0.18"
   }
 }
