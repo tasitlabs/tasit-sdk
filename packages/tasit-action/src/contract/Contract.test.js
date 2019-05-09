@@ -355,7 +355,9 @@ describe("TasitAction.Contract", () => {
       action.on("confirmation", confirmationListener);
       action.on("error", errorListener);
 
-      // Note: No time is necessary because no additional block will be mined
+      // Note: Sending this triggers a block being mined,
+      // and since no additional blocks will be mined,
+      // the timeout will be reached before another confirmation occurs
       action.send();
     });
 
@@ -632,7 +634,9 @@ describe("TasitAction.Contract", () => {
       sampleContract.on("ValueChanged", confirmationListener);
       sampleContract.on("error", errorListener);
 
-      // Note: No time is necessary because no additional block will be mined
+      // Note: Sending this triggers a block being mined,
+      // and since no additional blocks will be mined,
+      // the timeout will be reached before another confirmation occurs
       action.send();
     });
 
