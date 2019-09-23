@@ -11,7 +11,7 @@
     "ganache-cli": "^6.4.3",
     "lerna": "^3.13.4",
     "prettier": "^1.17.0",
-    "prettier-plugin-solidity": "^1.0.0-alpha.22"
+    "prettier-plugin-solidity": "^1.0.0-alpha.34"
   },
   "scripts": {
     "clean:all": "npx lerna run clean --stream && npx lerna clean --yes && rm -rf ./node_modules",
