@@ -9,7 +9,7 @@
 
 ### Introduction
 
-The Tasit SDK is a JavaScript SDK for making mobile Ethereum dapps using React Native.
+The Tasit SDK is a JavaScript/TypeScript SDK for making mobile Ethereum dapps using React Native.
 
 Development of the Tasit SDK is supported in part by [Gnosis](https://github.com/gnosis/) through their [GECO](https://github.com/gnosis/GECO) grant initiative.
 
@@ -158,7 +158,7 @@ You might want to jump ahead to the "why" sections to start:
 
 #### A pub/sub API for Ethereum contracts perfect for optimistic updates
 
-The Tasit SDK provides JavaScript middleware for reading from and writing to smart contracts (and listening to events) through an expressive pub/sub API. Meta-transactions are a first-class feature of the API for interacting with contracts.
+The Tasit SDK provides JavaScript/TypeScript middleware for reading from and writing to smart contracts (and listening to events) through an expressive pub/sub API. Meta-transactions are a first-class feature of the API for interacting with contracts.
 
 As a mobile developer, using the Tasit SDK to interact with the backend should be as simple as using Firebase as a backend-as-a-service. This library is written in such a way that the developer using the SDK can just think about writing data and listening for more data. The fact that there's a blockchain powering this is an implementation detail that is abstracted away.
 
@@ -226,7 +226,7 @@ Have a strong opinion on which onboarding flow we should prioritize the most? Pl
 
 #### Advanced support for popular ERC standards and heavily used contracts
 
-Classes of smart contracts we support include [NFTs](http://erc721.org/), [TCRs](https://medium.com/@simondlr/city-walls-bo-taoshi-exploring-the-power-of-token-curated-registries-588f208c17d5), [DAOs](https://blog.aragon.org/bringing-daos-back-aragon-monthly-92756cb65639/), and two-sided marketplaces (like Gitcoin, CryptoCribs, Ethlance, etc.). There’s an ERC-standard-specific JavaScript API wrapping the lower-level Tasit SDK API for reading and writing and listening for data so that the function-names in the Tasit SDK are tailored to that type of dapp. As long as we’ve built the tooling to interact with that class of dapp at least once before, the Tasit SDK can “automagically” support any new dapp of that type.
+Classes of smart contracts we support include [NFTs](http://erc721.org/), [TCRs](https://medium.com/@simondlr/city-walls-bo-taoshi-exploring-the-power-of-token-curated-registries-588f208c17d5), [DAOs](https://blog.aragon.org/bringing-daos-back-aragon-monthly-92756cb65639/), and two-sided marketplaces (like Gitcoin, CryptoCribs, Ethlance, etc.). There’s an ERC-standard-specific JavaScript/TypeScript API wrapping the lower-level Tasit SDK API for reading and writing and listening for data so that the function-names in the Tasit SDK are tailored to that type of dapp. As long as we’ve built the tooling to interact with that class of dapp at least once before, the Tasit SDK can “automagically” support any new dapp of that type.
 
 [`tasit-action` is the child package](/packages/tasit-action/) that implements these features for the Tasit SDK.
 
