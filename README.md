@@ -344,4 +344,4 @@ We love getting feedback, so please feel free to reach out.
 
 - [Kanban board](https://github.com/orgs/tasitlabs/projects/1)
 
-- [Feature requests](https://tasit.canny.io/feature-requests)
+- [Feature requests](http://feedback.tasit.io/feature-requests)
