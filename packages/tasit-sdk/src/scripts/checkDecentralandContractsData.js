@@ -4,15 +4,36 @@
 // Note: This script is using mocha for convenience but isn't a test suite to be run by the `test` script.
 //
 
-import { Action, ContractBasedAccount } from "../TasitSdk";
+import { Action } from "../TasitSdk";
+import helpers from "../testHelpers/helpers";
+import DecentralandUtils from "../helpers/DecentralandUtils";
+
 const { ERC20 } = Action;
 const { Mana } = ERC20;
 
-import DecentralandUtils from "../helpers/DecentralandUtils";
+const {
+  constants,
+  expectMinimumEtherBalances,
+  expectMinimumTokenBalances,
+  addressesAreEqual,
+  accounts,
+  bigNumberify,
+  ProviderFactory,
+  getContractsAddresses,
+} = helpers;
 
 const fetch = require("node-fetch");
 
 const { TWO, TEN, BILLION, TOKEN_SUBDIVISIONS } = constants;
+
+const provider = ProviderFactory.getProvider();
+
+const {
+  MANA_ADDRESS,
+  LAND_PROXY_ADDRESS,
+  ESTATE_ADDRESS,
+  GNOSIS_SAFE_ADDRESS,
+} = getContractsAddresses();
 
 describe("Decentraland App pre-conditions", () => {
   const mana = new Mana(MANA_ADDRESS);
@@ -28,7 +49,7 @@ describe("Decentraland App pre-conditions", () => {
     assetsForSale = await getAllAssetsForSale();
   });
 
-  describe("Gnosis Safe wallet", () => {
+  describe("Gnosis Safe account", () => {
     it("should have at least ten ethers", async () => {
       await expectMinimumEtherBalances(provider, [GNOSIS_SAFE_ADDRESS], [TEN]);
     });
@@ -38,7 +59,7 @@ describe("Decentraland App pre-conditions", () => {
     });
   });
 
-  describe("Gnosis Safe wallet owner", () => {
+  describe("Gnosis Safe account owner", () => {
     it("should have at least two ethers", async () => {
       const { address: gnosisSafeOwnerAddress } = gnosisSafeOwner;
       await expectMinimumEtherBalances(
@@ -89,7 +110,7 @@ describe("Decentraland App pre-conditions", () => {
       const blankImageData = (await blankImage.buffer()).toString("base64");
 
       for (let asset of assetsForSale) {
-        const { id, assetId, nftAddress, priceInWei } = asset;
+        const { assetId, nftAddress, priceInWei } = asset;
         const price = bigNumberify(priceInWei);
 
         const isParcel = addressesAreEqual(nftAddress, LAND_PROXY_ADDRESS);

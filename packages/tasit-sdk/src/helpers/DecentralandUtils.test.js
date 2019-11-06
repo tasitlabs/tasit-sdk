@@ -1,19 +1,22 @@
 import { Account, Action } from "../TasitSdk";
-const { ConfigLoader, ERC20, ERC721, Marketplace } = Action;
-const { Mana } = ERC20;
-const { Estate, Land } = ERC721;
-const { Decentraland } = Marketplace;
+import helpers from "../testHelpers/helpers";
 import DecentralandUtils from "./DecentralandUtils";
+
+const { ERC721 } = Action;
+const { Estate, Land } = ERC721;
+
+const { accounts, getContractsAddresses } = helpers;
+
+const { LAND_ADDRESS, ESTATE_ADDRESS } = getContractsAddresses();
 
 // Note: This test suite assumes that all parcels and estates of SellerWallet are for sale
 // See more: `TasitSDk/packages/tasit-contracts/src/script/populateDecentralandContracts.js`
 describe("DecentralandUtils", () => {
-  const [minterWallet, sellerWallet] = accounts;
+  const [, sellerWallet] = accounts;
   let ephemeralWallet;
-  let mana;
   let land;
   let estate;
-  let marketplace;
+
   const decentralandUtils = new DecentralandUtils();
   const {
     getAllAssetsForSale,
@@ -29,10 +32,8 @@ describe("DecentralandUtils", () => {
   const isAssetAParcel = asset => asset.nftAddress === land.getAddress();
 
   beforeEach("", async () => {
-    mana = new Mana(MANA_ADDRESS);
-    land = new Land(LAND_PROXY_ADDRESS);
+    land = new Land(LAND_ADDRESS);
     estate = new Estate(ESTATE_ADDRESS);
-    marketplace = new Decentraland(MARKETPLACE_ADDRESS);
 
     ephemeralWallet = Account.create();
     ({ address: ephemeralAddress } = ephemeralWallet);
@@ -61,8 +62,6 @@ describe("DecentralandUtils", () => {
   });
 
   it("should get assets owned by an address", async () => {
-    const assetsForSale = await getAllAssetsForSale();
-
     const estateContractAddress = estate.getAddress();
 
     const sellerEstates = await _getEstatesOf(sellerAddress);

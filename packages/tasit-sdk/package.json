@@ -1,6 +1,6 @@
 {
   "name": "tasit-sdk",
-  "version": "0.0.17",
+  "version": "0.0.18",
   "description": "A JavaScript SDK for making mobile Ethereum dapps using React Native",
   "main": "dist/index.js",
   "keywords": [
@@ -25,19 +25,18 @@
     "test": "npm run setup:local && npm run mocha",
     "test:forked-testnet": "npm run setup:forked-ropsten && npm run mocha",
     "test:testnet": "npm run setup:ropsten && npm run mocha",
-    "mocha": "npx mocha \"src/**/*.test.js\"  --require @babel/register --file src/testHelpers/mochaSetup.js --no-timeouts",
-    "check:decentraland-data": "npx mocha src/scripts/checkDecentralandContractsData.js  --require @babel/register --file src/testHelpers/mochaSetup.js --no-timeouts",
-    "lint": "npx prettier src/* --write"
+    "mocha": "npx mocha \"src/**/*.test.js\"  --require @babel/register --file src/testHelpers/mochaSetup.js --timeouts 10000",
+    "check:decentraland-data": "npx mocha src/scripts/checkDecentralandContractsData.js  --require @babel/register --file src/testHelpers/mochaSetup.js --no-timeouts"
   },
   "bugs": {
     "url": "https://github.com/tasitlabs/tasitsdk/issues"
   },
   "dependencies": {
     "@babel/runtime": "^7.4.0",
-    "tasit-account": "^0.0.17",
-    "tasit-action": "^0.0.17",
-    "tasit-contract-based-account": "^0.0.17",
-    "tasit-contracts": "^0.0.17"
+    "tasit-account": "^0.0.18",
+    "tasit-action": "^0.0.18",
+    "tasit-contract-based-account": "^0.0.18",
+    "tasit-contracts": "^0.0.18"
   },
   "devDependencies": {
     "@babel/cli": "^7.2.3",
@@ -48,6 +47,6 @@
     "chai": "^4.2.0",
     "ethers": "^4.0.27",
     "mocha": "^6.1.4",
-    "node-fetch": "^2.3.0"
+    "node-fetch": "^2.5.0"
   }
 }

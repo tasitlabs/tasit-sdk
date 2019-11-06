@@ -29,7 +29,7 @@ Meta (a change that affects future changes to this repo)
 
 Technical debt (a code change that doesn't fix a bug or add a feature but makes something clearer for devs)
 
-Other (please describe below if you select "Other")
+##### Other (please describe below if you select "Other")
 
 ### Notes
 

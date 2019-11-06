@@ -4,6 +4,10 @@
   "description": "A monorepo for all npm packages in the Tasit ecosystem",
   "devDependencies": {
     "@babel/preset-env": "^7.4.1",
+    "babel-eslint": "^10.0.1",
+    "eslint": "^5.16.0",
+    "eslint-config-prettier": "^6.5.0",
+    "eslint-plugin-prettier": "^3.0.1",
     "ganache-cli": "^6.4.3",
     "lerna": "^3.13.4",
     "prettier": "^1.17.0",
@@ -15,14 +19,15 @@
     "bootstrap": "npx lerna bootstrap --hoist",
     "ganache:start:forked-ropsten": "npx ganache-cli --fork https://ropsten.infura.io --noVMErrorsOnRPCResponse true -m 'canal warfare equip auction crystal fossil helmet cash account joy inherit tank' --gasLimit 1000000000000 --host 0.0.0.0 > /dev/null 2>&1 &",
     "ganache:start:forked-goerli": "npx ganache-cli --fork https://goerli.infura.io/v3/974bd2e667b246f29d2589a59600530e --noVMErrorsOnRPCResponse true -m 'canal warfare equip auction crystal fossil helmet cash account joy inherit tank' --gasLimit 1000000000000 --host 0.0.0.0 > /dev/null 2>&1 &",
-    "ganache:start": "npx ganache-cli --noVMErrorsOnRPCResponse true -m 'canal warfare equip auction crystal fossil helmet cash account joy inherit tank' --gasLimit 1000000000 --host 0.0.0.0 > /dev/null 2>&1 &",
+    "ganache:start": "npx ganache-cli --noVMErrorsOnRPCResponse true -m 'canal warfare equip auction crystal fossil helmet cash account joy inherit tank' --gasLimit 1000000000 --host 0.0.0.0 > ganache-cli.log &",
     "ganache:stop": "kill `ps ax|grep ganache-cli|grep -v grep| awk '{print $1}'` 2> /dev/null; exit 0",
     "truffle:migrate": "npx lerna run migrate --scope tasit-contracts --stream",
     "prepare:blockchain": "npm run ganache:stop && npm run ganache:start && npm run truffle:migrate",
-    "pretest": "npm run prepare:blockchain",
+    "pretest": "npm run prepare:blockchain && npm run lint",
     "test": "npx lerna run test --stream --concurrency 1",
     "posttest": "npm run ganache:stop",
-    "start": "npm run clean:all && npm run bootstrap && npm run prepare:blockchain"
+    "start": "npm run clean:all && npm run bootstrap && npm run prepare:blockchain",
+    "lint": "npx prettier --write './packages/*/src/{*.js,**/*.js}' && npx eslint './packages/*/src/{*.js,**/*.js}'"
   },
   "repository": {
     "type": "git",

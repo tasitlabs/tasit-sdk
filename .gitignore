@@ -3,3 +3,4 @@
 lerna-debug.log
 **/dist/**/*
 *.tgz
+ganache-cli.log

@@ -2,45 +2,25 @@
 import { expect } from "chai";
 global.expect = expect;
 
-// Helpers
-import helpers from "./helpers";
-global = Object.assign(global, helpers);
-
+// Load config
 import { Action } from "../TasitSdk";
 const { ConfigLoader } = Action;
 import config from "../config/default";
 ConfigLoader.setConfig(config);
 
-const provider = ProviderFactory.getProvider();
-
-const { _network: network } = provider;
-const networkName = !network ? "local" : network.name;
-
-import TasitContracts from "tasit-contracts";
+// Helpers
+import helpers from "./helpers";
 const {
-  MANAToken,
-  LANDProxy,
-  EstateRegistry,
-  Marketplace,
-  GnosisSafe,
-} = TasitContracts[networkName];
-const { address: MANA_ADDRESS } = MANAToken;
-const { address: LAND_PROXY_ADDRESS } = LANDProxy;
-const { address: ESTATE_ADDRESS } = EstateRegistry;
-const { address: MARKETPLACE_ADDRESS } = Marketplace;
-const { address: GNOSIS_SAFE_ADDRESS } = GnosisSafe;
-global.MANA_ADDRESS = MANA_ADDRESS;
-global.LAND_PROXY_ADDRESS = LAND_PROXY_ADDRESS;
-global.ESTATE_ADDRESS = ESTATE_ADDRESS;
-global.MARKETPLACE_ADDRESS = MARKETPLACE_ADDRESS;
-global.GNOSIS_SAFE_ADDRESS = GNOSIS_SAFE_ADDRESS;
+  ProviderFactory,
+  createSnapshot,
+  revertFromSnapshot,
+  mineBlocks,
+} = helpers;
+
+const provider = ProviderFactory.getProvider();
 
 // Global hooks
 let snapshotId;
-
-before("global before() hook", async () => {
-  global.provider = provider;
-});
 
 beforeEach("global beforeEach() hook", async () => {
   snapshotId = await createSnapshot(provider);

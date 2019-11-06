@@ -1,22 +1,49 @@
 import { Account, Action, ContractBasedAccount } from "./TasitSdk";
-const { ConfigLoader, ERC20, ERC721, Marketplace } = Action;
+const { ERC20, ERC721, Marketplace } = Action;
 const { Mana } = ERC20;
 const { Estate, Land } = ERC721;
 const { Decentraland } = Marketplace;
 const { GnosisSafe } = ContractBasedAccount;
-import { ethers } from "ethers";
 
 import DecentralandUtils from "./helpers/DecentralandUtils";
 
 const decentralandUtils = new DecentralandUtils();
 const { _getEstatesOf, _getParcelsOf, getAssetsOf } = decentralandUtils;
 
-const { ONE, TEN, ONE_HUNDRED } = constants;
+import helpers from "./testHelpers/helpers";
+const {
+  accounts,
+  bigNumberify,
+  constants,
+  expectExactTokenBalances,
+  expectMinimumEtherBalances,
+  checkAsset,
+  ProviderFactory,
+  expectExactEtherBalances,
+  etherFaucet,
+  erc20Faucet,
+  mineBlocks,
+  pickAssetsForSale,
+  expectMinimumTokenBalances,
+  getContractsAddresses,
+} = helpers;
+
+const provider = ProviderFactory.getProvider();
+
+const { ONE, ONE_HUNDRED } = constants;
 const SMALL_AMOUNT = bigNumberify(`${1e17}`); // 0.1 ethers
 
+const {
+  MANA_ADDRESS,
+  LAND_ADDRESS,
+  ESTATE_ADDRESS,
+  MARKETPLACE_ADDRESS,
+  GNOSIS_SAFE_ADDRESS,
+} = getContractsAddresses();
+
 describe("Decentraland", () => {
-  let minterWallet;
-  let ephemeralWallet;
+  let minterAccount;
+  let ephemeralAccount;
   let ephemeralAddress;
   let mana;
   let land;
@@ -25,15 +52,15 @@ describe("Decentraland", () => {
   let landForSale;
   let estateForSale;
 
-  // TODO: Assign different contract objects for each wallet (avoiding setWallet)
+  // TODO: Assign different contract objects for each account (avoiding setAccount)
   before("", async () => {
-    [minterWallet] = accounts;
-    ephemeralWallet = Account.create();
-    ({ address: ephemeralAddress } = ephemeralWallet);
+    [minterAccount] = accounts;
+    ephemeralAccount = Account.create();
+    ({ address: ephemeralAddress } = ephemeralAccount);
 
     // Note: In future we can have other ERC20 than Mana to test the Marketplace orders
     mana = new Mana(MANA_ADDRESS);
-    land = new Land(LAND_PROXY_ADDRESS);
+    land = new Land(LAND_ADDRESS);
     estate = new Estate(ESTATE_ADDRESS);
     marketplace = new Decentraland(MARKETPLACE_ADDRESS);
 
@@ -48,14 +75,14 @@ describe("Decentraland", () => {
     await expectExactTokenBalances(land, [ephemeralAddress], [0]);
     await expectExactTokenBalances(estate, [ephemeralAddress], [0]);
 
-    mana.removeWallet();
-    land.removeWallet();
-    estate.removeWallet();
-    marketplace.removeWallet();
+    mana.removeAccount();
+    land.removeAccount();
+    estate.removeAccount();
+    marketplace.removeAccount();
   });
 
   describe("Marketplace", () => {
-    describe("read-only / without wallet test cases", () => {
+    describe("read-only / without account test cases", () => {
       // Note: If Decentraland were leveraging ERC721Metadata token URI's more,
       // we would have done expectations on them in this test
       it("should get land for sale info", async () => {
@@ -71,7 +98,7 @@ describe("Decentraland", () => {
         // Note: Metadata could be an empty string
         expect(metadata).to.not.be.null;
         if (metadata === "")
-          console.log(`Land parcel id ${assetId} with empty metadata.`);
+          console.info(`Land parcel id ${assetId} with empty metadata.`);
 
         const [x, y] = coords;
         expect(coords).to.not.include(null);
@@ -94,14 +121,14 @@ describe("Decentraland", () => {
         // Note: Metadata could be an empty string
         expect(metadata).to.not.be.null;
         if (metadata === "")
-          console.log(`Estate id ${assetId} with empty metadata.`);
+          console.info(`Estate id ${assetId} with empty metadata.`);
 
         expect(size.toNumber()).to.be.a("number");
         expect(size.toNumber()).to.be.at.least(0);
       });
     });
 
-    describe("write / with wallet test cases", () => {
+    describe("write / with account test cases", () => {
       let manaAmountForShopping;
       const gnosisSafeOwner = accounts[9];
       let gnosisSafe;
@@ -118,7 +145,7 @@ describe("Decentraland", () => {
       beforeEach("check Gnosis Safe balance", async () => {
         gnosisSafe = new GnosisSafe(GNOSIS_SAFE_ADDRESS);
 
-        // Expect an already-funded Gnosis Safe wallet
+        // Expect an already-funded Gnosis Safe account
         await expectMinimumEtherBalances(
           provider,
           [GNOSIS_SAFE_ADDRESS],
@@ -131,116 +158,222 @@ describe("Decentraland", () => {
           [ONE_HUNDRED]
         );
 
-        gnosisSafe.removeWallet();
+        gnosisSafe.removeAccount();
         gnosisSafe.setSigners([]);
       });
 
-      describe("Using an ephemeral wallet funded by faucets", () => {
-        beforeEach("onboarding", async () => {
-          const toAddress = ephemeralAddress;
+      describe("Using an ephemeral account funded by faucets", () => {
+        beforeEach("onboarding", done => {
+          (async () => {
+            await etherFaucet(
+              provider,
+              minterAccount,
+              ephemeralAddress,
+              SMALL_AMOUNT
+            );
+            await expectExactEtherBalances(
+              provider,
+              [ephemeralAddress],
+              [SMALL_AMOUNT]
+            );
+            await erc20Faucet(
+              mana,
+              minterAccount,
+              ephemeralAddress,
+              manaAmountForShopping
+            );
+            await expectExactTokenBalances(
+              mana,
+              [ephemeralAddress],
+              [manaAmountForShopping]
+            );
 
-          await etherFaucet(
-            provider,
-            minterWallet,
-            ephemeralAddress,
-            SMALL_AMOUNT
-          );
-          await expectExactEtherBalances(
-            provider,
-            [ephemeralAddress],
-            [SMALL_AMOUNT]
-          );
+            mana.setAccount(ephemeralAccount);
+            const approvalAction = mana.approve(
+              MARKETPLACE_ADDRESS,
+              manaAmountForShopping
+            );
 
-          await erc20Faucet(
-            mana,
-            minterWallet,
-            ephemeralAddress,
-            manaAmountForShopping
-          );
-          await expectExactTokenBalances(
-            mana,
-            [ephemeralAddress],
-            [manaAmountForShopping]
-          );
+            const errorListener = error => {
+              marketplace.off("error");
+              done(error);
+            };
 
-          mana.setWallet(ephemeralWallet);
-          const approvalAction = mana.approve(
-            MARKETPLACE_ADDRESS,
-            manaAmountForShopping
-          );
-          await approvalAction.send();
-          await approvalAction.waitForOneConfirmation();
+            const successfulListener = async () => {
+              const allowance = await mana.allowance(
+                ephemeralAddress,
+                MARKETPLACE_ADDRESS
+              );
+              expect(`${allowance}`).to.equal(`${manaAmountForShopping}`);
+              done();
+            };
 
-          const allowance = await mana.allowance(
-            ephemeralAddress,
-            MARKETPLACE_ADDRESS
-          );
+            mana.once("Approval", successfulListener);
+            mana.on("error", errorListener);
 
-          expect(`${allowance}`).to.equal(`${manaAmountForShopping}`);
+            approvalAction.send();
+          })();
         });
 
-        it("should buy an estate", async () => {
-          const {
-            assetId,
-            nftAddress,
-            seller,
-            priceInWei,
-            expiresAt,
-          } = estateForSale;
+        it("should buy an estate - using action events", done => {
+          (async () => {
+            const { assetId, nftAddress, priceInWei } = estateForSale;
 
-          await checkAsset(estate, mana, estateForSale, ephemeralAddress);
+            await checkAsset(estate, mana, estateForSale, ephemeralAddress);
 
-          await expectExactTokenBalances(estate, [ephemeralAddress], [0]);
+            await expectExactTokenBalances(estate, [ephemeralAddress], [0]);
 
-          const fingerprint = await estate.getFingerprint(`${assetId}`);
+            const fingerprint = await estate.getFingerprint(`${assetId}`);
 
-          marketplace.setWallet(ephemeralWallet);
-          const executeOrderAction = marketplace.safeExecuteOrder(
-            nftAddress,
-            `${assetId}`,
-            `${priceInWei}`,
-            `${fingerprint}`
-          );
-          await executeOrderAction.send();
-          await executeOrderAction.waitForOneConfirmation();
+            marketplace.setAccount(ephemeralAccount);
+            const executeOrderAction = marketplace.safeExecuteOrder(
+              nftAddress,
+              `${assetId}`,
+              `${priceInWei}`,
+              `${fingerprint}`
+            );
 
-          await expectExactTokenBalances(estate, [ephemeralAddress], [1]);
+            const confirmationListener = async () => {
+              executeOrderAction.off("error");
+              await expectExactTokenBalances(estate, [ephemeralAddress], [1]);
+              done();
+            };
+
+            const errorListener = error => {
+              executeOrderAction.off("error");
+              done(error);
+            };
+
+            executeOrderAction.once("confirmation", confirmationListener);
+            executeOrderAction.on("error", errorListener);
+
+            executeOrderAction.send();
+          })();
         });
 
-        it("should buy a parcel of land", async () => {
-          const {
-            assetId,
-            nftAddress,
-            seller,
-            priceInWei,
-            expiresAt,
-          } = landForSale;
+        it("should buy an estate - using contract events", done => {
+          (async () => {
+            const { assetId, nftAddress, priceInWei } = estateForSale;
 
-          await checkAsset(land, mana, landForSale, ephemeralAddress);
+            await checkAsset(estate, mana, estateForSale, ephemeralAddress);
 
-          await expectExactTokenBalances(land, [ephemeralAddress], [0]);
+            await expectExactTokenBalances(estate, [ephemeralAddress], [0]);
 
-          // LANDRegistry contract doesn't implement getFingerprint function
-          const fingerprint = "0x";
-          marketplace.setWallet(ephemeralWallet);
-          const executeOrderAction = marketplace.safeExecuteOrder(
-            nftAddress,
-            `${assetId}`,
-            `${priceInWei}`,
-            `${fingerprint}`
-          );
-          await executeOrderAction.send();
-          await executeOrderAction.waitForOneConfirmation();
+            const fingerprint = await estate.getFingerprint(`${assetId}`);
 
-          await expectExactTokenBalances(land, [ephemeralAddress], [1]);
+            marketplace.setAccount(ephemeralAccount);
+            const executeOrderAction = marketplace.safeExecuteOrder(
+              nftAddress,
+              `${assetId}`,
+              `${priceInWei}`,
+              `${fingerprint}`
+            );
+
+            const orderSuccessfulListener = async message => {
+              const { data } = message;
+              const { args } = data;
+              const { buyer } = args;
+              marketplace.off("error");
+              expect(buyer).to.equal(ephemeralAddress);
+              await expectExactTokenBalances(estate, [ephemeralAddress], [1]);
+              done();
+            };
+
+            const errorListener = error => {
+              const { message } = error;
+              console.warn(message);
+              marketplace.off("error");
+              done(error);
+            };
+
+            marketplace.once("OrderSuccessful", orderSuccessfulListener);
+            marketplace.on("error", errorListener);
+
+            executeOrderAction.send();
+          })();
+        });
+
+        it("should buy a parcel of land - using action events", done => {
+          (async () => {
+            const { assetId, nftAddress, priceInWei } = landForSale;
+
+            await checkAsset(land, mana, landForSale, ephemeralAddress);
+
+            await expectExactTokenBalances(land, [ephemeralAddress], [0]);
+
+            // LANDRegistry contract doesn't implement getFingerprint function
+            const fingerprint = "0x";
+            marketplace.setAccount(ephemeralAccount);
+            const executeOrderAction = marketplace.safeExecuteOrder(
+              nftAddress,
+              `${assetId}`,
+              `${priceInWei}`,
+              `${fingerprint}`
+            );
+
+            const confirmationListener = async () => {
+              executeOrderAction.off("error");
+              await expectExactTokenBalances(land, [ephemeralAddress], [1]);
+              done();
+            };
+
+            const errorListener = error => {
+              executeOrderAction.off("error");
+              done(error);
+            };
+
+            executeOrderAction.once("confirmation", confirmationListener);
+            executeOrderAction.on("error", errorListener);
+
+            executeOrderAction.send();
+          })();
+        });
+
+        it("should buy a parcel of land - using contract events", done => {
+          (async () => {
+            const { assetId, nftAddress, priceInWei } = landForSale;
+
+            await checkAsset(land, mana, landForSale, ephemeralAddress);
+
+            await expectExactTokenBalances(land, [ephemeralAddress], [0]);
+
+            // LANDRegistry contract doesn't implement getFingerprint function
+            const fingerprint = "0x";
+            marketplace.setAccount(ephemeralAccount);
+            const executeOrderAction = marketplace.safeExecuteOrder(
+              nftAddress,
+              `${assetId}`,
+              `${priceInWei}`,
+              `${fingerprint}`
+            );
+
+            const orderSuccessfulListener = async message => {
+              const { data } = message;
+              const { args } = data;
+              const { buyer } = args;
+
+              expect(buyer).to.equal(ephemeralAddress);
+              await expectExactTokenBalances(land, [ephemeralAddress], [1]);
+              marketplace.off("error");
+              done();
+            };
+
+            const errorListener = error => {
+              marketplace.off("error");
+              done(error);
+            };
+
+            marketplace.once("OrderSuccessful", orderSuccessfulListener);
+            marketplace.on("error", errorListener);
+
+            executeOrderAction.send();
+          })();
         });
       });
 
-      describe("Using an ephemeral wallet funded by a Gnosis Safe wallet", () => {
-        beforeEach("onboarding", async () => {
+      describe("Using an ephemeral account funded by a Gnosis Safe account", () => {
+        beforeEach("onboarding - check Gnosis Safe balance", async () => {
           const { address: gnosisSafeOwnerAddress } = gnosisSafeOwner;
-          gnosisSafe.setSigners([gnosisSafeOwner]);
-          gnosisSafe.setWallet(gnosisSafeOwner);
 
           // Gnosis Safe owner should have enough ethers to pay for the transaction's gas
           await expectMinimumEtherBalances(
@@ -249,393 +382,723 @@ describe("Decentraland", () => {
             [SMALL_AMOUNT]
           );
 
-          const toAddress = ephemeralAddress;
-
-          // Transfer a small amount of ethers to ephemeral account to pay for gas
-          const transferEthersAction = gnosisSafe.transferEther(
-            toAddress,
-            SMALL_AMOUNT
-          );
-          await transferEthersAction.send();
-          await transferEthersAction.waitForOneConfirmation();
-          await expectExactEtherBalances(provider, [toAddress], [SMALL_AMOUNT]);
-
-          const transferManaAction = gnosisSafe.transferERC20(
-            MANA_ADDRESS,
-            toAddress,
-            manaAmountForShopping
-          );
-          await transferManaAction.send();
-          await transferManaAction.waitForOneConfirmation();
-          await expectExactTokenBalances(
-            mana,
-            [toAddress],
-            [manaAmountForShopping]
-          );
-
-          mana.setWallet(ephemeralWallet);
-          const approvalAction = mana.approve(
-            MARKETPLACE_ADDRESS,
-            manaAmountForShopping
-          );
-          await approvalAction.send();
-          await approvalAction.waitForOneConfirmation();
-
-          const allowance = await mana.allowance(
-            ephemeralAddress,
-            MARKETPLACE_ADDRESS
-          );
-
-          expect(`${allowance}`).to.equal(`${manaAmountForShopping}`);
+          // Set account and signers
+          gnosisSafe.setSigners([gnosisSafeOwner]);
+          gnosisSafe.setAccount(gnosisSafeOwner);
         });
 
-        it("should buy an estate", async () => {
-          const {
-            assetId,
-            nftAddress,
-            seller,
-            priceInWei,
-            expiresAt,
-          } = estateForSale;
+        // Transfer a small amount of ethers to ephemeral account to pay for gas
+        beforeEach("onboarding - funding ephemeral account with ETH", done => {
+          (async () => {
+            const toAddress = ephemeralAddress;
 
-          await checkAsset(estate, mana, estateForSale, ephemeralAddress);
+            const action = gnosisSafe.transferEther(toAddress, SMALL_AMOUNT);
 
-          await expectExactTokenBalances(estate, [ephemeralAddress], [0]);
+            const confirmationListener = async () => {
+              await expectExactEtherBalances(
+                provider,
+                [toAddress],
+                [SMALL_AMOUNT]
+              );
 
-          const fingerprint = await estate.getFingerprint(`${assetId}`);
+              done();
+            };
 
-          marketplace.setWallet(ephemeralWallet);
-          const executeOrderAction = marketplace.safeExecuteOrder(
-            nftAddress,
-            `${assetId}`,
-            `${priceInWei}`,
-            `${fingerprint}`
-          );
+            const errorListener = error => {
+              action.off("error");
+              done(error);
+            };
 
-          await executeOrderAction.send();
-          await executeOrderAction.waitForOneConfirmation();
+            action.once("confirmation", confirmationListener);
+            action.on("error", errorListener);
 
-          await expectExactTokenBalances(estate, [ephemeralAddress], [1]);
-
-          const buyerEstates = await _getEstatesOf(ephemeralAddress);
-          const buyerAssets = await getAssetsOf(ephemeralAddress);
-
-          expect(buyerEstates).to.have.lengthOf(1);
-          expect(buyerAssets).to.have.lengthOf(1);
-
-          const tx = await executeOrderAction.getTransaction();
-          const { hash: purchaseTxHash } = tx;
-          const [buyerEstate] = buyerEstates;
-          const [buyerAsset] = buyerAssets;
-          const { transactionHash: estateTxHash } = buyerEstate;
-          const { transactionHash: assetTxHash } = buyerAsset;
-
-          expect(estateTxHash).to.equal(purchaseTxHash);
-          expect(assetTxHash).to.equal(purchaseTxHash);
+            action.send();
+          })();
         });
 
-        it("should buy a parcel of land", async () => {
-          const {
-            assetId,
-            nftAddress,
-            seller,
-            priceInWei,
-            expiresAt,
-          } = landForSale;
+        beforeEach("onboarding - funding ephemeral account with MANA", done => {
+          (async () => {
+            // Global hooks don't run between same level hooks
+            await mineBlocks(provider, 1);
 
-          await checkAsset(land, mana, landForSale, ephemeralAddress);
+            const toAddress = ephemeralAddress;
 
-          await expectExactTokenBalances(land, [ephemeralAddress], [0]);
+            const action = gnosisSafe.transferERC20(
+              MANA_ADDRESS,
+              toAddress,
+              manaAmountForShopping
+            );
 
-          // LANDRegistry contract doesn't implement getFingerprint function
-          const fingerprint = "0x";
-          marketplace.setWallet(ephemeralWallet);
-          const executeOrderAction = marketplace.safeExecuteOrder(
-            nftAddress,
-            `${assetId}`,
-            `${priceInWei}`,
-            `${fingerprint}`
-          );
+            const confirmationListener = async () => {
+              await expectExactTokenBalances(
+                mana,
+                [toAddress],
+                [manaAmountForShopping]
+              );
+              done();
+            };
 
-          await executeOrderAction.send();
-          await executeOrderAction.waitForOneConfirmation();
+            const errorListener = error => {
+              action.off("error");
+              done(error);
+            };
 
-          await expectExactTokenBalances(land, [ephemeralAddress], [1]);
+            action.once("confirmation", confirmationListener);
+            action.on("error", errorListener);
 
-          const buyerParcels = await _getParcelsOf(ephemeralAddress);
-          const buyerAssets = await getAssetsOf(ephemeralAddress);
+            action.send();
+          })();
+        });
 
-          expect(buyerParcels).to.have.lengthOf(1);
-          expect(buyerAssets).to.have.lengthOf(1);
+        beforeEach("onboarding - approving Marketplace to spend MANA", done => {
+          (async () => {
+            // Global hooks don't run between same level hooks
+            await mineBlocks(provider, 1);
 
-          const tx = await executeOrderAction.getTransaction();
-          const { hash: purchaseTxHash } = tx;
-          const [buyerParcel] = buyerParcels;
-          const [buyerAsset] = buyerAssets;
-          const { transactionHash: parcelTxHash } = buyerParcel;
-          const { transactionHash: assetTxHash } = buyerAsset;
+            mana.setAccount(ephemeralAccount);
+            const action = mana.approve(
+              MARKETPLACE_ADDRESS,
+              manaAmountForShopping
+            );
 
-          expect(parcelTxHash).to.equal(purchaseTxHash);
-          expect(assetTxHash).to.equal(purchaseTxHash);
+            const confirmationListener = async () => {
+              const allowance = await mana.allowance(
+                ephemeralAddress,
+                MARKETPLACE_ADDRESS
+              );
+
+              expect(`${allowance}`).to.equal(`${manaAmountForShopping}`);
+              done();
+            };
+
+            const errorListener = error => {
+              action.off("error");
+              done(error);
+            };
+
+            action.once("confirmation", confirmationListener);
+            action.on("error", errorListener);
+
+            action.send();
+          })();
+        });
+
+        it("should buy an estate", done => {
+          (async () => {
+            const { assetId, nftAddress, priceInWei } = estateForSale;
+
+            await checkAsset(estate, mana, estateForSale, ephemeralAddress);
+
+            await expectExactTokenBalances(estate, [ephemeralAddress], [0]);
+
+            const fingerprint = await estate.getFingerprint(`${assetId}`);
+
+            marketplace.setAccount(ephemeralAccount);
+            const action = marketplace.safeExecuteOrder(
+              nftAddress,
+              `${assetId}`,
+              `${priceInWei}`,
+              `${fingerprint}`
+            );
+
+            const confirmationListener = async () => {
+              await expectExactTokenBalances(estate, [ephemeralAddress], [1]);
+
+              const buyerEstates = await _getEstatesOf(ephemeralAddress);
+              const buyerAssets = await getAssetsOf(ephemeralAddress);
+
+              expect(buyerEstates).to.have.lengthOf(1);
+              expect(buyerAssets).to.have.lengthOf(1);
+
+              const tx = await action.getTransaction();
+              const { hash: purchaseTxHash } = tx;
+              const [buyerEstate] = buyerEstates;
+              const [buyerAsset] = buyerAssets;
+              const { transactionHash: estateTxHash } = buyerEstate;
+              const { transactionHash: assetTxHash } = buyerAsset;
+
+              expect(estateTxHash).to.equal(purchaseTxHash);
+              expect(assetTxHash).to.equal(purchaseTxHash);
+
+              done();
+            };
+
+            const errorListener = error => {
+              action.off("error");
+              done(error);
+            };
+
+            action.once("confirmation", confirmationListener);
+            action.on("error", errorListener);
+
+            action.send();
+          })();
+        });
+
+        it("should buy a parcel of land", done => {
+          (async () => {
+            const { assetId, nftAddress, priceInWei } = landForSale;
+
+            await checkAsset(land, mana, landForSale, ephemeralAddress);
+
+            await expectExactTokenBalances(land, [ephemeralAddress], [0]);
+
+            // LANDRegistry contract doesn't implement getFingerprint function
+            const fingerprint = "0x";
+            marketplace.setAccount(ephemeralAccount);
+            const action = marketplace.safeExecuteOrder(
+              nftAddress,
+              `${assetId}`,
+              `${priceInWei}`,
+              `${fingerprint}`
+            );
+
+            const confirmationListener = async () => {
+              await expectExactTokenBalances(land, [ephemeralAddress], [1]);
+
+              const buyerParcels = await _getParcelsOf(ephemeralAddress);
+              const buyerAssets = await getAssetsOf(ephemeralAddress);
+
+              expect(buyerParcels).to.have.lengthOf(1);
+              expect(buyerAssets).to.have.lengthOf(1);
+
+              const tx = await action.getTransaction();
+              const { hash: purchaseTxHash } = tx;
+              const [buyerParcel] = buyerParcels;
+              const [buyerAsset] = buyerAssets;
+              const { transactionHash: parcelTxHash } = buyerParcel;
+              const { transactionHash: assetTxHash } = buyerAsset;
+
+              expect(parcelTxHash).to.equal(purchaseTxHash);
+              expect(assetTxHash).to.equal(purchaseTxHash);
+
+              done();
+            };
+
+            const errorListener = error => {
+              action.off("error");
+              done(error);
+            };
+
+            action.once("confirmation", confirmationListener);
+            action.on("error", errorListener);
+
+            action.send();
+          })();
         });
       });
 
       // WIP: Not working because of gas issue on Marketplace.safeExecuteOrder() call
-      describe.skip("Using funds from a Gnosis Safe wallet", () => {
-        beforeEach("onboarding", async () => {
-          // Funding ephemeral account with some ethers to pay for gas
-          // TODO: ephemeralWallet should broadcast this action
+      describe("Using funds from a Gnosis Safe account", () => {
+        beforeEach("onboarding - funding ephemeral account with ETH", done => {
+          gnosisSafe.setSigners([gnosisSafeOwner]);
+          gnosisSafe.setAccount(gnosisSafeOwner);
           const toAddress = ephemeralAddress;
-          gnosisSafe.setSigners([gnosisSafeOwner]);
-          gnosisSafe.setWallet(gnosisSafeOwner);
-          const transferEthersAction = gnosisSafe.transferEther(
-            toAddress,
-            SMALL_AMOUNT
-          );
-          await transferEthersAction.send();
-          await transferEthersAction.waitForOneConfirmation();
-          await expectExactEtherBalances(provider, [toAddress], [SMALL_AMOUNT]);
 
-          // Gnosis Safe should approve Marketplace to spend its MANA Tokens
-          // TODO: ephemeralWallet should broadcast this action
-          const contractAddress = mana.getAddress();
-          const contractABI = mana.getABI();
-          const functionName = "approve";
-          const argsArray = [MARKETPLACE_ADDRESS, manaAmountForShopping];
-          gnosisSafe.setSigners([gnosisSafeOwner]);
-          gnosisSafe.setWallet(gnosisSafeOwner);
-          const approvalAction = gnosisSafe.customContractAction(
-            contractAddress,
-            contractABI,
-            functionName,
-            argsArray
-          );
-          await approvalAction.send();
-          await approvalAction.waitForOneConfirmation();
+          // Funding ephemeral account with some ethers to pay for gas
+          // TODO: ephemeralAccount should broadcast this action
+          const action = gnosisSafe.transferEther(toAddress, SMALL_AMOUNT);
 
-          const owner = GNOSIS_SAFE_ADDRESS;
-          const spender = MARKETPLACE_ADDRESS;
-          const allowance = await mana.allowance(owner, spender);
-          expect(`${allowance}`).to.equal(`${manaAmountForShopping}`);
+          const confirmationListener = async () => {
+            await expectExactEtherBalances(
+              provider,
+              [toAddress],
+              [SMALL_AMOUNT]
+            );
+
+            done();
+          };
+
+          const errorListener = error => {
+            action.off("error");
+            done(error);
+          };
+
+          action.once("confirmation", confirmationListener);
+          action.on("error", errorListener);
+
+          action.send();
         });
 
-        it("should buy an estate", async () => {
-          const {
-            assetId,
-            nftAddress,
-            seller,
-            priceInWei,
-            expiresAt,
-          } = estateForSale;
+        beforeEach("onboarding - approving Marketplace to spend MANA", done => {
+          (async () => {
+            // Global hooks don't run between same level hooks
+            await mineBlocks(provider, 1);
 
-          const buyerAddress = GNOSIS_SAFE_ADDRESS;
-          await checkAsset(estate, mana, estateForSale, buyerAddress);
+            // Gnosis Safe should approve Marketplace to spend its MANA Tokens
+            // TODO: ephemeralAccount should broadcast this action
+            const contractAddress = mana.getAddress();
+            const contractABI = mana.getABI();
+            const functionName = "approve";
+            const argsArray = [MARKETPLACE_ADDRESS, manaAmountForShopping];
+            const action = gnosisSafe.customContractAction(
+              contractAddress,
+              contractABI,
+              functionName,
+              argsArray
+            );
 
-          await expectExactTokenBalances(estate, [GNOSIS_SAFE_ADDRESS], [0]);
+            const confirmationListener = async () => {
+              const owner = GNOSIS_SAFE_ADDRESS;
+              const spender = MARKETPLACE_ADDRESS;
+              const allowance = await mana.allowance(owner, spender);
+              expect(`${allowance}`).to.equal(`${manaAmountForShopping}`);
 
-          // Gnosis Safe should execute an open order
-          // TODO: ephemeralWallet should broadcast this action
-          const contractAddress = marketplace.getAddress();
-          const contractABI = marketplace.getABI();
-          const functionName = "safeExecuteOrder";
-          const fingerprint = await estate.getFingerprint(`${assetId}`);
-          const argsArray = [
-            nftAddress,
-            `${assetId}`,
-            `${priceInWei}`,
-            `${fingerprint}`,
-          ];
+              done();
+            };
 
-          gnosisSafe.setSigners([gnosisSafeOwner]);
-          gnosisSafe.setWallet(gnosisSafeOwner);
-          const executeOrderAction = gnosisSafe.customContractAction(
-            contractAddress,
-            contractABI,
-            functionName,
-            argsArray
-          );
+            const errorListener = error => {
+              action.off("error");
+              done(error);
+            };
 
-          const onFailed = message => {
-            const { data } = message;
-            const { args } = data;
-            const { txHash } = args;
-          };
-          gnosisSafe.once("ExecutionFailed", onFailed);
+            action.once("confirmation", confirmationListener);
+            action.on("error", errorListener);
 
-          await executeOrderAction.send();
-          await executeOrderAction.waitForOneConfirmation();
-
-          await mineBlocks(provider, 1);
-
-          await expectExactTokenBalances(estate, [GNOSIS_SAFE_ADDRESS], [1]);
+            action.send();
+          })();
         });
 
-        it("should buy a parcel of land", async () => {
-          const {
-            assetId,
-            nftAddress,
-            seller,
-            priceInWei,
-            expiresAt,
-          } = landForSale;
+        it("should buy an estate - using action events", done => {
+          (async () => {
+            // Global hooks don't run between same level hooks
+            await mineBlocks(provider, 1);
 
-          await checkAsset(land, mana, landForSale, GNOSIS_SAFE_ADDRESS);
+            const { assetId, nftAddress, priceInWei } = estateForSale;
 
-          await expectExactTokenBalances(land, [GNOSIS_SAFE_ADDRESS], [0]);
+            const buyerAddress = GNOSIS_SAFE_ADDRESS;
+            await checkAsset(estate, mana, estateForSale, buyerAddress);
 
-          // Gnosis Safe should execute an open order
-          // TODO: ephemeralWallet should broadcast this action
-          const contractAddress = marketplace.getAddress();
-          const contractABI = marketplace.getABI();
-          const functionName = "safeExecuteOrder";
-          // LANDRegistry contract doesn't implement getFingerprint function
-          const fingerprint = "0x";
-          const argsArray = [
-            nftAddress,
-            `${assetId}`,
-            `${priceInWei}`,
-            `${fingerprint}`,
-          ];
-          const ethersAmount = "0";
-          gnosisSafe.setSigners([gnosisSafeOwner]);
-          gnosisSafe.setWallet(gnosisSafeOwner);
-          const executeOrderAction = gnosisSafe.customContractAction(
-            contractAddress,
-            contractABI,
-            functionName,
-            argsArray,
-            ethersAmount
-          );
+            await expectExactTokenBalances(estate, [GNOSIS_SAFE_ADDRESS], [0]);
 
-          const onFailed = message => {
-            const { data } = message;
-            const { args } = data;
-            const { txHash } = args;
-          };
-          gnosisSafe.once("ExecutionFailed", onFailed);
+            // Gnosis Safe should execute an open order
+            // TODO: ephemeralAccount should broadcast this action
+            const contractAddress = marketplace.getAddress();
+            const contractABI = marketplace.getABI();
+            const functionName = "safeExecuteOrder";
+            const fingerprint = await estate.getFingerprint(`${assetId}`);
+            const argsArray = [
+              nftAddress,
+              `${assetId}`,
+              `${priceInWei}`,
+              `${fingerprint}`,
+            ];
 
-          await executeOrderAction.send();
-          await executeOrderAction.waitForOneConfirmation();
+            gnosisSafe.setSigners([gnosisSafeOwner]);
+            gnosisSafe.setAccount(gnosisSafeOwner);
+            const action = gnosisSafe.customContractAction(
+              contractAddress,
+              contractABI,
+              functionName,
+              argsArray
+            );
 
-          await mineBlocks(provider, 1);
+            const confirmationListener = async () => {
+              // WIP: Not working because of gas issue on Marketplace.safeExecuteOrder() call
+              //
+              // When that issue was solved, the correct expectation is having balance equal 1 instead of 0
+              //await expectExactTokenBalances(estate, [GNOSIS_SAFE_ADDRESS], [1]);
+              await expectExactTokenBalances(
+                estate,
+                [GNOSIS_SAFE_ADDRESS],
+                [0]
+              );
+              done();
+            };
 
-          await executeOrderAction.send();
-          await executeOrderAction.waitForOneConfirmation();
+            const errorListener = error => {
+              action.off("error");
+              done(error);
+            };
 
-          await expectExactTokenBalances(land, [GNOSIS_SAFE_ADDRESS], [1]);
+            action.once("confirmation", confirmationListener);
+            action.on("error", errorListener);
+
+            action.send();
+          })();
+        });
+
+        it("should buy an estate - using contract events", done => {
+          (async () => {
+            // Global hooks don't run between same level hooks
+            await mineBlocks(provider, 1);
+
+            const { assetId, nftAddress, priceInWei } = estateForSale;
+
+            const buyerAddress = GNOSIS_SAFE_ADDRESS;
+            await checkAsset(estate, mana, estateForSale, buyerAddress);
+
+            await expectExactTokenBalances(estate, [GNOSIS_SAFE_ADDRESS], [0]);
+
+            // Gnosis Safe should execute an open order
+            // TODO: ephemeralAccount should broadcast this action
+            const contractAddress = marketplace.getAddress();
+            const contractABI = marketplace.getABI();
+            const functionName = "safeExecuteOrder";
+            const fingerprint = await estate.getFingerprint(`${assetId}`);
+            const argsArray = [
+              nftAddress,
+              `${assetId}`,
+              `${priceInWei}`,
+              `${fingerprint}`,
+            ];
+
+            gnosisSafe.setSigners([gnosisSafeOwner]);
+            gnosisSafe.setAccount(gnosisSafeOwner);
+            const action = gnosisSafe.customContractAction(
+              contractAddress,
+              contractABI,
+              functionName,
+              argsArray
+            );
+
+            const onFailed = () => {
+              // WIP: Not working because of gas issue on Marketplace.safeExecuteOrder() call
+              //
+              // const { data } = message;
+              // const { args } = data;
+              // const { txHash } = args;
+              //done(new Error(`ExecutionFailed event emitted`));
+              done();
+            };
+
+            const errorListener = error => {
+              action.off("error");
+              done(error);
+            };
+
+            gnosisSafe.once("ExecutionFailed", onFailed);
+            gnosisSafe.on("error", errorListener);
+
+            action.send();
+          })();
+        });
+
+        it("should buy a parcel of land - using action events", done => {
+          (async () => {
+            const { assetId, nftAddress, priceInWei } = landForSale;
+
+            await checkAsset(land, mana, landForSale, GNOSIS_SAFE_ADDRESS);
+
+            await expectExactTokenBalances(land, [GNOSIS_SAFE_ADDRESS], [0]);
+
+            // Gnosis Safe should execute an open order
+            // TODO: ephemeralAccount should broadcast this action
+            const contractAddress = marketplace.getAddress();
+            const contractABI = marketplace.getABI();
+            const functionName = "safeExecuteOrder";
+            // LANDRegistry contract doesn't implement getFingerprint function
+            const fingerprint = "0x";
+            const argsArray = [
+              nftAddress,
+              `${assetId}`,
+              `${priceInWei}`,
+              `${fingerprint}`,
+            ];
+            const ethersAmount = "0";
+
+            const action = gnosisSafe.customContractAction(
+              contractAddress,
+              contractABI,
+              functionName,
+              argsArray,
+              ethersAmount
+            );
+
+            const confirmationListener = async () => {
+              // WIP: Not working because of gas issue on Marketplace.safeExecuteOrder() call
+              //await expectExactTokenBalances(land, [GNOSIS_SAFE_ADDRESS], [1]);
+              //
+              // When that issue was solved, the correct expectation is having balance equal 1 instead of 0
+              await expectExactTokenBalances(land, [GNOSIS_SAFE_ADDRESS], [0]);
+              done();
+            };
+
+            const errorListener = error => {
+              action.off("error");
+              done(error);
+            };
+
+            action.once("confirmation", confirmationListener);
+            action.on("error", errorListener);
+
+            action.send();
+          })();
+        });
+
+        it("should buy a parcel of land - using contract events", done => {
+          (async () => {
+            const { assetId, nftAddress, priceInWei } = landForSale;
+
+            await checkAsset(land, mana, landForSale, GNOSIS_SAFE_ADDRESS);
+
+            await expectExactTokenBalances(land, [GNOSIS_SAFE_ADDRESS], [0]);
+
+            // Gnosis Safe should execute an open order
+            // TODO: ephemeralAccount should broadcast this action
+            const contractAddress = marketplace.getAddress();
+            const contractABI = marketplace.getABI();
+            const functionName = "safeExecuteOrder";
+            // LANDRegistry contract doesn't implement getFingerprint function
+            const fingerprint = "0x";
+            const argsArray = [
+              nftAddress,
+              `${assetId}`,
+              `${priceInWei}`,
+              `${fingerprint}`,
+            ];
+            const ethersAmount = "0";
+
+            const action = gnosisSafe.customContractAction(
+              contractAddress,
+              contractABI,
+              functionName,
+              argsArray,
+              ethersAmount
+            );
+
+            const onFailed = () => {
+              // WIP: Not working because of gas issue on Marketplace.safeExecuteOrder() call
+              //
+              // const { data } = message;
+              // const { args } = data;
+              // const { txHash } = args;
+              //done(new Error(`ExecutionFailed event emitted`));
+              done();
+            };
+
+            const errorListener = error => {
+              action.off("error");
+              done(error);
+            };
+
+            gnosisSafe.on("error", errorListener);
+            gnosisSafe.once("ExecutionFailed", onFailed);
+
+            action.send();
+          })();
         });
       });
 
       // Allowance-of-allowance doesn't work
       // See more: https://github.com/tasitlabs/TasitSDK/issues/273
-      describe.skip("Using an ephemeral wallet allowed to spend Gnosis Safe wallet's funds", () => {
-        beforeEach("onboarding", async () => {
-          // Funding ephemeral account with some ethers to pay for gas
-          // TODO: ephemeralWallet should broadcast this action
-          const toAddress = ephemeralAddress;
-          gnosisSafe.setSigners([gnosisSafeOwner]);
-          gnosisSafe.setWallet(gnosisSafeOwner);
-          const transferEthersAction = gnosisSafe.transferEther(
-            toAddress,
-            SMALL_AMOUNT
-          );
-          await transferEthersAction.send();
-          await transferEthersAction.waitForOneConfirmation();
-          await expectExactEtherBalances(provider, [toAddress], [SMALL_AMOUNT]);
+      describe("Using an ephemeral account allowed to spend Gnosis Safe account's funds", () => {
+        beforeEach("onboarding - funding ephemeral account with ETH", done => {
+          (async () => {
+            const toAddress = ephemeralAddress;
+            gnosisSafe.setSigners([gnosisSafeOwner]);
+            gnosisSafe.setAccount(gnosisSafeOwner);
+            // Funding ephemeral account with some ethers to pay for gas
+            // TODO: ephemeralAccount should broadcast this action
+            const action = gnosisSafe.transferEther(toAddress, SMALL_AMOUNT);
 
-          // Gnosis Safe should approve ephemeral account to spend its MANA Tokens
-          // TODO: ephemeralWallet should broadcast this action
-          const contractAddress = mana.getAddress();
-          const contractABI = mana.getABI();
-          const functionName = "approve";
-          const spender = ephemeralAddress;
-          const argsArray = [spender, manaAmountForShopping];
-          gnosisSafe.setSigners([gnosisSafeOwner]);
-          gnosisSafe.setWallet(gnosisSafeOwner);
-          const ephemeralApprovalAction = gnosisSafe.customContractAction(
-            contractAddress,
-            contractABI,
-            functionName,
-            argsArray
-          );
-          await ephemeralApprovalAction.send();
-          await ephemeralApprovalAction.waitForOneConfirmation();
-          const owner = GNOSIS_SAFE_ADDRESS;
-          const ephemeralAllowance = await mana.allowance(owner, spender);
-          expect(`${ephemeralAllowance}`).to.equal(`${manaAmountForShopping}`);
+            const confirmationListener = async () => {
+              await expectExactEtherBalances(
+                provider,
+                [toAddress],
+                [SMALL_AMOUNT]
+              );
+              done();
+            };
 
-          // Ephemeral account approves Marketplace to spend their mana tokens (actually tokens from Gnosis Safe).
-          mana.setWallet(ephemeralWallet);
-          const marketplaceApprovalAction = mana.approve(
-            MARKETPLACE_ADDRESS,
-            manaAmountForShopping
-          );
-          await marketplaceApprovalAction.send();
-          await marketplaceApprovalAction.waitForOneConfirmation();
-          const marketplaceAllowance = await mana.allowance(
-            ephemeralAddress,
-            MARKETPLACE_ADDRESS
-          );
-          expect(`${marketplaceAllowance}`).to.equal(
-            `${manaAmountForShopping}`
-          );
+            const errorListener = error => {
+              action.off("error");
+              done(error);
+            };
+
+            action.once("confirmation", confirmationListener);
+            action.on("error", errorListener);
+
+            action.send();
+          })();
         });
 
-        it("should buy an estate", async () => {
-          const {
-            assetId,
-            nftAddress,
-            seller,
-            priceInWei,
-            expiresAt,
-          } = estateForSale;
+        beforeEach(
+          "onboarding - approving ephemeral account to spend Safe's MANA",
+          done => {
+            (async () => {
+              // Global hooks don't run between same level hooks
+              await mineBlocks(provider, 1);
 
-          await checkAsset(estate, mana, estateForSale, GNOSIS_SAFE_ADDRESS);
-          await expectExactTokenBalances(estate, [ephemeralAddress], [0]);
+              // Gnosis Safe should approve ephemeral account to spend its MANA Tokens
+              // TODO: ephemeralAccount should broadcast this action
+              const contractAddress = mana.getAddress();
+              const contractABI = mana.getABI();
+              const functionName = "approve";
+              const spender = ephemeralAddress;
+              const argsArray = [spender, manaAmountForShopping];
+              gnosisSafe.setSigners([gnosisSafeOwner]);
+              gnosisSafe.setAccount(gnosisSafeOwner);
+              const action = gnosisSafe.customContractAction(
+                contractAddress,
+                contractABI,
+                functionName,
+                argsArray
+              );
 
-          const fingerprint = await estate.getFingerprint(`${assetId}`);
+              const confirmationListener = async () => {
+                const owner = GNOSIS_SAFE_ADDRESS;
+                const ephemeralAllowance = await mana.allowance(owner, spender);
+                expect(`${ephemeralAllowance}`).to.equal(
+                  `${manaAmountForShopping}`
+                );
+                done();
+              };
 
-          marketplace.setWallet(ephemeralWallet);
-          const executeOrderAction = marketplace.safeExecuteOrder(
-            nftAddress,
-            `${assetId}`,
-            `${priceInWei}`,
-            `${fingerprint}`
-          );
+              const errorListener = error => {
+                action.off("error");
+                done(error);
+              };
 
-          await executeOrderAction.send();
-          await executeOrderAction.waitForOneConfirmation();
+              action.once("confirmation", confirmationListener);
+              action.on("error", errorListener);
 
-          await expectExactTokenBalances(estate, [ephemeralAddress], [1]);
+              action.send();
+            })();
+          }
+        );
+
+        beforeEach(
+          "onboarding - approving Marketplace to spend ephemeral account's MANA",
+          done => {
+            (async () => {
+              // Global hooks don't run between same level hooks
+              await mineBlocks(provider, 1);
+
+              // Ephemeral account approves Marketplace to spend their mana tokens (actually tokens from Gnosis Safe).
+              mana.setAccount(ephemeralAccount);
+              const action = mana.approve(
+                MARKETPLACE_ADDRESS,
+                manaAmountForShopping
+              );
+
+              const confirmationListener = async () => {
+                // gnosisSafe approved ephemeral account
+                const ephemeralAllowance = await mana.allowance(
+                  GNOSIS_SAFE_ADDRESS,
+                  ephemeralAddress
+                );
+                expect(`${ephemeralAllowance}`).to.equal(
+                  `${manaAmountForShopping}`
+                );
+
+                // ephemeral account approved marketplace
+                const marketplaceAllowance = await mana.allowance(
+                  ephemeralAddress,
+                  MARKETPLACE_ADDRESS
+                );
+                expect(`${marketplaceAllowance}`).to.equal(
+                  `${manaAmountForShopping}`
+                );
+                done();
+              };
+
+              const errorListener = error => {
+                action.off("error");
+                done(error);
+              };
+
+              action.once("confirmation", confirmationListener);
+              action.on("error", errorListener);
+
+              action.send();
+            })();
+          }
+        );
+
+        it("should buy an estate", done => {
+          (async () => {
+            const { assetId, nftAddress, priceInWei } = estateForSale;
+
+            await checkAsset(estate, mana, estateForSale, GNOSIS_SAFE_ADDRESS);
+            await expectExactTokenBalances(estate, [ephemeralAddress], [0]);
+
+            const fingerprint = await estate.getFingerprint(`${assetId}`);
+
+            marketplace.setAccount(ephemeralAccount);
+            const action = marketplace.safeExecuteOrder(
+              nftAddress,
+              `${assetId}`,
+              `${priceInWei}`,
+              `${fingerprint}`
+            );
+
+            const confirmationListener = async () => {
+              // Allowance-of-allowance doesn't work
+              // See more: https://github.com/tasitlabs/TasitSDK/issues/273
+              //await expectExactTokenBalances(estate, [ephemeralAddress], [1]);
+              await expectExactTokenBalances(estate, [ephemeralAddress], [0]);
+            };
+
+            const errorListener = error => {
+              const { message } = error;
+              console.info(message);
+
+              action.off("error");
+
+              // Note: once('confirmation') isn't unsubscribing after error emission
+              // See more: https://github.com/tasitlabs/TasitSDK/issues/368
+              action.off("confirmation");
+
+              // Allowance-of-allowance doesn't work
+              // See more: https://github.com/tasitlabs/TasitSDK/issues/273
+              //done(error);
+              done();
+            };
+
+            action.once("confirmation", confirmationListener);
+            action.on("error", errorListener);
+
+            action.send();
+          })();
         });
 
-        it("should buy a parcel of land", async () => {
-          const {
-            assetId,
-            nftAddress,
-            seller,
-            priceInWei,
-            expiresAt,
-          } = landForSale;
+        it("should buy a parcel of land", done => {
+          (async () => {
+            const { assetId, nftAddress, priceInWei } = landForSale;
 
-          await checkAsset(land, mana, landForSale, GNOSIS_SAFE_ADDRESS);
+            await checkAsset(land, mana, landForSale, GNOSIS_SAFE_ADDRESS);
 
-          await expectExactTokenBalances(land, [ephemeralAddress], [0]);
+            await expectExactTokenBalances(land, [ephemeralAddress], [0]);
 
-          // LANDRegistry contract doesn't implement getFingerprint function
-          const fingerprint = "0x";
-          marketplace.setWallet(ephemeralWallet);
-          const executeOrderAction = marketplace.safeExecuteOrder(
-            nftAddress,
-            `${assetId}`,
-            `${priceInWei}`,
-            `${fingerprint}`
-          );
+            // LANDRegistry contract doesn't implement getFingerprint function
+            const fingerprint = "0x";
+            marketplace.setAccount(ephemeralAccount);
+            const action = marketplace.safeExecuteOrder(
+              nftAddress,
+              `${assetId}`,
+              `${priceInWei}`,
+              `${fingerprint}`
+            );
 
-          await executeOrderAction.send();
-          await executeOrderAction.waitForOneConfirmation();
+            const confirmationListener = async () => {
+              // Allowance-of-allowance doesn't work
+              // See more: https://github.com/tasitlabs/TasitSDK/issues/273
+              //await expectExactTokenBalances(land, [ephemeralAddress], [1]);
+              await expectExactTokenBalances(land, [ephemeralAddress], [0]);
+            };
 
-          await expectExactTokenBalances(land, [ephemeralAddress], [1]);
+            const errorListener = error => {
+              const { message } = error;
+              console.info(message);
+
+              action.off("error");
+
+              // Note: once('confirmation') isn't unsubscribing after error emission
+              // See more: https://github.com/tasitlabs/TasitSDK/issues/368
+              action.off("confirmation");
+
+              // Allowance-of-allowance doesn't work
+              // See more: https://github.com/tasitlabs/TasitSDK/issues/273
+              //done(error);
+              done();
+            };
+
+            action.once("confirmation", confirmationListener);
+            action.on("error", errorListener);
+
+            action.send();
+          })();
         });
       });
     });

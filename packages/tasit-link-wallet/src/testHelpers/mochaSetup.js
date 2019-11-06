@@ -4,18 +4,23 @@ global.expect = expect;
 
 // Helpers
 import actionHelpers from "tasit-action/dist/testHelpers/helpers";
-global = Object.assign(global, actionHelpers);
+const {
+  developmentConfig,
+  ProviderFactory,
+  createSnapshot,
+  revertFromSnapshot,
+  mineBlocks,
+} = actionHelpers;
 
 import Action from "tasit-action";
 const { ConfigLoader } = Action;
 ConfigLoader.setConfig(developmentConfig);
 
 // Global hooks
+const provider = ProviderFactory.getProvider();
 let snapshotId;
 
 beforeEach("global beforeEach() hook", async () => {
-  const provider = ProviderFactory.getProvider();
-  global.provider = provider;
   snapshotId = await createSnapshot(provider);
 
   while (snapshotId > 1) {

@@ -12,7 +12,7 @@ const create = () => {
     const wallet = ethers.Wallet.createRandom();
     return wallet;
   } catch (error) {
-    throw new Error(`Error creating wallet: ${error.message}`);
+    throw new Error(`Error creating account: ${error.message}`);
   }
 };
 

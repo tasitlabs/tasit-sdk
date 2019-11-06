@@ -1,31 +1,49 @@
-// Helpers
-import actionHelpers from "tasit-action/dist/testHelpers/helpers";
-global = Object.assign(global, actionHelpers);
-
+import { TasitContracts } from "../TasitSdk";
 import DecentralandUtils from "../helpers/DecentralandUtils";
+import actionHelpers from "tasit-action/dist/testHelpers/helpers";
+const {
+  addressesAreEqual,
+  expectMinimumTokenBalances,
+  ProviderFactory,
+} = actionHelpers;
 
-export const duration = {
-  seconds: function(val) {
-    return val;
-  },
-  minutes: function(val) {
-    return val * this.seconds(60);
-  },
-  hours: function(val) {
-    return val * this.minutes(60);
-  },
-  days: function(val) {
-    return val * this.hours(24);
-  },
-  weeks: function(val) {
-    return val * this.days(7);
-  },
-  years: function(val) {
-    return val * this.days(365);
-  },
+const getNetworkName = () => {
+  const provider = ProviderFactory.getProvider();
+  const { _network: network } = provider;
+  const networkName = !network ? "local" : network.name;
+  return networkName;
+};
+
+export const getContractsAddresses = () => {
+  const networkName = getNetworkName();
+  const {
+    MANAToken,
+    LANDProxy,
+    EstateRegistry,
+    Marketplace,
+
+    GnosisSafe: GnosisSafeInfo,
+  } = TasitContracts[networkName];
+  const { address: MANA_ADDRESS } = MANAToken;
+  const { address: LAND_ADDRESS } = LANDProxy;
+  const { address: ESTATE_ADDRESS } = EstateRegistry;
+  const { address: MARKETPLACE_ADDRESS } = Marketplace;
+  const { address: GNOSIS_SAFE_ADDRESS } = GnosisSafeInfo;
+
+  const addresses = {
+    ESTATE_ADDRESS,
+    LAND_ADDRESS,
+    MARKETPLACE_ADDRESS,
+    MANA_ADDRESS,
+    GNOSIS_SAFE_ADDRESS,
+  };
+
+  return addresses;
 };
 
 export const pickAssetsForSale = async () => {
+  const { LAND_ADDRESS, ESTATE_ADDRESS } = getContractsAddresses();
+
   let landForSale;
   let estateForSale;
 
@@ -41,7 +59,7 @@ export const pickAssetsForSale = async () => {
   for (let order of openSellOrders) {
     const { nftAddress, expiresAt } = order;
 
-    const isLand = addressesAreEqual(nftAddress, LAND_PROXY_ADDRESS);
+    const isLand = addressesAreEqual(nftAddress, LAND_ADDRESS);
     const isEstate = addressesAreEqual(nftAddress, ESTATE_ADDRESS);
 
     const nowInSeconds = Date.now() / 1000;
@@ -66,8 +84,10 @@ export const checkAsset = async (
   nftContract,
   erc20Contract,
   assetForSale,
-  buyerAddress
+  ownerOfFunds
 ) => {
+  const { MARKETPLACE_ADDRESS } = getContractsAddresses();
+
   const { assetId, nftAddress, seller, priceInWei, expiresAt } = assetForSale;
 
   // Asset is the same as expected
@@ -79,8 +99,8 @@ export const checkAsset = async (
   const nowInSeconds = Date.now() / 1000;
   expect(nowInSeconds).to.be.below(expiresTime);
 
-  // Buyer has enough MANA
-  await expectMinimumTokenBalances(erc20Contract, [buyerAddress], [priceInWei]);
+  // Buyer (or Owner of funds if buyer is approved) has enough MANA
+  await expectMinimumTokenBalances(erc20Contract, [ownerOfFunds], [priceInWei]);
 
   // Marketplace is approved to transfer Estate or Parcel asset owned by the seller
   const approvedForAsset = await nftContract.getApproved(assetId);
@@ -94,9 +114,10 @@ export const checkAsset = async (
 };
 
 export const helpers = {
-  duration,
+  ...actionHelpers,
   pickAssetsForSale,
   checkAsset,
+  getContractsAddresses,
 };
 
 export default helpers;

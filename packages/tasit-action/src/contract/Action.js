@@ -1,60 +1,70 @@
 import Subscription from "./Subscription";
 import ProviderFactory from "../ProviderFactory";
-import ConfigLoader from "../ConfigLoader";
 
 // If necessary, we can create TransactionAction
 //  and/or MetaTxAction subclasses
 export class Action extends Subscription {
   #provider;
   #signer;
-  #rawTx;
+  #rawAction;
   #tx;
-  #txConfirmations;
-  #timeout;
-  #lastConfirmationTime;
+  #txConfirmations = 0;
 
-  constructor(rawTx, provider, signer) {
+  constructor(rawAction, provider, signer) {
     // Provider implements EventEmitter API and it's enough
     //  to handle with transactions events
     super(provider);
 
-    const { events } = ConfigLoader.getConfig();
-    const { timeout } = events;
-
-    this.#rawTx = rawTx;
+    this.#rawAction = rawAction;
     this.#signer = signer;
-    this.#timeout = timeout;
     this.#provider = provider;
     this.#txConfirmations = 0;
   }
 
-  _toRaw = async () => {
-    return await this.#rawTx;
+  _toRaw = () => {
+    return this.#rawAction;
   };
 
-  #signAndSend = async () => {
-    // TODO: Go deep on gas handling.
-    // Without that, VM returns a revert error instead of out of gas error.
-    // See: https://github.com/tasitlabs/TasitSDK/issues/173
-    //
-    // This command isn't enough
-    // const gasLimit = await this.#provider.estimateGas(this.#rawTx);
-    const gasParams = {
-      gasLimit: 7e6,
-      gasPrice: 1e9,
-    };
-
+  #fillRawAction = async rawTx => {
     const nonce = await this.#provider.getTransactionCount(
       this.#signer.address
     );
 
-    let rawTx = await this.#rawTx;
+    const network = await this.#provider.getNetwork();
+    const { chainId } = network;
 
-    rawTx = { ...rawTx, nonce, ...gasParams };
+    let { value } = rawTx;
+    value = !value ? 0 : value;
 
-    const signedTx = await this.#signer.sign(rawTx);
+    // Note: Gas estimation should be improved
+    // See: https://github.com/tasitlabs/TasitSDK/issues/173
+    //
+    // This command isn't working
+    const gasPrice = 1e9;
 
+    rawTx = { ...rawTx, nonce, chainId, value, gasPrice };
+
+    // Note: Gas estimation should be improved
+    // See: https://github.com/tasitlabs/TasitSDK/issues/173
+    //
+    // This command isn't working
+    //const gasLimit = await this.#provider.estimateGas(rawTx);
+    const gasLimit = 7e6;
+
+    rawTx = { ...rawTx, gasLimit };
+
+    return rawTx;
+  };
+
+  #signAndSend = async () => {
     try {
+      // Note: Resolving promise if the Action was created using a async rawTx
+      const rawAction = await this.#rawAction;
+
+      this.#rawAction = await this.#fillRawAction(rawAction);
+
+      const signedTx = await this.#signer.sign(this.#rawAction);
+
       this.#tx = await this.#provider.sendTransaction(signedTx);
     } catch (error) {
       this._emitErrorEvent(new Error(`Action with error: ${error.message}`));
@@ -71,14 +81,6 @@ export class Action extends Subscription {
 
   once = (eventName, listener) => {
     this.#addListener(eventName, listener, true);
-  };
-
-  getEventsTimeout = () => {
-    return this.#timeout;
-  };
-
-  setEventsTimeout = timeout => {
-    this.#timeout = timeout;
   };
 
   #addListener = (eventName, listener, once) => {
@@ -105,11 +107,12 @@ export class Action extends Subscription {
   #addConfirmationListener = (listener, once) => {
     const eventName = "confirmation";
 
-    const baseEthersListener = async blockNumber => {
+    // eslint-disable-next-line no-unused-vars
+    const ethersListener = async blockNumber => {
       try {
         const tx = await this.#tx;
         if (!tx) {
-          console.warn(`The action wasn't sent yet.`);
+          console.info(`The action wasn't sent yet.`);
           return;
         }
 
@@ -128,12 +131,11 @@ export class Action extends Subscription {
           );
         }
 
-        if (receipt === null) {
-          this.#txConfirmations = 0;
-          return;
-        }
+        if (!receipt) return;
 
-        const txFailed = receipt.status == 0;
+        const { confirmations, status } = receipt;
+        const txFailed = status === 0;
+
         if (txFailed) {
           this._emitErrorEventFromEventListener(
             new Error(`Action failed.`),
@@ -141,27 +143,6 @@ export class Action extends Subscription {
           );
           return;
         }
-
-        this._clearEventTimerIfExists(eventName);
-
-        this.#lastConfirmationTime = Date.now();
-
-        const timer = setTimeout(() => {
-          const currentTime = Date.now();
-          const timedOut =
-            currentTime - this.#lastConfirmationTime >= this.getEventsTimeout();
-
-          if (timedOut) {
-            this._emitErrorEventFromEventListener(
-              new Error(`Event ${eventName} reached timeout.`),
-              eventName
-            );
-          }
-        }, this.getEventsTimeout());
-
-        this._setEventTimer(eventName, timer);
-
-        const { confirmations } = receipt;
 
         this.#txConfirmations = confirmations;
 
@@ -171,7 +152,9 @@ export class Action extends Subscription {
           },
         };
 
+        // Note: Unsubscribing should be done after the user's listener function is called
         await listener(message);
+        if (once) this.off(eventName);
       } catch (error) {
         this._emitErrorEventFromEventListener(
           new Error(`Listener function with error: ${error.message}`),
@@ -179,17 +162,6 @@ export class Action extends Subscription {
         );
       }
     };
-
-    let ethersListener;
-
-    if (once) {
-      ethersListener = async blockNumber => {
-        await baseEthersListener(blockNumber);
-        this.off(eventName);
-      };
-    } else {
-      ethersListener = baseEthersListener;
-    }
 
     this._addEventListener(eventName, ethersListener);
   };

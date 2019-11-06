@@ -1,10 +1,17 @@
 import ERC721Full from "./ERC721Full";
-
 import TasitContracts from "tasit-contracts";
+import ProviderFactory from "../ProviderFactory";
+import {
+  accounts,
+  mineBlocks,
+  expectExactTokenBalances,
+} from "../testHelpers/helpers";
+
 const { local: localContracts } = TasitContracts;
 const { MyERC721Full, SampleContract } = localContracts;
 const { address: ERC721_FULL_ADDRESS } = MyERC721Full;
 const { address: SAMPLE_CONTRACT_ADDRESS } = SampleContract;
+const provider = ProviderFactory.getProvider();
 
 describe("TasitAction.ERC721.ERC721Full", () => {
   let owner;
@@ -86,13 +93,13 @@ describe("TasitAction.ERC721.ERC721Full", () => {
   describe("should throw error when instantiated with invalid args", () => {
     it("constructor without address", async () => {
       expect(() => {
-        new Contract();
+        new ERC721Full();
       }).to.throw();
     });
 
     it("constructor with invalid address", async () => {
       expect(() => {
-        new Contract("invalid address");
+        new ERC721Full("invalid address");
       }).to.throw();
     });
   });
@@ -173,7 +180,7 @@ describe("TasitAction.ERC721.ERC721Full", () => {
 
       await action.waitForOneConfirmation();
 
-      erc721.setWallet(bob);
+      erc721.setAccount(bob);
       action = erc721.transferFrom(ana.address, bob.address, tokenId);
       await action.send();
 
@@ -202,8 +209,7 @@ describe("TasitAction.ERC721.ERC721Full", () => {
 
       erc721 = new ERC721Full(ERC721_FULL_ADDRESS, ana);
 
-      const contractErrorListener = errorMessage => {
-        const { error } = errorMessage;
+      const contractErrorListener = error => {
         const { message } = error;
         expect(message).to.equal("Action failed.");
         contractErrorFakeFn();
@@ -240,8 +246,7 @@ describe("TasitAction.ERC721.ERC721Full", () => {
 
       erc721 = new ERC721Full(ERC721_FULL_ADDRESS, ana);
 
-      const actionErrorListener = errorMessage => {
-        const { error } = errorMessage;
+      const actionErrorListener = error => {
         const { message } = error;
         expect(message).to.equal("Action failed.");
         actionErrorFakeFn();

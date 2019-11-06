@@ -1,7 +1,5 @@
 import TasitAction from "tasit-action";
-const { Action, Contract, ERC20, ERC721 } = TasitAction;
-const { ERC20Detailed } = ERC20;
-const { ERC721Full } = ERC721;
+const { Action, Contract } = TasitAction;
 import GnosisSafeUtils from "./GnosisSafeUtils";
 import ActionUtils from "tasit-action/dist/contract/Utils.js";
 import TasitContracts from "tasit-contracts";
@@ -146,11 +144,15 @@ export default class GnosisSafe extends Contract {
   };
 
   #executeTransaction = (data, toAddress, etherValue) => {
-    const rawTxPromise = this.#prepareTransaction(data, toAddress, etherValue);
+    const rawActionPromise = this.#prepareTransaction(
+      data,
+      toAddress,
+      etherValue
+    );
     const provider = this._getProvider();
-    const signer = this.getWallet();
+    const signer = this.getAccount();
 
-    const action = new Action(rawTxPromise, provider, signer);
+    const action = new Action(rawActionPromise, provider, signer);
     return action;
   };
 
@@ -226,8 +228,8 @@ export default class GnosisSafe extends Contract {
       signatures
     );
 
-    const rawTx = await execTxAction._toRaw();
+    const rawAction = await execTxAction._toRaw();
 
-    return rawTx;
+    return rawAction;
   };
 }

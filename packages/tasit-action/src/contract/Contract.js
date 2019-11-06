@@ -37,10 +37,9 @@ export class Contract extends Subscription {
   }
 
   // Note: For now, `tasit-account` creates a ethers.js wallet object
-  // If that changes, maybe this method could be renamed to setAccount()
-  setWallet = wallet => {
+  setAccount = wallet => {
     if (!Utils.isEthersJsSigner(wallet))
-      throw new Error(`Cannot set an invalid wallet for a Contract`);
+      throw new Error(`Cannot set an invalid account for a Contract`);
 
     this.#ethersContract = new ethers.Contract(
       this.#ethersContract.address,
@@ -51,12 +50,12 @@ export class Contract extends Subscription {
     this.#addFunctionsToContract();
   };
 
-  getWallet = () => {
+  getAccount = () => {
     const { signer: wallet } = this.#ethersContract;
     return wallet;
   };
 
-  removeWallet = () => {
+  removeAccount = () => {
     this.#ethersContract = new ethers.Contract(
       this.#ethersContract.address,
       this.#ethersContract.interface.abi,
@@ -117,8 +116,8 @@ export class Contract extends Subscription {
           },
         };
 
+        // Note: Unsubscribing should be done only if the user's listener function will be called
         if (once) this.off(eventName);
-
         await listener(message);
       } catch (error) {
         this._emitErrorEventFromEventListener(
@@ -177,9 +176,8 @@ export class Contract extends Subscription {
 
       const action = new Action(rawTx, this.#provider, signer);
 
-      const errorListener = message => {
-        const { error } = message;
-        this._emitErrorEvent(new Error(`${error.message}`));
+      const errorListener = error => {
+        this._emitErrorEvent(error);
       };
 
       action.on("error", errorListener);
