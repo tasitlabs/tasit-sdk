@@ -21,7 +21,7 @@ _Disclaimer:_ The alpha version of this SDK is under active development. We enco
 
 ### Getting started
 
-Check out our docs at [docs.tasit.io](https://docs.tasit.io/docs)
+Check out our docs at [docs.tasit.io](https://docs.tasit.io/)
 
 ### Contact us
 
