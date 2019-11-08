@@ -1,0 +1,1 @@
+(window.webpackJsonp=window.webpackJsonp||[]).push([[15],{91:function(t){t.exports=JSON.parse('{"id":"contact","title":"Contact us","sidebar_label":"Contact us","description":"- [tasit.io](https://tasit.io/)","source":"@site/docs/Contact.md","permalink":"/docs/contact","sidebar":"docs","previous":{"title":"Why","permalink":"/docs/why"}}')}}]);

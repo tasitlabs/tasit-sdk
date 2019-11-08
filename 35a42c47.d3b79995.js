@@ -1,0 +1,1 @@
+(window.webpackJsonp=window.webpackJsonp||[]).push([[5],{105:function(i){i.exports=JSON.parse('{"id":"why","title":"Why","sidebar_label":"Why","description":"### Why?","source":"@site/docs/Why.md","permalink":"/docs/why","sidebar":"docs","next":{"title":"Contact us","permalink":"/docs/contact"},"previous":{"title":"Publishing","permalink":"/docs/publishing"}}')}}]);
