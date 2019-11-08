@@ -1,15 +1,28 @@
-# Tasit SDK
-
-[![CircleCI](https://circleci.com/gh/tasitlabs/TasitSDK.svg?style=svg)](https://circleci.com/gh/tasitlabs/TasitSDK)
-[![Greenkeeper badge](https://badges.greenkeeper.io/tasitlabs/TasitSDK.svg)](https://greenkeeper.io/)
+---
+id: home
+title: Tasit SDK
+sidebar_label: Home
+---
 
 <div align="left">
-  <img src="/docs/images/TasitLogoBlack.png" width="200" />
+  <img src="https://raw.githubusercontent.com/tasitlabs/TasitSDK/develop/docs/images/TasitLogoBlack.png" width="200" />
 </div>
+
+export const Highlight = ({children, color}) => (
+<span
+style={{
+      backgroundColor: color,
+      borderRadius: '2px',
+      color: '#fff',
+      padding: '0.2rem',
+    }}>
+{children}
+</span>
+);
 
 ### Introduction
 
-The Tasit SDK is a JavaScript/TypeScript SDK for making mobile Ethereum dapps using React Native.
+The <Highlight color="#25c2a0">Tasit SDK</Highlight> is a JavaScript/TypeScript SDK for making mobile Ethereum dapps using React Native.
 
 Development of the Tasit SDK is supported in part by [Gnosis](https://github.com/gnosis/) through their [GECO](https://github.com/gnosis/GECO) grant initiative.
 
@@ -19,24 +32,8 @@ This project is open-source and in need of additional funding to sustain work on
 
 _Disclaimer:_ The alpha version of this SDK is under active development. We encourage you to try it out today for hackathons, etc., but it's not ready for anything involving real funds on mainnet. If you'd prefer to wait for a more battle-tested release, please watch this repo with the `Releases only` setting and/or sign up to be notified about our releases on the [tasit.io](https://tasit.io) website.
 
-### Getting started
-
-Check out our docs at [docs.tasit.io](https://docs.tasit.io/docs)
+---
 
 ### Contact us
 
-We love getting feedback, so please feel free to reach out.
-
-- [tasit.io](https://tasit.io/)
-
-- [@TasitProject](https://twitter.com/TasitProject) on Twitter
-
-- [Medium](https://medium.com/tasit)
-
-- [Telegram](https://t.me/tasitlabs)
-
-- [Email](mailto:founders@tasit.io)
-
-- [Kanban board](https://github.com/orgs/tasitlabs/projects/1)
-
-- [Feature requests](http://feedback.tasit.io/feature-requests)
+We love getting feedback, so please feel free to [reach out](Contact.md).
