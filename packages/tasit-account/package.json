@@ -24,15 +24,15 @@
     "url": "https://github.com/tasitlabs/tasitsdk/issues"
   },
   "dependencies": {
-    "@babel/runtime": "^7.4.0",
-    "ethers": "^4.0.27"
+    "@babel/runtime": "^7.7.2",
+    "ethers": "^4.0.39"
   },
   "devDependencies": {
-    "@babel/cli": "^7.2.3",
-    "@babel/core": "^7.4.0",
-    "@babel/preset-env": "^7.4.1",
-    "@babel/register": "^7.4.0",
+    "@babel/cli": "^7.7.0",
+    "@babel/core": "^7.7.2",
+    "@babel/preset-env": "^7.7.1",
+    "@babel/register": "^7.7.0",
     "chai": "^4.2.0",
-    "mocha": "^6.1.4"
+    "mocha": "^6.2.2"
   }
 }
