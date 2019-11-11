@@ -10,12 +10,11 @@ module.exports = {
     "Tasit SDK Docs": [
       "home",
       "getting-started",
-      "motivation",
       "main-features",
       "other-features",
-      "publishing",
       "why",
       "contact",
+      "publishing",
     ],
   },
 };

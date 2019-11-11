@@ -15,8 +15,8 @@ import styles from "./styles.module.css";
 
 const features = [
   {
-    title: <>Easy to Use</>,
-    imageUrl: "img/TasitLogoSvg.svg",
+    title: <>Easy to use</>,
+    imageUrl: "img/blob-shape-1.svg",
     description: (
       <>
         The Tasit SDK was designed to be easily installed and used to get your
@@ -25,17 +25,22 @@ const features = [
     ),
   },
   {
-    title: <>Easy to Contribute</>,
-    imageUrl: "img/TasitLogoSvg.svg",
-    description: <>Feel free to open a PR.</>,
-  },
-  {
-    title: <>Plenty of Examples</>,
+    title: <>Onboarding done right</>,
     imageUrl: "img/TasitLogoSvg.svg",
     description: (
       <>
-        The apps the Tasit project has built with the Tasit SDK are open-source
-        as well.
+        Onboarding with ephemeral accounts, contract-based accounts, and
+        deep-linking to and from mobile wallets
+      </>
+    ),
+  },
+  {
+    title: <>Optimistic updates</>,
+    imageUrl: "img/blob-shape-2.svg",
+    description: (
+      <>
+        The API is built with optimistic UI updates and user-friendly
+        error-handling in mind
       </>
     ),
   },
@@ -61,7 +66,7 @@ function Home() {
   const { siteConfig = {} } = context;
   return (
     <Layout
-      title={`Hello from ${siteConfig.title}`}
+      title={`${siteConfig.title} Docs`}
       description="Description will go into a meta tag in <head />"
     >
       <header className={classnames("hero hero--primary", styles.heroBanner)}>
@@ -76,7 +81,7 @@ function Home() {
               )}
               to={useBaseUrl("docs/home")}
             >
-              Get Started
+              Get started
             </Link>
           </div>
         </div>

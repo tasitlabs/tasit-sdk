@@ -13,15 +13,13 @@ sidebar_label: Table of contents
 - [Automatic scaffolding using the Tasit CLI](#automatic-scaffolding-using-the-tasit-cli)
 - [Modular](#modular)
 
-[Motivation](Motivation.md)
-
 [Main features](MainFeatures.md)
 
 [Other features](OtherFeatures.md)
 
 [Why](Why.md)
 
-[Contact us](Contact.md)
+[Contact](Contact.md)
 
 [Publishing](Publishing.md)
 
