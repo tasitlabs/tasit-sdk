@@ -1,10 +1,12 @@
 ---
 id: publishing
-title: Publishing
-sidebar_label: Publishing
+title: (Internal docs) Publishing
+sidebar_label: (Internal docs) Publishing
 ---
 
 ### Publishing new versions
+
+**Note: This doc is mainly useful for the Tasit team to publish new versions of the Tasit SDK, not for a team using the Tasit SDK.**
 
 1. Create a publish issue on GitHub (with the desired new version number in the name).
 
@@ -50,7 +52,7 @@ sidebar_label: Publishing
 
 **Troubleshooting**
 
-    * Sometimes during the `lerna bootstrap` process, the file `package-lock.json` can be changed, and that will make `lerna publish` abort. Publishing will only be done if there are no unstaged files in the `git` repo. To solve that, commit the file and run the `publish` script again.
+Sometimes during the `lerna bootstrap` process, the file `package-lock.json` can be changed, and that will make `lerna publish` abort. Publishing will only be done if there are no unstaged files in the `git` repo. To solve that, commit the file and run the `publish` script again.
 
 ---
 

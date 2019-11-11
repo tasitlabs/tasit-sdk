@@ -7,7 +7,7 @@
 
 module.exports = {
   title: "Tasit SDK",
-  tagline: "Tasit SDK docs",
+  tagline: "Docs",
   url: "https://docs.tasit.io",
   baseUrl: "/",
   favicon: "img/favicon-32x32.png",
@@ -21,23 +21,7 @@ module.exports = {
         src: "img/TasitLogoSvg.svg",
       },
       links: [
-        { to: "docs/home", label: "Home", position: "left" },
-        {
-          to: "docs/getting-started",
-          label: "Get started",
-          position: "left",
-        },
-        { to: "docs/main-features", label: "Features", position: "left" },
-        {
-          to: "docs/why",
-          label: "Why",
-          position: "left",
-        },
-        {
-          to: "docs/contact",
-          label: "Contact",
-          position: "left",
-        },
+        { to: "docs/home", label: "Docs", position: "left" },
         {
           href: "https://github.com/tasitlabs/tasitsdk",
           label: "GitHub",
@@ -49,11 +33,15 @@ module.exports = {
       style: "dark",
       links: [
         {
-          title: "Docs",
+          title: "Tech",
           items: [
             {
               label: "Docs",
               to: "docs/home",
+            },
+            {
+              label: "Kanban board",
+              href: "https://github.com/orgs/tasitlabs/projects/1",
             },
           ],
         },
@@ -64,6 +52,10 @@ module.exports = {
               label: "Telegram",
               href: "https://t.me/tasitlabs",
             },
+            {
+              label: "Feature requests",
+              href: "http://feedback.tasit.io/feature-requests",
+            },
           ],
         },
         {
@@ -72,6 +64,10 @@ module.exports = {
             {
               label: "Twitter",
               href: "https://twitter.com/TasitProject",
+            },
+            {
+              label: "Medium",
+              href: "https://medium.com/tasit",
             },
           ],
         },
