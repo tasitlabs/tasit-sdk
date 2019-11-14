@@ -11,7 +11,7 @@
     "solidity"
   ],
   "author": "Tasit Labs",
-  "homepage": "https://github.com/tasitlabs/TasitSDK/tree/develop/packages/tasit-contracts#readme",
+  "homepage": "https://github.com/tasitlabs/TasitSDK/tree/develop/packages/contracts#readme",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -36,7 +36,8 @@
     "@babel/core": "^7.7.2",
     "@babel/node": "^7.7.0",
     "@babel/preset-env": "^7.7.1",
-    "truffle": "^5.0.44",
+    "node-fetch": "^2.6.0",
+    "truffle": "^5.1.0",
     "truffle-hdwallet-provider": "^1.0.17"
   },
   "dependencies": {
