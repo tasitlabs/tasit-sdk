@@ -1,7 +1,7 @@
 // This script will add land parcels, estates and sell orders to the Decentraland marketplace
 // This data is being used to test the Decentraland demo app
 import fetch from "node-fetch";
-import TasitAction from "../../../tasit-action/dist/";
+import TasitAction from "../../../action/dist/";
 const {
   ConfigLoader,
   ERC20,
@@ -12,7 +12,7 @@ const { Mana } = ERC20;
 const { Estate, Land } = ERC721;
 const { Decentraland } = MarketplaceContracts;
 
-import ProviderFactory from "../../../tasit-action/dist/ProviderFactory";
+import ProviderFactory from "../../../action/dist/ProviderFactory";
 
 import TasitContracts from "..";
 
@@ -25,7 +25,7 @@ import {
   erc20Faucet,
   expectExactTokenBalances,
   bigNumberify,
-} from "../../../tasit-action/dist/testHelpers/helpers";
+} from "../../../action/dist/testHelpers/helpers";
 
 const { TEN, BILLION, WEI_PER_ETHER } = constants;
 

@@ -3,19 +3,23 @@
     "default": {
       "packages": [
         "package.json",
-        "packages/tasit-account/package.json",
-        "packages/tasit-action/package.json",
-        "packages/tasit-contracts/package.json",
-        "packages/tasit-sdk/package.json",
-        "packages/tasit-contract-based-account/package.json",
-        "packages/tasit-link-wallet/package.json"
+        "packages/account/package.json",
+        "packages/action/package.json",
+        "packages/contract-based-account/package.json",
+        "packages/contracts/package.json",
+        "packages/docs/package.json",
+        "packages/link-wallet/package.json",
+        "packages/sdk/package.json"
       ]
     }
   },
   "ignore": [
     "tasit-account",
-    "tasit-contracts",
     "tasit-action",
-    "tasit-contract-based-account"
+    "tasit-contract-based-account",
+    "tasit-contracts",
+    "tasit-docs",
+    "tasit-link-wallet",
+    "tasit-sdk"
   ]
 }
