@@ -1,1 +1,0 @@
-(window.webpackJsonp=window.webpackJsonp||[]).push([[6],{93:function(e){e.exports=JSON.parse('{"id":"home","title":"Tasit SDK","sidebar_label":"Home","description":"<div align=\\"left\\">","source":"@site/docs/Home.md","permalink":"/docs/home","sidebar":"docs","next":{"title":"Getting started","permalink":"/docs/getting-started"}}')}}]);
