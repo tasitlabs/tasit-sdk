@@ -67,7 +67,7 @@ function Home() {
   return (
     <Layout
       title={`${siteConfig.title} Docs`}
-      description="Description will go into a meta tag in <head />"
+      description="Docs for the Tasit SDK: A JavaScript/TypeScript SDK for making native mobile Ethereum dapps using React Native"
     >
       <header className={classnames("hero hero--primary", styles.heroBanner)}>
         <div className="container">
