@@ -12,7 +12,7 @@ module.exports = {
   baseUrl: "/",
   favicon: "img/favicon-32x32.png",
   organizationName: "tasitlabs", // Usually your GitHub org/user name.
-  projectName: "TasitSDK", // Usually your repo name.
+  projectName: "tasit-sdk", // Usually your repo name.
   themeConfig: {
     navbar: {
       title: "Tasit SDK",
@@ -23,7 +23,7 @@ module.exports = {
       links: [
         { to: "docs/home", label: "Docs", position: "left" },
         {
-          href: "https://github.com/tasitlabs/tasitsdk",
+          href: "https://github.com/tasitlabs/tasit-sdk",
           label: "GitHub",
           position: "right",
         },
@@ -75,7 +75,7 @@ module.exports = {
       logo: {
         alt: "Tasit Logo",
         src:
-          "https://raw.githubusercontent.com/tasitlabs/TasitSDK/develop/docs/images/TasitLogoBlack.png",
+          "https://raw.githubusercontent.com/tasitlabs/tasit-sdk/develop/docs/images/TasitLogoBlack.png",
       },
       copyright: `Copyright © ${new Date().getFullYear()} Tasit`,
     },

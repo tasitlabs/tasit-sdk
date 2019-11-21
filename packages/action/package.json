@@ -1,8 +1,10 @@
 {
   "name": "tasit-action",
-  "version": "0.0.18",
+  "version": "0.0.19",
   "description": "A library for using Ethereum smart contracts that abstracts away the low-level blockchain-related details so that developers can focus on the core business logic for their app",
-  "main": "dist/index.js",
+  "main": "dist/index",
+  "module": "dist/tasit-action.esm.js",
+  "typings": "dist/index.d.ts",
   "keywords": [
     "ethereum",
     "dapp",
@@ -10,35 +12,51 @@
     "native"
   ],
   "author": "Tasit Labs",
-  "homepage": "https://github.com/tasitlabs/TasitSDK/tree/develop/packages/tasit-action#readme",
+  "homepage": "https://github.com/tasitlabs/tasit-sdk/tree/develop/packages/action#readme",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/tasitlabs/tasitsdk.git"
+    "url": "git+https://github.com/tasitlabs/tasit-sdk.git"
   },
+  "files": [
+    "dist"
+  ],
   "scripts": {
-    "prepare": "rm -rf dist/* && npx babel src --out-dir dist --ignore src/*.test.js,src/**/*.test.js",
-    "test": "npx mocha \"src/**/*.test.js\" --recursive --require @babel/register --file src/testHelpers/mochaSetup.js --timeout 8000"
+    "start": "tsdx watch",
+    "build": "tsdx build",
+    "test:tsdx": "tsdx test",
+    "lint": "tsdx lint src",
+    "test:mocha-babel": "npx mocha \"src/**/*.test.ts\" --recursive --require @babel/register --file src/testHelpers/mochaSetup.ts --timeout 8000",
+    "test": "npm run test:mocha-babel",
+    "upgrade": "npx ncu",
+    "upgrade:write": "npx ncu -u"
   },
   "bugs": {
-    "url": "https://github.com/tasitlabs/tasitsdk/issues"
+    "url": "https://github.com/tasitlabs/tasit-sdk/issues"
   },
   "dependencies": {
     "@babel/runtime": "^7.7.2",
     "ethers": "^4.0.39",
-    "tasit-contracts": "^0.0.18"
+    "tasit-contracts": "^0.0.19"
   },
   "devDependencies": {
     "@babel/cli": "^7.7.0",
     "@babel/core": "^7.7.2",
     "@babel/plugin-proposal-class-properties": "^7.7.0",
-    "@babel/preset-env": "^7.7.1",
+    "@babel/preset-typescript": "^7.7.2",
     "@babel/register": "^7.7.0",
+    "@typescript-eslint/eslint-plugin": "^2.8.0",
+    "@typescript-eslint/parser": "^2.8.0",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
+    "husky": "^3.1.0",
     "mocha": "^6.2.2",
     "node-fetch": "^2.6.0",
     "sinon": "^7.5.0",
-    "tasit-account": "^0.0.18"
+    "tasit-account": "^0.0.19",
+    "ts-node": "^8.5.2",
+    "tsdx": "^0.11.0",
+    "tslib": "^1.10.0",
+    "typescript": "^3.7.2"
   }
 }

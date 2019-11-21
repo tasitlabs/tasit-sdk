@@ -18,9 +18,9 @@ As a mobile developer, using the Tasit SDK to interact with the backend should b
 
 This middleware wraps the core ethers.js contract API for making JSON-RPC requests.
 
-[Here is a lot more info](/packages/tasit-action/README.md) about how this can be used.
+[Here is a lot more info](/packages/action/README.md) about how this can be used.
 
-[`tasit-action` is the child package](/packages/tasit-action/) that implements these features for the Tasit SDK.
+[`tasit-action` is the child package](/packages/action/) that implements these features for the Tasit SDK.
 
 _This makes the experience for new developers working on a mobile app with the Tasit SDK simpler, which means more mobile dapps for end users._
 
@@ -36,7 +36,7 @@ This SDK takes an opinionated approach to onboarding (although since it's a modu
 
 A native mobile dapp should be read-only for as long as possible. The user shouldn't know there's a blockchain involved or see anything about an account, and an Ethereum account shouldn't even be created until it becomes necessary. Why go through an onboarding flow at all right away?
 
-This flow for reading data from contracts without onboarding first just works with no special configuration. So in a sense [`tasit-action` is the child package](/packages/tasit-action/) that implements these features, but really these are just the basic features of that child package we've already discussed.
+This flow for reading data from contracts without onboarding first just works with no special configuration. So in a sense [`tasit-action` is the child package](/packages/action/) that implements these features, but really these are just the basic features of that child package we've already discussed.
 
 ##### Ephemeral account and private key generation
 
@@ -46,7 +46,7 @@ The Tasit SDK makes it simple for a new account to be instantiated in each mobil
 
 The intended UX is that this account should NOT have any significant amount of ETH, ERC20, or ERC721 tokens sent to it. This app is NOT a wallet. Instead, this address should be authorized to perform actions on behalf of a smart-contract-based account or software wallet a user already has with some ETH or tokens. This is an ephemeral account for that app on the device, and as the user gets more familiar with it their account can be progressively upgraded to a personal DAO later or their funds can be stored in their preferred primary software wallet.
 
-[`tasit-account` is the child package](/packages/tasit-account/) that implements these features for the Tasit SDK.
+[`tasit-account` is the child package](/packages/account/) that implements these features for the Tasit SDK.
 
 _This means fewer steps that need to be taken to onboard a new user._
 
@@ -58,7 +58,7 @@ This can be done using [meta-transactions](https://medium.com/@austin_48503/ethe
 
 The approach with meta-transactions (and universal login) is that the user's account is only used to sign messages, and then as a developer you can use your preferred centralized or decentralized solution to relay that as an Ethereum tx and pay and/or be rewarded as each solution sees fit.
 
-[`tasit-contract-based-account` is the child package](/packages/tasit-contract-based-account/) that implements these features for the Tasit SDK.
+[`tasit-contract-based-account` is the child package](/packages/contract-based-account/) that implements these features for the Tasit SDK.
 
 ##### For users that do have funds
 
@@ -70,7 +70,7 @@ A user flow where a dapp's ephemeral account requests an approval for X ERC20 to
 
 Through compatibility with WalletConnect, any standalone dapp can be authorized to take actions in a way that has only been possible in wallet apps to date. The wallet might be the [Gnosis Safe personal edition](https://blog.gnosis.pm/announcing-the-gnosis-safe-beta-personal-edition-19a69a4453e8), the [Balance wallet](https://twitter.com/ricburton/status/1038772498756714496), Status, Coinbase Wallet, Argent, BRD, etc.
 
-[`tasit-link-wallet` is the child package](/packages/tasit-link-wallet/) that implements these features for the Tasit SDK.
+[`tasit-link-wallet` is the child package](/packages/link-wallet/) that implements these features for the Tasit SDK.
 
 ##### Wrapping up onboarding
 
@@ -82,7 +82,7 @@ Have a strong opinion on which onboarding flow we should prioritize the most? Pl
 
 Classes of smart contracts we support include [NFTs](http://erc721.org/), [TCRs](https://medium.com/@simondlr/city-walls-bo-taoshi-exploring-the-power-of-token-curated-registries-588f208c17d5), [DAOs](https://blog.aragon.org/bringing-daos-back-aragon-monthly-92756cb65639/), and two-sided marketplaces (like Gitcoin, CryptoCribs, Ethlance, etc.). There’s an ERC-standard-specific JavaScript/TypeScript API wrapping the lower-level Tasit SDK API for reading and writing and listening for data so that the function-names in the Tasit SDK are tailored to that type of dapp. As long as we’ve built the tooling to interact with that class of dapp at least once before, the Tasit SDK can “automagically” support any new dapp of that type.
 
-[`tasit-action` is the child package](/packages/tasit-action/) that implements these features for the Tasit SDK.
+[`tasit-action` is the child package](/packages/action/) that implements these features for the Tasit SDK.
 
 _This means there’s a network effect for the Tasit SDK, so once we have a few apps using it, it will be much faster to make new apps with it._
 

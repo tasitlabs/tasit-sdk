@@ -1,0 +1,20 @@
+{
+  "extends": "../../tsconfig.json",
+  "include": ["src", "types"],
+  "compilerOptions": {
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "composite": true
+  },
+  "references": [
+    {
+      "path": "../action"
+    },
+    {
+      "path": "../contracts"
+    },
+    {
+      "path": "../account"
+    }
+  ]
+}

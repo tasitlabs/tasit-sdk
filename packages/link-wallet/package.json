@@ -1,8 +1,10 @@
 {
   "name": "tasit-link-wallet",
-  "version": "0.0.18",
+  "version": "0.0.19",
   "description": "Library for onboarding a user by linking a dapp with a wallet of their choosing.",
-  "main": "dist/index.js",
+  "main": "dist/index",
+  "module": "dist/tasit-link-wallet.esm.js",
+  "typings": "dist/index.d.ts",
   "keywords": [
     "ethereum",
     "dapp",
@@ -10,20 +12,29 @@
     "native"
   ],
   "author": "Tasit Labs",
-  "homepage": "https://github.com/tasitlabs/TasitSDK#readme",
+  "homepage": "https://github.com/tasitlabs/tasit-sdk#readme",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/tasitlabs/tasitsdk.git"
+    "url": "git+https://github.com/tasitlabs/tasit-sdk.git"
   },
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "clean": "rm -rf dist/*",
-    "compile": "npx babel src --out-dir dist --ignore **/*.test.js",
-    "prepare": "npm run clean && npm run compile",
-    "test": "npx mocha src/*.test.js --require @babel/register --file src/testHelpers/mochaSetup.js"
+    "prepare": "npm run clean && npm run build",
+    "test:mocha-babel": "npx mocha src/*.test.ts --require @babel/register --file src/testHelpers/mochaSetup.ts",
+    "start": "tsdx watch",
+    "build": "tsdx build",
+    "test:tsdx": "tsdx test",
+    "lint": "tsdx lint src",
+    "test": "npm run test:mocha-babel",
+    "upgrade": "npx ncu",
+    "upgrade:write": "npx ncu -u"
   },
   "bugs": {
-    "url": "https://github.com/tasitlabs/tasitsdk/issues"
+    "url": "https://github.com/tasitlabs/tasit-sdk/issues"
   },
   "dependencies": {
     "@babel/runtime": "^7.7.2"
@@ -31,10 +42,15 @@
   "devDependencies": {
     "@babel/cli": "^7.7.0",
     "@babel/core": "^7.7.2",
-    "@babel/preset-env": "^7.7.1",
+    "@babel/preset-typescript": "^7.7.2",
     "@babel/register": "^7.7.0",
     "chai": "^4.2.0",
+    "husky": "^3.1.0",
     "mocha": "^6.2.2",
-    "tasit-action": "^0.0.18"
+    "tasit-action": "^0.0.19",
+    "ts-node": "^8.5.2",
+    "tsdx": "^0.11.0",
+    "tslib": "^1.10.0",
+    "typescript": "^3.7.2"
   }
 }

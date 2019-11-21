@@ -1,3 +1,13 @@
 build/**
 3rd-parties/**/scripts/config/default.js
+3rd-parties/**/scripts/config/default.ts
 .secret.json
+dist/
+
+*.log
+.DS_Store
+node_modules
+.rts2_cache_cjs
+.rts2_cache_esm
+.rts2_cache_umd
+.rts2_cache_system

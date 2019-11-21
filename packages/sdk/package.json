@@ -1,8 +1,10 @@
 {
   "name": "tasit-sdk",
-  "version": "0.0.18",
-  "description": "A JavaScript SDK for making mobile Ethereum dapps using React Native",
-  "main": "dist/index.js",
+  "version": "0.0.19",
+  "description": "A JavaScript / TypeScript SDK for making mobile Ethereum dapps using React Native",
+  "main": "dist/index",
+  "module": "dist/tasit-sdk.esm.js",
+  "typings": "dist/index.d.ts",
   "keywords": [
     "ethereum",
     "dapp",
@@ -10,43 +12,57 @@
     "native"
   ],
   "author": "Tasit Labs",
-  "homepage": "https://github.com/tasitlabs/TasitSDK#readme",
+  "homepage": "https://github.com/tasitlabs/tasit-sdk#readme",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/tasitlabs/tasitsdk.git"
+    "url": "git+https://github.com/tasitlabs/tasit-sdk.git"
   },
+  "files": [
+    "dist"
+  ],
   "scripts": {
-    "prepare": "npx babel src --out-dir dist --ignore **/*.test.js",
+    "prepare": "npx babel src --out-dir dist --ignore **/*.test.ts",
     "setup:local": "cp src/config/development.js src/config/default.js",
     "setup:ropsten": "cp src/config/ropsten.js src/config/default.js",
     "setup:forked-ropsten": "cp src/config/forked-ropsten.js src/config/default.js",
     "setup:forked-goerli": "cp src/config/forked-goerli.js src/config/default.js",
-    "test": "npm run setup:local && npm run mocha",
-    "test:forked-testnet": "npm run setup:forked-ropsten && npm run mocha",
-    "test:testnet": "npm run setup:ropsten && npm run mocha",
-    "mocha": "npx mocha \"src/**/*.test.js\"  --require @babel/register --file src/testHelpers/mochaSetup.js --timeouts 10000",
-    "check:decentraland-data": "npx mocha src/scripts/checkDecentralandContractsData.js  --require @babel/register --file src/testHelpers/mochaSetup.js --no-timeouts"
+    "test": "npm run setup:local && npm run test:mocha",
+    "test:forked-testnet": "npm run setup:forked-ropsten && npm run test:mocha",
+    "test:testnet": "npm run setup:ropsten && npm run test:mocha",
+    "test:mocha": "npx test:mocha mocha \"src/**/*.test.ts\"  --require @babel/register --file src/testHelpers/mochaSetup.ts --timeouts 10000",
+    "check:decentraland-data": "npx test:mocha mocha src/scripts/checkDecentralandContractsData.ts  --require @babel/register --file src/testHelpers/mochaSetup.ts --no-timeouts",
+    "start": "tsdx watch",
+    "build": "tsdx build",
+    "test:tsdx": "tsdx test",
+    "lint": "tsdx lint src",
+    "upgrade": "npx ncu",
+    "upgrade:write": "npx ncu -u"
   },
   "bugs": {
-    "url": "https://github.com/tasitlabs/tasitsdk/issues"
+    "url": "https://github.com/tasitlabs/tasit-sdk/issues"
   },
   "dependencies": {
     "@babel/runtime": "^7.7.2",
-    "tasit-account": "^0.0.18",
-    "tasit-action": "^0.0.18",
-    "tasit-contract-based-account": "^0.0.18",
-    "tasit-contracts": "^0.0.18"
+    "tasit-account": "^0.0.19",
+    "tasit-action": "^0.0.19",
+    "tasit-contract-based-account": "^0.0.19",
+    "tasit-contracts": "^0.0.19"
   },
   "devDependencies": {
     "@babel/cli": "^7.7.0",
     "@babel/core": "^7.7.2",
     "@babel/plugin-proposal-class-properties": "^7.7.0",
-    "@babel/preset-env": "^7.7.1",
+    "@babel/preset-typescript": "^7.7.2",
     "@babel/register": "^7.7.0",
     "chai": "^4.2.0",
     "ethers": "^4.0.39",
+    "husky": "^3.1.0",
     "mocha": "^6.2.2",
-    "node-fetch": "^2.6.0"
+    "node-fetch": "^2.6.0",
+    "ts-node": "^8.5.2",
+    "tsdx": "^0.11.0",
+    "tslib": "^1.10.0",
+    "typescript": "^3.7.2"
   }
 }
