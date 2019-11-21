@@ -4,8 +4,8 @@ import "ethers/dist/shims.js";
 import { ethers } from "ethers";
 import Utils from "./Utils";
 import ProviderFactory from "../ProviderFactory";
-import Subscription from "../subscription/Subscription";
-import Action from "../action/Action";
+import Subscription from "../subscription";
+import Action from "../action";
 
 // Log levels: debug, default, info, warn, error, off
 // See more: https://github.com/ethers-io/ethers.js/blob/527de7ba5e1d31bd7c166a78d0fa62b58bf50a54/src.ts/errors.ts

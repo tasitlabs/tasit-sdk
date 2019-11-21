@@ -1,13 +1,18 @@
 import ConfigLoader from "./ConfigLoader";
-import Action from "./action/Action";
-import Contract from "./contract/Contract";
+
+import Action from "./action";
+
+import Contract from "./contract";
 import Utils from "./contract/Utils";
-import ERC721Full from "./erc721/ERC721Full";
-import Land from "./erc721/Land";
-import Decentraland from "./marketplace/Decentraland";
-import Estate from "./erc721/Estate";
-import Mana from "./erc20/Mana";
-import ERC20Full from "./erc20/ERC20Full";
+
+import ERC20Full from "./contract/erc20/ERC20Full";
+import Mana from "./contract/erc20/Mana";
+
+import ERC721Full from "./contract/erc721/ERC721Full";
+import Land from "./contract/erc721/Land";
+import Estate from "./contract/erc721/Estate";
+
+import Decentraland from "./contract/marketplace/Decentraland";
 
 export { Contract, ERC721Full, Land, Decentraland, Estate, Mana };
 

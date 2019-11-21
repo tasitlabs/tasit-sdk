@@ -1,4 +1,4 @@
-import Subscription from "../subscription/Subscription";
+import Subscription from "../subscription";
 import ProviderFactory from "../ProviderFactory";
 
 interface Network {
