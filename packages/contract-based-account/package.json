@@ -1,8 +1,10 @@
 {
   "name": "tasit-contract-based-account",
-  "version": "0.0.18",
+  "version": "0.0.19",
   "description": "Library for onboarding a user using a smart-contract-based account.",
-  "main": "dist/index.js",
+  "main": "dist/index",
+  "module": "dist/tasit-contract-based-account.esm.js",
+  "typings": "dist/index.d.ts",
   "keywords": [
     "ethereum",
     "dapp",
@@ -10,33 +12,57 @@
     "native"
   ],
   "author": "Tasit Labs",
-  "homepage": "https://github.com/tasitlabs/TasitSDK#readme",
+  "homepage": "https://github.com/tasitlabs/tasit-sdk#readme",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/tasitlabs/tasitsdk.git"
+    "url": "git+https://github.com/tasitlabs/tasit-sdk.git"
   },
+  "files": [
+    "dist"
+  ],
   "scripts": {
-    "prepare": "npx babel src --out-dir dist --ignore **/*.test.js",
-    "test": "npx mocha src/*.test.js --require @babel/register --file src/testHelpers/mochaSetup.js --timeout 4000"
+    "start": "tsdx watch",
+    "build": "tsdx build",
+    "test:tsdx": "tsdx test",
+    "lint": "tsdx lint src",
+    "test:mocha-babel": "npx mocha src/*.test.ts --require @babel/register --file src/testHelpers/mochaSetup.ts --timeout 4000",
+    "test": "npm run test:mocha-babel",
+    "upgrade": "npx ncu",
+    "upgrade:write": "npx ncu -u"
   },
   "bugs": {
-    "url": "https://github.com/tasitlabs/tasitsdk/issues"
+    "url": "https://github.com/tasitlabs/tasit-sdk/issues"
   },
+  "husky": {
+    "hooks": {
+      "pre-commit": "tsdx lint"
+    }
+  },
+  "peerDependencies": {},
   "dependencies": {
     "@babel/runtime": "^7.7.2",
     "ethers": "^4.0.39",
-    "tasit-action": "^0.0.18",
-    "tasit-contracts": "^0.0.18"
+    "tasit-action": "^0.0.19",
+    "tasit-contracts": "^0.0.19"
   },
   "devDependencies": {
     "@babel/cli": "^7.7.0",
     "@babel/core": "^7.7.2",
     "@babel/plugin-proposal-class-properties": "^7.7.0",
     "@babel/preset-env": "^7.7.1",
+    "@babel/preset-typescript": "^7.7.2",
     "@babel/register": "^7.7.0",
+    "@types/mocha": "^5.2.7",
     "chai": "^4.2.0",
+    "husky": "^3.1.0",
     "mocha": "^6.2.2",
-    "sinon": "^7.5.0"
+    "npm-check-updates": "^3.2.1",
+    "sinon": "^7.5.0",
+    "ts-node": "^8.5.2",
+    "tsdx": "^0.11.0",
+    "tslib": "^1.10.0",
+    "typescript": "^3.7.2",
+    "tasit-account": "^0.0.19"
   }
 }

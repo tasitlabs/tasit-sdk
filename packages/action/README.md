@@ -2,15 +2,15 @@
 
 This package helps with reading data from smart contracts, writing data to smart contracts, and listening for events.
 
-Most of the details are in the main README for the monorepo [here](https://github.com/tasitlabs/TasitSDK/blob/develop/README.md#reading-and-writing-data-and-reacting-to-events).
+Most of the details are in the main README for the monorepo [here](https://github.com/tasitlabs/tasit-sdk/blob/develop/README.md#reading-and-writing-data-and-reacting-to-events).
 
 # Reading and writing data and reacting to events
 
 This explains how one can use the Tasit SDK to interact with smart contracts at different levels of abstraction.
 
-_Note:_ This functionality all "lives" in `tasit-action`, a child package of the [`tasit-sdk`](https://github.com/tasitlabs/TasitSDK) that is also published to npm as a standalone module using [lerna](https://lernajs.io/).
+_Note:_ This functionality all "lives" in `tasit-action`, a child package of the [`tasit-sdk`](https://github.com/tasitlabs/tasit-sdk) that is also published to npm as a standalone module using [lerna](https://lernajs.io/).
 
-[For context, here is an overview](https://github.com/tasitlabs/TasitSDK/blob/develop/README.md#reading-and-writing-data-and-reacting-to-events) of how this fits in with the rest of the Tasit SDK.
+[For context, here is an overview](https://github.com/tasitlabs/tasit-sdk/blob/develop/README.md#reading-and-writing-data-and-reacting-to-events) of how this fits in with the rest of the Tasit SDK.
 
 Why `tasit-action`? **action:** [ak-shən], noun. "a thing done". It's also nice that "act" (the verb form) is part of the words _contract_ and _abstraction_ and _transaction_. Finally, directors say “action” before starting to film a scene in a movie. Also, since this package supports meta-transactions, it's not quite correct to call them transactions. "action" is our catch-all word for transactions and meta-transactions.
 
@@ -36,13 +36,13 @@ Why `tasit-action`? **action:** [ak-shən], noun. "a thing done". It's also nice
 
 - [Low-level Tasit SDK middleware](#getting-data---low-level-tasit-sdk-middleware)
 
-- [Contract API from ethers.js](#getting-data---contract-api-from-ethersjs)
+- [Contract API from ethers](#getting-data---contract-api-from-ethers)
 
 ##### Getting data - Decentraland
 
 Let's start at the highest level of abstraction possible, where we can construct our ideal API for the end user assuming we know the SDK is being used specifically for the Decentraland contracts.
 
-I think at this level of abstraction, we don't use ERC165 interface detection like we do at lower levels (see below). But actually, using it at all warrants more thought, depending on whether we're assuming the user knows the full contract ABI or not (and depending on whether ethers.js assumes that.)
+I think at this level of abstraction, we don't use ERC165 interface detection like we do at lower levels (see below). But actually, using it at all warrants more thought, depending on whether we're assuming the user knows the full contract ABI or not (and depending on whether ethers assumes that.)
 
 We just know the ABI for the open source contracts for that exact project and assume the presence of these functions. The developer can still use the lower-level APIs to confirm, though.
 
@@ -133,7 +133,7 @@ To make this example comparable with the ERC721 example above, let's say the con
 
 ```javascript
 // TODO: Finalize way to instantiate contract.
-// Maybe just the same as ethers.js?
+// Maybe just the same as ethers?
 const contract = new contract(address, contractABI);
 
 const balance = await contract.balanceOf(owner);
@@ -182,11 +182,11 @@ Find all `view` (`external` or `public`) functions. Assume they're the interesti
 
 Possibly even infer from param types what they might do, but that's a lot harder.
 
-##### Getting data - Contract API from ethers.js
+##### Getting data - Contract API from ethers
 
-Let's re-read the `tasit-action` section above when it is finalized and see how much it differs from the [ethers.js abstraction for connecting to contracts](https://docs.ethers.io/ethers.js/html/api-contract.html#connecting-to-existing-contracts).
+Let's re-read the `tasit-action` section above when it is finalized and see how much it differs from the [ethers abstraction for connecting to contracts](https://docs.ethers.io/ethers.js/html/api-contract.html#connecting-to-existing-contracts).
 
-We'll want to do the same for setting data and listening for events too. As long as there's any abstraction we want on top of the ethers.js contract functions, `tasit-action` support for contracts of unknown type seems justified. Setting data / creating transactions is very likely to diverge from the ethers.js library.
+We'll want to do the same for setting data and listening for events too. As long as there's any abstraction we want on top of the ethers contract functions, `tasit-action` support for contracts of unknown type seems justified. Setting data / creating transactions is very likely to diverge from the ethers library.
 
 ### Setting data
 
@@ -194,7 +194,7 @@ Setting data could possibly be non-async if it's like publishing in pubsub. Ther
 
 - [Low-level Tasit SDK middleware](#setting-data---low-level-tasit-sdk-middleware)
 
-- [Contract API from ethers.js](#setting-data---contract-api-from-ethersjs)
+- [Contract API from ethers](#setting-data---contract-api-from-ethers)
 
 - [Decentraland](#setting-data---decentraland)
 
@@ -202,7 +202,7 @@ Setting data could possibly be non-async if it's like publishing in pubsub. Ther
 
 ##### Setting data - Low-level Tasit SDK middleware
 
-When using the contract abstraction from ethers.js, the functions for setting data return a transaction hash.
+When using the contract abstraction from ethers, the functions for setting data return a transaction hash.
 
 That's too blockchain-y for the target audience. The API is being informed too much by the underlying implementation as opposed to the most understandable abstraction. The `tasit-action` API for setting data should be indistinguishable from using pubsub on a non-blockchain architecture.
 
@@ -234,11 +234,11 @@ Since remembering to remove the listener is a little clunky, we could also inclu
 
 For more customization of how this works, during or before sending the transaction the user of the SDK could pick which types of events they want to be subscribed to.
 
-##### Setting data - Contract API from ethers.js
+##### Setting data - Contract API from ethers
 
-Setting data on a contract returns a tx hash. In the example in the ethers.js docs, the next step is to `await` to see that the transaction has been confirmed.
+Setting data on a contract returns a tx hash. In the example in the ethers docs, the next step is to `await` to see that the transaction has been confirmed.
 
-`tasit-action` has more of a "optimistic updates" but "be sure to handle error cases" philosophy. Of course that could be achieved with the lower-level ethers.js API too, but the `tasit-action` abstraction gently guides the user towards that approach in a more opinionated fashion.
+`tasit-action` has more of a "optimistic updates" but "be sure to handle error cases" philosophy. Of course that could be achieved with the lower-level ethers API too, but the `tasit-action` abstraction gently guides the user towards that approach in a more opinionated fashion.
 
 ##### Setting data - Decentraland
 
@@ -264,7 +264,7 @@ Setting data on a contract returns a tx hash. In the example in the ethers.js do
 
 - [Decentraland](#listening-for-events---decentraland)
 
-- [Contract API from ethers.js](#listening-for-events---contract-api-from-ethersjs)
+- [Contract API from ethers](#listening-for-events---contract-api-from-ethers)
 
 ##### Listening for events - Low-level Tasit SDK middleware
 
@@ -298,7 +298,7 @@ In this example there's an event `Transfer` as one of the events supported by ER
 // extrapolate how this would work from the rest
 ```
 
-##### Listening for events - Contract API from ethers.js
+##### Listening for events - Contract API from ethers
 
 ```javascript
 // TODO: Add me

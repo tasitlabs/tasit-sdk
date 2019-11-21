@@ -1,7 +1,7 @@
 # Tasit SDK
 
-[![CircleCI](https://circleci.com/gh/tasitlabs/TasitSDK.svg?style=svg)](https://circleci.com/gh/tasitlabs/TasitSDK)
-[![Greenkeeper badge](https://badges.greenkeeper.io/tasitlabs/TasitSDK.svg)](https://greenkeeper.io/)
+[![CircleCI](https://circleci.com/gh/tasitlabs/tasit-sdk.svg?style=svg)](https://circleci.com/gh/tasitlabs/tasit-sdk)
+[![Greenkeeper badge](https://badges.greenkeeper.io/tasitlabs/tasit-sdk.svg)](https://greenkeeper.io/)
 
 <div align="left">
   <img src="/docs/images/TasitLogoBlack.png" width="200" />

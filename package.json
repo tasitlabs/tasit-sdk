@@ -4,14 +4,21 @@
   "description": "A monorepo for all npm packages in the Tasit ecosystem",
   "devDependencies": {
     "@babel/preset-env": "^7.7.1",
+    "@types/mocha": "^5.2.7",
+    "@types/node": "^12.12.11",
     "babel-eslint": "^10.0.3",
     "eslint": "^6.6.0",
     "eslint-config-prettier": "^6.5.0",
     "eslint-plugin-prettier": "^3.1.1",
     "ganache-cli": "^6.7.0",
+    "husky": "^3.1.0",
     "lerna": "^3.18.4",
     "prettier": "^1.18.2",
-    "prettier-plugin-solidity": "^1.0.0-alpha.22"
+    "prettier-plugin-solidity": "^1.0.0-alpha.22",
+    "ts-node": "^8.5.2",
+    "tsdx": "^0.11.0",
+    "tslib": "^1.10.0",
+    "typescript": "^3.7.2"
   },
   "scripts": {
     "clean:all": "npx lerna run clean --stream && npx lerna clean --yes && rm -rf ./node_modules",
@@ -28,11 +35,11 @@
     "test": "npx lerna run test --stream --concurrency 1",
     "posttest": "npm run ganache:stop",
     "start": "npm run clean:all && npm run bootstrap && npm run prepare:blockchain",
-    "lint": "npx prettier --write './packages/*/src/{*.js,**/*.js}' && npx eslint './packages/*/src/{*.js,**/*.js}'"
+    "lint": "npx prettier --write './packages/*/src/{*.js,*.ts,**/*.js,**/*.ts}' && npx eslint './packages/*/src/{*.js,*.ts,**/*.js,**/*.ts}'"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/tasitlabs/TasitSDK.git"
+    "url": "git+https://github.com/tasitlabs/tasit-sdk.git"
   },
   "keywords": [
     "dapp",
@@ -43,9 +50,9 @@
   "author": "Tasit Labs",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/tasitlabs/TasitSDK/issues"
+    "url": "https://github.com/tasitlabs/tasit-sdk/issues"
   },
-  "homepage": "https://github.com/tasitlabs/TasitSDK#readme",
+  "homepage": "https://github.com/tasitlabs/tasit-sdk#readme",
   "engines": {
     "node": ">=10.15.0",
     "npm": ">=6.4.1"

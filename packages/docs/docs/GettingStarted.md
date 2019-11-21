@@ -8,7 +8,7 @@ sidebar_label: Getting started
 
 You can use the Tasit SDK to create user-friendly mobile iOS and Android apps for a dapp using React Native.
 
-Looking for the entry point for the `tasit-sdk` package? [That's here](/packages/tasit-sdk/). The Tasit SDK is a collection of smaller packages exported as one using [lerna](https://lernajs.io/).
+Looking for the entry point for the `tasit-sdk` package? [That's here](/packages/sdk/). The Tasit SDK is a collection of smaller packages exported as one using [lerna](https://lernajs.io/).
 
 #### Installation
 
