@@ -59,7 +59,7 @@
     "npm-check-updates": "^3.2.1",
     "sinon": "^7.5.0",
     "ts-node": "^8.5.2",
-    "tsdx": "^0.11.0",
+    "tsdx": "^0.12.0",
     "tslib": "^1.10.0",
     "typescript": "^3.7.2",
     "tasit-account": "^0.0.19"
