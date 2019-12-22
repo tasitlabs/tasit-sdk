@@ -52,7 +52,7 @@
     "husky": "^3.1.0",
     "mocha": "^6.2.2",
     "node-fetch": "^2.6.0",
-    "sinon": "^7.5.0",
+    "sinon": "^8.0.0",
     "tasit-account": "^0.0.19",
     "ts-node": "^8.5.2",
     "tsdx": "^0.11.0",
