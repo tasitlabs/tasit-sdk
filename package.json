@@ -4,7 +4,7 @@
   "description": "A monorepo for all npm packages in the Tasit ecosystem",
   "devDependencies": {
     "@types/mocha": "^5.2.7",
-    "@types/node": "^12.12.11",
+    "@types/node": "^13.1.0",
     "babel-eslint": "^10.0.3",
     "eslint": "^6.6.0",
     "eslint-config-prettier": "^6.5.0",
