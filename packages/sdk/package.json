@@ -57,7 +57,7 @@
     "@babel/register": "^7.7.0",
     "chai": "^4.2.0",
     "ethers": "^4.0.39",
-    "husky": "^3.1.0",
+    "husky": "^4.0.2",
     "mocha": "^6.2.2",
     "node-fetch": "^2.6.0",
     "ts-node": "^8.5.2",
