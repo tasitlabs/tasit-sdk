@@ -33,7 +33,7 @@ We love getting feedback, so please feel free to reach out.
 
 - [Medium](https://medium.com/tasit)
 
-- [Telegram](https://t.me/tasitlabs)
+- [Telegram](https://t.me/tasitproject)
 
 - [Email](mailto:founders@tasit.io)
 
