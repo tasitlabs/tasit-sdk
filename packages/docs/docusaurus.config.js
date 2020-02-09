@@ -50,7 +50,11 @@ module.exports = {
           items: [
             {
               label: "Telegram",
-              href: "https://t.me/tasitlabs",
+              href: "https://t.me/tasitproject",
+            },
+            {
+              label: "Discord",
+              href: "https://discord.gg/bRp4QKq",
             },
             {
               label: "Feature requests",
