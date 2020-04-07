@@ -13,5 +13,6 @@ module.exports = (deployer, network, accounts) => {
     const to = "0x0000000000000000000000000000000000000000";
     const data = "0x";
     await safe.setup(owners, threshold, to, data);
+    // TODO: Log the address of this newly deployed Safe proxy
   });
 };

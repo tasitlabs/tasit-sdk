@@ -40,6 +40,11 @@ export const constants = {
   TOKEN_SUBDIVISIONS,
 };
 
+// Note: These private keys correspond to the the seed phrase
+// used for local ganache-cli development
+// Note that a different seed phrase / private key was used to deploy
+// the Rinkeby testnet contracts originally
+
 const privateKeys = [
   "0x02380f59eeed7a02557aeaab089606739feb0e1db34c6b08374ad31188a3892d",
   "0x2232aa52d058352511c5dd2d0ebcc0cfb6dfb5f051a9b367b7505556d2672490",
