@@ -395,19 +395,26 @@ const getParcelsFromAPI = async () => {
 (async () => {
   try {
     // Fund Gnosis Safe account with Mana tokens and ethers
-    await etherFaucet(provider, minterAccount, GNOSIS_SAFE_ADDRESS, TEN);
-    await expectExactEtherBalances(provider, [GNOSIS_SAFE_ADDRESS], [TEN]);
+    console.log("minter account", minterAccount.signingKey.address);
+    console.log({ GNOSIS_SAFE_ADDRESS });
+    console.log({ provider });
+    console.log("About to send ether from minter to Safe");
+    // await etherFaucet(provider, minterAccount, GNOSIS_SAFE_ADDRESS, TEN);
+    console.log("About to check ether amount");
+    // await expectExactEtherBalances(provider, [GNOSIS_SAFE_ADDRESS], [TEN]);
+    console.log("About to send MANA");
     await erc20Faucet(
       manaContract,
       minterAccount,
       GNOSIS_SAFE_ADDRESS,
       BILLION
     );
-    await expectExactTokenBalances(
-      manaContract,
-      [GNOSIS_SAFE_ADDRESS],
-      [BILLION]
-    );
+    console.log("About to check MANA amount");
+    // await expectExactTokenBalances(
+    //   manaContract,
+    //   [GNOSIS_SAFE_ADDRESS],
+    //   [BILLION]
+    // );
 
     const [parcels, estates] = await Promise.all([
       getParcelsFromAPI(),
@@ -418,6 +425,7 @@ const getParcelsFromAPI = async () => {
       estateParcel => !findParcel(estateParcel, parcels)
     );
 
+    console.log("About to create parcels and estates");
     const parcelIds = await createParcels(parcels);
 
     await createParcels(estatesParcels);

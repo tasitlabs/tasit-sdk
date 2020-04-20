@@ -111,10 +111,66 @@ const ropsten = {
   },
 };
 
+const rinkebyDeployedByDevMetaMask = {
+    EstateRegistry: {
+      address: "0x87795662aC66370b320C24682B73136d980A819C",
+      abi: estateRegistryABI,
+    },
+    LANDProxy: {
+      address: "0x77849D59344d4b41c69A2A1EFFFC7bB96f2B797f",
+      abi: landProxyABI,
+    },
+    LANDRegistry: {
+      address: "0x6AC9d5eDCF58F3e7166D8A2153F0295971E82123",
+      abi: landRegistryABI,
+    },
+    MANAToken: {
+      address: "0x6E1eb43ECEA518054048C154E868EF522DccfAa6",
+      abi: manaTokenABI,
+    },
+    Marketplace: {
+      address: "0xE293063b1e9dF515fd031066d43552Ec3853b751",
+      abi: marketplaceABI,
+    },
+    GnosisSafe: {
+      address: "0xc8FB1F400D4718c022d5aA8c7eDf8A3A685cf3E2",
+      abi: gnosisSafeABI,
+    },
+  };
+  
+  const rinkeby = {
+    EstateRegistry: {
+      address: "0x75acDF3f9C7E4f1141336401Da07265176530C19",
+      abi: estateRegistryABI,
+    },
+    LANDProxy: {
+      address: "0x74bFF5B8BaDd62DCf39E58216D23E03bA953cAe3",
+      abi: landProxyABI,
+    },
+    LANDRegistry: {
+      address: "0x8E91a85ce94430f83d81eAcCd3c018727e86bba0",
+      abi: landRegistryABI,
+    },
+    MANAToken: {
+      address: "0x2A3e6dDa5b3451645f193194E377B18798420168",
+      abi: manaTokenABI,
+    },
+    Marketplace: {
+      address: "0xE95Bc197Ba21B00BFbc8eCEBD4780be3427081be",
+      abi: marketplaceABI,
+    },
+    GnosisSafe: {
+      address: "0x366dd6FdB8EA347A186e251e39bE1f12eF11cc8A",
+      abi: gnosisSafeABI,
+    },
+  };
+  
+
 export const TasitContracts = {
   local,
   goerli,
   ropsten,
+  rinkeby,
 };
 
 export default TasitContracts;

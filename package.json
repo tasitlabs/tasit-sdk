@@ -3,6 +3,7 @@
   "private": true,
   "description": "A monorepo for all npm packages in the Tasit ecosystem",
   "devDependencies": {
+    "@truffle/hdwallet-provider": "^1.0.27",
     "@types/mocha": "^5.2.7",
     "@types/node": "^12.12.11",
     "babel-eslint": "^10.0.3",
@@ -14,6 +15,7 @@
     "lerna": "^3.18.4",
     "prettier": "^1.18.2",
     "prettier-plugin-solidity": "^1.0.0-alpha.22",
+    "truffle": "^5.1.4",
     "ts-node": "^8.5.2",
     "tsdx": "^0.11.0",
     "tslib": "^1.10.0",
@@ -29,6 +31,7 @@
     "ganache:stop": "kill `ps ax|grep ganache-cli|grep -v grep| awk '{print $1}'` 2> /dev/null; exit 0",
     "ganache:watch": "tail -f -n 100 ganache-cli.log",
     "truffle:migrate": "npx lerna run migrate --scope tasit-contracts --stream",
+    "truffle:migrate:rinkeby": "npx lerna run migrate:rinkeby --scope tasit-contracts --stream",
     "prepare:blockchain": "npm run ganache:stop && npm run ganache:start && npm run truffle:migrate",
     "pretest": "npm run prepare:blockchain && npm run lint",
     "test": "npx lerna run test --stream --concurrency 1",
