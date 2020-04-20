@@ -28,35 +28,36 @@
     "lint": "tsdx lint src",
     "test:mocha-babel": "npx mocha \"src/**/*.test.ts\" --recursive --require @babel/register --file src/testHelpers/mochaSetup.ts --timeout 8000",
     "test": "npm run test:mocha-babel",
-    "upgrade": "npx ncu",
-    "upgrade:write": "npx ncu -u"
+    "update": "npx ncu",
+    "update:write": "npm run update -- -u"
   },
   "bugs": {
     "url": "https://github.com/tasitlabs/tasit-sdk/issues"
   },
   "dependencies": {
-    "@babel/runtime": "^7.7.2",
-    "ethers": "^4.0.39",
-    "tasit-contracts": "^0.0.19"
+    "@babel/runtime": "^7.9.2",
+    "ethers": "^4.0.46",
+    "tasit-contracts": "^0.0.18"
   },
   "devDependencies": {
-    "@babel/cli": "^7.7.0",
-    "@babel/core": "^7.7.2",
-    "@babel/plugin-proposal-class-properties": "^7.7.0",
-    "@babel/preset-typescript": "^7.7.2",
-    "@babel/register": "^7.7.0",
-    "@typescript-eslint/eslint-plugin": "^2.8.0",
-    "@typescript-eslint/parser": "^2.8.0",
+    "@babel/cli": "^7.8.4",
+    "@babel/core": "^7.9.0",
+    "@babel/plugin-proposal-class-properties": "^7.8.3",
+    "@babel/preset-typescript": "^7.9.0",
+    "@babel/register": "^7.9.0",
+    "@typescript-eslint/eslint-plugin": "^2.29.0",
+    "@typescript-eslint/parser": "^2.29.0",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
-    "husky": "^3.1.0",
-    "mocha": "^6.2.2",
+    "husky": "^4.2.5",
+    "mocha": "^7.1.1",
     "node-fetch": "^2.6.0",
-    "sinon": "^7.5.0",
-    "tasit-account": "^0.0.19",
-    "ts-node": "^8.5.2",
-    "tsdx": "^0.11.0",
-    "tslib": "^1.10.0",
-    "typescript": "^3.7.2"
+    "npm-check-updates": "^4.1.2",
+    "sinon": "^9.0.2",
+    "tasit-account": "^0.0.18",
+    "ts-node": "^8.9.0",
+    "tsdx": "^0.13.2",
+    "tslib": "^1.11.1",
+    "typescript": "^3.8.3"
   }
 }

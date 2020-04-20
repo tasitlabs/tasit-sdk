@@ -39,28 +39,29 @@
     "test:tsdx": "tsdx test",
     "lint": "tsdx lint src",
     "test": "npm run test:truffle",
-    "upgrade": "npx ncu",
-    "upgrade:write": "npx ncu -u"
+    "update": "npx ncu",
+    "update:write": "npm run update -- -u"
   },
   "bugs": {
     "url": "https://github.com/tasitlabs/tasit-sdk/issues"
   },
   "devDependencies": {
-    "@babel/cli": "^7.7.0",
-    "@babel/core": "^7.7.2",
-    "@babel/node": "^7.7.0",
-    "@babel/preset-typescript": "^7.7.2",
-    "@truffle/hdwallet-provider": "^1.0.26",
-    "husky": "^3.1.0",
+    "@babel/cli": "^7.8.4",
+    "@babel/core": "^7.9.0",
+    "@babel/node": "^7.8.7",
+    "@babel/preset-typescript": "^7.9.0",
+    "@truffle/hdwallet-provider": "^1.0.34",
+    "husky": "^4.2.5",
     "node-fetch": "^2.6.0",
-    "truffle": "^5.1.3",
+    "npm-check-updates": "^4.1.2",
+    "truffle": "^5.1.22",
     "truffle-typings": "^1.0.8",
-    "ts-node": "^8.5.2",
-    "tsdx": "^0.11.0",
-    "tslib": "^1.10.0",
-    "typescript": "^3.7.2"
+    "ts-node": "^8.9.0",
+    "tsdx": "^0.13.2",
+    "tslib": "^1.11.1",
+    "typescript": "^3.8.3"
   },
   "dependencies": {
-    "openzeppelin-solidity": "^2.4.0"
+    "openzeppelin-solidity": "^2.5.0"
   }
 }
