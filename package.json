@@ -22,7 +22,7 @@
     "typescript": "^3.8.3"
   },
   "scripts": {
-    "postinstall": "lerna bootstrap",
+    "postinstall": "npx lerna bootstrap",
     "audit:fix:all": "npx lerna exec --stream --concurrency 1 npm audit fix",
     "update": "npx ncu -x '@types/mocha, @types/node'",
     "update:write": "npm run update -- -u",
