@@ -3,17 +3,19 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
+    "update": "npx ncu",
+    "update:write": "npm run update -- -u",
     "start": "npx docusaurus start",
     "build": "npx docusaurus build",
     "swizzle": "npx docusaurus swizzle",
     "deploy": "npx docusaurus deploy"
   },
   "dependencies": {
-    "@docusaurus/core": "^2.0.0-alpha.33",
-    "@docusaurus/preset-classic": "^2.0.0-alpha.33",
+    "@docusaurus/core": "^2.0.0-alpha.50",
+    "@docusaurus/preset-classic": "^2.0.0-alpha.40",
     "classnames": "^2.2.6",
-    "react": "^16.8.4",
-    "react-dom": "^16.8.4"
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1"
   },
   "browserslist": {
     "production": [
@@ -28,6 +30,7 @@
     ]
   },
   "devDependencies": {
-    "docusaurus": "^2.0.0-alpha.34"
+    "docusaurus": "^2.0.0-alpha.34",
+    "npm-check-updates": "^4.1.2"
   }
 }
