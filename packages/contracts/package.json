@@ -32,8 +32,8 @@
     "install:3rd-parties": "./3rd-parties/run_on_all.sh install `pwd`",
     "compile:3rd-parties": "./3rd-parties/run_on_all.sh compile `pwd`",
     "clean:3rd-parties": "./3rd-parties/run_on_all.sh clean `pwd`",
-    "populate-contracts": "NETWORK=development npx babel-node src/scripts/populateDecentralandContracts.ts",
-    "populate-contracts:rinkeby": "NETWORK=rinkeby npx babel-node src/scripts/populateDecentralandContracts.js",
+    "populate-contracts": "NETWORK=development npx ts-node src/scripts/populateDecentralandContracts.ts",
+    "populate-contracts:rinkeby": "NETWORK=rinkeby npx ts-node src/scripts/populateDecentralandContracts.ts",
     "start": "tsdx watch",
     "build": "tsdx build",
     "test:tsdx": "tsdx test",
@@ -51,6 +51,7 @@
     "@babel/node": "^7.8.7",
     "@babel/preset-typescript": "^7.9.0",
     "@truffle/hdwallet-provider": "^1.0.34",
+    "truffle-hdwallet-provider": "1.0.17",
     "husky": "^4.2.5",
     "node-fetch": "^2.6.0",
     "npm-check-updates": "^4.1.2",
@@ -62,6 +63,7 @@
     "typescript": "^3.8.3"
   },
   "dependencies": {
+    "zeppelin-solidity": "1.12.0",
     "openzeppelin-solidity": "^2.5.0"
   }
 }
