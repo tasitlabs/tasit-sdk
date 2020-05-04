@@ -8,7 +8,7 @@ sidebar_label: Getting started
 
 You can use the Tasit SDK to create user-friendly mobile iOS and Android apps for a dapp using React Native.
 
-Looking for the entry point for the `tasit-sdk` package? [That's here](/packages/sdk/). The Tasit SDK is a collection of smaller packages exported as one using [lerna](https://lernajs.io/).
+Looking for the entry point for the `tasit-sdk` package? [That's here](https://github.com/tasitlabs/tasit-sdk/tree/develop/packages/sdk). The Tasit SDK is a collection of smaller packages exported as one using [lerna](https://lerna.js.org/).
 
 #### Installation
 
@@ -18,7 +18,7 @@ Getting started is as simple as running
 
 #### Usage
 
-Are you looking to add functionality to a pre-existing app using the Tasit SDK?
+Are you looking to add Ethereum-related functionality to a pre-existing app using the Tasit SDK?
 
 Using the Tasit SDK from within your app is simple.
 In `App.js` or the appropriate React Native component, import whichever APIs you need from the Tasit SDK.
@@ -33,9 +33,9 @@ console.log(ephemeralWallet.address); // '0x...'
 Or maybe you want to interact with a contract:
 
 ```javascript
-import { Contract } from "tasit-sdk";
+import { Contracts } from "tasit-sdk";
 
-const { NFT } = Contract;
+const { NFT } = Contracts;
 
 // const contractAddress = '0x0E86...333'
 
@@ -51,12 +51,6 @@ action.sendForFree(); // meta-tx broadcast
 // confirmations for your use case
 // ...
 ```
-
-#### Automatic scaffolding using the Tasit CLI
-
-Are you starting a project from scratch? Let the Tasit CLI scaffold out your project for you. More details on this [here](https://github.com/tasitlabs/tasit#automatic-scaffolding-using-the-tasit-cli).
-
-The code for the CLI lives over in the [`tasit` repo](https://github.com/tasitlabs/tasit) with the code for the mobile apps, because it heavily uses the React Native components there when generating the scaffolding.
 
 #### Modular
 
@@ -77,17 +71,6 @@ import Account from "tasit-account";
 
 ...with the rest of the code remaining the same.
 
-Or maybe you just want to use the simple abstraction for interacting with smart contracts. Then just install `tasit-action` directly instead.
-
-```
-npm install --save tasit-action
-```
-
-```javascript
-import { Contract } from "tasit-action";
-// ...
-```
-
 ---
 
-[Go back to the home page of the docs](Home.md)
+See something that can be improved on this page? [Edit it here](https://github.com/tasitlabs/tasit-sdk/blob/develop/packages/docs/docs/GettingStarted.md).

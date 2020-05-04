@@ -1,5 +1,6 @@
-import Contract from "../Contract";
-import TasitContracts from "tasit-contracts";
+import { Contract } from "tasit-action";
+
+import TasitContracts from "../../..";
 const { local } = TasitContracts;
 const { MyERC721Full } = local;
 const { abi } = MyERC721Full;

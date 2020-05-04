@@ -166,11 +166,11 @@ const rinkebyDeployedByDevMetaMask = {
   };
   
 
-export const TasitContracts = {
+export const Contracts = {
   local,
   goerli,
   ropsten,
   rinkeby,
 };
 
-export default TasitContracts;
+export default Contracts;

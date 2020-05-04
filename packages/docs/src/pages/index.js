@@ -30,7 +30,7 @@ const features = [
     description: (
       <>
         Onboarding with ephemeral accounts, contract-based accounts, and
-        deep-linking to and from mobile wallets
+        deep linking to and from mobile wallets
       </>
     ),
   },
