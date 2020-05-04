@@ -10,7 +10,6 @@ sidebar_label: Table of contents
 
 - [Installation](#installation)
 - [Usage](#usage)
-- [Automatic scaffolding using the Tasit CLI](#automatic-scaffolding-using-the-tasit-cli)
 - [Modular](#modular)
 
 [Main features](MainFeatures.md)
@@ -25,4 +24,6 @@ sidebar_label: Table of contents
 
 ---
 
-[Go back to the home page of the docs](Home.md)
+[Go back](Home.md) to the home page of the docs.
+
+See something that can be improved on this page? [Edit it here](https://github.com/tasitlabs/tasit-sdk/blob/develop/packages/docs/docs/TableOfContents.md).

@@ -1,6 +1,6 @@
 {
   "name": "tasit-docs",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "private": true,
   "scripts": {
     "update": "npx ncu",
@@ -11,7 +11,7 @@
     "deploy": "npx docusaurus deploy"
   },
   "dependencies": {
-    "@docusaurus/core": "^2.0.0-alpha.50",
+    "@docusaurus/core": "^2.0.0-alpha.54",
     "@docusaurus/preset-classic": "^2.0.0-alpha.40",
     "classnames": "^2.2.6",
     "react": "^16.13.1",
@@ -30,7 +30,7 @@
     ]
   },
   "devDependencies": {
-    "docusaurus": "^2.0.0-alpha.34",
+    "docusaurus": "^2.0.0-alpha.54",
     "npm-check-updates": "^4.1.2"
   }
 }
