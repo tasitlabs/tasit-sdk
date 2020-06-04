@@ -1,9 +1,9 @@
 {
-  "name": "tasit-account",
+  "name": "@tasit/account",
   "version": "0.0.19",
   "description": "Library for using Ethereum accounts",
   "main": "dist/index",
-  "module": "dist/tasit-account.esm.js",
+  "module": "dist/@tasit/account.esm.js",
   "typings": "dist/index.d.ts",
   "keywords": [
     "ethereum",

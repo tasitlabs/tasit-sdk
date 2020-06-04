@@ -11,4 +11,4 @@ For context, here is an [overview of how this fits in with the rest of the Tasit
 ### 3rd-party contracts
 
 ##### Gnosis Safe
-[This])(https://github.com/gnosis/safe-contracts/tree/e13a145485f35514e19284dbcd16df9fe2f893ca) is the version of the Gnosis Safe contracts this package is using.
+[This](https://github.com/gnosis/safe-contracts/tree/e13a145485f35514e19284dbcd16df9fe2f893ca) is the version of the Gnosis Safe contracts this package is using.

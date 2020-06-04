@@ -8,8 +8,6 @@
   "keywords": [
     "ethereum",
     "dapp",
-    "truffle",
-    "ganache",
     "solidity"
   ],
   "author": "Tasit Labs",
@@ -28,8 +26,6 @@
     "compile:contracts": "npx buidler compile --config buidler.config.5.js && npx buidler compile",
     "compile": "npm run compile:contracts",
     "build": "npm run compile && npm run typechain",
-    "migrate": "npx truffle migrate && npm run populate-contracts",
-    "migrate:rinkeby": "npx truffle migrate --network rinkeby && npm run populate-contracts:rinkeby",
     "prepare": "npm run compile",
     "populate-contracts": "NETWORK=development npx ts-node src/scripts/populateDecentralandContracts.ts",
     "populate-contracts:rinkeby": "NETWORK=rinkeby npx ts-node src/scripts/populateDecentralandContracts.ts",
