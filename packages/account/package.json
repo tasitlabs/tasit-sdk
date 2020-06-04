@@ -44,7 +44,6 @@
     "@babel/preset-typescript": "^7.9.0",
     "@babel/register": "^7.9.0",
     "chai": "^4.2.0",
-    "husky": "^4.2.5",
     "mocha": "^7.1.2",
     "npm-check-updates": "^4.1.2",
     "ts-node": "^8.9.1",
