@@ -1,0 +1,7 @@
+{
+  "extends": "solhint:recommended",
+  "rules": {
+      "bracket-align": "off"
+  },
+  "plugins": ["prettier"]
+}
