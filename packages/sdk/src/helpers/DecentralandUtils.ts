@@ -53,9 +53,9 @@ export default class DecentralandUtils {
 
     const latestOrdersCreated = [];
 
-    ordersCreated.reverse().forEach(created => {
+    ordersCreated.reverse().forEach((created) => {
       const isOlder = latestOrdersCreated.find(
-        o => `${o.assetId}` === `${created.assetId}`
+        (o) => `${o.assetId}` === `${created.assetId}`
       );
       if (!isOlder) latestOrdersCreated.push(created);
     });
@@ -63,18 +63,20 @@ export default class DecentralandUtils {
     // Open = Created - Cancelled - Executed
     const openOrders = latestOrdersCreated
       .filter(
-        created =>
-          !ordersCancelled.find(cancelled => ordersAreEqual(cancelled, created))
+        (created) =>
+          !ordersCancelled.find((cancelled) =>
+            ordersAreEqual(cancelled, created)
+          )
       )
       .filter(
-        created =>
-          !ordersExecuted.find(executed => ordersAreEqual(executed, created))
+        (created) =>
+          !ordersExecuted.find((executed) => ordersAreEqual(executed, created))
       );
 
     return openOrders;
   };
 
-  getAssetsOf = async address => {
+  getAssetsOf = async (address) => {
     let [estates, parcels] = await Promise.all([
       this._getEstatesOf(address),
       this._getParcelsOf(address),
@@ -83,12 +85,12 @@ export default class DecentralandUtils {
     const estateAddress = this.estate.address;
     const landAddress = this.land.address;
 
-    estates = estates.map(estate => ({
+    estates = estates.map((estate) => ({
       ...estate,
       nftAddress: estateAddress,
     }));
 
-    parcels = parcels.map(parcel => ({
+    parcels = parcels.map((parcel) => ({
       ...parcel,
       nftAddress: landAddress,
     }));
@@ -99,7 +101,7 @@ export default class DecentralandUtils {
   };
 
   // TODO: Move to private
-  _getEstatesOf = async address => {
+  _getEstatesOf = async (address) => {
     const estates = await this.getAssetsFromContractAndOwner(
       this.estate,
       address
@@ -108,7 +110,7 @@ export default class DecentralandUtils {
   };
 
   // TODO: Move to private
-  _getParcelsOf = async address => {
+  _getParcelsOf = async (address) => {
     const parcels = await this.getAssetsFromContractAndOwner(
       this.land,
       address
@@ -121,27 +123,27 @@ export default class DecentralandUtils {
   private getAssetsFromContractAndOwner = async (contract, address) => {
     const { address: nftAddress } = contract;
 
-    const fromTransferEventToAsset = transfer => {
+    const fromTransferEventToAsset = (transfer) => {
       const { assetId, transactionHash } = transfer;
       const asset = { id: `${assetId}`, nftAddress, transactionHash };
       return asset;
     };
 
-    const getAssetId = asset => asset.id;
+    const getAssetId = (asset) => asset.id;
 
     const transfers = await this.getTransfers(contract);
 
     const receivedAssets = transfers
-      .filter(transfer => transfer.to === address)
+      .filter((transfer) => transfer.to === address)
       .map(fromTransferEventToAsset);
 
     const sentAssets = transfers
-      .filter(transfer => transfer.from === address)
+      .filter((transfer) => transfer.from === address)
       .map(fromTransferEventToAsset);
 
     // Owned = Received - Sent
     const ownedAssets = receivedAssets.filter(
-      received => !sentAssets.map(getAssetId).includes(getAssetId(received))
+      (received) => !sentAssets.map(getAssetId).includes(getAssetId(received))
     );
 
     return ownedAssets;
@@ -159,7 +161,7 @@ export default class DecentralandUtils {
     return this.getOrders("OrderSuccessful");
   };
 
-  private getOrders = async eventName => {
+  private getOrders = async (eventName) => {
     let eventABI;
 
     if (eventName === "OrderCreated") {
@@ -181,7 +183,7 @@ export default class DecentralandUtils {
     return this.listEventLogs(eventABI, filter);
   };
 
-  private getTransfers = async contract => {
+  private getTransfers = async (contract) => {
     const eventABI = [
       "event Transfer(address indexed from, address indexed to, uint256 indexed assetId)",
     ];
@@ -207,7 +209,7 @@ export default class DecentralandUtils {
 
     // ethers helpers class for dealing with ABI
     // transforming a { 0, 1, 2 } transfer event object to { from, to, assetId }
-    const parsedLogs = logs.map(log => {
+    const parsedLogs = logs.map((log) => {
       const { transactionHash } = log;
       const parsedLog = iface.parseLog(log);
       const { values } = parsedLog;

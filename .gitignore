@@ -4,4 +4,5 @@ lerna-debug.log
 **/dist/**/*
 *.tgz
 ganache-cli.log
+buidler-evm.log
 **/.vscode/

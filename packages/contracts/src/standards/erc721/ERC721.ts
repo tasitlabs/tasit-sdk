@@ -2,8 +2,8 @@ import { Contract } from "tasit-action";
 
 import TasitContracts from "../..";
 const { local } = TasitContracts;
-const { MyERC721Full } = local;
-const { abi } = MyERC721Full;
+const { MyERC721 } = local;
+const { abi } = MyERC721;
 
 const abiString = JSON.stringify(abi);
 

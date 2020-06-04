@@ -56,7 +56,7 @@ export const pickAssetsForSale = async () => {
   expect(openSellOrders).to.not.be.empty;
 
   // Pick two open sell orders: one for a parcel of land and one for an estate
-  for (let order of openSellOrders) {
+  for (const order of openSellOrders) {
     const { nftAddress, expiresAt } = order;
 
     const isLand = addressesAreEqual(nftAddress, LAND_ADDRESS);

@@ -6,10 +6,10 @@ import GnosisSafeUtils from "./GnosisSafeUtils";
 import TasitContracts from "tasit-contracts";
 
 const { local } = TasitContracts;
-const { GnosisSafe: GnosisSafeInfo, MyERC20Full, MyERC721Full } = local;
+const { GnosisSafe: GnosisSafeInfo, MyERC20, MyERC721 } = local;
 const { abi: gnosisSafeABI } = GnosisSafeInfo;
-const { abi: erc20ABI } = MyERC20Full;
-const { abi: erc721ABI } = MyERC721Full;
+const { abi: erc20ABI } = MyERC20;
+const { abi: erc721ABI } = MyERC721;
 
 // Possible Gnosis Safe wallet operations
 const operations = {

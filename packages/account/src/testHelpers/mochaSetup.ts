@@ -5,8 +5,9 @@ import { expect } from "chai";
 global.expect = expect;
 
 // Helpers
-import actionHelpers from "../../../tasit-action/dist/testHelpers/helpers";
-const { createSnapshot, revertFromSnapshot, mineBlocks } = actionHelpers;
+import TasitAction from "@tasit/action";
+const { helpers } = TasitAction;
+const { createSnapshot, revertFromSnapshot, mineBlocks } = helpers;
 
 // Global hooks
 let snapshotId;

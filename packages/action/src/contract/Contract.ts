@@ -171,7 +171,7 @@ export class Contract extends Subscription {
         return json.type === "function";
       })
       .forEach((f: ContractFunction) => {
-        var isWrite =
+        const isWrite =
           (f.constant === undefined &&
             f.stateMutability !== "view" &&
             f.stateMutability !== "pure") ||

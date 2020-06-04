@@ -57,7 +57,7 @@ describe("ethers", () => {
   });
 
   it("should set contract's value", async () => {
-    var rand = Math.floor(Math.random() * Math.floor(1000)).toString();
+    const rand = Math.floor(Math.random() * Math.floor(1000)).toString();
 
     const sentTx = await sampleContract.setValue(rand);
     await provider.waitForTransaction(sentTx.hash);
@@ -67,7 +67,7 @@ describe("ethers", () => {
     expect(value).to.equal(rand);
   });
 
-  it("should watch contract's ValueChanged event", done => {
+  it("should watch contract's ValueChanged event", (done) => {
     (async () => {
       const oldValue = await sampleContract.getValue();
       const newValue = `I like cats`;
@@ -103,7 +103,7 @@ describe("ethers", () => {
     })();
   });
 
-  it("should remove listener using removeAllListeners function", done => {
+  it("should remove listener using removeAllListeners function", (done) => {
     (async () => {
       const timeout = setTimeout(() => {
         done(new Error("timeout"));
@@ -159,7 +159,7 @@ describe("ethers", () => {
   // Note that this is different behavior from web3.js
   // See more: packages/contracts/test/SampleContract
   // and https://github.com/ethers-io/ethers.js/issues/407
-  it("should call overloading functions - ethers", async function() {
+  it("should call overloading functions - ethers", async function () {
     const f1 = await sampleContract["overloading()"]();
     const f2 = await sampleContract["overloading(string)"]("a");
     const f3 = await sampleContract["overloading(string,string)"]("a", "b");

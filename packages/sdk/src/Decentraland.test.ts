@@ -163,7 +163,7 @@ describe("Decentraland", () => {
       });
 
       describe("Using an ephemeral account funded by faucets", () => {
-        beforeEach("onboarding", done => {
+        beforeEach("onboarding", (done) => {
           (async () => {
             await etherFaucet(
               provider,
@@ -194,7 +194,7 @@ describe("Decentraland", () => {
               manaAmountForShopping
             );
 
-            const errorListener = error => {
+            const errorListener = (error) => {
               marketplace.off("error");
               done(error);
             };
@@ -215,7 +215,7 @@ describe("Decentraland", () => {
           })();
         });
 
-        it("should buy an estate - using action events", done => {
+        it("should buy an estate - using action events", (done) => {
           (async () => {
             const { assetId, nftAddress, priceInWei } = estateForSale;
 
@@ -239,7 +239,7 @@ describe("Decentraland", () => {
               done();
             };
 
-            const errorListener = error => {
+            const errorListener = (error) => {
               executeOrderAction.off("error");
               done(error);
             };
@@ -251,7 +251,7 @@ describe("Decentraland", () => {
           })();
         });
 
-        it("should buy an estate - using contract events", done => {
+        it("should buy an estate - using contract events", (done) => {
           (async () => {
             const { assetId, nftAddress, priceInWei } = estateForSale;
 
@@ -269,7 +269,7 @@ describe("Decentraland", () => {
               `${fingerprint}`
             );
 
-            const orderSuccessfulListener = async message => {
+            const orderSuccessfulListener = async (message) => {
               const { data } = message;
               const { args } = data;
               const { buyer } = args;
@@ -279,7 +279,7 @@ describe("Decentraland", () => {
               done();
             };
 
-            const errorListener = error => {
+            const errorListener = (error) => {
               const { message } = error;
               console.warn(message);
               marketplace.off("error");
@@ -293,7 +293,7 @@ describe("Decentraland", () => {
           })();
         });
 
-        it("should buy a parcel of land - using action events", done => {
+        it("should buy a parcel of land - using action events", (done) => {
           (async () => {
             const { assetId, nftAddress, priceInWei } = landForSale;
 
@@ -317,7 +317,7 @@ describe("Decentraland", () => {
               done();
             };
 
-            const errorListener = error => {
+            const errorListener = (error) => {
               executeOrderAction.off("error");
               done(error);
             };
@@ -329,7 +329,7 @@ describe("Decentraland", () => {
           })();
         });
 
-        it("should buy a parcel of land - using contract events", done => {
+        it("should buy a parcel of land - using contract events", (done) => {
           (async () => {
             const { assetId, nftAddress, priceInWei } = landForSale;
 
@@ -347,7 +347,7 @@ describe("Decentraland", () => {
               `${fingerprint}`
             );
 
-            const orderSuccessfulListener = async message => {
+            const orderSuccessfulListener = async (message) => {
               const { data } = message;
               const { args } = data;
               const { buyer } = args;
@@ -358,7 +358,7 @@ describe("Decentraland", () => {
               done();
             };
 
-            const errorListener = error => {
+            const errorListener = (error) => {
               marketplace.off("error");
               done(error);
             };
@@ -388,102 +388,111 @@ describe("Decentraland", () => {
         });
 
         // Transfer a small amount of ethers to ephemeral account to pay for gas
-        beforeEach("onboarding - funding ephemeral account with ETH", done => {
-          (async () => {
-            const toAddress = ephemeralAddress;
+        beforeEach(
+          "onboarding - funding ephemeral account with ETH",
+          (done) => {
+            (async () => {
+              const toAddress = ephemeralAddress;
 
-            const action = gnosisSafe.transferEther(toAddress, SMALL_AMOUNT);
+              const action = gnosisSafe.transferEther(toAddress, SMALL_AMOUNT);
 
-            const confirmationListener = async () => {
-              await expectExactEtherBalances(
-                provider,
-                [toAddress],
-                [SMALL_AMOUNT]
+              const confirmationListener = async () => {
+                await expectExactEtherBalances(
+                  provider,
+                  [toAddress],
+                  [SMALL_AMOUNT]
+                );
+
+                done();
+              };
+
+              const errorListener = (error) => {
+                action.off("error");
+                done(error);
+              };
+
+              action.once("confirmation", confirmationListener);
+              action.on("error", errorListener);
+
+              action.send();
+            })();
+          }
+        );
+
+        beforeEach(
+          "onboarding - funding ephemeral account with MANA",
+          (done) => {
+            (async () => {
+              // Global hooks don't run between same level hooks
+              await mineBlocks(provider, 1);
+
+              const toAddress = ephemeralAddress;
+
+              const action = gnosisSafe.transferERC20(
+                MANA_ADDRESS,
+                toAddress,
+                manaAmountForShopping
               );
 
-              done();
-            };
+              const confirmationListener = async () => {
+                await expectExactTokenBalances(
+                  mana,
+                  [toAddress],
+                  [manaAmountForShopping]
+                );
+                done();
+              };
 
-            const errorListener = error => {
-              action.off("error");
-              done(error);
-            };
+              const errorListener = (error) => {
+                action.off("error");
+                done(error);
+              };
 
-            action.once("confirmation", confirmationListener);
-            action.on("error", errorListener);
+              action.once("confirmation", confirmationListener);
+              action.on("error", errorListener);
 
-            action.send();
-          })();
-        });
+              action.send();
+            })();
+          }
+        );
 
-        beforeEach("onboarding - funding ephemeral account with MANA", done => {
-          (async () => {
-            // Global hooks don't run between same level hooks
-            await mineBlocks(provider, 1);
+        beforeEach(
+          "onboarding - approving Marketplace to spend MANA",
+          (done) => {
+            (async () => {
+              // Global hooks don't run between same level hooks
+              await mineBlocks(provider, 1);
 
-            const toAddress = ephemeralAddress;
-
-            const action = gnosisSafe.transferERC20(
-              MANA_ADDRESS,
-              toAddress,
-              manaAmountForShopping
-            );
-
-            const confirmationListener = async () => {
-              await expectExactTokenBalances(
-                mana,
-                [toAddress],
-                [manaAmountForShopping]
-              );
-              done();
-            };
-
-            const errorListener = error => {
-              action.off("error");
-              done(error);
-            };
-
-            action.once("confirmation", confirmationListener);
-            action.on("error", errorListener);
-
-            action.send();
-          })();
-        });
-
-        beforeEach("onboarding - approving Marketplace to spend MANA", done => {
-          (async () => {
-            // Global hooks don't run between same level hooks
-            await mineBlocks(provider, 1);
-
-            mana.setAccount(ephemeralAccount);
-            const action = mana.approve(
-              MARKETPLACE_ADDRESS,
-              manaAmountForShopping
-            );
-
-            const confirmationListener = async () => {
-              const allowance = await mana.allowance(
-                ephemeralAddress,
-                MARKETPLACE_ADDRESS
+              mana.setAccount(ephemeralAccount);
+              const action = mana.approve(
+                MARKETPLACE_ADDRESS,
+                manaAmountForShopping
               );
 
-              expect(`${allowance}`).to.equal(`${manaAmountForShopping}`);
-              done();
-            };
+              const confirmationListener = async () => {
+                const allowance = await mana.allowance(
+                  ephemeralAddress,
+                  MARKETPLACE_ADDRESS
+                );
 
-            const errorListener = error => {
-              action.off("error");
-              done(error);
-            };
+                expect(`${allowance}`).to.equal(`${manaAmountForShopping}`);
+                done();
+              };
 
-            action.once("confirmation", confirmationListener);
-            action.on("error", errorListener);
+              const errorListener = (error) => {
+                action.off("error");
+                done(error);
+              };
 
-            action.send();
-          })();
-        });
+              action.once("confirmation", confirmationListener);
+              action.on("error", errorListener);
 
-        it("should buy an estate", done => {
+              action.send();
+            })();
+          }
+        );
+
+        it("should buy an estate", (done) => {
           (async () => {
             const { assetId, nftAddress, priceInWei } = estateForSale;
 
@@ -523,7 +532,7 @@ describe("Decentraland", () => {
               done();
             };
 
-            const errorListener = error => {
+            const errorListener = (error) => {
               action.off("error");
               done(error);
             };
@@ -535,7 +544,7 @@ describe("Decentraland", () => {
           })();
         });
 
-        it("should buy a parcel of land", done => {
+        it("should buy a parcel of land", (done) => {
           (async () => {
             const { assetId, nftAddress, priceInWei } = landForSale;
 
@@ -575,7 +584,7 @@ describe("Decentraland", () => {
               done();
             };
 
-            const errorListener = error => {
+            const errorListener = (error) => {
               action.off("error");
               done(error);
             };
@@ -590,64 +599,28 @@ describe("Decentraland", () => {
 
       // WIP: Not working because of gas issue on Marketplace.safeExecuteOrder() call
       describe("Using funds from a Gnosis Safe account", () => {
-        beforeEach("onboarding - funding ephemeral account with ETH", done => {
-          gnosisSafe.setSigners([gnosisSafeOwner]);
-          gnosisSafe.setAccount(gnosisSafeOwner);
-          const toAddress = ephemeralAddress;
+        beforeEach(
+          "onboarding - funding ephemeral account with ETH",
+          (done) => {
+            gnosisSafe.setSigners([gnosisSafeOwner]);
+            gnosisSafe.setAccount(gnosisSafeOwner);
+            const toAddress = ephemeralAddress;
 
-          // Funding ephemeral account with some ethers to pay for gas
-          // TODO: ephemeralAccount should broadcast this action
-          const action = gnosisSafe.transferEther(toAddress, SMALL_AMOUNT);
-
-          const confirmationListener = async () => {
-            await expectExactEtherBalances(
-              provider,
-              [toAddress],
-              [SMALL_AMOUNT]
-            );
-
-            done();
-          };
-
-          const errorListener = error => {
-            action.off("error");
-            done(error);
-          };
-
-          action.once("confirmation", confirmationListener);
-          action.on("error", errorListener);
-
-          action.send();
-        });
-
-        beforeEach("onboarding - approving Marketplace to spend MANA", done => {
-          (async () => {
-            // Global hooks don't run between same level hooks
-            await mineBlocks(provider, 1);
-
-            // Gnosis Safe should approve Marketplace to spend its MANA Tokens
+            // Funding ephemeral account with some ethers to pay for gas
             // TODO: ephemeralAccount should broadcast this action
-            const contractAddress = mana.getAddress();
-            const contractABI = mana.getABI();
-            const functionName = "approve";
-            const argsArray = [MARKETPLACE_ADDRESS, manaAmountForShopping];
-            const action = gnosisSafe.customContractAction(
-              contractAddress,
-              contractABI,
-              functionName,
-              argsArray
-            );
+            const action = gnosisSafe.transferEther(toAddress, SMALL_AMOUNT);
 
             const confirmationListener = async () => {
-              const owner = GNOSIS_SAFE_ADDRESS;
-              const spender = MARKETPLACE_ADDRESS;
-              const allowance = await mana.allowance(owner, spender);
-              expect(`${allowance}`).to.equal(`${manaAmountForShopping}`);
+              await expectExactEtherBalances(
+                provider,
+                [toAddress],
+                [SMALL_AMOUNT]
+              );
 
               done();
             };
 
-            const errorListener = error => {
+            const errorListener = (error) => {
               action.off("error");
               done(error);
             };
@@ -656,10 +629,52 @@ describe("Decentraland", () => {
             action.on("error", errorListener);
 
             action.send();
-          })();
-        });
+          }
+        );
 
-        it("should buy an estate - using action events", done => {
+        beforeEach(
+          "onboarding - approving Marketplace to spend MANA",
+          (done) => {
+            (async () => {
+              // Global hooks don't run between same level hooks
+              await mineBlocks(provider, 1);
+
+              // Gnosis Safe should approve Marketplace to spend its MANA Tokens
+              // TODO: ephemeralAccount should broadcast this action
+              const contractAddress = mana.getAddress();
+              const contractABI = mana.getABI();
+              const functionName = "approve";
+              const argsArray = [MARKETPLACE_ADDRESS, manaAmountForShopping];
+              const action = gnosisSafe.customContractAction(
+                contractAddress,
+                contractABI,
+                functionName,
+                argsArray
+              );
+
+              const confirmationListener = async () => {
+                const owner = GNOSIS_SAFE_ADDRESS;
+                const spender = MARKETPLACE_ADDRESS;
+                const allowance = await mana.allowance(owner, spender);
+                expect(`${allowance}`).to.equal(`${manaAmountForShopping}`);
+
+                done();
+              };
+
+              const errorListener = (error) => {
+                action.off("error");
+                done(error);
+              };
+
+              action.once("confirmation", confirmationListener);
+              action.on("error", errorListener);
+
+              action.send();
+            })();
+          }
+        );
+
+        it("should buy an estate - using action events", (done) => {
           (async () => {
             // Global hooks don't run between same level hooks
             await mineBlocks(provider, 1);
@@ -706,7 +721,7 @@ describe("Decentraland", () => {
               done();
             };
 
-            const errorListener = error => {
+            const errorListener = (error) => {
               action.off("error");
               done(error);
             };
@@ -718,7 +733,7 @@ describe("Decentraland", () => {
           })();
         });
 
-        it("should buy an estate - using contract events", done => {
+        it("should buy an estate - using contract events", (done) => {
           (async () => {
             // Global hooks don't run between same level hooks
             await mineBlocks(provider, 1);
@@ -762,7 +777,7 @@ describe("Decentraland", () => {
               done();
             };
 
-            const errorListener = error => {
+            const errorListener = (error) => {
               action.off("error");
               done(error);
             };
@@ -774,7 +789,7 @@ describe("Decentraland", () => {
           })();
         });
 
-        it("should buy a parcel of land - using action events", done => {
+        it("should buy a parcel of land - using action events", (done) => {
           (async () => {
             const { assetId, nftAddress, priceInWei } = landForSale;
 
@@ -814,7 +829,7 @@ describe("Decentraland", () => {
               done();
             };
 
-            const errorListener = error => {
+            const errorListener = (error) => {
               action.off("error");
               done(error);
             };
@@ -826,7 +841,7 @@ describe("Decentraland", () => {
           })();
         });
 
-        it("should buy a parcel of land - using contract events", done => {
+        it("should buy a parcel of land - using contract events", (done) => {
           (async () => {
             const { assetId, nftAddress, priceInWei } = landForSale;
 
@@ -867,7 +882,7 @@ describe("Decentraland", () => {
               done();
             };
 
-            const errorListener = error => {
+            const errorListener = (error) => {
               action.off("error");
               done(error);
             };
@@ -883,39 +898,42 @@ describe("Decentraland", () => {
       // Allowance-of-allowance doesn't work
       // See more: https://github.com/tasitlabs/tasit-sdk/issues/273
       describe("Using an ephemeral account allowed to spend Gnosis Safe account's funds", () => {
-        beforeEach("onboarding - funding ephemeral account with ETH", done => {
-          (async () => {
-            const toAddress = ephemeralAddress;
-            gnosisSafe.setSigners([gnosisSafeOwner]);
-            gnosisSafe.setAccount(gnosisSafeOwner);
-            // Funding ephemeral account with some ethers to pay for gas
-            // TODO: ephemeralAccount should broadcast this action
-            const action = gnosisSafe.transferEther(toAddress, SMALL_AMOUNT);
+        beforeEach(
+          "onboarding - funding ephemeral account with ETH",
+          (done) => {
+            (async () => {
+              const toAddress = ephemeralAddress;
+              gnosisSafe.setSigners([gnosisSafeOwner]);
+              gnosisSafe.setAccount(gnosisSafeOwner);
+              // Funding ephemeral account with some ethers to pay for gas
+              // TODO: ephemeralAccount should broadcast this action
+              const action = gnosisSafe.transferEther(toAddress, SMALL_AMOUNT);
 
-            const confirmationListener = async () => {
-              await expectExactEtherBalances(
-                provider,
-                [toAddress],
-                [SMALL_AMOUNT]
-              );
-              done();
-            };
+              const confirmationListener = async () => {
+                await expectExactEtherBalances(
+                  provider,
+                  [toAddress],
+                  [SMALL_AMOUNT]
+                );
+                done();
+              };
 
-            const errorListener = error => {
-              action.off("error");
-              done(error);
-            };
+              const errorListener = (error) => {
+                action.off("error");
+                done(error);
+              };
 
-            action.once("confirmation", confirmationListener);
-            action.on("error", errorListener);
+              action.once("confirmation", confirmationListener);
+              action.on("error", errorListener);
 
-            action.send();
-          })();
-        });
+              action.send();
+            })();
+          }
+        );
 
         beforeEach(
           "onboarding - approving ephemeral account to spend Safe's MANA",
-          done => {
+          (done) => {
             (async () => {
               // Global hooks don't run between same level hooks
               await mineBlocks(provider, 1);
@@ -945,7 +963,7 @@ describe("Decentraland", () => {
                 done();
               };
 
-              const errorListener = error => {
+              const errorListener = (error) => {
                 action.off("error");
                 done(error);
               };
@@ -960,7 +978,7 @@ describe("Decentraland", () => {
 
         beforeEach(
           "onboarding - approving Marketplace to spend ephemeral account's MANA",
-          done => {
+          (done) => {
             (async () => {
               // Global hooks don't run between same level hooks
               await mineBlocks(provider, 1);
@@ -993,7 +1011,7 @@ describe("Decentraland", () => {
                 done();
               };
 
-              const errorListener = error => {
+              const errorListener = (error) => {
                 action.off("error");
                 done(error);
               };
@@ -1006,7 +1024,7 @@ describe("Decentraland", () => {
           }
         );
 
-        it("should buy an estate", done => {
+        it("should buy an estate", (done) => {
           (async () => {
             const { assetId, nftAddress, priceInWei } = estateForSale;
 
@@ -1030,7 +1048,7 @@ describe("Decentraland", () => {
               await expectExactTokenBalances(estate, [ephemeralAddress], [0]);
             };
 
-            const errorListener = error => {
+            const errorListener = (error) => {
               const { message } = error;
               console.info(message);
 
@@ -1053,7 +1071,7 @@ describe("Decentraland", () => {
           })();
         });
 
-        it("should buy a parcel of land", done => {
+        it("should buy a parcel of land", (done) => {
           (async () => {
             const { assetId, nftAddress, priceInWei } = landForSale;
 
@@ -1078,7 +1096,7 @@ describe("Decentraland", () => {
               await expectExactTokenBalances(land, [ephemeralAddress], [0]);
             };
 
-            const errorListener = error => {
+            const errorListener = (error) => {
               const { message } = error;
               console.info(message);
 

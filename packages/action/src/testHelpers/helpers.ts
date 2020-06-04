@@ -59,7 +59,7 @@ const privateKeys = [
 ];
 export const accounts = privateKeys.map(createFromPrivateKey);
 
-const mineOneBlock = async provider => {
+const mineOneBlock = async (provider) => {
   await provider.send("evm_increaseTime", [1]);
   await provider.send("evm_mine", []);
 };
@@ -80,7 +80,7 @@ export const mineBlocks = async (provider, n) => {
   }
 };
 
-export const createSnapshot = async provider => {
+export const createSnapshot = async (provider) => {
   // Do nothing if provider isn't a JSON-RPC
   if (!provider.send) return 1;
   const id = await provider.send("evm_snapshot", []);
@@ -93,8 +93,8 @@ export const revertFromSnapshot = async (provider, snapshotId) => {
   return await provider.send("evm_revert", [snapshotId]);
 };
 
-export const wait = async ms => {
-  return new Promise(resolve => setTimeout(resolve, ms));
+export const wait = async (ms) => {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 };
 
 export const expectExactEtherBalances = async (
@@ -104,7 +104,7 @@ export const expectExactEtherBalances = async (
 ) => {
   expect(addresses.length).to.equal(balances.length);
   let index = 0;
-  for (let address of addresses) {
+  for (const address of addresses) {
     const balance = await provider.getBalance(address);
     const expectedBalance = balances[index++];
     expect(balance.toString()).to.equal(expectedBalance.toString());
@@ -118,7 +118,7 @@ export const expectMinimumEtherBalances = async (
 ) => {
   expect(addresses.length).to.equal(balances.length);
   let index = 0;
-  for (let address of addresses) {
+  for (const address of addresses) {
     const balance = await provider.getBalance(address);
     const actual = bigNumberify(balance);
     const expected = bigNumberify(balances[index++]);
@@ -133,7 +133,7 @@ export const expectMinimumTokenBalances = async (
 ) => {
   expect(addresses.length).to.equal(balances.length);
   let index = 0;
-  for (let address of addresses) {
+  for (const address of addresses) {
     const balance = await token.balanceOf(address);
     const actual = bigNumberify(balance);
     const expected = bigNumberify(balances[index++]);
@@ -144,7 +144,7 @@ export const expectMinimumTokenBalances = async (
 export const expectExactTokenBalances = async (token, addresses, balances) => {
   expect(addresses.length).to.equal(balances.length);
   let index = 0;
-  for (let address of addresses) {
+  for (const address of addresses) {
     const balance = await token.balanceOf(address);
     const expectedBalance = balances[index++];
     expect(balance.toString()).to.equal(expectedBalance.toString());
@@ -196,22 +196,22 @@ export const addressesAreEqual = (address1, address2) => {
 };
 
 export const duration = {
-  seconds: function(val) {
+  seconds: function (val) {
     return val;
   },
-  minutes: function(val) {
+  minutes: function (val) {
     return val * this.seconds(60);
   },
-  hours: function(val) {
+  hours: function (val) {
     return val * this.minutes(60);
   },
-  days: function(val) {
+  days: function (val) {
     return val * this.hours(24);
   },
-  weeks: function(val) {
+  weeks: function (val) {
     return val * this.days(7);
   },
-  years: function(val) {
+  years: function (val) {
     return val * this.days(365);
   },
 };

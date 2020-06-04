@@ -29,8 +29,8 @@ const features = [
     imageUrl: "img/TasitLogoSvg.svg",
     description: (
       <>
-        Onboarding with ephemeral accounts, contract-based accounts, and
-        deep linking to and from mobile wallets
+        Onboarding with ephemeral accounts, contract-based accounts, and deep
+        linking to and from mobile wallets
       </>
     ),
   },

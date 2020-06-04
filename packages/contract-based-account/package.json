@@ -26,8 +26,8 @@
     "build": "tsdx build",
     "test:tsdx": "tsdx test",
     "lint": "tsdx lint src",
-    "test:mocha-babel": "npx mocha src/*.test.ts --require @babel/register --file src/testHelpers/mochaSetup.ts --timeout 4000",
-    "test": "npm run test:mocha-babel",
+    "test:mocha-tsnode": "npx mocha src/*.test.ts --require ts-node/register --file src/testHelpers/mochaSetup.ts --timeout 4000",
+    "test": "npm run test:mocha-tsnode",
     "update": "npx ncu",
     "update:write": "npm run update -- -u"
   },
@@ -36,7 +36,6 @@
   },
   "peerDependencies": {},
   "dependencies": {
-    "@babel/runtime": "^7.9.6",
     "ethers": "^4.0.47",
     "tasit-action": "^0.0.18",
     "@tasit/action": "../action",
@@ -44,21 +43,17 @@
     "@tasit/contracts": "../contracts"
   },
   "devDependencies": {
-    "@babel/cli": "^7.8.4",
-    "@babel/core": "^7.9.6",
-    "@babel/plugin-proposal-class-properties": "^7.8.3",
-    "@babel/preset-typescript": "^7.9.0",
-    "@babel/register": "^7.9.0",
+    "@babel/preset-typescript": "^7.10.1",
     "@types/mocha": "^7.0.2",
     "chai": "^4.2.0",
-    "mocha": "^7.1.2",
-    "npm-check-updates": "^4.1.2",
+    "mocha": "^7.2.0",
+    "npm-check-updates": "^6.0.1",
     "sinon": "^9.0.2",
     "tasit-account": "^0.0.18",
     "@tasit/account": "../account",
-    "ts-node": "^8.9.1",
+    "ts-node": "^8.10.2",
     "tsdx": "^0.13.2",
-    "tslib": "^1.11.1",
-    "typescript": "^3.8.3"
+    "tslib": "^2.0.0",
+    "typescript": "^3.9.3"
   }
 }

@@ -1,3 +1,11 @@
+// Chai
+import chai, { expect } from "chai";
+import chaiAsPromised from "chai-as-promised";
+chai.use(chaiAsPromised);
+
+// Sinon
+import sinon from "sinon";
+
 import Contract from "./Contract";
 import TasitContracts from "tasit-contracts";
 import ProviderFactory from "../ProviderFactory";
@@ -145,7 +153,9 @@ describe("TasitAction.Contract", () => {
 
         // Some error (orphan block, failed tx) events are being triggered only from the confirmationListener
         // See more: https://github.com/tasitlabs/tasit-sdk/issues/253
-        action.on("confirmation", () => {});
+        action.on("confirmation", () => {
+          // do nothing
+        });
 
         await action.waitForOneConfirmation();
 
@@ -155,7 +165,7 @@ describe("TasitAction.Contract", () => {
       });
 
       it("and Action error event on action error", async () => {
-        const contractErrorListener = sinon.fake(error => {
+        const contractErrorListener = sinon.fake((error) => {
           const { message } = error;
           console.info(message);
         });
@@ -166,9 +176,11 @@ describe("TasitAction.Contract", () => {
 
         // Some error (orphan block, failed tx) events are being triggered only from the confirmationListener
         // See more: https://github.com/tasitlabs/tasit-sdk/issues/253
-        action.on("confirmation", () => {});
+        action.on("confirmation", () => {
+          // do nothing
+        });
 
-        const actionErrorListener = sinon.fake(error => {
+        const actionErrorListener = sinon.fake((error) => {
           const { message } = error;
           console.info(message);
 
@@ -187,10 +199,10 @@ describe("TasitAction.Contract", () => {
         expect(actionErrorListener.callCount).to.equal(1);
       });
 
-      it("on contract event listener error", done => {
+      it("on contract event listener error", (done) => {
         action = sampleContract.setValue("hello world");
 
-        const errorListener = sinon.fake(error => {
+        const errorListener = sinon.fake((error) => {
           const { message } = error;
           console.info(message);
 
@@ -227,7 +239,9 @@ describe("TasitAction.Contract", () => {
       await action.send();
 
       expect(() => {
-        action.on("invalid", () => {});
+        action.on("invalid", () => {
+          // do nothing
+        });
       }).to.throw();
     });
 
@@ -279,7 +293,7 @@ describe("TasitAction.Contract", () => {
 
       await action.waitForOneConfirmation();
 
-      const confirmationListener = sinon.fake(async message => {
+      const confirmationListener = sinon.fake(async (message) => {
         const { data } = message;
         const { confirmations } = data;
 
@@ -311,7 +325,7 @@ describe("TasitAction.Contract", () => {
 
       const errorListener = sinon.fake();
 
-      const confirmationListener = sinon.fake(async message => {
+      const confirmationListener = sinon.fake(async (message) => {
         const { data } = message;
         const { confirmations } = data;
 
@@ -333,11 +347,11 @@ describe("TasitAction.Contract", () => {
       expect(errorListener.called).to.be.false;
     });
 
-    it("action should call error listener after timeout", done => {
+    it("action should call error listener after timeout", (done) => {
       action = sampleContract.setValue("hello world");
       action.setTimeout(100);
 
-      const errorListener = sinon.fake(error => {
+      const errorListener = sinon.fake((error) => {
         const { eventName, message } = error;
         expect(eventName).to.equal("confirmation");
         expect(message).to.equal("Event confirmation reached timeout.");
@@ -350,7 +364,9 @@ describe("TasitAction.Contract", () => {
         done();
       });
 
-      const confirmationListener = sinon.fake(() => {});
+      const confirmationListener = sinon.fake(() => {
+        // do nothing
+      });
 
       action.on("confirmation", confirmationListener);
       action.on("error", errorListener);
@@ -365,8 +381,12 @@ describe("TasitAction.Contract", () => {
       action = sampleContract.setValue("hello world");
       await action.send();
 
-      const listener1 = () => {};
-      const listener2 = () => {};
+      const listener1 = () => {
+        // do nothing
+      };
+      const listener2 = () => {
+        // do nothing
+      };
 
       expect(action.subscribedEventNames()).to.deep.equal(["error"]);
 
@@ -386,7 +406,9 @@ describe("TasitAction.Contract", () => {
       action = sampleContract.setValue("hello world");
       await action.send();
 
-      const listener1 = () => {};
+      const listener1 = () => {
+        // do nothing
+      };
 
       expect(action.subscribedEventNames()).to.deep.equal(["error"]);
 
@@ -414,7 +436,7 @@ describe("TasitAction.Contract", () => {
         confirmationFn();
       };
 
-      const errorListener = error => {
+      const errorListener = (error) => {
         const { message } = error;
         // Note: This assertion will not fail the test case (UnhandledPromiseRejectionWarning)
         expect(message).to.equal(
@@ -460,7 +482,7 @@ describe("TasitAction.Contract", () => {
       const confirmationListener = sinon.fake();
       const errorFn = sinon.fake();
 
-      const errorListener = error => {
+      const errorListener = (error) => {
         const { message } = error;
 
         // Note: This assertion will not fail the test case (UnhandledPromiseRejectionWarning)
@@ -541,7 +563,7 @@ describe("TasitAction.Contract", () => {
     it("'once' listener should be unsubscribed only after user listener function was called", async () => {
       action = sampleContract.setValue(rand);
 
-      const errorListener = sinon.fake(error => {
+      const errorListener = sinon.fake((error) => {
         const { message } = error;
         console.info(message);
 
@@ -573,7 +595,7 @@ describe("TasitAction.Contract", () => {
       }).not.to.throw();
     });
 
-    it("should trigger an event one time when you're listening to that event and the contract triggers it", done => {
+    it("should trigger an event one time when you're listening to that event and the contract triggers it", (done) => {
       action = sampleContract.setValue("hello world");
 
       const valueChangedListener = sinon.fake(() => {
@@ -582,7 +604,7 @@ describe("TasitAction.Contract", () => {
         done();
       });
 
-      const errorListener = sinon.fake(error => {
+      const errorListener = sinon.fake((error) => {
         done(error);
       });
 
@@ -592,10 +614,10 @@ describe("TasitAction.Contract", () => {
       action.send();
     });
 
-    it("should be able to listen to an event triggered by the contract", done => {
+    it("should be able to listen to an event triggered by the contract", (done) => {
       action = sampleContract.setValue("hello world");
 
-      const errorListener = sinon.fake(error => {
+      const errorListener = sinon.fake((error) => {
         done(error);
       });
 
@@ -612,11 +634,11 @@ describe("TasitAction.Contract", () => {
     });
 
     // Non-deterministic test
-    it.skip("contract should call error listener after timeout", done => {
+    it.skip("contract should call error listener after timeout", (done) => {
       sampleContract.setTimeout(100);
       action = sampleContract.setValue("hello world");
 
-      const errorListener = sinon.fake(error => {
+      const errorListener = sinon.fake((error) => {
         const { eventName, message } = error;
         expect(eventName).to.equal("ValueChanged");
         expect(message).to.equal("Event ValueChanged reached timeout.");
@@ -629,7 +651,9 @@ describe("TasitAction.Contract", () => {
         done();
       });
 
-      const confirmationListener = sinon.fake(() => {});
+      const confirmationListener = sinon.fake(() => {
+        // do nothing
+      });
 
       sampleContract.on("ValueChanged", confirmationListener);
       sampleContract.on("error", errorListener);
@@ -642,13 +666,19 @@ describe("TasitAction.Contract", () => {
 
     it("should throw error when listening on invalid event", async () => {
       expect(() => {
-        sampleContract.on("InvalidEvent", () => {});
+        sampleContract.on("InvalidEvent", () => {
+          // do nothing
+        });
       }).to.throw();
     });
 
     it("subscription should have one listener per event", async () => {
-      const listener1 = () => {};
-      const listener2 = () => {};
+      const listener1 = () => {
+        // do nothing
+      };
+      const listener2 = () => {
+        // do nothing
+      };
 
       expect(sampleContract.subscribedEventNames()).to.be.empty;
 
@@ -664,7 +694,9 @@ describe("TasitAction.Contract", () => {
     });
 
     it("should remove an event", async () => {
-      const listener1 = () => {};
+      const listener1 = () => {
+        // do nothing
+      };
 
       expect(sampleContract.subscribedEventNames()).to.be.empty;
 
@@ -680,9 +712,15 @@ describe("TasitAction.Contract", () => {
     });
 
     it("should manage many listeners", async () => {
-      const listener1 = () => {};
-      const listener2 = () => {};
-      const listener3 = () => {};
+      const listener1 = () => {
+        // do nothing
+      };
+      const listener2 = () => {
+        // do nothing
+      };
+      const listener3 = () => {
+        // do nothing
+      };
 
       expect(sampleContract.subscribedEventNames()).to.be.empty;
 
@@ -715,5 +753,7 @@ describe("TasitAction.Contract", () => {
 
   // Send method interface: Contract.send(tx: msg, bool: free) => Subscription
   // On free send how know if contract-based-account should be used?
-  it.skip("should send a signed message", async () => {});
+  it.skip("should send a signed message", async () => {
+    // do nothing
+  });
 });

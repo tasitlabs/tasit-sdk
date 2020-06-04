@@ -1,6 +1,6 @@
 import { ethers } from "ethers";
 
-export const createFromPrivateKey = privKey => {
+export const createFromPrivateKey = (privKey) => {
   try {
     const wallet = new ethers.Wallet(privKey);
     return wallet;
