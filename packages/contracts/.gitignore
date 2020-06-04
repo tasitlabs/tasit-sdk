@@ -1,8 +1,12 @@
-build/**
+build
 3rd-parties/**/scripts/config/default.js
 3rd-parties/**/scripts/config/default.ts
 .secret.json
-dist/
+dist
+
+# local .env* files
+.env.local
+.env.*.local
 
 *.log
 .DS_Store
@@ -11,3 +15,11 @@ node_modules
 .rts2_cache_esm
 .rts2_cache_umd
 .rts2_cache_system
+node_modules
+
+#Buidler files
+cache
+artifacts
+
+#TypeChain
+typechain
