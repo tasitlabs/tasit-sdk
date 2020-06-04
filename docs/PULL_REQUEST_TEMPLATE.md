@@ -1,20 +1,16 @@
-<!-- Please fill out this template when opening a new PR. Thanks! -->
+<!-- Please fill this out when opening a new PR. Thanks! -->
 
 ### Issue link
-
 <!--- Is there an open issue for this PR? If so, please link to it.--->
 
 ### Auto-close the issue?
-
 <!---
-If this PR should close the associated issue when it's merged, please change XXX below to the issue number.
-Otherwise, you can remove this section.
+If no to above question, you can remove this section. If there is an associated issue AND this PR should close it when it's merged, please change XXX below to the issue number.
 --->
 
 Closes #XXX
 
 ### Types of changes
-
 <!--- What type(s) of change(s) does your code introduce? Please use the - [ ] and - [x] syntax to put a checkmark next to those that apply: -->
 
 - [ ] Bug fix (non-breaking change that fixes an issue)
@@ -26,5 +22,4 @@ Closes #XXX
 - [ ] Other (please describe below if you select "Other")
 
 ### Notes
-
 <!--- Any other context to be aware of when reviewing this PR -->
