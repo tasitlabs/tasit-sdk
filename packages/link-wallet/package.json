@@ -1,0 +1,57 @@
+{
+  "name": "@tasit/link-wallet",
+  "version": "0.0.19",
+  "description": "Library for onboarding a user by linking a dapp with a wallet of their choosing.",
+  "main": "dist/index",
+  "module": "dist/@tasit/link-wallet.esm.js",
+  "typings": "dist/index.d.ts",
+  "keywords": [
+    "ethereum",
+    "dapp",
+    "react",
+    "native"
+  ],
+  "author": "Tasit Labs",
+  "homepage": "https://github.com/tasitlabs/tasit-sdk#readme",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tasitlabs/tasit-sdk.git"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "clean": "rm -rf dist/*",
+    "prepare": "npm run clean && npm run build",
+    "test:mocha-babel": "npx mocha src/*.test.ts --require @babel/register --file src/testHelpers/mochaSetup.ts",
+    "start": "tsdx watch",
+    "build": "tsdx build",
+    "test:tsdx": "tsdx test",
+    "lint": "tsdx lint src",
+    "test": "npm run test:mocha-babel",
+    "update": "npx ncu",
+    "update:write": "npm run update -- -u"
+  },
+  "bugs": {
+    "url": "https://github.com/tasitlabs/tasit-sdk/issues"
+  },
+  "dependencies": {
+    "@babel/runtime": "^7.9.6"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.8.4",
+    "@babel/core": "^7.9.6",
+    "@babel/preset-typescript": "^7.9.0",
+    "@babel/register": "^7.9.0",
+    "chai": "^4.2.0",
+    "mocha": "^7.1.2",
+    "npm-check-updates": "^4.1.2",
+    "@tasit/action": "../action",
+    "tasit-action": "^0.0.18",
+    "ts-node": "^8.9.1",
+    "tsdx": "^0.13.2",
+    "tslib": "^1.11.1",
+    "typescript": "^3.8.3"
+  }
+}

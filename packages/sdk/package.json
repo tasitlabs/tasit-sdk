@@ -1,0 +1,69 @@
+{
+  "name": "tasit-sdk",
+  "version": "0.0.19",
+  "description": "A JavaScript / TypeScript SDK for making mobile Ethereum dapps using React Native",
+  "main": "dist/index",
+  "module": "dist/tasit-sdk.esm.js",
+  "typings": "dist/index.d.ts",
+  "keywords": [
+    "ethereum",
+    "dapp",
+    "react",
+    "native"
+  ],
+  "author": "Tasit Labs",
+  "homepage": "https://github.com/tasitlabs/tasit-sdk#readme",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tasitlabs/tasit-sdk.git"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "prepare": "npx babel src --out-dir dist --ignore **/*.test.ts",
+    "setup:local": "cp src/config/development.js src/config/default.js",
+    "setup:ropsten": "cp src/config/ropsten.js src/config/default.js",
+    "test": "npm run setup:local && npm run test:mocha",
+    "test:testnet": "npm run setup:ropsten && npm run test:mocha",
+    "test:mocha": "npx test:mocha mocha \"src/**/*.test.ts\"  --require @babel/register --file src/testHelpers/mochaSetup.ts --timeouts 10000",
+    "check:decentraland-data": "npx test:mocha mocha src/scripts/checkDecentralandContractsData.ts  --require @babel/register --file src/testHelpers/mochaSetup.ts --no-timeouts",
+    "start": "tsdx watch",
+    "build": "tsdx build",
+    "test:tsdx": "tsdx test",
+    "lint": "tsdx lint src",
+    "update": "npx ncu",
+    "update:write": "npm run update -- -u"
+  },
+  "bugs": {
+    "url": "https://github.com/tasitlabs/tasit-sdk/issues"
+  },
+  "dependencies": {
+    "@babel/runtime": "^7.9.6",
+    "tasit-account": "^0.0.18",
+    "tasit-action": "^0.0.18",
+    "tasit-contract-based-account": "^0.0.18",
+    "tasit-contracts": "^0.0.18",
+    "@tasit/account": "../account",
+    "@tasit/action": "../action",
+    "@tasit/contract-based-account": "../contract-based-account",
+    "@tasit/contracts": "../contracts"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.8.4",
+    "@babel/core": "^7.9.6",
+    "@babel/plugin-proposal-class-properties": "^7.8.3",
+    "@babel/preset-typescript": "^7.9.0",
+    "@babel/register": "^7.9.0",
+    "chai": "^4.2.0",
+    "ethers": "^4.0.47",
+    "mocha": "^7.2.0",
+    "node-fetch": "^2.6.0",
+    "npm-check-updates": "^6.0.1",
+    "ts-node": "^8.10.2",
+    "tsdx": "^0.13.2",
+    "tslib": "^1.11.1",
+    "typescript": "^3.9.3"
+  }
+}
