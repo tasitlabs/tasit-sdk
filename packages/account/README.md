@@ -1,4 +1,4 @@
-# `tasit-account`
+# `@tasit/account`
 
 This package helps with instantiating an ephemeral account in a mobile dapp.
 

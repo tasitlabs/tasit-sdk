@@ -1,6 +1,6 @@
 import { ethers } from "ethers";
 
-import actionHelpers from "../../tasit-action/dist/testHelpers/helpers";
+import actionHelpers from "../../@tasit/action/dist/testHelpers/helpers";
 const { constants, accounts } = actionHelpers;
 
 const { ZERO } = constants;

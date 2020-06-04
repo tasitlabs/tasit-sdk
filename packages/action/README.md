@@ -1,4 +1,4 @@
-# `tasit-action`
+# `@tasit/action`
 
 This package helps with reading data from smart contracts, writing data to smart contracts, and listening for events.
 
@@ -8,11 +8,11 @@ Most of the details are in the main README for the monorepo [here](https://githu
 
 This explains how one can use the Tasit SDK to interact with smart contracts at different levels of abstraction.
 
-_Note:_ This functionality all "lives" in `tasit-action`, a child package of the [`tasit-sdk`](https://github.com/tasitlabs/tasit-sdk) that is also published to npm as a standalone module using [lerna](https://lernajs.io/).
+_Note:_ This functionality all "lives" in `@tasit/action`, a child package of the [`tasit-sdk`](https://github.com/tasitlabs/tasit-sdk) that is also published to npm as a standalone module using [lerna](https://lerna.js.org/).
 
 [For context, here is an overview](https://github.com/tasitlabs/tasit-sdk/blob/develop/README.md#reading-and-writing-data-and-reacting-to-events) of how this fits in with the rest of the Tasit SDK.
 
-Why `tasit-action`? **action:** [ak-shən], noun. "a thing done". It's also nice that "act" (the verb form) is part of the words _contract_ and _abstraction_ and _transaction_. Finally, directors say “action” before starting to film a scene in a movie. Also, since this package supports meta-transactions, it's not quite correct to call them transactions. "action" is our catch-all word for transactions and meta-transactions.
+Why `@tasit/action`? **action:** [ak-shən], noun. "a thing done". It's also nice that "act" (the verb form) is part of the words _contract_ and _abstraction_ and _transaction_. Finally, directors say “action” before starting to film a scene in a movie. Also, since this package supports meta-transactions, it's not quite correct to call them transactions. "action" is our catch-all word for transactions and meta-transactions.
 
 ### Table of Contents
 
@@ -47,7 +47,7 @@ I think at this level of abstraction, we don't use ERC165 interface detection li
 We just know the ABI for the open source contracts for that exact project and assume the presence of these functions. The developer can still use the lower-level APIs to confirm, though.
 
 ```javascript
-import { Decentraland } from tasit-action
+import { Decentraland } from @tasit/action
 // We already know what would have normally been the params here
 // (contractABI, address, etc.)
 const decentraland = new Decentraland()
@@ -90,7 +90,7 @@ Let's now consider a slightly lower level of abstraction, where we can construct
 
 There's functionality for determining what ERC721 features it supports beyond the basic, required ones using ERC165 interface detection.
 
-Moreso than for an unknown contract with the lower-level `tasit-action` API, using ERC165 here is justified because it's a first-class feature for extensions of ERC721 in [OpenZeppelin](https://github.com/OpenZeppelin/openzeppelin-solidity/blob/5caecf548c04c97955b8f0487ceb804fab0e2ca1/contracts/token/ERC721/ERC721Metadata.sol#L5).
+Moreso than for an unknown contract with the lower-level `@tasit/action` API, using ERC165 here is justified because it's a first-class feature for extensions of ERC721 in [OpenZeppelin](https://github.com/OpenZeppelin/openzeppelin-solidity/blob/5caecf548c04c97955b8f0487ceb804fab0e2ca1/contracts/token/ERC721/ERC721Metadata.sol#L5).
 
 But maybe there doesn't need to be if we decide the contract ABI will be present for sure. This is an _open question_ for now.
 
@@ -115,7 +115,7 @@ if (supportsMetadata) {
 }
 ```
 
-Alternatively, because tokenURI is just an `external` or `public` `view` function you can get it directly using the underlying "call a contract method" approach you'll see used exclusively below in the lower-level `tasit-action` library with no prior knowledge about contract type.
+Alternatively, because tokenURI is just an `external` or `public` `view` function you can get it directly using the underlying "call a contract method" approach you'll see used exclusively below in the lower-level `@tasit/action` library with no prior knowledge about contract type.
 
 ```javascript
 const tokenURI = await nft.tokenURI(tokenId);
@@ -147,7 +147,7 @@ Checks whether the contract will let you look up other interfaces it implements 
 const supportsInterface = await contract.usesSupportsInterface();
 ```
 
-Let's use ERC165 to see if this contract uses the ERC721Metadata extension. Remember, this will be a longer shot because we're just using `tasit-action`, not the ERC721 abstraction that already "knows" ERC165 is popular for ERC721s. Unlike above where we did `nft.detectInterfaces()`, we don't know the hashes of the interfaces to check for without the prior knowledge of what type of contract this is. So we'll need to check for ERC721Metadata using its hash as an argument.
+Let's use ERC165 to see if this contract uses the ERC721Metadata extension. Remember, this will be a longer shot because we're just using `@tasit/action`, not the ERC721 abstraction that already "knows" ERC165 is popular for ERC721s. Unlike above where we did `nft.detectInterfaces()`, we don't know the hashes of the interfaces to check for without the prior knowledge of what type of contract this is. So we'll need to check for ERC721Metadata using its hash as an argument.
 
 If we decide the user of the SDK has to have the full ABI at this point, maybe this feature is less useful.
 
@@ -184,9 +184,9 @@ Possibly even infer from param types what they might do, but that's a lot harder
 
 ##### Getting data - Contract API from ethers
 
-Let's re-read the `tasit-action` section above when it is finalized and see how much it differs from the [ethers abstraction for connecting to contracts](https://docs.ethers.io/ethers.js/html/api-contract.html#connecting-to-existing-contracts).
+Let's re-read the `@tasit/action` section above when it is finalized and see how much it differs from the [ethers abstraction for connecting to contracts](https://docs.ethers.io/ethers.js/html/api-contract.html#connecting-to-existing-contracts).
 
-We'll want to do the same for setting data and listening for events too. As long as there's any abstraction we want on top of the ethers contract functions, `tasit-action` support for contracts of unknown type seems justified. Setting data / creating transactions is very likely to diverge from the ethers library.
+We'll want to do the same for setting data and listening for events too. As long as there's any abstraction we want on top of the ethers contract functions, `@tasit/action` support for contracts of unknown type seems justified. Setting data / creating transactions is very likely to diverge from the ethers library.
 
 ### Setting data
 
@@ -204,7 +204,7 @@ Setting data could possibly be non-async if it's like publishing in pubsub. Ther
 
 When using the contract abstraction from ethers, the functions for setting data return a transaction hash.
 
-That's too blockchain-y for the target audience. The API is being informed too much by the underlying implementation as opposed to the most understandable abstraction. The `tasit-action` API for setting data should be indistinguishable from using pubsub on a non-blockchain architecture.
+That's too blockchain-y for the target audience. The API is being informed too much by the underlying implementation as opposed to the most understandable abstraction. The `@tasit/action` API for setting data should be indistinguishable from using pubsub on a non-blockchain architecture.
 
 So the "set" should return something that lets the user subscribe for the 1st or 7th or nth confirmation of the result, but it shouldn't be a tx hash.
 
@@ -238,7 +238,7 @@ For more customization of how this works, during or before sending the transacti
 
 Setting data on a contract returns a tx hash. In the example in the ethers docs, the next step is to `await` to see that the transaction has been confirmed.
 
-`tasit-action` has more of a "optimistic updates" but "be sure to handle error cases" philosophy. Of course that could be achieved with the lower-level ethers API too, but the `tasit-action` abstraction gently guides the user towards that approach in a more opinionated fashion.
+`@tasit/action` has more of a "optimistic updates" but "be sure to handle error cases" philosophy. Of course that could be achieved with the lower-level ethers API too, but the `@tasit/action` abstraction gently guides the user towards that approach in a more opinionated fashion.
 
 ##### Setting data - Decentraland
 

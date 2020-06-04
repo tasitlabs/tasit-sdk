@@ -15,7 +15,7 @@ For this project, `develop` is the name of the default branch for the project. T
 ### Overview of architecture of the Tasit project
 
 The `tasit-sdk` repo (the one you're looking at now) is the "middleware" code for interacting with the blockchain that you can use from within a React Native app. The code for our React Native mobile apps themselves is over in a different GitHub repo called `tasit`.
-There are multiple npm packages within this repo. It's a "monorepo" (feel free google this term for more info). We use [lerna](https://lernajs.io/) to manage the packages. That's a popular technique.
+There are multiple npm packages within this repo. It's a "monorepo" (feel free google this term for more info). We use [lerna](https://lerna.js.org/) to manage the packages. That's a popular technique.
 
 ### How to set up the local environment
 

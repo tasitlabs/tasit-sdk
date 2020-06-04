@@ -1,4 +1,4 @@
-import { Contract } from "tasit-action";
+import { Contract } from "@tasit/action";
 
 import TasitContracts from "../..";
 const { local } = TasitContracts;

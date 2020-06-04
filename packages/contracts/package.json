@@ -22,7 +22,7 @@
   ],
   "scripts": {
     "clean": "rm -rf build/ dist/",
-    "compile:ts": "npx tsc src --out-dir dist --ignore src/*.test.ts,src/**/*.test.ts",
+    "compile:ts": "npx tsdx build",
     "compile:contracts": "npx buidler compile --config buidler.config.5.js && npx buidler compile",
     "compile": "npm run compile:contracts",
     "build": "npm run compile && npm run typechain",
@@ -72,7 +72,7 @@
     "typescript": "^3.9.3"
   },
   "dependencies": {
-    "openzeppelin-solidity": "3.0.1",
+    "@openzeppelin/contracts": "3.0.1",
     "tasit-action": "^0.0.18"
   }
 }

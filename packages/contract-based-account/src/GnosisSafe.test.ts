@@ -4,9 +4,9 @@ import GnosisSafe from "./GnosisSafe";
 
 // TODO: Use the @tasit scoped version of these packages
 import Account from "@tasit/account";
-// import Account from "../../tasit-account/dist";
-import TasitContracts from "tasit-contracts";
-import actionHelpers from "tasit-action/dist/testHelpers/helpers";
+// import Account from "../../@tasit/account/dist";
+import TasitContracts from "@tasit/contracts";
+import actionHelpers from "@tasit/action/dist/testHelpers/helpers";
 const { ERC20, ERC721 } = Action;
 
 const {
@@ -237,7 +237,7 @@ describe("GnosisSafe", () => {
       });
 
       describe("test cases that need ERC20 spending approval for ephemeral account", () => {
-        // TODO: Move to tasit-link-wallet
+        // TODO: Move to @tasit/link-wallet
         beforeEach(
           "contract-based accounts' owner should approve an ephemeral account to spend funds",
           async () => {

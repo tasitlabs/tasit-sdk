@@ -21,7 +21,7 @@ An abstraction around the [ethers.js](https://github.com/ethers-io/ethers.js) co
 Helpers for upgrading an external owned account on Ethereum into a contract-based account using the Gnosis Safe (or other alternatives).
 
 ### contracts
-This repo tracks a few useful 3rd party contracts and exports classes for interacting with them using the `tasit-action` API.
+This repo tracks a few useful 3rd party contracts and exports classes for interacting with them using the `@tasit/action` API.
 
 ### docs
 (These docs!)

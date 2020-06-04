@@ -1,6 +1,6 @@
 import { TasitContracts } from "../TasitSdk";
 import DecentralandUtils from "../helpers/DecentralandUtils";
-import actionHelpers from "tasit-action/dist/testHelpers/helpers";
+import actionHelpers from "@tasit/action/dist/testHelpers/helpers";
 const {
   addressesAreEqual,
   expectMinimumTokenBalances,

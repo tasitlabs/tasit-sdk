@@ -7,7 +7,7 @@ chai.use(chaiAsPromised);
 import sinon from "sinon";
 
 import Contract from "./Contract";
-import TasitContracts from "tasit-contracts";
+import TasitContracts from "@tasit/contracts";
 import ProviderFactory from "../ProviderFactory";
 import {
   accounts,

@@ -1,5 +1,5 @@
 import ERC20 from "./ERC20";
-import TasitContracts from "tasit-contracts";
+import TasitContracts from "@tasit/contracts";
 const { local: localContracts } = TasitContracts;
 const { MyERC20 } = localContracts;
 const { address: ERC20_ADDRESS } = MyERC20;

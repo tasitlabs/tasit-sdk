@@ -3,7 +3,7 @@ import { expect } from "chai";
 global.expect = expect;
 
 // Helpers
-import actionHelpers from "tasit-action/dist/testHelpers/helpers";
+import actionHelpers from "@tasit/action/dist/testHelpers/helpers";
 const {
   developmentConfig,
   ProviderFactory,
@@ -12,7 +12,7 @@ const {
   mineBlocks,
 } = actionHelpers;
 
-import Action from "tasit-action";
+import Action from "@tasit/action";
 const { ConfigLoader } = Action;
 ConfigLoader.setConfig(developmentConfig);
 

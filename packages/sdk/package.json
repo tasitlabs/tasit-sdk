@@ -22,7 +22,7 @@
     "dist"
   ],
   "scripts": {
-    "prepare": "npx tsc src --out-dir dist --ignore **/*.test.ts",
+    "prepare": "npx tsdx build",
     "setup:local": "cp src/config/development.js src/config/default.js",
     "setup:ropsten": "cp src/config/ropsten.js src/config/default.js",
     "test": "npm run setup:local && npm run test:mocha",

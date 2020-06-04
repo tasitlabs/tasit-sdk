@@ -29,8 +29,8 @@ const features = [
     imageUrl: "img/TasitLogoSvg.svg",
     description: (
       <>
-        Onboarding with ephemeral accounts, contract-based accounts, and deep
-        linking to and from mobile wallets
+        Onboard your users with ephemeral accounts, contract-based accounts, and deep
+        linking to and from mobile wallets.
       </>
     ),
   },
@@ -40,7 +40,7 @@ const features = [
     description: (
       <>
         The API is built with optimistic UI updates and user-friendly
-        error-handling in mind
+        error-handling in mind.
       </>
     ),
   },

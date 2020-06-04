@@ -1,5 +1,5 @@
 import ERC721 from "./ERC721";
-import TasitContracts from "tasit-contracts";
+import TasitContracts from "@tasit/contracts";
 import ProviderFactory from "../ProviderFactory";
 import {
   accounts,

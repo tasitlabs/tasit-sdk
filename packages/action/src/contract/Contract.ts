@@ -56,7 +56,7 @@ export class Contract extends Subscription {
     this.addFunctionsToContract();
   }
 
-  // Note: For now, `tasit-account` creates a ethers wallet object
+  // Note: For now, `@tasit/account` creates a ethers wallet object
   setAccount = (wallet: Wallet) => {
     if (!Utils.isEthersJsSigner(wallet))
       throw new Error(`Cannot set an invalid account for a Contract`);

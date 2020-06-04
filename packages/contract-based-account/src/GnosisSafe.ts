@@ -1,9 +1,9 @@
-import TasitAction from "tasit-action";
+import TasitAction from "@tasit/action";
 
 const { Action, Contract, Utils: ActionUtils } = TasitAction;
 import GnosisSafeUtils from "./GnosisSafeUtils";
 
-import TasitContracts from "tasit-contracts";
+import TasitContracts from "@tasit/contracts";
 
 const { local } = TasitContracts;
 const { GnosisSafe: GnosisSafeInfo, MyERC20, MyERC721 } = local;

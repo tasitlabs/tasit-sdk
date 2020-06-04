@@ -35,7 +35,7 @@ We leave the JSON-RPC provider configurable so that the SDK doesn't take an opin
 
 There are a couple projects working to make it simple to spin up your own high-availability, high-performance JSON-RPC client(s) (including Infura) or to use a decentralized and incentivized network of full nodes, so that should decentralize things a bit until we get to Eth 2.0. See [DAppNode](https://dappnode.io/), [denode](https://github.com/ChainSafeSystems/denode), [Vipnode](https://vipnode.org/), and [Incubed](https://slock.it/incubed.html) by slock.it.
 
-[`tasit-action` is the child package](/packages/action/) that implements these features for the Tasit SDK.
+[`@tasit/action` is the child package](/packages/action/) that implements these features for the Tasit SDK.
 
 ##### In the future
 

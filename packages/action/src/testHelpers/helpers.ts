@@ -8,7 +8,7 @@ import developmentConfig from "../config/default";
 // Note that lerna bootstrap does this for you since it
 // runs prepare in all bootstrapped packages.
 // Refs: https://github.com/lerna/lerna/tree/master/commands/bootstrap
-import { createFromPrivateKey } from "tasit-account/dist/testHelpers/helpers";
+import { createFromPrivateKey } from "@tasit/account/dist/testHelpers/helpers";
 
 const { utils: ethersUtils, constants: ethersConstants } = ethers;
 const { WeiPerEther: WEI_PER_ETHER } = ethersConstants;

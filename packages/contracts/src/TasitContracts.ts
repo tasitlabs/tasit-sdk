@@ -9,7 +9,7 @@ import myERC721ABI from "../abi/MyERC721.json";
 // @ts-ignore semantic error TS6307
 import sampleContractABI from "../abi/SampleContract.json";
 
-// Note: Under the current `tasit-contracts` setup the contracts always will deployed with these addresses
+// Note: Under the current `@tasit/contracts` setup the contracts always will deployed with these addresses
 // See https://github.com/tasitlabs/tasit-sdk/issues/138
 const local = {
   SampleContract: {

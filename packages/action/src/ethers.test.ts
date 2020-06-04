@@ -1,5 +1,5 @@
 import { ethers } from "ethers";
-import TasitContracts from "tasit-contracts";
+import TasitContracts from "@tasit/contracts";
 
 import ProviderFactory from "./ProviderFactory";
 import { accounts } from "./testHelpers/helpers";
