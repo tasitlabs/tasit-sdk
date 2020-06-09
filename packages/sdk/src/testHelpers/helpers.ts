@@ -1,6 +1,6 @@
 import { TasitContracts } from "../TasitSdk";
 import DecentralandUtils from "../helpers/DecentralandUtils";
-import actionHelpers from "tasit-action/dist/testHelpers/helpers";
+import actionHelpers from "@tasit/action/dist/testHelpers/helpers";
 const {
   addressesAreEqual,
   expectMinimumTokenBalances,
@@ -56,7 +56,7 @@ export const pickAssetsForSale = async () => {
   expect(openSellOrders).to.not.be.empty;
 
   // Pick two open sell orders: one for a parcel of land and one for an estate
-  for (let order of openSellOrders) {
+  for (const order of openSellOrders) {
     const { nftAddress, expiresAt } = order;
 
     const isLand = addressesAreEqual(nftAddress, LAND_ADDRESS);

@@ -9,7 +9,7 @@ import myERC721ABI from "../abi/MyERC721.json";
 // @ts-ignore semantic error TS6307
 import sampleContractABI from "../abi/SampleContract.json";
 
-// Note: Under the current `tasit-contracts` setup the contracts always will deployed with these addresses
+// Note: Under the current `@tasit/contracts` setup the contracts always will deployed with these addresses
 // See https://github.com/tasitlabs/tasit-sdk/issues/138
 const local = {
   SampleContract: {
@@ -30,8 +30,7 @@ const local = {
   },
 };
 
-const goerli = {
-};
+const goerli = {};
 
 const ropsten = {
   GnosisSafe: {
@@ -41,25 +40,25 @@ const ropsten = {
 };
 
 const rinkebyDeployedByDevMetaMask = {
-    GnosisSafe: {
-      address: "0xc8FB1F400D4718c022d5aA8c7eDf8A3A685cf3E2",
-      abi: gnosisSafeABI,
-    },
-  };
-  
+  GnosisSafe: {
+    address: "0xc8FB1F400D4718c022d5aA8c7eDf8A3A685cf3E2",
+    abi: gnosisSafeABI,
+  },
+};
+
 const rinkeby = {
-    GnosisSafe: {
-      address: "0x366dd6FdB8EA347A186e251e39bE1f12eF11cc8A",
-      abi: gnosisSafeABI,
-    },
-  };
-  
+  GnosisSafe: {
+    address: "0x366dd6FdB8EA347A186e251e39bE1f12eF11cc8A",
+    abi: gnosisSafeABI,
+  },
+};
 
 export const Contracts = {
   local,
   goerli,
   ropsten,
   rinkeby,
+  rinkebyDeployedByDevMetaMask,
 };
 
 export default Contracts;

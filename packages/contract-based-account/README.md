@@ -1,8 +1,8 @@
-# `tasit-contract-based-account`
+# `@tasit/contract-based-account`
 
 This package helps with onboarding a user using a smart-contract-based "account". Examples of such smart-contract-based accounts include the [Gnosis Safe](https://safe.gnosis.io/), [Universal Login](https://universallogin.io/), Argent, the Dharma smart wallet, Abridged, and Authereum.
 
-This functionality all "lives" in `tasit-contract-based-account`, a child package of the [`tasit-sdk`](https://github.com/tasitlabs/tasit-sdk) that is also published to npm as a standalone module using [lerna](https://lernajs.io/).
+This functionality all "lives" in `@tasit/contract-based-account`, a child package of the [`tasit-sdk`](https://github.com/tasitlabs/tasit-sdk) that is also published to npm as a standalone module using [lerna](https://lerna.js.org/).
 
 [For context, here is an overview](https://github.com/tasitlabs/tasit-sdk/blob/develop/README.md#for-users-new-to-ethereum-with-no-funds) of how this fits in with the rest of the Tasit SDK in the [onboarding section](https://github.com/tasitlabs/tasit-sdk/blob/develop/README.md#onboarding). But this can be used as a stand-alone, modular package if you prefer!
 
@@ -34,6 +34,6 @@ The package is optimized and bundled with Rollup into multiple formats (CommonJS
 Runs the test watcher (Jest) in an interactive mode.
 By default, runs tests related to files changed since the last commit.
 
-### `npm run test:mocha-babel`
+### `npm run test:mocha-tsnode`
 
 Runs the tests (written with mocha)

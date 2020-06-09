@@ -66,7 +66,8 @@ export class ProviderFactory {
         break;
       }
       case "jsonrpc": {
-        let { url, port, user, password, allowInsecure } = jsonRpc;
+        let { url, port, allowInsecure } = jsonRpc;
+        const { user, password } = jsonRpc;
         if (url === undefined) url = defaultConfig.jsonRpc.url;
         if (port === undefined) port = defaultConfig.jsonRpc.port;
         if (allowInsecure === undefined)

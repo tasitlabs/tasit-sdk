@@ -1,14 +1,13 @@
-import Action from "tasit-action";
+import Action from "@tasit/action";
 
 import GnosisSafe from "./GnosisSafe";
 
-import Account from "tasit-account";
-// import Account from "../../tasit-account/dist";
-import TasitContracts from "tasit-contracts";
-import actionHelpers from "tasit-action/dist/testHelpers/helpers";
+// TODO: Use the @tasit scoped version of these packages
+import Account from "@tasit/account";
+// import Account from "../../@tasit/account/dist";
+import TasitContracts from "@tasit/contracts";
+import actionHelpers from "@tasit/action/dist/testHelpers/helpers";
 const { ERC20, ERC721 } = Action;
-const { ERC20Full } = ERC20;
-const { ERC721Full } = ERC721;
 
 const {
   constants,
@@ -24,10 +23,10 @@ const {
   etherFaucet,
 } = actionHelpers;
 const { local } = TasitContracts;
-const { GnosisSafe: GnosisSafeInfo, MyERC20Full, MyERC721Full } = local;
+const { GnosisSafe: GnosisSafeInfo, MyERC20, MyERC721 } = local;
 const { address: GNOSIS_SAFE_ADDRESS } = GnosisSafeInfo;
-const { address: ERC20_ADDRESS } = MyERC20Full;
-const { address: NFT_ADDRESS } = MyERC721Full;
+const { address: ERC20_ADDRESS } = MyERC20;
+const { address: NFT_ADDRESS } = MyERC721;
 
 const { ZERO, ONE } = constants;
 const SMALL_AMOUNT = bigNumberify(`${1e17}`); // 0.1 ethers
@@ -54,8 +53,8 @@ describe("GnosisSafe", () => {
     // To change that, edit the file "contract/3rd-parties/gnosis/scripts/2_deploy_contracts.ts"
     gnosisSafe = new GnosisSafe(GNOSIS_SAFE_ADDRESS);
 
-    erc20 = new ERC20Full(ERC20_ADDRESS);
-    nft = new ERC721Full(NFT_ADDRESS);
+    erc20 = new ERC20(ERC20_ADDRESS);
+    nft = new ERC721(NFT_ADDRESS);
   });
 
   beforeEach("", async () => {
@@ -136,7 +135,7 @@ describe("GnosisSafe", () => {
         gnosisSafe.setAccount(gnosisSafeOwner);
         const action = gnosisSafe.transferEther(toAddress, ONE);
 
-        const errorListener = sinon.fake(error => {
+        const errorListener = sinon.fake((error) => {
           const { message } = error;
           console.info(message);
 
@@ -145,7 +144,9 @@ describe("GnosisSafe", () => {
 
         // Note: Some error events are being triggered only from the confirmationListener
         // See more: https://github.com/tasitlabs/tasit-sdk/issues/253
-        const confirmationListener = () => {};
+        const confirmationListener = () => {
+          // do nothing
+        };
 
         action.on("error", errorListener);
         action.on("confirmation", confirmationListener);
@@ -196,7 +197,7 @@ describe("GnosisSafe", () => {
         );
       });
 
-      it("ephemeral account shouldn't be able to transfer funds from contract-based account without allowance", done => {
+      it("ephemeral account shouldn't be able to transfer funds from contract-based account without allowance", (done) => {
         (async () => {
           const balanceBefore = await erc20.balanceOf(GNOSIS_SAFE_ADDRESS);
 
@@ -209,7 +210,7 @@ describe("GnosisSafe", () => {
             ONE
           );
 
-          const errorListener = sinon.fake(async error => {
+          const errorListener = sinon.fake(async (error) => {
             const { message } = error;
             console.info(message);
 
@@ -236,7 +237,7 @@ describe("GnosisSafe", () => {
       });
 
       describe("test cases that need ERC20 spending approval for ephemeral account", () => {
-        // TODO: Move to tasit-link-wallet
+        // TODO: Move to @tasit/link-wallet
         beforeEach(
           "contract-based accounts' owner should approve an ephemeral account to spend funds",
           async () => {

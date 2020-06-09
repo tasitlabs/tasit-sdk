@@ -1,11 +1,14 @@
+// TODO: Determine why we get this error
+// SyntaxError: Cannot use import statement outside a module
+// when calling this with the mocha --file flag before the test suite runs
+
 // Chai
 import chai, { expect } from "chai";
-global.expect = expect;
-chai.use(require("chai-as-promised"));
+import chaiAsPromised from "chai-as-promised";
+chai.use(chaiAsPromised);
 
-// Sinon
-import sinon from "sinon";
-global.sinon = sinon;
+// TODO: Decide if we still want to set globals here or if we're comfortable
+// with the same imports of expect and sinon in each test file
 
 // Helpers
 import { createSnapshot, revertFromSnapshot, mineBlocks } from "./helpers";
@@ -18,7 +21,7 @@ ConfigLoader.setConfig(config);
 const provider = ProviderFactory.getProvider();
 let snapshotId;
 
-beforeEach("global beforeEach() hook", async () => {
+beforeEach(async () => {
   snapshotId = await createSnapshot(provider);
 
   while (snapshotId > 1) {
@@ -28,7 +31,7 @@ beforeEach("global beforeEach() hook", async () => {
   expect(snapshotId).to.equal(1);
 });
 
-afterEach("global afterEach() hook", async () => {
+afterEach(async () => {
   expect(snapshotId).to.equal(1);
   await revertFromSnapshot(provider, snapshotId);
 
