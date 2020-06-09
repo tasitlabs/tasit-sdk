@@ -39,7 +39,6 @@
   },
   "devDependencies": {
     "@babel/preset-typescript": "^7.10.1",
-    "@tasit/action": "^0.0.19",
     "@types/chai": "^4.2.11",
     "@types/mocha": "^7.0.2",
     "@types/node": "^14.0.10",

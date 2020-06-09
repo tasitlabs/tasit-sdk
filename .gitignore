@@ -6,3 +6,4 @@ lerna-debug.log
 ganache-cli.log
 buidler-evm.log
 **/.vscode/
+yarn.lock

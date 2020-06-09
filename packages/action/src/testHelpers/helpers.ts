@@ -3,13 +3,6 @@ import { ethers } from "ethers";
 import ProviderFactory from "../ProviderFactory";
 import developmentConfig from "../config/default";
 
-// Note:  Using dist file because babel doesn't compile node_modules files.
-// Any changes on src should be followed by compilation to avoid unexpected behaviors.
-// Note that lerna bootstrap does this for you since it
-// runs prepare in all bootstrapped packages.
-// Refs: https://github.com/lerna/lerna/tree/master/commands/bootstrap
-import { createFromPrivateKey } from "@tasit/account/dist/testHelpers/helpers";
-
 const { utils: ethersUtils, constants: ethersConstants } = ethers;
 const { WeiPerEther: WEI_PER_ETHER } = ethersConstants;
 export const { bigNumberify } = ethersUtils;
@@ -28,6 +21,8 @@ const ONE_HUNDRED = bigNumberify(100).mul(TOKEN_SUBDIVISIONS);
 const ONE_THOUSAND = bigNumberify(1000).mul(TOKEN_SUBDIVISIONS);
 const BILLION = bigNumberify(`${1e9}`).mul(TOKEN_SUBDIVISIONS);
 
+// Note: Also defined in @tasit/account test helpers
+// Potential candidate for extracting to test helpers child package.
 export const constants = {
   ZERO,
   ONE,
@@ -39,6 +34,18 @@ export const constants = {
   WEI_PER_ETHER,
   TOKEN_SUBDIVISIONS,
 };
+
+// Note: Also defined in @tasit/account test helpers
+// Potential candidate for extracting to test helpers child package.
+export const createFromPrivateKey = (privKey) => {
+  try {
+    const wallet = new ethers.Wallet(privKey);
+    return wallet;
+  } catch (error) {
+    throw new Error(`Error creating account: ${error.message}`);
+  }
+};
+
 
 // Note: These private keys correspond to the the seed phrase
 // used for local ganache-cli development
@@ -57,6 +64,9 @@ const privateKeys = [
   "0xda1a8c477afeb99ae2c2300b22ad612ccf4c184564e332ae9a32f784bbca8d6b",
   "0x633a290bcdabb9075c5a4b3885c69ce64b4b0e6079eb929abb2ac9427c49733b",
 ];
+
+// Note: Also defined in @tasit/account test helpers
+// Potential candidate for extracting to test helpers child package.
 export const accounts = privateKeys.map(createFromPrivateKey);
 
 const mineOneBlock = async (provider) => {

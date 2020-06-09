@@ -3,7 +3,7 @@
   "version": "0.0.19",
   "description": "",
   "main": "dist/index",
-  "module": "dist/tasit-contracts.esm.js",
+  "module": "dist/@tasit/contracts.esm.js",
   "typings": "dist/index.d.ts",
   "keywords": [
     "ethereum",
@@ -72,7 +72,6 @@
     "typescript": "^3.9.3"
   },
   "dependencies": {
-    "@openzeppelin/contracts": "3.0.1",
-    "tasit-action": "^0.0.18"
+    "@openzeppelin/contracts": "3.0.1"
   }
 }

@@ -7,6 +7,9 @@ chai.use(chaiAsPromised);
 import sinon from "sinon";
 
 import Contract from "./Contract";
+
+// In order to test the action package in a meaningful way, it needs
+// to be able to interact with contracts.
 import TasitContracts from "@tasit/contracts";
 import ProviderFactory from "../ProviderFactory";
 import {

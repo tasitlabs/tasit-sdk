@@ -37,10 +37,8 @@
   "peerDependencies": {},
   "dependencies": {
     "ethers": "^4.0.47",
-    "tasit-action": "^0.0.18",
-    "@tasit/action": "../action",
-    "tasit-contracts": "^0.0.18",
-    "@tasit/contracts": "../contracts"
+    "@tasit/action": "^0.0.19",
+    "@tasit/contracts": "^0.0.19"
   },
   "devDependencies": {
     "@babel/preset-typescript": "^7.10.1",
@@ -49,8 +47,7 @@
     "mocha": "^7.2.0",
     "npm-check-updates": "^6.0.1",
     "sinon": "^9.0.2",
-    "tasit-account": "^0.0.18",
-    "@tasit/account": "../account",
+    "@tasit/account": "^0.0.19",
     "ts-node": "^8.10.2",
     "tsdx": "^0.13.2",
     "tslib": "^2.0.0",
