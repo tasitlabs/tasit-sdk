@@ -22,7 +22,7 @@ const {
   getContractsAddresses,
 } = helpers;
 
-const fetch = require("node-fetch");
+import fetch from "node-fetch";
 
 const { TWO, TEN, BILLION, TOKEN_SUBDIVISIONS } = constants;
 
@@ -76,14 +76,14 @@ describe("Decentraland App pre-conditions", () => {
     });
 
     it("should have at least 1 parcel for sale", async () => {
-      const parcelsForSale = assetsForSale.filter(asset =>
+      const parcelsForSale = assetsForSale.filter((asset) =>
         addressesAreEqual(asset.nftAddress, LAND_PROXY_ADDRESS)
       );
       expect(parcelsForSale.length).to.be.at.least(1);
     });
 
     it("should have at least 1 estate for sale", async () => {
-      const estatessForSale = assetsForSale.filter(asset =>
+      const estatessForSale = assetsForSale.filter((asset) =>
         addressesAreEqual(asset.nftAddress, ESTATE_ADDRESS)
       );
       expect(estatessForSale.length).to.be.at.least(1);
@@ -91,7 +91,7 @@ describe("Decentraland App pre-conditions", () => {
 
     it("shouldn't have any duplicated sell orders", async () => {
       const assetForSaleIds = [];
-      assetsForSale.forEach(assetForSale => {
+      assetsForSale.forEach((assetForSale) => {
         let { assetId } = assetForSale;
         assetId = `${assetId}`;
         if (!assetForSaleIds.includes(assetId)) assetForSaleIds.push(assetId);
@@ -109,7 +109,7 @@ describe("Decentraland App pre-conditions", () => {
       );
       const blankImageData = (await blankImage.buffer()).toString("base64");
 
-      for (let asset of assetsForSale) {
+      for (const asset of assetsForSale) {
         const { assetId, nftAddress, priceInWei } = asset;
         const price = bigNumberify(priceInWei);
 

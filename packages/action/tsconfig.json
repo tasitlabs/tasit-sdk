@@ -4,7 +4,10 @@
   "compilerOptions": {
     "outDir": "./dist",
     "rootDir": "./src",
-    "composite": true
+    "composite": true,
+    "types": [
+      "mocha"
+    ]
   },
   "references": [
     {

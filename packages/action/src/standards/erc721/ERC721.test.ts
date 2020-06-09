@@ -1,5 +1,5 @@
 import ERC721 from "./ERC721";
-import TasitContracts from "tasit-contracts";
+import TasitContracts from "@tasit/contracts";
 import ProviderFactory from "../ProviderFactory";
 import {
   accounts,
@@ -52,8 +52,8 @@ describe("TasitAction.ERC721.ERC721", () => {
     // Two blocks to minimize the risk that polling doesn't occur.
     await mineBlocks(provider, 2);
 
-    expect(provider._events, "ethers should not be listening to any events.")
-      .to.be.empty;
+    expect(provider._events, "ethers should not be listening to any events.").to
+      .be.empty;
 
     if (erc721) {
       erc721.unsubscribe();
@@ -118,8 +118,8 @@ describe("TasitAction.ERC721.ERC721", () => {
       action = erc721.mint(ana.address, tokenId);
       await action.send();
 
-      const event = await new Promise(function(resolve, reject) {
-        erc721.on("Transfer", message => {
+      const event = await new Promise(function (resolve, reject) {
+        erc721.on("Transfer", (message) => {
           const { data } = message;
           const { args } = data;
           resolve(args);
@@ -142,7 +142,7 @@ describe("TasitAction.ERC721.ERC721", () => {
     it("should transfer an owned token", async () => {
       erc721 = new ERC721(ERC721_ADDRESS, ana);
 
-      const transferListener = sinon.fake(message => {
+      const transferListener = sinon.fake((message) => {
         const { data } = message;
         const { args } = data;
 
@@ -209,7 +209,7 @@ describe("TasitAction.ERC721.ERC721", () => {
 
       erc721 = new ERC721(ERC721_ADDRESS, ana);
 
-      const contractErrorListener = error => {
+      const contractErrorListener = (error) => {
         const { message } = error;
         expect(message).to.equal("Action failed.");
         contractErrorFakeFn();
@@ -226,7 +226,9 @@ describe("TasitAction.ERC721.ERC721", () => {
 
       // Some error (orphan block, failed tx) events are being triggered only from the confirmationListener
       // See more: https://github.com/tasitlabs/tasit-sdk/issues/253
-      action.on("confirmation", () => {});
+      action.on("confirmation", () => {
+        // do nothing
+      });
 
       await action.waitForOneConfirmation();
 
@@ -246,7 +248,7 @@ describe("TasitAction.ERC721.ERC721", () => {
 
       erc721 = new ERC721(ERC721_ADDRESS, ana);
 
-      const actionErrorListener = error => {
+      const actionErrorListener = (error) => {
         const { message } = error;
         expect(message).to.equal("Action failed.");
         actionErrorFakeFn();
@@ -261,7 +263,9 @@ describe("TasitAction.ERC721.ERC721", () => {
 
       // Some error (orphan block, failed tx) events are being triggered only from the confirmationListener
       // See more: https://github.com/tasitlabs/tasit-sdk/issues/253
-      action.on("confirmation", () => {});
+      action.on("confirmation", () => {
+        // do nothing
+      });
 
       await action.send();
 

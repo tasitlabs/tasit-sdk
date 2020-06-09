@@ -20,10 +20,10 @@ import {
   duration,
   constants,
   accounts,
-  etherFaucet,
-  expectExactEtherBalances,
+  // etherFaucet,
+  // expectExactEtherBalances,
   erc20Faucet,
-  expectExactTokenBalances,
+  // expectExactTokenBalances,
   bigNumberify,
 } from "../../../action/dist/testHelpers/helpers";
 
@@ -41,7 +41,25 @@ if (!network) {
 let EVENTS_TIMEOUT;
 let ASSETS_TO_CREATE;
 
-const config = require(`../config/${network}.js`);
+import configGoerli from "../config/goerli.js";
+import configDevelopment from "../config/goerli.js";
+import configRinkeby from "../config/goerli.js";
+import configRopsten from "../config/goerli.js";
+
+const config = (() => {
+  if (network === "goerli") {
+    return configGoerli;
+  }
+  if (network === "development") {
+    return configDevelopment;
+  }
+  if (network === "ropsten") {
+    return configRopsten;
+  }
+  if (network === "rinkeby") {
+    return configRinkeby;
+  }
+})();
 
 if (network === "development") {
   network = "local";
@@ -84,8 +102,8 @@ const cancelSellOrder = async (nftAddress, id) => {
   await action.waitForOneConfirmation();
 };
 
-const cancelOrdersOfEstatesWithoutImage = async estatesIds => {
-  const getImageDataFromEstateId = async id => {
+const cancelOrdersOfEstatesWithoutImage = async (estatesIds) => {
+  const getImageDataFromEstateId = async (id) => {
     const image = await fetch(
       `https://api.decentraland.org/v1/estates/${id}/map.png`
     );
@@ -97,7 +115,7 @@ const cancelOrdersOfEstatesWithoutImage = async estatesIds => {
   const blankImageData = await getImageDataFromEstateId(5);
 
   marketplaceContract.setAccount(sellerAccount);
-  for (let id of estatesIds) {
+  for (const id of estatesIds) {
     const imageData = await getImageDataFromEstateId(id);
 
     if (imageData === blankImageData) {
@@ -110,21 +128,21 @@ const cancelOrdersOfEstatesWithoutImage = async estatesIds => {
   }
 };
 
-const extractParcelsFromEstates = estates => {
+const extractParcelsFromEstates = (estates) => {
   let estatesParcels = [];
-  estates.forEach(estate => {
+  estates.forEach((estate) => {
     const { parcels } = estate;
     estatesParcels = [...estatesParcels, ...parcels];
   });
   return estatesParcels;
 };
 
-const updateParcelsData = async parcels => {
+const updateParcelsData = async (parcels) => {
   console.info("Updating parcels with metadata...");
 
   landContract.setAccount(sellerAccount);
-  for (let parcel of parcels) {
-    let { x, y, metadata: parcelName } = parcel;
+  for (const parcel of parcels) {
+    const { x, y, metadata: parcelName } = parcel;
     console.info(`Setting metadata for parcel (${x},${y})...`);
     if (parcelName && parcelName !== "") {
       const updateAction = landContract.updateLandData(x, y, parcelName);
@@ -138,11 +156,11 @@ const updateParcelsData = async parcels => {
 
 // Tech-debt: Use `assignMultipleParcels` to save gas cost.
 // The amount of parcels per call should be short enough to avoid out-of-gas.
-const createParcels = async parcels => {
+const createParcels = async (parcels) => {
   console.info("Creating parcels...");
 
-  let parcelIds = [];
-  for (let parcel of parcels) {
+  const parcelIds = [];
+  for (const parcel of parcels) {
     try {
       const id = await createParcel(parcel);
       parcelIds.push(id);
@@ -156,7 +174,7 @@ const createParcels = async parcels => {
   return parcelIds;
 };
 
-const createParcel = async parcel => {
+const createParcel = async (parcel) => {
   const { x, y } = parcel;
   landContract.setAccount(minterAccount);
   const action = landContract.assignNewParcel(`${x}`, `${y}`, sellerAddress);
@@ -178,7 +196,7 @@ const createParcel = async parcel => {
       resolve(id);
     });
 
-    action.on("error", error => {
+    action.on("error", (error) => {
       const { message } = error;
       console.warn(message);
       action.unsubscribe();
@@ -192,14 +210,14 @@ const createParcel = async parcel => {
   return parcelId;
 };
 
-const createEstate = async estate => {
+const createEstate = async (estate) => {
   const { metadata: estateName, parcels } = estate;
   const { address: beneficiaryAddress } = sellerAccount;
 
-  let xArray = [];
-  let yArray = [];
+  const xArray = [];
+  const yArray = [];
 
-  parcels.forEach(parcel => {
+  parcels.forEach((parcel) => {
     xArray.push(parcel.x);
     yArray.push(parcel.y);
   });
@@ -227,23 +245,25 @@ const createEstate = async estate => {
 
     // Some error (orphan block, failed tx) events are being triggered only from the confirmationListener
     // See more: https://github.com/tasitlabs/tasit-sdk/issues/253
-    action.on("confirmation", () => {});
+    action.on("confirmation", () => {
+      // do nothing
+    });
 
-    action.on("error", error => {
+    action.on("error", (error) => {
       const { message } = error;
       console.warn(message);
       action.unsubscribe();
       reject();
     });
 
-    estateContract.on("error", error => {
+    estateContract.on("error", (error) => {
       const { message } = error;
       console.warn(message);
       estateContract.unsubscribe();
       reject();
     });
 
-    estateContract.on("CreateEstate", message => {
+    estateContract.on("CreateEstate", (message) => {
       const { data } = message;
       const { args } = data;
       action.unsubscribe();
@@ -259,11 +279,11 @@ const createEstate = async estate => {
   return estateId;
 };
 
-const createEstates = async estates => {
+const createEstates = async (estates) => {
   console.info("Creating estates...");
 
   const estateIds = [];
-  for (let estate of estates) {
+  for (const estate of estates) {
     try {
       const id = await createEstate(estate);
       estateIds.push(id);
@@ -305,19 +325,19 @@ function getRandomInt(min, max) {
 
 const placeAssetOrders = async (estateIds, parcelIds) => {
   console.info(`Placing sell orders...`);
-  const shuffleArray = arr => arr.sort(() => Math.random() - 0.5);
+  const shuffleArray = (arr) => arr.sort(() => Math.random() - 0.5);
 
-  const estatesToSell = estateIds.map(id => {
+  const estatesToSell = estateIds.map((id) => {
     return { nftAddress: ESTATE_ADDRESS, id };
   });
 
-  const parcelsToSell = parcelIds.map(id => {
+  const parcelsToSell = parcelIds.map((id) => {
     return { nftAddress: LAND_PROXY_ADDRESS, id };
   });
 
   const assetsToSell = shuffleArray([...estatesToSell, ...parcelsToSell]);
 
-  for (let asset of assetsToSell) {
+  for (const asset of assetsToSell) {
     const { nftAddress, id } = asset;
 
     await placeAssetSellOrder(nftAddress, id);
@@ -346,7 +366,7 @@ const placeAssetSellOrder = async (nftAddress, assetId) => {
 const parcelsAreEqual = (p1, p2) => p1.x === p2.x && p1.y === p2.y;
 
 const findParcel = (parcel, listOfParcels) => {
-  return listOfParcels.find(p => parcelsAreEqual(p, parcel));
+  return listOfParcels.find((p) => parcelsAreEqual(p, parcel));
 };
 
 const getEstatesFromAPI = async () => {
@@ -360,14 +380,14 @@ const getEstatesFromAPI = async () => {
   const { data: jsonData } = json;
   const { estates: estatesFromAPI } = jsonData;
 
-  const allEstates = estatesFromAPI.map(estate => {
+  const allEstates = estatesFromAPI.map((estate) => {
     const { data } = estate;
     const { name: metadata, parcels } = data;
     return { metadata, parcels };
   });
 
   // Keep estates with small number of parcels to avoid out-of-gas on creation
-  const estates = allEstates.filter(e => e.parcels.length < 10);
+  const estates = allEstates.filter((e) => e.parcels.length < 10);
   return estates;
 };
 
@@ -382,7 +402,7 @@ const getParcelsFromAPI = async () => {
   const { data: jsonData } = json;
   const { parcels: parcelsFromAPI } = jsonData;
 
-  const parcels = parcelsFromAPI.map(parcel => {
+  const parcels = parcelsFromAPI.map((parcel) => {
     const { x, y, data } = parcel;
     let { name: metadata } = data;
     if (!metadata) metadata = "";
@@ -395,21 +415,21 @@ const getParcelsFromAPI = async () => {
 (async () => {
   try {
     // Fund Gnosis Safe account with Mana tokens and ethers
-    console.log("minter account", minterAccount.signingKey.address);
-    console.log({ GNOSIS_SAFE_ADDRESS });
-    console.log({ provider });
-    console.log("About to send ether from minter to Safe");
+    console.info("minter account", minterAccount.signingKey.address);
+    console.info({ GNOSIS_SAFE_ADDRESS });
+    console.info({ provider });
+    console.info("About to send ether from minter to Safe");
     // await etherFaucet(provider, minterAccount, GNOSIS_SAFE_ADDRESS, TEN);
-    console.log("About to check ether amount");
+    console.info("About to check ether amount");
     // await expectExactEtherBalances(provider, [GNOSIS_SAFE_ADDRESS], [TEN]);
-    console.log("About to send MANA");
+    console.info("About to send MANA");
     await erc20Faucet(
       manaContract,
       minterAccount,
       GNOSIS_SAFE_ADDRESS,
       BILLION
     );
-    console.log("About to check MANA amount");
+    console.info("About to check MANA amount");
     // await expectExactTokenBalances(
     //   manaContract,
     //   [GNOSIS_SAFE_ADDRESS],
@@ -422,10 +442,10 @@ const getParcelsFromAPI = async () => {
     ]);
 
     const estatesParcels = extractParcelsFromEstates(estates).filter(
-      estateParcel => !findParcel(estateParcel, parcels)
+      (estateParcel) => !findParcel(estateParcel, parcels)
     );
 
-    console.log("About to create parcels and estates");
+    console.info("About to create parcels and estates");
     const parcelIds = await createParcels(parcels);
 
     await createParcels(estatesParcels);

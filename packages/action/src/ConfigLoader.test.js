@@ -9,13 +9,13 @@ const {
   EtherscanProvider,
 } = providers;
 
-const parseNetworkNameFromEthers = networkName => {
+const parseNetworkNameFromEthers = (networkName) => {
   if (networkName === "unknown") return "other";
   if (networkName === "homestead") return "mainnet";
   return networkName;
 };
 
-const extractProviderConfig = async provider => {
+const extractProviderConfig = async (provider) => {
   await provider.ready;
   const network = await provider.getNetwork();
   let { name: networkName } = network;
@@ -64,7 +64,7 @@ const extractProviderConfig = async provider => {
   return config;
 };
 
-const fulfillConfigWithDefaults = config => {
+const fulfillConfigWithDefaults = (config) => {
   let { provider } = config;
   let { jsonRpc, provider: providerType, infura, etherscan } = provider;
 
@@ -98,7 +98,7 @@ const fulfillConfigWithDefaults = config => {
   return config;
 };
 
-const checkConfig = async config => {
+const checkConfig = async (config) => {
   const userConfig = fulfillConfigWithDefaults(config);
 
   ConfigLoader.setConfig(config);

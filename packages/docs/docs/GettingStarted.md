@@ -56,16 +56,16 @@ action.sendForFree(); // meta-tx broadcast
 
 The Tasit SDK is designed with modularity in mind. Are you only planning on using the Tasit SDK for generating an ephemeral Ethereum acccount in your app? That works too!
 
-You can install `tasit-account` directly and keep your app's dependencies leaner.
+You can install `@tasit/account` directly and keep your app's dependencies leaner.
 
 ```
-npm install --save tasit-account
+npm install --save @tasit/account
 ```
 
 Then the usage example from before becomes:
 
 ```javascript
-import Account from "tasit-account";
+import Account from "@tasit/account";
 // ...
 ```
 

@@ -28,8 +28,8 @@ describe("DecentralandUtils", () => {
   const { address: sellerAddress } = sellerWallet;
   let ephemeralAddress;
 
-  const isAssetAnEstate = asset => asset.nftAddress === estate.getAddress();
-  const isAssetAParcel = asset => asset.nftAddress === land.getAddress();
+  const isAssetAnEstate = (asset) => asset.nftAddress === estate.getAddress();
+  const isAssetAParcel = (asset) => asset.nftAddress === land.getAddress();
 
   beforeEach("", async () => {
     land = new Land(LAND_ADDRESS);
@@ -77,9 +77,9 @@ describe("DecentralandUtils", () => {
     expect(estateParcels).to.have.lengthOf(estateParcelBalance);
 
     const sellerAssets = await getAssetsOf(sellerAddress);
-    const sellerAssetIds = sellerAssets.map(a => a.id);
-    const sellerEstateIds = sellerEstates.map(e => e.id);
-    const sellerParcelIds = sellerParcels.map(p => p.id);
+    const sellerAssetIds = sellerAssets.map((a) => a.id);
+    const sellerEstateIds = sellerEstates.map((e) => e.id);
+    const sellerParcelIds = sellerParcels.map((p) => p.id);
     expect(sellerAssetIds).to.have.members([
       ...sellerParcelIds,
       ...sellerEstateIds,
@@ -95,7 +95,7 @@ describe("DecentralandUtils", () => {
   });
 
   it("should expose transactionHash", async () => {
-    const expectAssetHasTxHash = asset =>
+    const expectAssetHasTxHash = (asset) =>
       expect(asset.transactionHash).to.be.ok;
 
     const sellerAssets = await getAssetsOf(sellerAddress);
