@@ -44,7 +44,7 @@ export const constants = {
 };
 
 // Note: These private keys correspond to the the seed phrase
-// used for local buidleri-evm development
+// used for local buidler-evm development
 
 // Note: Using these same private keys in the root of the monorepo
 // for the buidler config
