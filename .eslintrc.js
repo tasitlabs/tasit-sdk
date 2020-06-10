@@ -13,4 +13,7 @@ module.exports = {
     "no-console": ["error", { allow: ["warn", "error", "info"] }],
     "@typescript-eslint/ban-ts-comment": "off"
   },
+  globals: {
+    expect: true
+  }
 };

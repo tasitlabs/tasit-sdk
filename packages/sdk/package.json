@@ -22,17 +22,18 @@
     "dist"
   ],
   "scripts": {
-    "prepare": "npx tsdx build",
+    "clean": "rm -rf dist/*",
+    "prepare": "npm run clean && npm run build",
     "setup:local": "cp src/config/development.js src/config/default.js",
     "setup:ropsten": "cp src/config/ropsten.js src/config/default.js",
     "test": "npm run setup:local && npm run test:mocha",
     "test:testnet": "npm run setup:ropsten && npm run test:mocha",
     "test:mocha": "npx test:mocha mocha \"src/**/*.test.ts\"  --require ts-node/register --file src/testHelpers/mochaSetup.ts --timeouts 10000",
     "check:decentraland-data": "npx test:mocha mocha src/scripts/checkDecentralandContractsData.ts  --require ts-node/register --file src/testHelpers/mochaSetup.ts --no-timeouts",
-    "start": "tsdx watch",
-    "build": "tsdx build",
-    "test:tsdx": "tsdx test",
-    "lint": "tsdx lint src",
+    "start": "npx tsdx watch",
+    "build": "npx tsdx build",
+    "test:tsdx": "npx tsdx test",
+    "lint": "npx tsdx lint src",
     "update": "npx ncu",
     "update:write": "npm run update -- -u"
   },
@@ -46,7 +47,6 @@
     "@tasit/contracts": "^0.0.19"
   },
   "devDependencies": {
-    "@babel/preset-typescript": "^7.10.1",
     "chai": "^4.2.0",
     "ethers": "^4.0.47",
     "mocha": "^7.2.0",

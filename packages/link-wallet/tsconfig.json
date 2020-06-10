@@ -5,10 +5,10 @@
     "outDir": "./dist",
     "rootDir": "./src",
     "composite": true
-  },
-  "references": [
-    {
-      "path": "../action"
-    }
-  ]
+  }
+  // "references": [
+  //   {
+  //     "path": "../action"
+  //   }
+  // ]
 }

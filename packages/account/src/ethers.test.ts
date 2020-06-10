@@ -1,11 +1,13 @@
 import { ethers } from "ethers";
 
+import { expect } from "chai";
+
 import helpers from "./testHelpers/helpers";
 const { constants, accounts } = helpers;
 
 const { ZERO } = constants;
 
-const provider = new ethers.providers.JsonRpcProvider();
+const provider = new ethers.providers.JsonRpcProvider("http://localhost:8545");
 provider.pollingInterval = 50;
 
 // Note: We're intentionally not testing the `fromEncryptedJson` or `encrypt` functions
@@ -15,7 +17,7 @@ provider.pollingInterval = 50;
 describe("ethers", () => {
   let wallet;
 
-  beforeEach("instantiate wallet and provider objects", async () => {
+  beforeEach(async () => {
     [wallet] = accounts;
     wallet = wallet.connect(provider);
 
@@ -88,6 +90,11 @@ describe("ethers", () => {
     const signedTx = await wallet.sign(rawTx);
     const sentTx = await provider.sendTransaction(signedTx);
     expect(sentTx).not.to.be.undefined;
+    expect(sentTx.hash).not.to.be.undefined;
+
+    if (!sentTx.hash) {
+      throw new Error("Transaction hash undefined");
+    }
 
     await provider.waitForTransaction(sentTx.hash);
     const txResponse = await provider.getTransaction(sentTx.hash);

@@ -1,4 +1,4 @@
-const development = {
+export const development = {
   provider: {
     network: "other",
     provider: "jsonrpc",
@@ -13,4 +13,4 @@ const development = {
   },
 };
 
-module.exports = development;
+export default development;

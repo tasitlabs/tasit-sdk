@@ -46,7 +46,6 @@ export const createFromPrivateKey = (privKey) => {
   }
 };
 
-
 // Note: These private keys correspond to the the seed phrase
 // used for local ganache-cli development
 // Note that a different seed phrase / private key was used to deploy

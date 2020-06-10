@@ -1,4 +1,18 @@
 {
+  "npmClient": "npm",
   "packages": ["packages/*"],
+  "command": {
+    "bootstrap": {
+      "ignore": "@tasit/contract-based-account"
+    },
+    "publish": {
+      "npmClient": "npm",
+      "allowBranch": [
+        "primary",
+        "develop"
+      ],
+      "registry": "https://registry.npmjs.org/"
+    }
+  },
   "version": "0.0.19"
 }

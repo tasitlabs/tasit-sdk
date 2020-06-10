@@ -22,11 +22,12 @@
     "dist"
   ],
   "scripts": {
-    "start": "tsdx watch",
-    "build": "tsdx build",
-    "test:tsdx": "tsdx test",
-    "lint": "tsdx lint src",
-    "test:mocha-tsnode": "npx mocha src/*.test.ts --require ts-node/register --file src/testHelpers/mochaSetup.ts --timeout 4000",
+    "prepare": "npm run build",
+    "start": "npx tsdx watch",
+    "build": "npx tsdx build",
+    "test:tsdx": "npx tsdx test",
+    "lint": "npx tsdx lint src",
+    "test:mocha-tsnode": "env TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\" }' npx mocha --require ts-node/register --timeout 4000 src/*.test.ts",
     "test": "npm run test:mocha-tsnode",
     "update": "npx ncu",
     "update:write": "npm run update -- -u"
@@ -38,7 +39,6 @@
     "ethers": "^4.0.47"
   },
   "devDependencies": {
-    "@babel/preset-typescript": "^7.10.1",
     "@types/chai": "^4.2.11",
     "@types/mocha": "^7.0.2",
     "@types/node": "^14.0.10",

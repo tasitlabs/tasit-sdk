@@ -5,19 +5,19 @@
     "outDir": "./dist",
     "rootDir": "./src",
     "composite": true
-  },
-  "references": [
-    {
-      "path": "../account"
-    },
-    {
-      "path": "../action"
-    },
-    {
-      "path": "../contract-based-account"
-    },
-    {
-      "path": "../contracts"
-    }
-  ]
+  }
+  // "references": [
+  //   {
+  //     "path": "../account"
+  //   },
+  //   {
+  //     "path": "../action"
+  //   },
+  //   {
+  //     "path": "../contract-based-account"
+  //   },
+  //   {
+  //     "path": "../contracts"
+  //   }
+  // ]
 }
