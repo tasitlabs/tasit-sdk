@@ -1,9 +1,15 @@
 import TasitAction from "@tasit/action";
-
+// TODO: Import these non-default exports directly
+// import { Action, Contract, Utils: ActionUtils } from "@tasit/action";
 const { Action, Contract, Utils: ActionUtils } = TasitAction;
-import GnosisSafeUtils from "./GnosisSafeUtils";
 
+import GnosisSafeUtils from "./GnosisSafeUtils";
 import TasitContracts from "@tasit/contracts";
+
+interface RawAction {
+  to: any;
+  data: any;
+}
 
 const { local } = TasitContracts;
 const { GnosisSafe: GnosisSafeInfo, MyERC20, MyERC721 } = local;
@@ -47,7 +53,8 @@ export default class GnosisSafe extends Contract {
   // class contains initialized properties or has parameter properties.
   constructor(address: string, wallet) {
     const abi = gnosisSafeABI;
-    super(address, abi, wallet);
+    const abiString = abi.toString();
+    super(address, abiString, wallet);
     this.utils = new GnosisSafeUtils(this);
   }
 
@@ -151,7 +158,8 @@ export default class GnosisSafe extends Contract {
   };
 
   private executeTransaction = (data: any, toAddress: any, etherValue: any) => {
-    const rawActionPromise = this.prepareTransaction(
+    // TODO: Start using prepareTransaction again once we fix that
+    const rawActionPromise: Promise<RawAction> = this.prepareTransaction(
       data,
       toAddress,
       etherValue
@@ -212,8 +220,10 @@ export default class GnosisSafe extends Contract {
       signersCount
     );
 
+    // TODO: Decide if we expect for nonce to exist
     const nonce = await this.nonce();
 
+    // TODO: Decide if we expect for getTransactionHash to exist
     const transactionHash = await this.getTransactionHash(
       toAddress,
       etherValue,

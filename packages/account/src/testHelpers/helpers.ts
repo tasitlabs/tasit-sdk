@@ -44,10 +44,10 @@ export const constants = {
 };
 
 // Note: These private keys correspond to the the seed phrase
-// used for local ganache-cli development
-// Note that a different seed phrase / private key was used to deploy
-// the Rinkeby testnet contracts originally
+// used for local buidleri-evm development
 
+// Note: Using these same private keys in the root of the monorepo
+// for the buidler config
 const privateKeys = [
   "0x02380f59eeed7a02557aeaab089606739feb0e1db34c6b08374ad31188a3892d",
   "0x2232aa52d058352511c5dd2d0ebcc0cfb6dfb5f051a9b367b7505556d2672490",
@@ -60,6 +60,10 @@ const privateKeys = [
   "0xda1a8c477afeb99ae2c2300b22ad612ccf4c184564e332ae9a32f784bbca8d6b",
   "0x633a290bcdabb9075c5a4b3885c69ce64b4b0e6079eb929abb2ac9427c49733b",
 ];
+
+// Note: A different seed phrase / private key was used to deploy
+// the Rinkeby testnet contracts originally
+
 
 // Note: Also defined in @tasit/action test helpers
 // Potential candidate for extracting to test helpers child package.

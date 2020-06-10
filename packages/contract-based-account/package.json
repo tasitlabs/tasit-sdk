@@ -1,6 +1,7 @@
 {
   "name": "@tasit/contract-based-account",
   "version": "0.0.19",
+  "private": true,
   "description": "Library for onboarding a user using a smart-contract-based account.",
   "main": "dist/index",
   "module": "dist/@tasit/contract-based-account.esm.js",
@@ -22,10 +23,11 @@
     "dist"
   ],
   "scripts": {
-    "start": "tsdx watch",
-    "build": "tsdx build",
-    "test:tsdx": "tsdx test",
-    "lint": "tsdx lint src",
+    "prepare": "npm run build",
+    "start": "npx tsdx watch",
+    "build": "npx tsdx build",
+    "test:tsdx": "npx tsdx test",
+    "lint": "npx tsdx lint src",
     "test:mocha-tsnode": "npx mocha src/*.test.ts --require ts-node/register --file src/testHelpers/mochaSetup.ts --timeout 4000",
     "test": "npm run test:mocha-tsnode",
     "update": "npx ncu",
@@ -41,7 +43,6 @@
     "@tasit/contracts": "^0.0.19"
   },
   "devDependencies": {
-    "@babel/preset-typescript": "^7.10.1",
     "@types/mocha": "^7.0.2",
     "chai": "^4.2.0",
     "mocha": "^7.2.0",
