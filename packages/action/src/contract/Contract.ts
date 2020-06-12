@@ -35,7 +35,7 @@ export class Contract extends Subscription {
   // on the next line
   // @ts-ignore: semantic error TS2376: A 'super' call must be the first statement in the constructor when a class contains initialized properties or has parameter properties.
 
-  constructor(address: string, abi: string, wallet: Wallet | undefined) {
+  constructor(address: string, abi: string, wallet?: Wallet | undefined) {
     if (!Utils.isAddress(address) || !Utils.isABI(abi))
       throw new Error(`Cannot create a Contract without a address and ABI`);
 

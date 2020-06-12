@@ -6,6 +6,7 @@ import Contracts from "@tasit/contracts";
 export {
   Account,
   Action,
+  // TODO: Add @tasit/contract-based-account back as a dep
   // ContractBasedAccount,
   Contracts,
 };

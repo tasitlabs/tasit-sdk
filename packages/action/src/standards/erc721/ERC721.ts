@@ -1,6 +1,6 @@
-import { Contract } from "@tasit/action";
+import Contract from "../../contract";
 
-import TasitContracts from "../..";
+import TasitContracts from "@tasit/contracts";
 const { local } = TasitContracts;
 const { MyERC721 } = local;
 const { abi } = MyERC721;

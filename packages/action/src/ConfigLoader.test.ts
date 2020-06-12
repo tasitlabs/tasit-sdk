@@ -1,6 +1,7 @@
 import ProviderFactory from "./ProviderFactory";
 import ConfigLoader from "./ConfigLoader";
 import { ethers } from "ethers";
+import { expect } from "chai";
 const { providers } = ethers;
 const {
   JsonRpcProvider,
@@ -15,6 +16,27 @@ const parseNetworkNameFromEthers = (networkName) => {
   return networkName;
 };
 
+interface Api {
+  apiKey: string;
+}
+
+interface JsonRpc {
+  url: string;
+  port: number;
+  user: any;
+  password: any;
+  allowInsecure: any;
+}
+
+interface Config {
+  pollingInterval: any;
+  provider?: string;
+  network: string;
+  etherscan?: Api;
+  infura?: Api;
+  jsonRpc?: JsonRpc;
+}
+
 const extractProviderConfig = async (provider) => {
   await provider.ready;
   const network = await provider.getNetwork();
@@ -26,7 +48,7 @@ const extractProviderConfig = async (provider) => {
     connection,
   } = provider;
 
-  let config = {
+  let config: Config = {
     network: parseNetworkNameFromEthers(networkName),
     pollingInterval,
   };
@@ -116,11 +138,13 @@ const checkConfig = async (config) => {
 describe("TasitAction.ConfigLoader", () => {
   let defaultConfig;
 
-  beforeEach("store default config", () => {
-    defaultConfig = ConfigLoader.getConfig();
+  // store default config
+  beforeEach(() => {
+    defaultConfig = ConfigLoader.getDefaultConfig();
   });
 
-  afterEach("back to default config", () => {
+  // back to default config
+  afterEach(() => {
     ConfigLoader.setConfig(defaultConfig);
   });
 
