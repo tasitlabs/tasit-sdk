@@ -1,6 +1,6 @@
 {
   "name": "@tasit/docs",
-  "version": "0.0.1",
+  "version": "0.0.20",
   "private": true,
   "scripts": {
     "update": "npx ncu -x 'react, react-dom'",
