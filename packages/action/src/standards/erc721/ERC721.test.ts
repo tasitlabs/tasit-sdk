@@ -1,17 +1,27 @@
 import ERC721 from "./ERC721";
 import TasitContracts from "@tasit/contracts";
-import ProviderFactory from "../ProviderFactory";
+import ProviderFactory from "../../ProviderFactory";
+
 import {
   accounts,
   mineBlocks,
   expectExactTokenBalances,
-} from "../testHelpers/helpers";
+} from "../../testHelpers/helpers";
+
+import { expect} from "chai";
+import sinon from "sinon";
 
 const { local: localContracts } = TasitContracts;
 const { MyERC721, SampleContract } = localContracts;
 const { address: ERC721_ADDRESS } = MyERC721;
 const { address: SAMPLE_CONTRACT_ADDRESS } = SampleContract;
 const provider = ProviderFactory.getProvider();
+
+interface Event {
+  from: string;
+  to: string;
+  tokenId: number;
+}
 
 describe("TasitAction.ERC721.ERC721", () => {
   let owner;
@@ -25,7 +35,7 @@ describe("TasitAction.ERC721.ERC721", () => {
     [owner, ana, bob] = accounts;
   });
 
-  beforeEach("", async () => {
+  beforeEach(async () => {
     action = undefined;
 
     erc721 = new ERC721(ERC721_ADDRESS, owner);
@@ -47,7 +57,7 @@ describe("TasitAction.ERC721.ERC721", () => {
     );
   });
 
-  afterEach("", async () => {
+  afterEach(async () => {
     // This line ensures that a new event listener does not catch an existing event from last the block
     // Two blocks to minimize the risk that polling doesn't occur.
     await mineBlocks(provider, 2);
@@ -93,12 +103,14 @@ describe("TasitAction.ERC721.ERC721", () => {
   describe("should throw error when instantiated with invalid args", () => {
     it("constructor without address", async () => {
       expect(() => {
+        // @ts-ignore: TS2554
         new ERC721();
       }).to.throw();
     });
 
     it("constructor with invalid address", async () => {
       expect(() => {
+        // @ts-ignore: TS2554
         new ERC721("invalid address");
       }).to.throw();
     });
@@ -114,11 +126,12 @@ describe("TasitAction.ERC721.ERC721", () => {
     const tokenId = 1;
     const zeroAddress = "0x0000000000000000000000000000000000000000";
 
-    beforeEach("should mint one token to ana", async () => {
+    // should mint one token to ana
+    beforeEach(async () => {
       action = erc721.mint(ana.address, tokenId);
       await action.send();
 
-      const event = await new Promise(function (resolve, reject) {
+      const event: Event = await new Promise(function (resolve, reject) {
         erc721.on("Transfer", (message) => {
           const { data } = message;
           const { args } = data;
@@ -134,7 +147,7 @@ describe("TasitAction.ERC721.ERC721", () => {
 
       expect(event.from).to.equal(zeroAddress);
       expect(event.to).to.equal(ana.address);
-      expect(event.tokenId.eq(tokenId)).to.be.true;
+      expect(event.tokenId).to.equal(tokenId);
 
       await expectExactTokenBalances(erc721, [ana.address], [1]);
     });

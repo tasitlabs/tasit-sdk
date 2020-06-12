@@ -3,7 +3,7 @@ import chai, { expect } from "chai";
 import chaiAsPromised from "chai-as-promised";
 chai.use(chaiAsPromised);
 
-// Sinon
+
 import sinon from "sinon";
 
 import Contract from "./Contract";
@@ -31,8 +31,10 @@ describe("TasitAction.Contract", () => {
   let sampleContract;
   let account;
   let action;
+  let contractAbiString;
 
-  beforeEach("should connect to an existing contract", async () => {
+  // should connect to an existing contract
+  beforeEach(async () => {
     if (action) {
       expect(action.subscribedEventNames()).to.be.empty;
     }
@@ -43,7 +45,9 @@ describe("TasitAction.Contract", () => {
 
     [account] = accounts;
 
-    sampleContract = new Contract(SAMPLE_CONTRACT_ADDRESS, sampleContractABI);
+    contractAbiString = sampleContractABI.toString();
+
+    sampleContract = new Contract(SAMPLE_CONTRACT_ADDRESS, contractAbiString);
     expect(sampleContract).to.exist;
     expect(sampleContract.getAddress()).to.equal(SAMPLE_CONTRACT_ADDRESS);
     expect(sampleContract.getValue).to.exist;
@@ -52,7 +56,8 @@ describe("TasitAction.Contract", () => {
     expect(sampleContract.getABI()).to.deep.equal(sampleContractABI);
   });
 
-  afterEach("revert blockchain snapshot", async () => {
+  // revert blockchain snapshot
+  afterEach(async () => {
     if (sampleContract) {
       sampleContract.unsubscribe();
 
@@ -76,25 +81,28 @@ describe("TasitAction.Contract", () => {
   describe("should throw error when instantiated with invalid args", () => {
     it("constructor without address and ABI", async () => {
       expect(() => {
+        // @ts-ignore: TS2554
         new Contract();
       }).to.throw();
     });
 
     it("constructor without ABI", async () => {
       expect(() => {
+        // @ts-ignore: TS2554
         new Contract(SAMPLE_CONTRACT_ADDRESS);
       }).to.throw();
     });
 
     it("constructor without address but with ABI", async () => {
       expect(() => {
-        new Contract(null, sampleContractABI);
+        // @ts-ignore: TS2345
+        new Contract(null, contractAbiString);
       }).to.throw();
     });
 
     it("constructor with invalid address and valid ABI", async () => {
       expect(() => {
-        new Contract("invalid address", sampleContractABI);
+        new Contract("invalid address", contractAbiString);
       }).to.throw();
     });
 
@@ -139,7 +147,8 @@ describe("TasitAction.Contract", () => {
   });
 
   describe("Contract errors behavior", async () => {
-    beforeEach("assign an account to the contract", () => {
+    // assign an account to the contract
+    beforeEach(() => {
       expect(() => {
         sampleContract.setAccount(account);
       }).not.to.throw();
@@ -229,7 +238,8 @@ describe("TasitAction.Contract", () => {
   describe("Transactions (Actions) Subscription", async () => {
     let rand;
 
-    beforeEach("assign an account to the contract", () => {
+    // assign an account to the contract
+    beforeEach(() => {
       expect(() => {
         sampleContract.setAccount(account);
       }).not.to.throw();

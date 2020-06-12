@@ -1,4 +1,8 @@
 import { ethers } from "ethers";
+
+// Chai
+import { expect } from "chai";
+
 import TasitContracts from "@tasit/contracts";
 
 import ProviderFactory from "./ProviderFactory";
@@ -17,7 +21,8 @@ let wallet;
 let sampleContract;
 
 describe("ethers", () => {
-  beforeEach("instantiate provider, wallet and contract objects", async () => {
+  // instantiate provider, wallet and contract objects
+  beforeEach(async () => {
     [wallet] = accounts;
     wallet = wallet.connect(provider);
     expect(wallet.address).to.have.lengthOf(42);
@@ -128,7 +133,7 @@ describe("ethers", () => {
     let rawTx;
     let signedTx;
 
-    beforeEach("", async () => {
+    beforeEach(async () => {
       const data = sampleContract.interface.functions.setValue.encode([rand]);
 
       rawTx = {

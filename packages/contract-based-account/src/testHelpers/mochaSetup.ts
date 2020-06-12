@@ -1,7 +1,7 @@
 // Chai
 import { expect } from "chai";
 
-// Sinon
+
 import sinon from "sinon";
 
 // Helpers
