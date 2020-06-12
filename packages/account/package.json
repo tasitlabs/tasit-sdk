@@ -21,6 +21,9 @@
   "files": [
     "dist"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "prepare": "npm run build",
     "start": "npx tsdx watch",
@@ -49,5 +52,6 @@
     "tsdx": "^0.13.2",
     "tslib": "^2.0.0",
     "typescript": "^3.9.3"
-  }
+  },
+  "gitHead": "e8a1bfd65bd8a3274f27605bbc1b6eedbd418496"
 }

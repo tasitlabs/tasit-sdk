@@ -35,6 +35,9 @@
   "bugs": {
     "url": "https://github.com/tasitlabs/tasit-sdk/issues"
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "dependencies": {
     "ethers": "^4.0.47"
   },
@@ -57,5 +60,6 @@
     "tsdx": "^0.13.2",
     "tslib": "^2.0.0",
     "typescript": "^3.9.3"
-  }
+  },
+  "gitHead": "e8a1bfd65bd8a3274f27605bbc1b6eedbd418496"
 }

@@ -44,6 +44,9 @@
     "update:write": "npm run update -- -u",
     "deploy:rinkeby": "npx buidler run --network rinkeby scripts/deploy.ts"
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "bugs": {
     "url": "https://github.com/tasitlabs/tasit-sdk/issues"
   },
@@ -73,5 +76,6 @@
   },
   "dependencies": {
     "@openzeppelin/contracts": "3.0.2"
-  }
+  },
+  "gitHead": "e8a1bfd65bd8a3274f27605bbc1b6eedbd418496"
 }
