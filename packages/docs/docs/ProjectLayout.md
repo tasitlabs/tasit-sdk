@@ -4,9 +4,7 @@ title: Project layout
 sidebar_label: Project layout
 ---
 
-# Directories in the monorepo
-
-For those familiar with Ethereum, here are some details about the scope of each of the packages in this project and what they're built with.
+_For those familiar with Ethereum, here are some details about the scope of each of the packages in this project and what they're built with._
 
 ### sdk
 This package exports the child packages below as a single export for convenience.
@@ -29,5 +27,3 @@ This repo tracks a few useful 3rd party contracts and exports classes for intera
 ---
 
 [Go back](Home.md) to the home page of the docs.
-
-See something that can be improved on this page? [Edit it here](https://github.com/tasitlabs/tasit-sdk/blob/develop/packages/docs/docs/ProjectLayout.md).

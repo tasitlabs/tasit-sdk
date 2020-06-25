@@ -34,6 +34,3 @@ _Disclaimer:_ The alpha version of this SDK is under active development. We enco
 
 ---
 
-See something that can be improved on this page? [Edit it here](https://github.com/tasitlabs/tasit-sdk/blob/develop/packages/docs/docs/Home.md).
-
-Check out the link below for a quick guide on how to get started with making a native mobile Ethereum dapp using the Tasit SDK!

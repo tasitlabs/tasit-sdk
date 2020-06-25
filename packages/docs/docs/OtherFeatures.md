@@ -74,5 +74,3 @@ This feature lives over in our `tasit` repo - [here](https://github.com/tasitlab
 ---
 
 [Go back](Home.md) to the home page of the docs.
-
-See something that can be improved on this page? [Edit it here](https://github.com/tasitlabs/tasit-sdk/blob/develop/packages/docs/docs/OtherFeatures.md).

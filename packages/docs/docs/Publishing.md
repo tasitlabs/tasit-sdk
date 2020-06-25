@@ -57,5 +57,3 @@ Sometimes during the `lerna bootstrap` process, the file `package-lock.json` can
 ---
 
 [Go back](Home.md) to the home page of the docs.
-
-See something that can be improved on this page? [Edit it here](https://github.com/tasitlabs/tasit-sdk/blob/develop/packages/docs/docs/Publishing.md).
