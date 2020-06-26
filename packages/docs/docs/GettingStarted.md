@@ -72,5 +72,3 @@ import Account from "@tasit/account";
 ...with the rest of the code remaining the same.
 
 ---
-
-See something that can be improved on this page? [Edit it here](https://github.com/tasitlabs/tasit-sdk/blob/develop/packages/docs/docs/GettingStarted.md).

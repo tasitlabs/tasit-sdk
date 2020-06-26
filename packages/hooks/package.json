@@ -1,0 +1,52 @@
+{
+  "version": "0.0.21",
+  "license": "MIT",
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "engines": {
+    "node": ">=10"
+  },
+  "scripts": {
+    "start": "npx tsdx watch",
+    "build": "npx tsdx build",
+    "test": "npx tsdx test --passWithNoTests",
+    "lint": "npx tsdx lint",
+    "prepare": "npx tsdx build"
+  },
+  "peerDependencies": {
+    "react": ">=16",
+    "react-native": "~0.61"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npx tsdx lint"
+    }
+  },
+  "prettier": {
+    "printWidth": 80,
+    "semi": true,
+    "singleQuote": true,
+    "trailingComma": "es5"
+  },
+  "name": "@tasit/hooks",
+  "author": "Tasit Labs",
+  "module": "dist/hooks.esm.js",
+  "dependencies": {
+    "@tasit/account": "0.0.21"
+  },
+  "devDependencies": {
+    "@types/react": "~16.9.23",
+    "@types/react-dom": "~16.9.8",
+    "husky": "^4.2.5",
+    "react": "~16.9.0",
+    "react-dom": "~16.9.0",
+    "react-native": "~0.61",
+    "tsdx": "^0.13.2",
+    "tslib": "^2.0.0",
+    "typescript": "^3.9.5"
+  }
+}
