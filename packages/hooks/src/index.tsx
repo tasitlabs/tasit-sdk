@@ -9,7 +9,10 @@ export function useAccount(options: AccountOptions): (string | boolean)[] {
   useEffect(() => {
     function makeAccount() {
       const account = Account.createUsingRandomness(randomBytes);
-      const { address: accountAddress, privateKey } = account;
+      const {
+        address: accountAddress,
+        // privateKey
+      } = account;
       // console.log({ accountAddress });
       // console.log({ privateKey });
 

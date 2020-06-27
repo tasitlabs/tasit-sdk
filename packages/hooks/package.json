@@ -26,6 +26,10 @@
       "pre-commit": "npx tsdx lint"
     }
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tasitlabs/tasit-sdk.git"
+  },
   "prettier": {
     "printWidth": 80,
     "semi": true,
