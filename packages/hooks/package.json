@@ -4,11 +4,13 @@
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
   "files": [
-    "dist",
-    "src"
+    "dist"
   ],
   "engines": {
     "node": ">=10"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "scripts": {
     "start": "npx tsdx watch",
@@ -20,6 +22,10 @@
   "peerDependencies": {
     "react": ">=16",
     "react-native": "~0.61"
+  },
+  "homepage": "https://tasit.dev",
+  "bugs": {
+    "url": "https://github.com/tasitlabs/tasit-sdk/issues"
   },
   "husky": {
     "hooks": {
