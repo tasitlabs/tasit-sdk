@@ -4,11 +4,13 @@
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
   "files": [
-    "dist",
-    "src"
+    "dist"
   ],
   "engines": {
     "node": ">=10"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "scripts": {
     "start": "npx tsdx watch",
@@ -21,10 +23,18 @@
     "react": ">=16",
     "react-native": "~0.61"
   },
+  "homepage": "https://tasit.dev",
+  "bugs": {
+    "url": "https://github.com/tasitlabs/tasit-sdk/issues"
+  },
   "husky": {
     "hooks": {
       "pre-commit": "npx tsdx lint"
     }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tasitlabs/tasit-sdk.git"
   },
   "prettier": {
     "printWidth": 80,
@@ -40,9 +50,11 @@
   },
   "devDependencies": {
     "@react-native-community/bob": "^0.15.3",
+    "@testing-library/react-hooks": "^3.3.0",
     "@types/react": "~16.9.23",
     "husky": "^4.2.5",
     "react": "~16.9.0",
+    "react-test-renderer": "~16.9.0",
     "react-native": "~0.61",
     "tsdx": "^0.13.2",
     "tslib": "^2.0.0",

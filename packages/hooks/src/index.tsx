@@ -7,9 +7,14 @@ export function useAccount(options: AccountOptions): (string | boolean)[] {
   const { asyncStorage = true, randomBytes, randomBytesGenerated } = options;
 
   useEffect(() => {
-    function makeAccount() {
+    // console.log('useEffect in useAccount running');
+    function makeAccount(): void {
+      // console.log('makeAccount running');
       const account = Account.createUsingRandomness(randomBytes);
-      const { address: accountAddress, privateKey } = account;
+      const {
+        address: accountAddress,
+        // privateKey
+      } = account;
       // console.log({ accountAddress });
       // console.log({ privateKey });
 
@@ -23,7 +28,7 @@ export function useAccount(options: AccountOptions): (string | boolean)[] {
     if (randomBytesGenerated) {
       makeAccount();
     }
-  }, []);
+  }, [asyncStorage, randomBytes, randomBytesGenerated]);
 
   return [address, addressDefined];
 }
