@@ -71,3 +71,16 @@ Per Palmer Group guidelines, [always use named exports.](https://github.com/palm
 ## Publishing to NPM
 
 We recommend using [np](https://github.com/sindresorhus/np).
+
+## Local development
+
+Note: When you want to use the local version of this lib in an local Expo app while developing, refer to the metro config file used in the `account-example` app in the [`]tasit` repo](https://github.com/tasitlabs/tasit) and enable some settigs there that are disabled.
+
+To make sure two versions of React aren't found, follow these instructions:
+
+Your bundler might “see” two Reacts — one in the application folder and one in your library folder. One possible fix is to run `npm link ../../../tasit/apps/account-example/node_modules/react` from this dir, `tasit-sdk/packages/hooks`. This should make the library use the application’s React copy.
+
+Note that depending on what dir your local app and this library are in, the number of `..`'s is likely to change.
+
+(Source: https://reactjs.org/warnings/invalid-hook-call-warning.html towards the bottom)
+

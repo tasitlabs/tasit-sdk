@@ -1,7 +1,9 @@
 {
+  "name": "@tasit/hooks",
   "version": "0.0.21",
   "license": "MIT",
   "main": "dist/index.js",
+  "module": "dist/hooks.esm.js",
   "typings": "dist/index.d.ts",
   "files": [
     "dist"
@@ -42,9 +44,7 @@
     "singleQuote": true,
     "trailingComma": "es5"
   },
-  "name": "@tasit/hooks",
   "author": "Tasit Labs",
-  "module": "dist/hooks.esm.js",
   "dependencies": {
     "@tasit/account": "0.0.21"
   },

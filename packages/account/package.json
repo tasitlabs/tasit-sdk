@@ -3,7 +3,7 @@
   "version": "0.0.21",
   "description": "Library for using Ethereum accounts",
   "main": "dist/index",
-  "module": "dist/@tasit/account.esm.js",
+  "module": "dist/account.esm.js",
   "typings": "dist/index.d.ts",
   "keywords": [
     "ethereum",
