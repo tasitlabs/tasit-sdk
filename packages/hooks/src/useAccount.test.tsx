@@ -3,7 +3,7 @@ import {
   // act
 } from '@testing-library/react-hooks';
 
-import { useAccount } from './useAccount';
+import useAccount from './useAccount';
 
 const INPUT_ENTROPY_ARRAY = [
   21,
