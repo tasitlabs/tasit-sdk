@@ -62,5 +62,6 @@
     "tsdx": "^0.13.2",
     "tslib": "^2.0.0",
     "typescript": "^3.9.5"
-  }
+  },
+  "gitHead": "2e377adf0f958fcc15ac274a1459cdc381bb018a"
 }
