@@ -1,3 +1,1 @@
-import { useAccount } from './useAccount';
-
-export default { useAccount }
+export { default } from "./useAccount";
