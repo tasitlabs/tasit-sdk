@@ -74,7 +74,7 @@ We recommend using [np](https://github.com/sindresorhus/np).
 
 ## Local development
 
-Note: When you want to use the local version of this lib in an local Expo app while developing, refer to the metro config file used in the `account-example` app in the [`]tasit` repo](https://github.com/tasitlabs/tasit) and enable some settigs there that are disabled.
+Note: When you want to use the local version of this lib in an local Expo app while developing, refer to the metro config file used in the `account-example` app in the [`tasit` repo](https://github.com/tasitlabs/tasit) and enable some settigs there that are disabled.
 
 To make sure two versions of React aren't found, follow these instructions:
 
