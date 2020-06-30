@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import Account from '@tasit/account';
 
-export function useAccount(options: AccountOptions): (string | boolean)[] {
+export function useAccount(options: AccountOptions): string {
   const [address, setAddress] = useState('');
   // TODO: Investigate whether useState internally in the hook is
   // useful here
@@ -32,7 +32,7 @@ export function useAccount(options: AccountOptions): (string | boolean)[] {
     }
   }, [asyncStorage, randomBytes, randomBytesGenerated]);
 
-  return [address];
+  return address;
 }
 
 export interface AccountOptions {

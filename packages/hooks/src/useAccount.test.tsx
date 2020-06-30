@@ -37,7 +37,7 @@ test('does nothing without randomBytes', () => {
     })
   );
 
-  expect(result.current[0]).toEqual('');
+  expect(result.current).toEqual('');
 });
 
 test('does something with randomBytes', () => {
@@ -48,7 +48,7 @@ test('does something with randomBytes', () => {
     })
   );
 
-  expect(result.current[0]).toEqual(
+  expect(result.current).toEqual(
     '0x80F8f3629b58b0b2873c6424cDe17540F645df16'
   );
 });
@@ -63,7 +63,7 @@ test('handles rerendering with NO change in randomBytes input', () => {
 
   rerender();
 
-  expect(result.current[0]).toEqual('');
+  expect(result.current).toEqual('');
 });
 
 test('handles rerendering with a change in randomBytes', () => {
@@ -85,7 +85,7 @@ test('handles rerendering with a change in randomBytes', () => {
   randomBytesGenerated = true;
   rerender();
 
-  expect(result.current[0]).toEqual(
+  expect(result.current).toEqual(
     '0x80F8f3629b58b0b2873c6424cDe17540F645df16'
   );
 });
