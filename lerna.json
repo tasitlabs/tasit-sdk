@@ -10,11 +10,11 @@
     "publish": {
       "npmClient": "npm",
       "allowBranch": [
-        "primary",
+        "main",
         "develop"
       ],
       "registry": "https://registry.npmjs.org/"
     }
   },
-  "version": "0.0.21"
+  "version": "0.0.22"
 }
