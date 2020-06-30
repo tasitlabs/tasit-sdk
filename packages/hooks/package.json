@@ -1,6 +1,6 @@
 {
   "name": "@tasit/hooks",
-  "version": "0.0.23",
+  "version": "0.0.24",
   "license": "MIT",
   "main": "dist/index.js",
   "module": "dist/hooks.esm.js",
@@ -48,7 +48,7 @@
   },
   "author": "Tasit Labs",
   "dependencies": {
-    "@tasit/account": "^0.0.23"
+    "@tasit/account": "^0.0.24"
   },
   "devDependencies": {
     "@react-native-community/bob": "^0.16.2",
