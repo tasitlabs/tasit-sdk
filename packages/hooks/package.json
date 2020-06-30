@@ -1,7 +1,9 @@
 {
+  "name": "@tasit/hooks",
   "version": "0.0.21",
   "license": "MIT",
   "main": "dist/index.js",
+  "module": "dist/hooks.esm.js",
   "typings": "dist/index.d.ts",
   "files": [
     "dist"
@@ -17,7 +19,9 @@
     "build": "npx tsdx build",
     "test": "npx tsdx test --passWithNoTests",
     "lint": "npx tsdx lint",
-    "prepare": "npx tsdx build"
+    "prepare": "npx tsdx build",
+    "update": "ncu -x 'react-native, react-test-renderer, @types/react'",
+    "update:write": "npm run update -- -u"
   },
   "peerDependencies": {
     "react": ">=16",
@@ -42,20 +46,19 @@
     "singleQuote": true,
     "trailingComma": "es5"
   },
-  "name": "@tasit/hooks",
   "author": "Tasit Labs",
-  "module": "dist/hooks.esm.js",
   "dependencies": {
     "@tasit/account": "0.0.21"
   },
   "devDependencies": {
-    "@react-native-community/bob": "^0.15.3",
+    "@react-native-community/bob": "^0.16.2",
     "@testing-library/react-hooks": "^3.3.0",
     "@types/react": "~16.9.23",
     "husky": "^4.2.5",
+    "npm-check-updates": "^7.0.1",
     "react": "~16.9.0",
-    "react-test-renderer": "~16.9.0",
     "react-native": "~0.61",
+    "react-test-renderer": "~16.9.0",
     "tsdx": "^0.13.2",
     "tslib": "^2.0.0",
     "typescript": "^3.9.5"
