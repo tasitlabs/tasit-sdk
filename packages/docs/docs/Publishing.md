@@ -6,7 +6,7 @@ sidebar_label: (Internal docs) Publishing
 
 ### Publishing new versions
 
-**Note: This doc is mainly useful for the Tasit team to publish new versions of the Tasit SDK, not for a team using the Tasit SDK.**
+**Note: This doc is mainly useful for the Tasit team to publish new versions of Tasit, not for a team using Tasit.**
 
 1. Create a publish issue on GitHub (with the desired new version number in the name).
 

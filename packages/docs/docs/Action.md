@@ -3,11 +3,11 @@
 
 # Reading and writing data and reacting to events
 
-This explains how one can use the Tasit SDK to interact with smart contracts at different levels of abstraction.
+This explains how one can use Tasit to interact with smart contracts at different levels of abstraction.
 
 _Note:_ This functionality all "lives" in `@tasit/action`, a child package of the [`tasit-sdk`](https://github.com/tasitlabs/tasit-sdk) that is also published to npm as a standalone module using [lerna](https://lerna.js.org/).
 
-[For context, here is an overview](https://github.com/tasitlabs/tasit-sdk/blob/develop/README.md#reading-and-writing-data-and-reacting-to-events) of how this fits in with the rest of the Tasit SDK.
+[For context, here is an overview](https://github.com/tasitlabs/tasit-sdk/blob/develop/README.md#reading-and-writing-data-and-reacting-to-events) of how this fits in with the rest of Tasit.
 
 Why `@tasit/action`? **action:** [ak-shən], noun. "a thing done". It's also nice that "act" (the verb form) is part of the words _contract_ and _abstraction_ and _transaction_. Finally, directors say “action” before starting to film a scene in a movie. Also, since this package supports meta-transactions, it's not quite correct to call them transactions. "action" is our catch-all word for transactions and meta-transactions.
 
@@ -31,7 +31,7 @@ Why `@tasit/action`? **action:** [ak-shən], noun. "a thing done". It's also nic
 
 - [ERC721](#getting-data---erc721)
 
-- [Low-level Tasit SDK middleware](#getting-data---low-level-tasit-sdk-middleware)
+- [Low-level Tasit middleware](#getting-data---low-level-tasit-sdk-middleware)
 
 - [Contract API from ethers](#getting-data---contract-api-from-ethers)
 
@@ -78,7 +78,7 @@ All of this could be done with a little more work using just the ERC721 abstract
 
 Open questions:
 
-- Whether the address should be configurable at this level of abstraction. For instance, the developer using this SDK might know sooner than the Tasit SDK project core devs do that a non-upgradeable contract project (that is, a standard smart contract project - not a delegatecall + proxy project) is deploying new contracts and will be using a new interface address from now on.
+- Whether the address should be configurable at this level of abstraction. For instance, the developer using this SDK might know sooner than Tasit project core devs do that a non-upgradeable contract project (that is, a standard smart contract project - not a delegatecall + proxy project) is deploying new contracts and will be using a new interface address from now on.
 - Whether the ABI should be in version control in this package or whether we want to add functionality for getting it from the web, using Etherscan's API or hopefully a decentralized npm where teams publish generated files like ABIs down the road.
 
 ##### Getting data - ERC721
@@ -122,7 +122,7 @@ Fetching additional metadata from the tokenURI is obviously something we need to
 
 Fetching images from additional URIs linked to in the JSON blob available at the main tokenURI will also be a common use case in the app.
 
-##### Getting data - Low-level Tasit SDK middleware
+##### Getting data - Low-level Tasit middleware
 
 A low-level library for calling all of the functions on a given smart contract and listening to events from the smart contract.
 
@@ -189,7 +189,7 @@ We'll want to do the same for setting data and listening for events too. As long
 
 Setting data could possibly be non-async if it's like publishing in pubsub. There's additional info on this in the [notes](#notes) section at the beginning.
 
-- [Low-level Tasit SDK middleware](#setting-data---low-level-tasit-sdk-middleware)
+- [Low-level Tasit middleware](#setting-data---low-level-tasit-sdk-middleware)
 
 - [Contract API from ethers](#setting-data---contract-api-from-ethers)
 
@@ -197,7 +197,7 @@ Setting data could possibly be non-async if it's like publishing in pubsub. Ther
 
 - [ERC721](#setting-data---erc721)
 
-##### Setting data - Low-level Tasit SDK middleware
+##### Setting data - Low-level Tasit middleware
 
 When using the contract abstraction from ethers, the functions for setting data return a transaction hash.
 
@@ -255,7 +255,7 @@ Setting data on a contract returns a tx hash. In the example in the ethers docs,
 
 ### Listening for events
 
-- [Low-level Tasit SDK middleware](#listening-for-events---low-level-tasit-sdk-middleware)
+- [Low-level Tasit middleware](#listening-for-events---low-level-tasit-sdk-middleware)
 
 - [ERC721](#listening-for-events---erc721)
 
@@ -263,7 +263,7 @@ Setting data on a contract returns a tx hash. In the example in the ethers docs,
 
 - [Contract API from ethers](#listening-for-events---contract-api-from-ethers)
 
-##### Listening for events - Low-level Tasit SDK middleware
+##### Listening for events - Low-level Tasit middleware
 
 Listening for events has a similar subcriptions API to the one you use after creating a transaction (see above).
 

@@ -1,5 +1,5 @@
 module.exports = {
-  title: "Tasit SDK",
+  title: "Tasit",
   tagline: "Docs",
   url: "https://docs.tasit.io",
   baseUrl: "/",
@@ -8,7 +8,7 @@ module.exports = {
   projectName: "tasit-sdk", // Usually your repo name.
   themeConfig: {
     navbar: {
-      title: "Tasit SDK",
+      title: "Tasit",
       logo: {
         alt: "Tasit Logo",
         src: "img/TasitLogoSvg.svg",

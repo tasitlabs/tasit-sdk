@@ -64,7 +64,7 @@ function Home() {
   return (
     <Layout
       title={`${siteConfig.title} Docs`}
-      description="Docs for the Tasit SDK: A JavaScript/TypeScript SDK for making native mobile Ethereum dapps using React Native"
+      description="Docs for Tasit: A JavaScript/TypeScript SDK for making native mobile Ethereum dapps using React Native"
     >
       <header className={classnames("hero hero--primary", styles.heroBanner)}>
         <div className="container">
