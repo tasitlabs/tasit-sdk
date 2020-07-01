@@ -1,6 +1,6 @@
 {
   "name": "tasit",
-  "version": "0.0.25",
+  "version": "0.0.26",
   "description": "A JavaScript / TypeScript SDK for making mobile Ethereum dapps using React Native",
   "main": "dist/index",
   "module": "dist/tasit.esm.js",
@@ -41,9 +41,9 @@
     "url": "https://github.com/tasitlabs/tasit-sdk/issues"
   },
   "dependencies": {
-    "@tasit/account": "^0.0.25",
-    "@tasit/action": "^0.0.25",
-    "@tasit/contracts": "^0.0.25"
+    "@tasit/account": "^0.0.26",
+    "@tasit/action": "^0.0.26",
+    "@tasit/contracts": "^0.0.26"
   },
   "devDependencies": {
     "chai": "^4.2.0",
