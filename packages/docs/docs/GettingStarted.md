@@ -8,13 +8,13 @@ sidebar_label: Getting started
 
 You can use the Tasit SDK to create user-friendly mobile iOS and Android apps for a dapp using React Native.
 
-Looking for the entry point for the `tasit-sdk` package? [That's here](https://github.com/tasitlabs/tasit-sdk/tree/develop/packages/sdk). The Tasit SDK is a collection of smaller packages exported as one using [lerna](https://lerna.js.org/).
+Looking for the entry point for the `tasit` package? [That's here](https://github.com/tasitlabs/tasit-sdk/tree/develop/packages/sdk). The Tasit SDK is a collection of smaller packages exported as one using [lerna](https://lerna.js.org/).
 
 #### Installation
 
 Getting started is as simple as running
 
-`npm install --save tasit-sdk`
+`npm install --save tasit`
 
 #### Usage
 
@@ -24,7 +24,7 @@ Using the Tasit SDK from within your app is simple.
 In `App.js` or the appropriate React Native component, import whichever APIs you need from the Tasit SDK.
 
 ```javascript
-import { Account } from "tasit-sdk";
+import { Account } from "tasit";
 const ephemeralWallet = Account.create();
 console.log(ephemeralWallet.address); // '0x...'
 // ...
@@ -33,7 +33,7 @@ console.log(ephemeralWallet.address); // '0x...'
 Or maybe you want to interact with a contract:
 
 ```javascript
-import { Contracts } from "tasit-sdk";
+import { Contracts } from "tasit";
 
 const { NFT } = Contracts;
 

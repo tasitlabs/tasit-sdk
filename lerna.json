@@ -4,9 +4,6 @@
     "packages/*"
   ],
   "command": {
-    "bootstrap": {
-      "ignore": "@tasit/contract-based-account"
-    },
     "publish": {
       "npmClient": "npm",
       "allowBranch": [

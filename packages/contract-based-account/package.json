@@ -42,6 +42,7 @@
   "dependencies": {
     "@tasit/action": "^0.0.24",
     "@tasit/contracts": "^0.0.24",
+    "axios": "^0.19.2",
     "ethers": "^4.0.47"
   },
   "devDependencies": {

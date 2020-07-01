@@ -39,7 +39,7 @@ sidebar_label: (Internal docs) Publishing
      - @tasit/account: 0.0.7 => 0.0.8
      - @tasit/action: 0.0.7 => 0.0.8
      - @tasit/contracts: 0.0.7 => 0.0.8
-     - tasit-sdk: 0.0.7 => 0.0.8
+     - tasit: 0.0.7 => 0.0.8
 
     ? Are you sure you want to publish these packages? (ynH)
     ```
