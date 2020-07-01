@@ -35,11 +35,11 @@ We leave the JSON-RPC provider configurable so that the SDK doesn't take an opin
 
 There are a couple projects working to make it simple to spin up your own high-availability, high-performance JSON-RPC client(s) (including Infura) or to use a decentralized and incentivized network of full nodes, so that should decentralize things a bit until we get to Eth 2.0. See [DAppNode](https://dappnode.io/), [denode](https://github.com/ChainSafeSystems/denode), [Vipnode](https://vipnode.org/), and [Incubed](https://slock.it/incubed.html) by slock.it.
 
-[`@tasit/action` is the child package](/packages/action/) that implements these features for the Tasit SDK.
+[`@tasit/action` is the child package](/packages/action/) that implements these features for Tasit.
 
 ##### In the future
 
-We have no plans until Eth 2.0 to make a special abstraction for running a local light geth node like Status did originally. The Tasit SDK works with whatever JSON-RPC client you point it at, but we won't be adding an abstraction for using a light client within the native mobile dapp until Eth 2.0. People have had too many issues with this on mobile: dropped network connections, using all disk space, battery usage, etc.
+We have no plans until Eth 2.0 to make a special abstraction for running a local light geth node like Status did originally. Tasit works with whatever JSON-RPC client you point it at, but we won't be adding an abstraction for using a light client within the native mobile dapp until Eth 2.0. People have had too many issues with this on mobile: dropped network connections, using all disk space, battery usage, etc.
 
 Looking towards the future, light and ultralight client projects we're tracking for first-class support in this SDK include:
 
@@ -49,9 +49,9 @@ Looking towards the future, light and ultralight client projects we're tracking 
 
 #### Eth 2.0 support
 
-The Tasit SDK will work with the Ethereum 2.0 release. We support Ethereum-based dapps to start, and in the long run the Tasit SDK will work with any blockchain that uses EVM and/or eWASM.
+Tasit will work with the Ethereum 2.0 release. We support Ethereum-based dapps to start, and in the long run Tasit will work with any blockchain that uses EVM and/or eWASM.
 
-_In order for the Tasit SDK to make a difference for current and future users of Ethereum, it will need to support future versions of the EVM._
+_In order for Tasit to make a difference for current and future users of Ethereum, it will need to support future versions of the EVM._
 
 #### L2 support
 
@@ -65,7 +65,7 @@ The Decentraland app generated using `tasit init --nft` ship with styled-but-cus
 
 This feature lives over in our `tasit` repo - [details here](https://github.com/tasitlabs/tasit#automatic-scaffolding-using-the-tasit-cli) - since it's tightly integrated with the React Native mobile dapp codebase.
 
-_This also makes the experience for new developers working on a mobile app with the Tasit SDK simpler, which also means more mobile dapps for end users._
+_This also makes the experience for new developers working on a mobile app with Tasit simpler, which also means more mobile dapps for end users._
 
 #### A library of native mobile dapp components
 

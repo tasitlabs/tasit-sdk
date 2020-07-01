@@ -4,7 +4,7 @@ This package helps with onboarding a user using a smart-contract-based "account"
 
 This functionality all "lives" in `@tasit/contract-based-account`, a child package of the [`tasit-sdk`](https://github.com/tasitlabs/tasit-sdk) that is also published to npm as a standalone module using [lerna](https://lerna.js.org/).
 
-For context, here is an overview of how this fits in with the rest of the Tasit SDK in the [onboarding section](https://docs.tasit.io/docs/main-features#onboarding-with-ephemeral-accounts-and-contract-based-accounts). But this can be used as a stand-alone, modular package if you prefer!
+For context, here is an overview of how this fits in with the rest of Tasit in the [onboarding section](https://docs.tasit.io/docs/main-features#onboarding-with-ephemeral-accounts-and-contract-based-accounts). But this can be used as a stand-alone, modular package if you prefer!
 
 ---
 

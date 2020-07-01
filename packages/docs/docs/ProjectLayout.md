@@ -7,7 +7,7 @@ sidebar_label: Project layout
 _For those familiar with Ethereum, here are some details about the scope of each of the packages in this project and what they're built with._
 
 ### tasit
-This package (the Tasit SDK) exports the child packages below as a single export for convenience.
+This package (Tasit) exports the child packages below as a single export for convenience.
 
 ### account
 An abstraction around [ethers.js](https://github.com/ethers-io/ethers.js) utilities for creating a new Ethereum account
