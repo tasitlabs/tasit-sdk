@@ -1,5 +1,5 @@
 # `tasit`
 
-This is the package the most devs will add as a depedendency for their React Native app. This package imports and reexposes the smaller packages in this repo that collectively constitute the Tasit SDK.
+`tasit` is an SDK for building a standalone native mobile Ethereum dapp using React Native.
 
-Most of the details are in the main README for the monorepo [here](https://github.com/tasitlabs/tasit-sdk/blob/develop/README.md).
+[docs.tasit.io](https://docs.tasit.io)
