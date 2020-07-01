@@ -48,7 +48,8 @@
   },
   "author": "Tasit Labs",
   "dependencies": {
-    "@tasit/account": "^0.0.24"
+    "@tasit/account": "^0.0.24",
+    "@tasit/contract-based-account": "^0.0.24"
   },
   "devDependencies": {
     "@react-native-community/bob": "^0.16.2",

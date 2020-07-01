@@ -69,11 +69,6 @@ module.exports = {
           ],
         },
       ],
-      logo: {
-        alt: "Tasit Logo",
-        src:
-          "https://raw.githubusercontent.com/tasitlabs/tasit-sdk/develop/docs/images/TasitLogoBlack.png",
-      },
       copyright: `Copyright © ${new Date().getFullYear()} Tasit`,
     },
   },
