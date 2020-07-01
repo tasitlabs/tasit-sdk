@@ -1,7 +1,7 @@
 # Tasit SDK
 
 <div align="left">
-  <img src="/docs/images/TasitLogoBlack.png" width="200" />
+  <img src="/assets/images/TasitLogoBlack.png" width="200" />
 </div>
 
 ### Introduction
