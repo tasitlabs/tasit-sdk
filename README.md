@@ -25,7 +25,7 @@ Please feel free to reach out.
    | 📝  Medium  | [medium.com/tasit](https://medium.com/tasit) |
    | 💬  Discord  | [discordapp.com/invite/bRp4QKq](https://discordapp.com/invite/bRp4QKq) |
    | 💬  Telegram | [t.me/tasitproject](https://t.me/tasitproject) |
-   | 📧  Email  | [founders@tasit.io](mailto:founders@tasit.io) |
+   | 📧  Email  | [team@tasit.io](mailto:team@tasit.io) |
    | 🗺️  Roadmap  | [github.com/orgs/tasitlabs/projects/1](https://github.com/orgs/tasitlabs/projects/1) |
    | 💡  Feature requests  | [feedback.tasit.io/feature-requests](http://feedback.tasit.io/feature-requests) |
 

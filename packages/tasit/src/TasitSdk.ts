@@ -1,12 +1,13 @@
 import Account from "@tasit/account";
 import Action from "@tasit/action";
-// import ContractBasedAccount from "@tasit/contract-based-account";
+import ContractBasedAccount from "@tasit/contract-based-account";
 import Contracts from "@tasit/contracts";
+// import hooks from "@tasit/hooks";
 
 export {
   Account,
   Action,
-  // TODO: Add @tasit/contract-based-account back as a dep
-  // ContractBasedAccount,
+  // hooks, // TODO: Figure out what to do about this package expecting peer dep of React
+  ContractBasedAccount,
   Contracts,
 };

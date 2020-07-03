@@ -24,7 +24,7 @@ style={{
 
 <Highlight color="rgb(0, 154, 115)">Tasit</Highlight> is a JavaScript/TypeScript SDK for making mobile Ethereum dapps using React Native.
 
-Development of Tasit is supported in part by the [Ethereum Foundation](https://ecosystem.support/) as well as by [Gnosis](https://gnosis.io/) through their [GECO](https://github.com/gnosis/GECO) grant initiative.
+Development of Tasit is supported in part by the [Ethereum Foundation](https://esp.ethereum.foundation/) as well as by [Gnosis](https://gnosis.io/) through their [GECO](https://github.com/gnosis/GECO) grant initiative.
 
 This project is open-source and in need of funding to sustain work on it. If you're able to contribute, please consider [supporting the project on Gitcoin Grants](https://gitcoin.co/grants/183/tasit-native-mobile-ethereum-dapps) or sending ETH or DAI to the Tasit project's Aragon Agent address:
 

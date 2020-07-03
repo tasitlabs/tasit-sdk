@@ -59,17 +59,13 @@ We're keeping an eye on various zk rollup projects and optimistic rollup project
 
 #### Automatic scaffolding using the Tasit CLI
 
-Are you starting a project from scratch? Let the Tasit CLI scaffold out your project for you. More details on this [here](https://github.com/tasitlabs/tasit#automatic-scaffolding-using-the-tasit-cli).
+Are you starting a project from scratch? Let the Tasit CLI scaffold out your project for you.
 
 The Decentraland app generated using `tasit init --nft` ship with styled-but-customizable React Native components for using each feature of the dapp, leveraging the js middleware.
-
-This feature lives over in our `tasit` repo - [details here](https://github.com/tasitlabs/tasit#automatic-scaffolding-using-the-tasit-cli) - since it's tightly integrated with the React Native mobile dapp codebase.
 
 _This also makes the experience for new developers working on a mobile app with Tasit simpler, which also means more mobile dapps for end users._
 
 #### A library of native mobile dapp components
-
-This feature lives over in our `tasit` repo - [here](https://github.com/tasitlabs/tasit/tree/develop/shared) - since it's tightly integrated with the React Native mobile dapp codebase.
 
 ---
 

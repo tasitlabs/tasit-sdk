@@ -3,7 +3,7 @@
   "version": "0.0.27",
   "description": "",
   "main": "dist/index",
-  "module": "dist/@tasit/contracts.esm.js",
+  "module": "dist/contracts.esm.js",
   "typings": "dist/index.d.ts",
   "keywords": [
     "ethereum",

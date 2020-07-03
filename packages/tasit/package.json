@@ -43,7 +43,13 @@
   "dependencies": {
     "@tasit/account": "^0.0.27",
     "@tasit/action": "^0.0.27",
-    "@tasit/contracts": "^0.0.27"
+    "@tasit/contract-based-account": "^0.0.27",
+    "@tasit/contracts": "^0.0.27",
+    "@tasit/hooks": "^0.0.27"
+  },
+  "peerDependencies": {
+    "react": ">=16",
+    "react-native": "~0.61"
   },
   "devDependencies": {
     "chai": "^4.2.0",
