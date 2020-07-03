@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import Account from '@tasit/account';
 
-export default function useAccount(options: AccountOptions): string {
+export function useAccount(options: AccountOptions): string {
   const [address, setAddress] = useState('');
   // TODO: Investigate whether useState internally in the hook is
   // useful here
