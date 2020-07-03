@@ -3,7 +3,7 @@
   "version": "0.0.27",
   "description": "Library for onboarding a user by linking a dapp with a wallet of their choosing.",
   "main": "dist/index",
-  "module": "dist/@tasit/link-wallet.esm.js",
+  "module": "dist/link-wallet.esm.js",
   "typings": "dist/index.d.ts",
   "keywords": [
     "ethereum",

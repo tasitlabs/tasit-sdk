@@ -2,9 +2,9 @@
 
 This package helps with onboarding a user using a smart-contract-based "account". Examples of such smart-contract-based accounts include the [Gnosis Safe](https://safe.gnosis.io/), [Universal Login](https://universallogin.io/), Argent, the Dharma smart wallet, Abridged, and Authereum.
 
-This functionality all "lives" in `@tasit/contract-based-account`, a child package of the [`tasit-sdk`](https://github.com/tasitlabs/tasit-sdk) that is also published to npm as a standalone module using [lerna](https://lerna.js.org/).
+This functionality all "lives" in `@tasit/contract-based-account`, a child package of [`tasit`](https://github.com/tasitlabs/tasit-sdk) that is also published to npm as a standalone module using [lerna](https://lerna.js.org/).
 
-For context, here is an overview of how this fits in with the rest of Tasit in the [onboarding section](https://docs.tasit.io/docs/main-features#onboarding-with-ephemeral-accounts-and-contract-based-accounts). But this can be used as a stand-alone, modular package if you prefer!
+For context, [here is an overview](https://docs.tasit.io/docs/project-layout) of how this fits in with the rest of Tasit. But this can be used as a standalone, modular package if you prefer!
 
 ---
 

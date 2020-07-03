@@ -14,7 +14,8 @@ type GnosisSafeCreationData = {
 // Gnosis Safe has already been created for the user,
 // don't bother rendering a component which uses this hook
 // TODO: Pass in saltNonce so the user can use this again with the same settings
-export default async function useGnosisSafe(
+// TODO: Think about whether we want a hook to be async
+export async function useGnosisSafe(
   owners: string[],
   threshold: number,
   randomBytes: Uint8Array

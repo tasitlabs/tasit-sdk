@@ -14,7 +14,7 @@ For this project, `develop` is the name of the default branch for the project. T
 
 ### Overview of architecture of the Tasit project
 
-The `tasit-sdk` repo (the one you're looking at now) is the "middleware" code for interacting with the blockchain that you can use from within a React Native app. The code for our React Native mobile apps themselves is over in a different GitHub repo called `tasit`.
+The `tasit-sdk` repo (the one you're looking at now) is the "middleware" code for interacting with the blockchain that you can use from within a React Native app. The code for our React Native mobile apps themselves is over in a different GitHub repo called `tasit-apps`.
 There are multiple npm packages within this repo. It's a "monorepo" (feel free google this term for more info). We use [lerna](https://lerna.js.org/) to manage the packages. That's a popular technique.
 
 ### How to set up the local environment
@@ -41,7 +41,7 @@ Some other projects keep all their tests in one big test directory, but we find 
 
 If you want to test only the package that you are working on, run `npm pretest` from `tasit-sdk` folder and then run `npm test` from the package's folder.
 
-The `pretest` script will start `ganache-cli` and deploy contracts from `tasit-contract`.
+The `pretest` script will start `buidler-evm` and deploy contracts from `tasit-contract`.
 
 ### Making some changes
 
@@ -60,3 +60,15 @@ Once that's done, you're ready to create a PR (a pull request).
 GitHub has some good guides on how to create a PR. When you create one, you'll be prompted to fill out our pull request template.
 
 When a PR is opened from your feature branch, CircleCI will automatically run the linting script and the test suite to make sure that everything will still work if we merge your changes into the develop branch of the main repo on GitHub.
+
+## Local development
+
+Note: When you want to use the local version of `tasit` or a child package from the lerna monorepo like `@tasit/[package_name]` in a local Expo app while developing, refer to the metro config file used in the `account-example` app in the [`tasit-apps` repo](https://github.com/tasitlabs/tasit-apps) and enable some settigs there that are disabled.
+
+To make sure two versions of React aren't found, follow these instructions:
+
+Your bundler might “see” two Reacts — one in the application folder and one in your library folder. One possible fix is to run `npm link ../../../tasit-apps/apps/account-example/node_modules/react` from this dir, `tasit-sdk/packages/[package_name]`. This should make the library use the application’s React copy.
+
+Note that depending on what dir your local app and this library are in, the number of `..`'s is likely to change.
+
+(Source: https://reactjs.org/warnings/invalid-hook-call-warning.html towards the bottom)

@@ -1,1 +1,2 @@
-export { default } from "./useAccount";
+export * from './useAccount';
+export * from './useGnosisSafe';

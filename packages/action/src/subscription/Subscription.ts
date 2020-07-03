@@ -130,7 +130,7 @@ export class Subscription {
       );
 
     // Note:
-    // On the development env (using ganache-cli)
+    // On the development env (using buidler-evm)
     // Blocks are being mined simultaneously and generating a sort of unexpected behaviors like:
     // - once listeners called many times
     // - sequential blocks giving same confirmation to a transaction

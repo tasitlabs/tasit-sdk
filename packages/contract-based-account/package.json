@@ -4,7 +4,7 @@
   "private": false,
   "description": "Library for onboarding a user using a smart-contract-based account.",
   "main": "dist/index",
-  "module": "dist/@tasit/contract-based-account.esm.js",
+  "module": "dist/contract-based-account.esm.js",
   "typings": "dist/index.d.ts",
   "keywords": [
     "ethereum",

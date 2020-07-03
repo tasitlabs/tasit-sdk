@@ -19,7 +19,7 @@ const create = () => {
 // In the client app
 // import * as Random from 'expo-random';
 // const randomBytes = await Random.getRandomBytesAsync(16);
-// https://github.com/expo/expo/tree/master/packages/expo-random#getrandombytesasync
+// https://github.com/expo/expo/tree/main/packages/expo-random#getrandombytesasync
 
 const createUsingRandomness = (randomBytes: Uint8Array) => {
   try {
