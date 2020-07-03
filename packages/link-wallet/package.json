@@ -1,6 +1,6 @@
 {
   "name": "@tasit/link-wallet",
-  "version": "0.0.27",
+  "version": "0.0.28",
   "description": "Library for onboarding a user by linking a dapp with a wallet of their choosing.",
   "main": "dist/index",
   "module": "dist/link-wallet.esm.js",
@@ -37,7 +37,7 @@
     "url": "https://github.com/tasitlabs/tasit-sdk/issues"
   },
   "devDependencies": {
-    "@tasit/action": "^0.0.27",
+    "@tasit/action": "^0.0.28",
     "chai": "^4.2.0",
     "mocha": "^7.2.0",
     "npm-check-updates": "^6.0.1",

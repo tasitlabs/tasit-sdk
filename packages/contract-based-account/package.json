@@ -1,6 +1,6 @@
 {
   "name": "@tasit/contract-based-account",
-  "version": "0.0.27",
+  "version": "0.0.28",
   "private": false,
   "description": "Library for onboarding a user using a smart-contract-based account.",
   "main": "dist/index",
@@ -40,13 +40,13 @@
     "url": "https://github.com/tasitlabs/tasit-sdk/issues"
   },
   "dependencies": {
-    "@tasit/action": "^0.0.27",
-    "@tasit/contracts": "^0.0.27",
+    "@tasit/action": "^0.0.28",
+    "@tasit/contracts": "^0.0.28",
     "axios": "^0.19.2",
     "ethers": "^4.0.47"
   },
   "devDependencies": {
-    "@tasit/account": "^0.0.27",
+    "@tasit/account": "^0.0.28",
     "@types/mocha": "^7.0.2",
     "chai": "^4.2.0",
     "mocha": "^7.2.0",
