@@ -53,7 +53,7 @@ describe("Decentraland", () => {
   let estateForSale;
 
   // TODO: Assign different contract objects for each account (avoiding setAccount)
-  beforeAll("", async () => {
+  beforeAll(async () => {
     [minterAccount] = accounts;
     ephemeralAccount = Account.create();
     ({ address: ephemeralAddress } = ephemeralAccount);
@@ -70,7 +70,7 @@ describe("Decentraland", () => {
     expect(landForSale).not.toBeInstanceOf("undefined");
   });
 
-  beforeEach("", async () => {
+  beforeEach(async () => {
     await expectExactTokenBalances(mana, [ephemeralAddress], [0]);
     await expectExactTokenBalances(land, [ephemeralAddress], [0]);
     await expectExactTokenBalances(estate, [ephemeralAddress], [0]);
@@ -133,7 +133,7 @@ describe("Decentraland", () => {
       const gnosisSafeOwner = accounts[9];
       let gnosisSafe;
 
-      beforeEach("", async () => {
+      beforeEach(async () => {
         const { priceInWei: landPrice } = landForSale;
         const { priceInWei: estatePrice } = estateForSale;
 
@@ -142,7 +142,8 @@ describe("Decentraland", () => {
         );
       });
 
-      beforeEach("check Gnosis Safe balance", async () => {
+      // check Gnosis Safe balance
+      beforeEach(async () => {
         gnosisSafe = new GnosisSafe(GNOSIS_SAFE_ADDRESS);
 
         // Expect an already-funded Gnosis Safe account
@@ -163,7 +164,8 @@ describe("Decentraland", () => {
       });
 
       describe("Using an ephemeral account funded by faucets", () => {
-        beforeEach("onboarding", (done) => {
+        // onboarding
+        beforeEach((done) => {
           (async () => {
             await etherFaucet(
               provider,
@@ -372,7 +374,8 @@ describe("Decentraland", () => {
       });
 
       describe("Using an ephemeral account funded by a Gnosis Safe account", () => {
-        beforeEach("onboarding - check Gnosis Safe balance", async () => {
+        // onboarding - check Gnosis Safe balance
+        beforeEach(async () => {
           const { address: gnosisSafeOwnerAddress } = gnosisSafeOwner;
 
           // Gnosis Safe owner should have enough ethers to pay for the transaction's gas
@@ -388,7 +391,8 @@ describe("Decentraland", () => {
         });
 
         // Transfer a small amount of ethers to ephemeral account to pay for gas
-        beforeEach("onboarding - funding ephemeral account with ETH", (done) => {
+        // onboarding - funding ephemeral account with ETH
+        beforeEach((done) => {
           (async () => {
             const toAddress = ephemeralAddress;
 
@@ -416,7 +420,8 @@ describe("Decentraland", () => {
           })();
         });
 
-        beforeEach("onboarding - funding ephemeral account with MANA", (done) => {
+        // onboarding - funding ephemeral account with MANA
+        beforeEach((done) => {
           (async () => {
             // Global hooks don't run between same level hooks
             await mineBlocks(provider, 1);
@@ -450,7 +455,8 @@ describe("Decentraland", () => {
           })();
         });
 
-        beforeEach("onboarding - approving Marketplace to spend MANA", (done) => {
+        // onboarding - approving Marketplace to spend MANA
+        beforeEach((done) => {
           (async () => {
             // Global hooks don't run between same level hooks
             await mineBlocks(provider, 1);
@@ -590,7 +596,8 @@ describe("Decentraland", () => {
 
       // WIP: Not working because of gas issue on Marketplace.safeExecuteOrder() call
       describe("Using funds from a Gnosis Safe account", () => {
-        beforeEach("onboarding - funding ephemeral account with ETH", (done) => {
+        // onboarding - funding ephemeral account with ETH
+        beforeEach((done) => {
           gnosisSafe.setSigners([gnosisSafeOwner]);
           gnosisSafe.setAccount(gnosisSafeOwner);
           const toAddress = ephemeralAddress;
@@ -620,7 +627,8 @@ describe("Decentraland", () => {
           action.send();
         });
 
-        beforeEach("onboarding - approving Marketplace to spend MANA", (done) => {
+        // onboarding - approving Marketplace to spend MANA
+        beforeEach((done) => {
           (async () => {
             // Global hooks don't run between same level hooks
             await mineBlocks(provider, 1);
@@ -883,7 +891,8 @@ describe("Decentraland", () => {
       // Allowance-of-allowance doesn't work
       // See more: https://github.com/tasitlabs/tasit-sdk/issues/273
       describe("Using an ephemeral account allowed to spend Gnosis Safe account's funds", () => {
-        beforeEach("onboarding - funding ephemeral account with ETH", (done) => {
+        // onboarding - funding ephemeral account with ETH
+        beforeEach((done) => {
           (async () => {
             const toAddress = ephemeralAddress;
             gnosisSafe.setSigners([gnosisSafeOwner]);
@@ -913,9 +922,8 @@ describe("Decentraland", () => {
           })();
         });
 
-        beforeEach(
-          "onboarding - approving ephemeral account to spend Safe's MANA",
-          (done) => {
+        // onboarding - approving ephemeral account to spend Safe's MANA
+        beforeEach((done) => {
             (async () => {
               // Global hooks don't run between same level hooks
               await mineBlocks(provider, 1);
@@ -955,10 +963,9 @@ describe("Decentraland", () => {
             })();
           }
         );
-
-        beforeEach(
-          "onboarding - approving Marketplace to spend ephemeral account's MANA",
-          (done) => {
+        
+        // onboarding - approving Marketplace to spend ephemeral account's MANA
+        beforeEach((done) => {
             (async () => {
               // Global hooks don't run between same level hooks
               await mineBlocks(provider, 1);
