@@ -30,7 +30,7 @@ describe("TasitAction.ERC721.ERC721", () => {
 
   let action;
 
-  beforeAll("", async () => {
+  beforeAll(async () => {
     [owner, ana, bob] = accounts;
   });
 

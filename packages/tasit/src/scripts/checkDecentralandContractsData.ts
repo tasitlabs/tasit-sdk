@@ -45,7 +45,8 @@ describe("Decentraland App pre-conditions", () => {
   const { getAllAssetsForSale } = decentralandUtils;
   let assetsForSale = [];
 
-  beforeAll("load assets for sale from blockchain", async () => {
+  // load assets for sale from blockchain
+  beforeAll(async () => {
     assetsForSale = await getAllAssetsForSale();
   });
 

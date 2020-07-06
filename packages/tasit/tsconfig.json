@@ -1,6 +1,6 @@
 {
   "extends": "../../tsconfig.json",
-  "include": ["src", "types", "testSetup.ts"],
+  "include": ["src", "types"],
   "compilerOptions": {
     "outDir": "./dist",
     "rootDir": "./src",

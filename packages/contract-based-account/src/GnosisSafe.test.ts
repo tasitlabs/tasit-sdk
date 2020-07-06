@@ -42,7 +42,7 @@ describe("GnosisSafe", () => {
   let erc20;
   let nft;
 
-  beforeAll("", async () => {
+  beforeAll(async () => {
     // That account is funded with ethers and is owner of all token contracts deployed
     [minter] = accounts;
     gnosisSafeOwner = accounts[9];

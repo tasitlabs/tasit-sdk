@@ -1,10 +1,5 @@
 import { ethers } from 'ethers';
 
-// TODO: Fix this import to get provider factory from @tasit/action
-// or decide that that factory is in scope for this package
-// import ProviderFactory from '../../action/src/ProviderFactory';
-// import developmentConfig from '../../action/src/config/default';
-
 import ProviderFactory from '@tasit/action';
 import developmentConfig from './config/default';
 

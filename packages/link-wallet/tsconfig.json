@@ -1,6 +1,6 @@
 {
   "extends": "../../tsconfig.json",
-  "include": ["src", "types", "mochaSetup.js"],
+  "include": ["src", "types"],
   "compilerOptions": {
     "outDir": "./dist",
     "rootDir": "./src",
