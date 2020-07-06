@@ -1,5 +1,4 @@
 // Chai
-import { expect } from "chai";
 global.expect = expect;
 
 // Load config
@@ -29,11 +28,11 @@ beforeEach("global beforeEach() hook", async () => {
     await revertFromSnapshot(provider, snapshotId--);
   }
 
-  expect(snapshotId).to.equal(1);
+  expect(snapshotId).toBe(1);
 });
 
 afterEach("global afterEach() hook", async () => {
-  expect(snapshotId).to.equal(1);
+  expect(snapshotId).toBe(1);
   await revertFromSnapshot(provider, snapshotId);
 
   // Note: Without this the test suite is breaking.
