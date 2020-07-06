@@ -2,7 +2,11 @@ import { Account, Action } from "../TasitSdk";
 import helpers from "../testHelpers/helpers";
 import DecentralandUtils from "./DecentralandUtils";
 
-const { ERC721 } = Action;
+const { standards } = Action;
+const { ERC721 } = standards;
+
+// TODO: Add an Estate class or remove tests using them
+// or rewrite the tests to use lower-level Tasit methods
 const { Estate, Land } = ERC721;
 
 const { accounts, getContractsAddresses } = helpers;
@@ -31,7 +35,7 @@ describe("DecentralandUtils", () => {
   const isAssetAnEstate = (asset) => asset.nftAddress === estate.getAddress();
   const isAssetAParcel = (asset) => asset.nftAddress === land.getAddress();
 
-  beforeEach("", async () => {
+  beforeEach(async () => {
     land = new Land(LAND_ADDRESS);
     estate = new Estate(ESTATE_ADDRESS);
 
@@ -47,7 +51,7 @@ describe("DecentralandUtils", () => {
 
     const parcelsOfSeller = await land.balanceOf(sellerAddress);
 
-    expect(`${parcelsOfSeller}`).to.equal(`${parcelsForSaleAmount}`);
+    expect(`${parcelsOfSeller}`).toBe(`${parcelsForSaleAmount}`);
   });
 
   it("should get estates for sale", async () => {
@@ -58,7 +62,7 @@ describe("DecentralandUtils", () => {
 
     const estatesOfSeller = await estate.balanceOf(sellerAddress);
 
-    expect(`${estatesOfSeller}`).to.equal(`${estatesForSaleAmount}`);
+    expect(`${estatesOfSeller}`).toBe(`${estatesForSaleAmount}`);
   });
 
   it("should get assets owned by an address", async () => {
@@ -66,44 +70,44 @@ describe("DecentralandUtils", () => {
 
     const sellerEstates = await _getEstatesOf(sellerAddress);
     const sellerEstateBalance = await estate.balanceOf(sellerAddress);
-    expect(sellerEstates).to.have.lengthOf(sellerEstateBalance);
+    expect(sellerEstates).toHaveLength(sellerEstateBalance);
 
     const sellerParcels = await _getParcelsOf(sellerAddress);
     const sellerParcelBalance = await land.balanceOf(sellerAddress);
-    expect(sellerParcels).to.have.lengthOf(sellerParcelBalance);
+    expect(sellerParcels).toHaveLength(sellerParcelBalance);
 
     const estateParcels = await _getParcelsOf(estateContractAddress);
     const estateParcelBalance = await land.balanceOf(estateContractAddress);
-    expect(estateParcels).to.have.lengthOf(estateParcelBalance);
+    expect(estateParcels).toHaveLength(estateParcelBalance);
 
     const sellerAssets = await getAssetsOf(sellerAddress);
     const sellerAssetIds = sellerAssets.map((a) => a.id);
     const sellerEstateIds = sellerEstates.map((e) => e.id);
     const sellerParcelIds = sellerParcels.map((p) => p.id);
-    expect(sellerAssetIds).to.have.members([
+    expect(sellerAssetIds).toEqual(expect.arrayContaining([
       ...sellerParcelIds,
       ...sellerEstateIds,
-    ]);
+    ]));
   });
 
   it("should get empty array from an address without assets", async () => {
     const estateIds = await _getEstatesOf(ephemeralAddress);
     const parcelIds = await _getParcelsOf(ephemeralAddress);
 
-    expect(estateIds).deep.equal([]);
-    expect(parcelIds).deep.equal([]);
+    expect(estateIds).toEqual([]);
+    expect(parcelIds).toEqual([]);
   });
 
   it("should expose transactionHash", async () => {
     const expectAssetHasTxHash = (asset) =>
-      expect(asset.transactionHash).to.be.ok;
+      expect(asset.transactionHash).toBeTruthy();
 
     const sellerAssets = await getAssetsOf(sellerAddress);
-    expect(sellerAssets).to.not.be.empty;
+    expect(Object.keys(sellerAssets)).not.toHaveLength(0);
     sellerAssets.forEach(expectAssetHasTxHash);
 
     const assetsForSale = await getAllAssetsForSale();
-    expect(assetsForSale).to.not.be.empty;
+    expect(Object.keys(assetsForSale)).not.toHaveLength(0);
     assetsForSale.forEach(expectAssetHasTxHash);
   });
 });

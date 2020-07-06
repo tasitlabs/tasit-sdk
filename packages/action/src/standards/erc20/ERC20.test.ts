@@ -16,6 +16,6 @@
 //   it.skip("should get the ERC20 name", async () => {
 //     const erc20 = new ERC20(ERC20_ADDRESS);
 //     const name = await erc20.name();
-//     expect(name).to.equal("ERC20");
+//     expect(name).toEqual("ERC20");
 //   });
 // });

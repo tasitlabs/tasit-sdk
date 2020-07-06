@@ -26,7 +26,7 @@
     "prepare": "npm run clean && npm run build",
     "setup:local": "cp src/config/development.js src/config/default.js",
     "setup:ropsten": "cp src/config/ropsten.js src/config/default.js",
-    "test": "npm run setup:local && npm run test:mocha",
+    "test": "npm run setup:local && npm run test:tsdx",
     "test:testnet": "npm run setup:ropsten && npm run test:mocha",
     "test:mocha": "npx test:mocha mocha \"src/**/*.test.ts\"  --require ts-node/register --file src/testHelpers/mochaSetup.ts --timeouts 10000",
     "check:decentraland-data": "npx test:mocha mocha src/scripts/checkDecentralandContractsData.ts  --require ts-node/register --file src/testHelpers/mochaSetup.ts --no-timeouts",
@@ -48,19 +48,18 @@
     "@tasit/hooks": "^0.0.28"
   },
   "peerDependencies": {
-    "react": ">=16",
+    "react": ">=16.8",
     "react-native": "~0.61"
   },
   "devDependencies": {
-    "chai": "^4.2.0",
     "ethers": "^4.0.47",
-    "mocha": "^7.2.0",
     "node-fetch": "^2.6.0",
     "npm-check-updates": "^6.0.1",
     "ts-node": "^8.10.2",
     "tsdx": "^0.13.2",
     "tslib": "^2.0.0",
-    "typescript": "^3.9.3"
+    "typescript": "^3.9.6",
+    "@tasit/test-helpers": "^0.0.28"
   },
-  "gitHead": "fc17ed73b2c70e3f94dcc4b23ffbf502fa16b0ab"
+  "gitHead": "08af46b69dccad031c3230a563650278e8688006"
 }

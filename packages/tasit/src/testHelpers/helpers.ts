@@ -1,11 +1,12 @@
-import { TasitContracts } from "../TasitSdk";
+// import { Contracts } from "../TasitSdk";
 import DecentralandUtils from "../helpers/DecentralandUtils";
-import actionHelpers from "@tasit/action/dist/testHelpers/helpers";
+import coreHelpers from "@tasit/test-helpers";
+
 const {
   addressesAreEqual,
   expectMinimumTokenBalances,
   ProviderFactory,
-} = actionHelpers;
+} = coreHelpers;
 
 const getNetworkName = () => {
   const provider = ProviderFactory.getProvider();
@@ -53,7 +54,7 @@ export const pickAssetsForSale = async () => {
   const openSellOrders = await getAllAssetsForSale();
 
   // Note: The exact amount of land isn't predictable since we are forking from the latest block
-  expect(openSellOrders).to.not.be.empty;
+  expect(Object.keys(openSellOrders)).not.toHaveLength(0);
 
   // Pick two open sell orders: one for a parcel of land and one for an estate
   for (const order of openSellOrders) {
@@ -71,10 +72,8 @@ export const pickAssetsForSale = async () => {
     if (landForSale && estateForSale) break;
 
     if (!isLand && !isEstate)
-      expect(
-        false,
-        "All land for sale should be an NFT that is either a parcel of land or an estate"
-      ).to.equal(true);
+      // "All land for sale should be an NFT that is either a parcel of land or an estate"
+      expect(false).toBe(true);
   }
 
   return { landForSale, estateForSale };
@@ -92,12 +91,12 @@ export const checkAsset = async (
 
   // Asset is the same as expected
   const nftContractAddress = nftContract.getAddress();
-  expect(addressesAreEqual(nftAddress, nftContractAddress)).to.be.true;
+  expect(addressesAreEqual(nftAddress, nftContractAddress)).toBe(true);
 
   // Sell order isn't expired
   const expiresTime = Number(expiresAt);
   const nowInSeconds = Date.now() / 1000;
-  expect(nowInSeconds).to.be.below(expiresTime);
+  expect(nowInSeconds).toBeLessThan(expiresTime);
 
   // Buyer (or Owner of funds if buyer is approved) has enough MANA
   await expectMinimumTokenBalances(erc20Contract, [ownerOfFunds], [priceInWei]);
@@ -110,11 +109,11 @@ export const checkAsset = async (
   );
   const approved =
     addressesAreEqual(approvedForAsset, MARKETPLACE_ADDRESS) || approvedForAll;
-  expect(approved).to.be.true;
+  expect(approved).toBe(true);
 };
 
 export const helpers = {
-  ...actionHelpers,
+  ...coreHelpers,
   pickAssetsForSale,
   checkAsset,
   getContractsAddresses,

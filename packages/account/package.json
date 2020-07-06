@@ -31,7 +31,7 @@
     "test:tsdx": "npx tsdx test",
     "lint": "npx tsdx lint src",
     "test:mocha-tsnode": "env TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\" }' npx mocha --require ts-node/register --timeout 4000 src/*.test.ts",
-    "test": "npm run test:mocha-tsnode",
+    "test": "npm run test:tsdx",
     "update": "npx ncu",
     "update:write": "npm run update -- -u"
   },
@@ -42,16 +42,13 @@
     "ethers": "^4.0.47"
   },
   "devDependencies": {
-    "@types/chai": "^4.2.11",
-    "@types/mocha": "^7.0.2",
     "@types/node": "^14.0.13",
-    "chai": "^4.2.0",
-    "mocha": "^8.0.1",
+    "@tasit/test-helpers": "^0.0.28",
     "npm-check-updates": "^7.0.1",
     "ts-node": "^8.10.2",
     "tsdx": "^0.13.2",
     "tslib": "^2.0.0",
     "typescript": "^3.9.5"
   },
-  "gitHead": "fc17ed73b2c70e3f94dcc4b23ffbf502fa16b0ab"
+  "gitHead": "08af46b69dccad031c3230a563650278e8688006"
 }

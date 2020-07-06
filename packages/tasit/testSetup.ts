@@ -1,15 +1,11 @@
-// Chai
-import { expect } from "chai";
-global.expect = expect;
-
 // Load config
-import { Action } from "../TasitSdk";
+import { Action } from "./src/TasitSdk";
 const { ConfigLoader } = Action;
-import config from "../config/default";
+import config from "./src/config/development";
 ConfigLoader.setConfig(config);
 
 // Helpers
-import helpers from "./helpers";
+import helpers from "@tasit/test-helpers";
 const {
   ProviderFactory,
   createSnapshot,
@@ -22,18 +18,18 @@ const provider = ProviderFactory.getProvider();
 // Global hooks
 let snapshotId;
 
-beforeEach("global beforeEach() hook", async () => {
+beforeEach(async () => {
   snapshotId = await createSnapshot(provider);
 
   while (snapshotId > 1) {
     await revertFromSnapshot(provider, snapshotId--);
   }
 
-  expect(snapshotId).to.equal(1);
+  expect(snapshotId).toBe(1);
 });
 
-afterEach("global afterEach() hook", async () => {
-  expect(snapshotId).to.equal(1);
+afterEach(async () => {
+  expect(snapshotId).toBe(1);
   await revertFromSnapshot(provider, snapshotId);
 
   // Note: Without this the test suite is breaking.

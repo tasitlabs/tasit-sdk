@@ -1,7 +1,6 @@
 import ProviderFactory from "./ProviderFactory";
 import ConfigLoader from "./ConfigLoader";
 import { ethers } from "ethers";
-import { expect } from "chai";
 const { providers } = ethers;
 const {
   JsonRpcProvider,
@@ -132,7 +131,7 @@ const checkConfig = async (config) => {
     events: eventsConfig,
   };
 
-  expect(userConfig).to.deep.equal(loadedConfig);
+  expect(userConfig).toEqual(loadedConfig);
 };
 
 describe("TasitAction.ConfigLoader", () => {
@@ -148,39 +147,45 @@ describe("TasitAction.ConfigLoader", () => {
     ConfigLoader.setConfig(defaultConfig);
   });
 
-  it("should setup a provider connected to a local node using JsonRPC", async () => {
-    const config = {
-      provider: {
-        network: "other",
-        provider: "jsonrpc",
-        pollingInterval: 50,
-        jsonRpc: {
-          url: "http://localhost",
-          port: 8545,
+  it(
+    "should setup a provider connected to a local node using JsonRPC",
+    async () => {
+      const config = {
+        provider: {
+          network: "other",
+          provider: "jsonrpc",
+          pollingInterval: 50,
+          jsonRpc: {
+            url: "http://localhost",
+            port: 8545,
+          },
         },
-      },
-      events: {
-        timeout: 2000,
-      },
-    };
+        events: {
+          timeout: 2000,
+        },
+      };
 
-    await checkConfig(config);
-  });
+      await checkConfig(config);
+    }
+  );
 
-  it("should setup a provider connected to the rinkeby testnet using Fallback", async () => {
-    const config = {
-      provider: {
-        network: "rinkeby",
-        provider: "fallback",
-        pollingInterval: 4000,
-      },
-      events: {
-        timeout: 2000,
-      },
-    };
+  it(
+    "should setup a provider connected to the rinkeby testnet using Fallback",
+    async () => {
+      const config = {
+        provider: {
+          network: "rinkeby",
+          provider: "fallback",
+          pollingInterval: 4000,
+        },
+        events: {
+          timeout: 2000,
+        },
+      };
 
-    await checkConfig(config);
-  });
+      await checkConfig(config);
+    }
+  );
 
   describe("should setup a provider connected to the ropsten testnet using Infura", async () => {
     it("without apiKey", async () => {
@@ -252,19 +257,22 @@ describe("TasitAction.ConfigLoader", () => {
       await checkConfig(config);
     });
 
-    it("should setup a provider connected to the goerli testnet using Fallback", async () => {
-      const config = {
-        provider: {
-          network: "goerli",
-          provider: "fallback",
-          pollingInterval: 4000,
-        },
-        events: {
-          timeout: 2000,
-        },
-      };
+    it(
+      "should setup a provider connected to the goerli testnet using Fallback",
+      async () => {
+        const config = {
+          provider: {
+            network: "goerli",
+            provider: "fallback",
+            pollingInterval: 4000,
+          },
+          events: {
+            timeout: 2000,
+          },
+        };
 
-      await checkConfig(config);
-    });
+        await checkConfig(config);
+      }
+    );
   });
 });
