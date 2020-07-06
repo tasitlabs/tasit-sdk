@@ -8,7 +8,6 @@ import {
   expectExactTokenBalances,
 } from "../../testHelpers/helpers";
 
-import { expect} from "chai";
 import sinon from "sinon";
 
 const { local: localContracts } = TasitContracts;
@@ -31,7 +30,7 @@ describe("TasitAction.ERC721.ERC721", () => {
 
   let action;
 
-  before("", async () => {
+  beforeAll("", async () => {
     [owner, ana, bob] = accounts;
   });
 
@@ -40,11 +39,11 @@ describe("TasitAction.ERC721.ERC721", () => {
 
     erc721 = new ERC721(ERC721_ADDRESS, owner);
 
-    expect(erc721).to.exist;
-    expect(erc721.getAddress()).to.equal(ERC721_ADDRESS);
-    expect(erc721.name).to.exist;
-    expect(erc721.symbol).to.exist;
-    expect(erc721._getProvider()).to.exist;
+    expect(erc721).toBeDefined();
+    expect(erc721.getAddress()).toBe(ERC721_ADDRESS);
+    expect(erc721.name).toBeDefined();
+    expect(erc721.symbol).toBeDefined();
+    expect(erc721._getProvider()).toBeDefined();
 
     // This line ensures that a new event listener does not catch an existing event from last the block
     // Two blocks to minimize the risk that polling doesn't occur.
@@ -62,41 +61,31 @@ describe("TasitAction.ERC721.ERC721", () => {
     // Two blocks to minimize the risk that polling doesn't occur.
     await mineBlocks(provider, 2);
 
-    expect(provider._events, "ethers should not be listening to any events.").to
-      .be.empty;
+    expect(provider._events).toHaveLength(0);
 
     if (erc721) {
       erc721.unsubscribe();
 
-      expect(erc721.subscribedEventNames()).to.be.empty;
+      expect(erc721.subscribedEventNames()).toHaveLength(0);
 
-      expect(
-        erc721.getEmitter()._events,
-        "ethers should not be listening to any events."
-      ).to.be.empty;
+      expect(erc721.getEmitter()._events).toHaveLength(0);
     }
 
     if (action) {
       await action.waitForOneConfirmation();
       action.unsubscribe();
 
-      expect(action.subscribedEventNames()).to.be.empty;
+      expect(action.subscribedEventNames()).toHaveLength(0);
 
-      expect(
-        action.getEmitter()._events,
-        "ethers should not be listening to any events."
-      ).to.be.empty;
+      expect(action.getEmitter()._events).toHaveLength(0);
     }
 
     if (erc721) {
       erc721.unsubscribe();
 
-      expect(erc721.subscribedEventNames()).to.be.empty;
+      expect(erc721.subscribedEventNames()).toHaveLength(0);
 
-      expect(
-        erc721.getEmitter()._events,
-        "ethers should not be listening to any events."
-      ).to.be.empty;
+      expect(erc721.getEmitter()._events).toHaveLength(0);
     }
   });
 
@@ -105,21 +94,21 @@ describe("TasitAction.ERC721.ERC721", () => {
       expect(() => {
         // @ts-ignore: TS2554
         new ERC721();
-      }).to.throw();
+      }).toThrowError();
     });
 
     it("constructor with invalid address", async () => {
       expect(() => {
         // @ts-ignore: TS2554
         new ERC721("invalid address");
-      }).to.throw();
+      }).toThrowError();
     });
   });
 
   it("should call a read-only contract method", async () => {
     const name = await erc721.name();
-    expect(name).to.exist;
-    expect(name).to.equal("ERC721");
+    expect(name).toBeDefined();
+    expect(name).toBe("ERC721");
   });
 
   describe("ERC721 functions", () => {
@@ -145,9 +134,9 @@ describe("TasitAction.ERC721.ERC721", () => {
 
       erc721.off("Transfer");
 
-      expect(event.from).to.equal(zeroAddress);
-      expect(event.to).to.equal(ana.address);
-      expect(event.tokenId).to.equal(tokenId);
+      expect(event.from).toBe(zeroAddress);
+      expect(event.to).toBe(ana.address);
+      expect(event.tokenId).toBe(tokenId);
 
       await expectExactTokenBalances(erc721, [ana.address], [1]);
     });
@@ -159,9 +148,9 @@ describe("TasitAction.ERC721.ERC721", () => {
         const { data } = message;
         const { args } = data;
 
-        expect(args.from).to.equal(ana.address);
-        expect(args.to).to.equal(bob.address);
-        expect(args.tokenId.toNumber()).to.equal(tokenId);
+        expect(args.from).toBe(ana.address);
+        expect(args.to).toBe(bob.address);
+        expect(args.tokenId.toNumber()).toBe(tokenId);
       });
 
       const errorListener = sinon.fake();
@@ -176,7 +165,7 @@ describe("TasitAction.ERC721.ERC721", () => {
 
       await mineBlocks(provider, 2);
 
-      expect(errorListener.called).to.be.false;
+      expect(errorListener.called).toBe(false);
 
       await expectExactTokenBalances(
         erc721,
@@ -217,82 +206,88 @@ describe("TasitAction.ERC721.ERC721", () => {
       );
     });
 
-    it("should trigger an error if the user is listening for errors from a contract and tries safeTransferFrom to a contract without onERC721Received", async () => {
-      const contractErrorFakeFn = sinon.fake();
+    it(
+      "should trigger an error if the user is listening for errors from a contract and tries safeTransferFrom to a contract without onERC721Received",
+      async () => {
+        const contractErrorFakeFn = sinon.fake();
 
-      erc721 = new ERC721(ERC721_ADDRESS, ana);
+        erc721 = new ERC721(ERC721_ADDRESS, ana);
 
-      const contractErrorListener = (error) => {
-        const { message } = error;
-        expect(message).to.equal("Action failed.");
-        contractErrorFakeFn();
-      };
+        const contractErrorListener = (error) => {
+          const { message } = error;
+          expect(message).toBe("Action failed.");
+          contractErrorFakeFn();
+        };
 
-      erc721.on("error", contractErrorListener);
+        erc721.on("error", contractErrorListener);
 
-      action = erc721.safeTransferFrom(
-        ana.address,
-        SAMPLE_CONTRACT_ADDRESS,
-        tokenId
-      );
-      await action.send();
+        action = erc721.safeTransferFrom(
+          ana.address,
+          SAMPLE_CONTRACT_ADDRESS,
+          tokenId
+        );
+        await action.send();
 
-      // Some error (orphan block, failed tx) events are being triggered only from the confirmationListener
-      // See more: https://github.com/tasitlabs/tasit-sdk/issues/253
-      action.on("confirmation", () => {
-        // do nothing
-      });
+        // Some error (orphan block, failed tx) events are being triggered only from the confirmationListener
+        // See more: https://github.com/tasitlabs/tasit-sdk/issues/253
+        action.on("confirmation", () => {
+          // do nothing
+        });
 
-      await action.waitForOneConfirmation();
+        await action.waitForOneConfirmation();
 
-      await mineBlocks(provider, 2);
+        await mineBlocks(provider, 2);
 
-      expect(contractErrorFakeFn.called).to.be.true;
+        expect(contractErrorFakeFn.called).toBe(true);
 
-      await expectExactTokenBalances(
-        erc721,
-        [ana.address, SAMPLE_CONTRACT_ADDRESS],
-        [1, 0]
-      );
-    });
+        await expectExactTokenBalances(
+          erc721,
+          [ana.address, SAMPLE_CONTRACT_ADDRESS],
+          [1, 0]
+        );
+      }
+    );
 
-    it("should trigger an error if the user is listening for errors for an action and tries safeTransferFrom to a contract without onERC721Received", async () => {
-      const actionErrorFakeFn = sinon.fake();
+    it(
+      "should trigger an error if the user is listening for errors for an action and tries safeTransferFrom to a contract without onERC721Received",
+      async () => {
+        const actionErrorFakeFn = sinon.fake();
 
-      erc721 = new ERC721(ERC721_ADDRESS, ana);
+        erc721 = new ERC721(ERC721_ADDRESS, ana);
 
-      const actionErrorListener = (error) => {
-        const { message } = error;
-        expect(message).to.equal("Action failed.");
-        actionErrorFakeFn();
-      };
+        const actionErrorListener = (error) => {
+          const { message } = error;
+          expect(message).toBe("Action failed.");
+          actionErrorFakeFn();
+        };
 
-      action = erc721.safeTransferFrom(
-        ana.address,
-        SAMPLE_CONTRACT_ADDRESS,
-        tokenId
-      );
-      action.on("error", actionErrorListener);
+        action = erc721.safeTransferFrom(
+          ana.address,
+          SAMPLE_CONTRACT_ADDRESS,
+          tokenId
+        );
+        action.on("error", actionErrorListener);
 
-      // Some error (orphan block, failed tx) events are being triggered only from the confirmationListener
-      // See more: https://github.com/tasitlabs/tasit-sdk/issues/253
-      action.on("confirmation", () => {
-        // do nothing
-      });
+        // Some error (orphan block, failed tx) events are being triggered only from the confirmationListener
+        // See more: https://github.com/tasitlabs/tasit-sdk/issues/253
+        action.on("confirmation", () => {
+          // do nothing
+        });
 
-      await action.send();
+        await action.send();
 
-      await action.waitForOneConfirmation();
+        await action.waitForOneConfirmation();
 
-      await mineBlocks(provider, 1);
+        await mineBlocks(provider, 1);
 
-      expect(actionErrorFakeFn.called).to.be.true;
+        expect(actionErrorFakeFn.called).toBe(true);
 
-      await expectExactTokenBalances(
-        erc721,
-        [ana.address, SAMPLE_CONTRACT_ADDRESS],
-        [1, 0]
-      );
-    });
+        await expectExactTokenBalances(
+          erc721,
+          [ana.address, SAMPLE_CONTRACT_ADDRESS],
+          [1, 0]
+        );
+      }
+    );
   });
 });
