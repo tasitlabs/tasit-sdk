@@ -6,7 +6,7 @@
 // import Account from "@tasit/account";
 // // import Account from "../../@tasit/account/dist";
 // import TasitContracts from "@tasit/contracts";
-// import actionHelpers from "@tasit/action/dist/testHelpers/helpers";
+// import actionHelpers from "@tasit/test-helpers";
 // const { ERC20, ERC721 } = Action;
 
 // const {

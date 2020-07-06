@@ -11,7 +11,7 @@ chai.use(chaiAsPromised);
 // with the same imports of expect and sinon in each test file
 
 // Helpers
-import { createSnapshot, revertFromSnapshot, mineBlocks } from "./helpers";
+import { createSnapshot, revertFromSnapshot, mineBlocks } from "@tasit/test-helpers";
 import ProviderFactory from "../ProviderFactory";
 import ConfigLoader from "../ConfigLoader";
 import config from "../config/default";

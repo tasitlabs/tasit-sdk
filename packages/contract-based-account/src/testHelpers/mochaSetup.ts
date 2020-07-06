@@ -5,7 +5,7 @@ import { expect } from "chai";
 import sinon from "sinon";
 
 // Helpers
-import actionHelpers from "@tasit/action/dist/testHelpers/helpers";
+import actionHelpers from "@tasit/test-helpers";
 
 import Action from "@tasit/action";
 global.expect = expect;

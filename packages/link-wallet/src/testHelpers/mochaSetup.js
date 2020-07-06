@@ -3,7 +3,7 @@ import { expect } from "chai";
 global.expect = expect;
 
 // Helpers
-import actionHelpers from "@tasit/action/dist/testHelpers/helpers";
+import actionHelpers from "@tasit/test-helpers";
 const {
   developmentConfig,
   ProviderFactory,
