@@ -29,7 +29,7 @@
     "singleQuote": true,
     "trailingComma": "es5"
   },
-  "name": "test-helpers",
+  "name": "@tasit/test-helpers",
   "author": "Tasit Labs",
   "module": "dist/test-helpers.esm.js",
   "devDependencies": {
