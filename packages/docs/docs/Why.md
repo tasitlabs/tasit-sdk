@@ -18,7 +18,7 @@ sidebar_label: Why
 
 Today, using a dapp from a phone is painful. Almost no dapps have standalone mobile apps, and you're not easily able to use the dapp without ETH/tokens or with the ETH/tokens you have in another wallet. We lose mainstream people from the onboarding funnel because of this. Some dapps can be used inside a single app like Coinbase Wallet or Status that serves as a dapp browser, but this feels like a terribly broken UX for anyone who has been using a mobile phone for a while, and it also feels like broken UX for people who are used to using web-based dapps with MetaMask (where the wallet mostly stays out of the way until you need it). The ideal UX would be installing each mobile dapp in a way that feels the same as installing any mobile app, and giving it permission to take actions during onboarding with the costs subsidized by others or with your ETH/tokens held in a separate wallet.
 
-The idea is that the Tasit SDK would be used by many different mobile apps on a user's device. Once the Tasit SDK is around, more dapps will have dedicated mobile apps. This will remove a key barrier to mainstream adoption of Ethereum dapps.
+The idea is that Tasit would be used by many different mobile apps on a user's device. Once Tasit is around, more dapps will have dedicated mobile apps. This will remove a key barrier to mainstream adoption of Ethereum dapps.
 
 ##### Right to exit for users
 
@@ -30,9 +30,9 @@ The user-facing answer for "Why?" focused on the UX/product, since that's the ma
 
 One major reason most dapps don’t have standalone mobile apps today is because it’s hard for developers to build mobile Ethereum dapps. There isn’t much good tooling for it. This SDK provides that tooling so that developers can focus on the "business logic" for their dapp.
 
-Developers shouldn't need to reinvent the wheel for each new dapp: account and private key generation, linking to another wallet or adding meta-transaction support, etc. Let the Tasit SDK handle those parts for you.
+Developers shouldn't need to reinvent the wheel for each new dapp: account and private key generation, linking to another wallet or adding meta-transaction support, etc. Let Tasit handle those parts for you.
 
-There's no reason building an Ethereum dapp should feel much different for the front-end developer than building an app using Firebase as the back end - with the Tasit SDK, that's the case.
+There's no reason building an Ethereum dapp should feel much different for the front-end developer than building an app using Firebase as the back end - with Tasit, that's the case.
 
 If you want to see the Ethereum ecosystem grow, mobile is critical for making that happen, because that's where all the users are.
 
@@ -55,5 +55,3 @@ Most younger developers building interesting new mobile apps these days use Reac
 ---
 
 [Go back](Home.md) to the home page of the docs.
-
-See something that can be improved on this page? [Edit it here](https://github.com/tasitlabs/tasit-sdk/blob/develop/packages/docs/docs/Why.md).

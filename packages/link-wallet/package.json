@@ -1,9 +1,9 @@
 {
   "name": "@tasit/link-wallet",
-  "version": "0.0.19",
+  "version": "0.0.29",
   "description": "Library for onboarding a user by linking a dapp with a wallet of their choosing.",
   "main": "dist/index",
-  "module": "dist/@tasit/link-wallet.esm.js",
+  "module": "dist/link-wallet.esm.js",
   "typings": "dist/index.d.ts",
   "keywords": [
     "ethereum",
@@ -12,7 +12,7 @@
     "native"
   ],
   "author": "Tasit Labs",
-  "homepage": "https://github.com/tasitlabs/tasit-sdk#readme",
+  "homepage": "https://tasit.dev",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -25,28 +25,27 @@
     "clean": "rm -rf dist/*",
     "prepare": "npm run clean && npm run build",
     "test:mocha-tsnode": "npx mocha src/*.test.ts --require ts-node/register --file src/testHelpers/mochaSetup.ts",
-    "start": "tsdx watch",
-    "build": "tsdx build",
-    "test:tsdx": "tsdx test",
-    "lint": "tsdx lint src",
-    "test": "npm run test:mocha-tsnode",
+    "start": "npx tsdx watch",
+    "build": "npx tsdx build",
+    "test:tsdx": "npx tsdx test",
+    "lint": "npx tsdx lint src",
+    "test": "npm run test:tsdx",
     "update": "npx ncu",
     "update:write": "npm run update -- -u"
   },
   "bugs": {
     "url": "https://github.com/tasitlabs/tasit-sdk/issues"
   },
-  "dependencies": {
-  },
   "devDependencies": {
-    "@babel/preset-typescript": "^7.10.1",
-    "chai": "^4.2.0",
-    "mocha": "^7.2.0",
+    "@tasit/action": "^0.0.29",
     "npm-check-updates": "^6.0.1",
-    "@tasit/action": "^0.0.19",
     "ts-node": "^8.10.2",
     "tsdx": "^0.13.2",
     "tslib": "^2.0.0",
     "typescript": "^3.9.3"
-  }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "gitHead": "08af46b69dccad031c3230a563650278e8688006"
 }

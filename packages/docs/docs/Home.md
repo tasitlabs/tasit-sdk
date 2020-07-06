@@ -1,6 +1,6 @@
 ---
 id: home
-title: Tasit SDK
+title: Tasit
 sidebar_label: Home
 ---
 
@@ -22,9 +22,9 @@ style={{
 
 ### Introduction
 
-The <Highlight color="rgb(0, 154, 115)">Tasit SDK</Highlight> is a JavaScript/TypeScript SDK for making mobile Ethereum dapps using React Native.
+<Highlight color="rgb(0, 154, 115)">Tasit</Highlight> is a JavaScript/TypeScript SDK for making mobile Ethereum dapps using React Native.
 
-Development of the Tasit SDK is supported in part by the [Ethereum Foundation](https://ecosystem.support/) as well as by [Gnosis](https://gnosis.io/) through their [GECO](https://github.com/gnosis/GECO) grant initiative.
+Development of Tasit is supported in part by the [Ethereum Foundation](https://esp.ethereum.foundation/) as well as by [Gnosis](https://gnosis.io/) through their [GECO](https://github.com/gnosis/GECO) grant initiative.
 
 This project is open-source and in need of funding to sustain work on it. If you're able to contribute, please consider [supporting the project on Gitcoin Grants](https://gitcoin.co/grants/183/tasit-native-mobile-ethereum-dapps) or sending ETH or DAI to the Tasit project's Aragon Agent address:
 
@@ -34,6 +34,3 @@ _Disclaimer:_ The alpha version of this SDK is under active development. We enco
 
 ---
 
-See something that can be improved on this page? [Edit it here](https://github.com/tasitlabs/tasit-sdk/blob/develop/packages/docs/docs/Home.md).
-
-Check out the link below for a quick guide on how to get started with making a native mobile Ethereum dapp using the Tasit SDK!

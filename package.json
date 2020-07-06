@@ -3,8 +3,7 @@
   "private": true,
   "description": "A monorepo for all npm packages in the Tasit ecosystem",
   "devDependencies": {
-    "@nomiclabs/buidler": "^1.3.5",
-    "@types/mocha": "^5.2.7",
+    "@nomiclabs/buidler": "^1.3.6",
     "@types/node": "^13.13.1",
     "@typescript-eslint/eslint-plugin": "^3.1.0",
     "@typescript-eslint/parser": "^3.1.0",
@@ -24,20 +23,23 @@
   "scripts": {
     "postinstall": "npm run bootstrap",
     "audit:fix:all": "npx lerna exec --stream --concurrency 1 -- npm audit fix",
-    "update": "npx ncu -x '@types/mocha, @types/node'",
+    "update": "npx ncu -x '@types/node'",
     "update:write": "npm run update -- -u",
     "update:all": "npx lerna run update --stream --concurrency 1",
     "update:all:write": "npx lerna run update:write --concurrency 1",
     "clean": "npx lerna run clean --stream && npx lerna clean --yes && rm -rf ./node_modules && npm run remove:package-lock",
     "publish": "npm run bootstrap && npm test && npx lerna publish",
     "bootstrap": "npx lerna bootstrap",
+    "buidler-evm:scoped:start": "npx lerna run buidler-evm:start --scope @tasit/contracts --stream",
+    "buidler-evm:scoped:stop": "npx lerna run buidler-evm:stop --scope @tasit/contracts --stream",
+    "buidler-evm:scoped:watch": "npx lerna run buidler-evm:watch --scope @tasit/contracts --stream",
     "buidler-evm:start": "npx buidler node > buidler-evm.log &",
-    "buidler-evm:stop": "echo 'implement me'",
+    "buidler-evm:stop": "kill `ps ax|grep 'buidler node'|grep -v grep| awk '{print $1}'` 2> /dev/null; exit 0",
     "buidler-evm:watch": "tail -f -n 100 buidler-evm.log",
-    "buidler:migrate": "npx lerna run compile --scope @tasit/contracts --stream",
+    "buidler:migrate": "npx lerna run compile:contracts --scope @tasit/contracts --stream",
     "builder:migrate:rinkeby": "npx lerna run compile:rinkeby --scope @tasit/contracts --stream",
     "prepare:blockchain": "npm run buidler-evm:stop && npm run buidler-evm:start && npm run buidler:migrate",
-    "pretest": "npm run prepare:blockchain && npm run lint",
+    "pretest": "npm run prepare:blockchain",
     "remove:package-lock": "npx lerna exec --stream --concurrency 1 -- rm -f package-lock.json",
     "test": "npx lerna run test --stream --concurrency 1",
     "posttest": "npm run buidler-evm:stop",
@@ -59,9 +61,10 @@
   "bugs": {
     "url": "https://github.com/tasitlabs/tasit-sdk/issues"
   },
-  "homepage": "https://github.com/tasitlabs/tasit-sdk#readme",
+  "homepage": "https://tasit.dev",
   "engines": {
     "node": ">=10.15.0",
     "npm": ">=6.4.1"
-  }
+  },
+  "dependencies": {}
 }

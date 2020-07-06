@@ -1,10 +1,11 @@
 import ConfigLoader from "./ConfigLoader";
 
 import Action from "./action";
+import ProviderFactory from "./ProviderFactory";
 
 import Contract from "./contract";
+import standards from "./standards";
 import Utils from "./contract/Utils";
-import helpers from "./testHelpers/helpers";
 
 export { Contract };
 
@@ -13,7 +14,8 @@ export const TasitAction = {
   ConfigLoader,
   Action,
   Utils,
-  helpers,
+  ProviderFactory,
+  standards
 };
 
 export default TasitAction;

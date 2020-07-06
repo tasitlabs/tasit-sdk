@@ -1,9 +1,10 @@
 {
   "name": "@tasit/contract-based-account",
-  "version": "0.0.19",
+  "version": "0.0.29",
+  "private": false,
   "description": "Library for onboarding a user using a smart-contract-based account.",
   "main": "dist/index",
-  "module": "dist/@tasit/contract-based-account.esm.js",
+  "module": "dist/contract-based-account.esm.js",
   "typings": "dist/index.d.ts",
   "keywords": [
     "ethereum",
@@ -12,7 +13,7 @@
     "native"
   ],
   "author": "Tasit Labs",
-  "homepage": "https://github.com/tasitlabs/tasit-sdk#readme",
+  "homepage": "https://tasit.dev",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -21,36 +22,38 @@
   "files": [
     "dist"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
-    "start": "tsdx watch",
-    "build": "tsdx build",
-    "test:tsdx": "tsdx test",
-    "lint": "tsdx lint src",
+    "prepare": "npm run build",
+    "start": "npx tsdx watch",
+    "build": "npx tsdx build",
+    "test:tsdx": "npx tsdx test",
+    "lint": "npx tsdx lint src",
     "test:mocha-tsnode": "npx mocha src/*.test.ts --require ts-node/register --file src/testHelpers/mochaSetup.ts --timeout 4000",
-    "test": "npm run test:mocha-tsnode",
+    "test": "npm run test:tsdx",
     "update": "npx ncu",
     "update:write": "npm run update -- -u"
   },
   "bugs": {
     "url": "https://github.com/tasitlabs/tasit-sdk/issues"
   },
-  "peerDependencies": {},
   "dependencies": {
-    "ethers": "^4.0.47",
-    "@tasit/action": "^0.0.19",
-    "@tasit/contracts": "^0.0.19"
+    "@tasit/action": "^0.0.29",
+    "@tasit/contracts": "^0.0.29",
+    "axios": "^0.19.2",
+    "ethers": "^4.0.47"
   },
   "devDependencies": {
-    "@babel/preset-typescript": "^7.10.1",
-    "@types/mocha": "^7.0.2",
-    "chai": "^4.2.0",
-    "mocha": "^7.2.0",
+    "@tasit/account": "^0.0.29",
+    "@tasit/test-helpers": "^0.0.29",
     "npm-check-updates": "^6.0.1",
     "sinon": "^9.0.2",
-    "@tasit/account": "^0.0.19",
     "ts-node": "^8.10.2",
     "tsdx": "^0.13.2",
     "tslib": "^2.0.0",
     "typescript": "^3.9.3"
-  }
+  },
+  "gitHead": "08af46b69dccad031c3230a563650278e8688006"
 }

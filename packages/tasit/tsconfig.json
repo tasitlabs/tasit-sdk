@@ -1,0 +1,23 @@
+{
+  "extends": "../../tsconfig.json",
+  "include": ["src", "types"],
+  "compilerOptions": {
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "composite": true
+  }
+  // "references": [
+  //   {
+  //     "path": "../account"
+  //   },
+  //   {
+  //     "path": "../action"
+  //   },
+  //   {
+  //     "path": "../contract-based-account"
+  //   },
+  //   {
+  //     "path": "../contracts"
+  //   }
+  // ]
+}

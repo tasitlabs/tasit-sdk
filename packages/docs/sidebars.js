@@ -7,7 +7,7 @@
 
 module.exports = {
   docs: {
-    "Tasit SDK Docs": [
+    "Tasit Docs": [
       "home",
       "getting-started",
       "main-features",

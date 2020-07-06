@@ -1,7 +1,9 @@
-import GnosisSafe from "./GnosisSafe";
+// import GnosisSafe from "./GnosisSafe";
+import * as Deploy from "./Deploy";
 
 export const TasitContractBasedAccount = {
-  GnosisSafe,
+  // GnosisSafe,
+  Deploy
 };
 
 export default TasitContractBasedAccount;

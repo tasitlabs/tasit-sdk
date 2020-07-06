@@ -1,4 +1,5 @@
 import { ethers } from "ethers";
+
 import TasitContracts from "@tasit/contracts";
 
 import ProviderFactory from "./ProviderFactory";
@@ -17,43 +18,47 @@ let wallet;
 let sampleContract;
 
 describe("ethers", () => {
-  beforeEach("instantiate provider, wallet and contract objects", async () => {
+  // instantiate provider, wallet and contract objects
+  beforeEach(async () => {
     [wallet] = accounts;
     wallet = wallet.connect(provider);
-    expect(wallet.address).to.have.lengthOf(42);
-    expect(wallet.provider).to.be.not.undefined;
+    expect(wallet.address).toHaveLength(42);
+    expect(wallet.provider).toBeDefined();
 
     sampleContract = new ethers.Contract(
       SAMPLE_CONTRACT_ADDRESS,
       sampleContractABI,
       wallet
     );
-    expect(sampleContract.address).to.equal(SAMPLE_CONTRACT_ADDRESS);
+    expect(sampleContract.address).toBe(SAMPLE_CONTRACT_ADDRESS);
   });
 
-  it("should instatiate contract object using human-readable ABI", async () => {
-    const humanReadableABI = [
-      "event ValueChanged(address indexed author, string oldValue, string newValue)",
-      "constructor(string memory) public",
-      "function getValue() public view returns (string memory)",
-      "function setValue(string memory) public",
-    ];
+  it(
+    "should instatiate contract object using human-readable ABI",
+    async () => {
+      const humanReadableABI = [
+        "event ValueChanged(address indexed author, string oldValue, string newValue)",
+        "constructor(string memory) public",
+        "function getValue() public view returns (string memory)",
+        "function setValue(string memory) public",
+      ];
 
-    sampleContract = undefined;
-    sampleContract = new ethers.Contract(
-      SAMPLE_CONTRACT_ADDRESS,
-      humanReadableABI,
-      wallet
-    );
-    expect(sampleContract.interface.functions.getValue).to.exist;
-    expect(sampleContract.interface.functions.setValue).to.exist;
-    expect(sampleContract.interface.events.ValueChanged).to.exist;
-  });
+      sampleContract = undefined;
+      sampleContract = new ethers.Contract(
+        SAMPLE_CONTRACT_ADDRESS,
+        humanReadableABI,
+        wallet
+      );
+      expect(sampleContract.interface.functions.getValue).toBeDefined();
+      expect(sampleContract.interface.functions.setValue).toBeDefined();
+      expect(sampleContract.interface.events.ValueChanged).toBeDefined();
+    }
+  );
 
   it("should get contract's value", async () => {
     const value = await sampleContract.getValue();
-    expect(value).to.exist;
-    expect(value).to.be.a("string");
+    expect(value).toBeDefined();
+    expect(value).toBeInstanceOf("string");
   });
 
   it("should set contract's value", async () => {
@@ -64,7 +69,7 @@ describe("ethers", () => {
 
     const value = await sampleContract.getValue();
 
-    expect(value).to.equal(rand);
+    expect(value).toBe(rand);
   });
 
   it("should watch contract's ValueChanged event", (done) => {
@@ -84,15 +89,15 @@ describe("ethers", () => {
           newValue: eventNewValue,
         } = event.args;
 
-        expect([eventAuthor, eventOldValue, eventNewValue]).to.deep.equal([
+        expect([eventAuthor, eventOldValue, eventNewValue]).toEqual([
           wallet.address,
           oldValue,
           newValue,
         ]);
 
         event.removeListener();
-        expect(sampleContract.listenerCount("ValueChanged")).to.equal(0);
-        expect(sampleContract.provider._events).to.be.empty;
+        expect(sampleContract.listenerCount("ValueChanged")).toBe(0);
+        expect(sampleContract.provider._events).toHaveLength(0);
         clearTimeout(timeout);
         done();
       };
@@ -111,8 +116,8 @@ describe("ethers", () => {
 
       const listener = () => {
         sampleContract.removeAllListeners("ValueChanged");
-        expect(sampleContract.listenerCount("ValueChanged")).to.equal(0);
-        expect(sampleContract.provider._events).to.be.empty;
+        expect(sampleContract.listenerCount("ValueChanged")).toBe(0);
+        expect(sampleContract.provider._events).toHaveLength(0);
         clearTimeout(timeout);
         done();
       };
@@ -128,7 +133,7 @@ describe("ethers", () => {
     let rawTx;
     let signedTx;
 
-    beforeEach("", async () => {
+    beforeEach(async () => {
       const data = sampleContract.interface.functions.setValue.encode([rand]);
 
       rawTx = {
@@ -141,7 +146,7 @@ describe("ethers", () => {
 
     it("should sign set contract's value tx", async () => {
       signedTx = await wallet.sign(rawTx);
-      expect(signedTx).to.exist;
+      expect(signedTx).toBeDefined();
     });
 
     it("should set contract's value using signed tx", async () => {
@@ -150,7 +155,7 @@ describe("ethers", () => {
       await provider.waitForTransaction(sentTx.hash);
 
       const value = await sampleContract.getValue();
-      expect(value).to.equal(rand);
+      expect(value).toBe(rand);
     });
   });
 
@@ -159,13 +164,13 @@ describe("ethers", () => {
   // Note that this is different behavior from web3.js
   // See more: packages/contracts/test/SampleContract
   // and https://github.com/ethers-io/ethers.js/issues/407
-  it("should call overloading functions - ethers", async function () {
+  it("should call overloading functions - ethers", async () => {
     const f1 = await sampleContract["overloading()"]();
     const f2 = await sampleContract["overloading(string)"]("a");
     const f3 = await sampleContract["overloading(string,string)"]("a", "b");
 
-    expect(f1.toNumber()).to.equal(1);
-    expect(f2.toNumber()).to.equal(2);
-    expect(f3.toNumber()).to.equal(3);
+    expect(f1.toNumber()).toBe(1);
+    expect(f2.toNumber()).toBe(2);
+    expect(f3.toNumber()).toBe(3);
   });
 });

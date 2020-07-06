@@ -1,0 +1,68 @@
+{
+  "name": "@tasit/hooks",
+  "version": "0.0.29",
+  "license": "MIT",
+  "main": "dist/index.js",
+  "module": "dist/hooks.esm.js",
+  "typings": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=10"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "start": "npx tsdx watch",
+    "build": "npx tsdx build",
+    "test": "npx tsdx test --passWithNoTests",
+    "lint": "npx tsdx lint",
+    "prepare": "npx tsdx build",
+    "update": "ncu -x 'react-native, react-test-renderer, @types/react'",
+    "update:write": "npm run update -- -u"
+  },
+  "peerDependencies": {
+    "react": ">=16.8",
+    "react-native": "~0.61"
+  },
+  "homepage": "https://tasit.dev",
+  "bugs": {
+    "url": "https://github.com/tasitlabs/tasit-sdk/issues"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npx tsdx lint"
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tasitlabs/tasit-sdk.git"
+  },
+  "prettier": {
+    "printWidth": 80,
+    "semi": true,
+    "singleQuote": true,
+    "trailingComma": "es5"
+  },
+  "author": "Tasit Labs",
+  "dependencies": {
+    "@tasit/account": "^0.0.29",
+    "@tasit/contract-based-account": "^0.0.29"
+  },
+  "devDependencies": {
+    "@react-native-community/bob": "^0.16.2",
+    "@testing-library/react-hooks": "^3.3.0",
+    "@types/react": "~16.9.23",
+    "husky": "^4.2.5",
+    "npm-check-updates": "^7.0.1",
+    "react": "~16.9.0",
+    "react-native": "~0.61",
+    "react-test-renderer": "~16.9.0",
+    "tsdx": "^0.13.2",
+    "tslib": "^2.0.0",
+    "typescript": "^3.9.5"
+  },
+  "gitHead": "08af46b69dccad031c3230a563650278e8688006"
+}

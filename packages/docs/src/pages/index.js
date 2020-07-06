@@ -15,32 +15,29 @@ import styles from "./styles.module.css";
 
 const features = [
   {
-    title: <>Easy to use</>,
-    imageUrl: "img/blob-shape-1.svg",
+    title: <>ONBOARDING</>,
+    imageUrl: "img/door-no-color.svg",
     description: (
       <>
-        The Tasit SDK was designed to be easily installed and used to get your
-        mobile Ethereum dapp up and running quickly.
+        in-dapp fiat onramps, in-dapp wallets (burner and contract-based)
       </>
     ),
   },
   {
-    title: <>Onboarding done right</>,
-    imageUrl: "img/TasitLogoSvg.svg",
+    title: <>ONGOING UX</>,
+    imageUrl: "img/smile-with-hearts-no-color.svg",
     description: (
       <>
-        Onboard your users with ephemeral accounts, contract-based accounts, and deep
-        linking to and from mobile wallets.
+        ENS, The Graph, Optimistic UI, meta-transactions
       </>
     ),
   },
   {
-    title: <>Optimistic updates</>,
-    imageUrl: "img/blob-shape-2.svg",
+    title: <>MOBILE STUFF</>,
+    imageUrl: "img/mobile-no-color.svg",
     description: (
       <>
-        The API is built with optimistic UI updates and user-friendly
-        error-handling in mind.
+        deep linking, biometric auth, push notifications
       </>
     ),
   },
@@ -67,7 +64,7 @@ function Home() {
   return (
     <Layout
       title={`${siteConfig.title} Docs`}
-      description="Docs for the Tasit SDK: A JavaScript/TypeScript SDK for making native mobile Ethereum dapps using React Native"
+      description="Docs for Tasit: A JavaScript/TypeScript SDK for making native mobile Ethereum dapps using React Native"
     >
       <header className={classnames("hero hero--primary", styles.heroBanner)}>
         <div className="container">

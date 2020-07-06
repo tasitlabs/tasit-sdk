@@ -4,12 +4,10 @@ title: Project layout
 sidebar_label: Project layout
 ---
 
-# Directories in the monorepo
+_For those familiar with Ethereum, here are some details about the scope of each of the packages in this project and what they're built with._
 
-For those familiar with Ethereum, here are some details about the scope of each of the packages in this project and what they're built with.
-
-### sdk
-This package exports the child packages below as a single export for convenience.
+### tasit
+This package (Tasit) exports the child packages below as a single export for convenience.
 
 ### account
 An abstraction around [ethers.js](https://github.com/ethers-io/ethers.js) utilities for creating a new Ethereum account
@@ -26,8 +24,9 @@ This repo tracks a few useful 3rd party contracts and exports classes for intera
 ### docs
 (These docs!)
 
+### hooks
+This package exposes functionality from the other packages as React hooks, assuming that the consuming package has React as a peer dependency. For instance, there's a `useAccount` hook that wraps some functionality from the `account` package.
+
 ---
 
 [Go back](Home.md) to the home page of the docs.
-
-See something that can be improved on this page? [Edit it here](https://github.com/tasitlabs/tasit-sdk/blob/develop/packages/docs/docs/ProjectLayout.md).

@@ -6,7 +6,7 @@ import GnosisSafe from "./GnosisSafe";
 import Account from "@tasit/account";
 // import Account from "../../@tasit/account/dist";
 import TasitContracts from "@tasit/contracts";
-import actionHelpers from "@tasit/action/dist/testHelpers/helpers";
+import helpers from "@tasit/test-helpers";
 const { ERC20, ERC721 } = Action;
 
 const {
@@ -21,7 +21,7 @@ const {
   erc20Faucet,
   erc721Faucet,
   etherFaucet,
-} = actionHelpers;
+} = helpers;
 const { local } = TasitContracts;
 const { GnosisSafe: GnosisSafeInfo, MyERC20, MyERC721 } = local;
 const { address: GNOSIS_SAFE_ADDRESS } = GnosisSafeInfo;
@@ -42,7 +42,7 @@ describe("GnosisSafe", () => {
   let erc20;
   let nft;
 
-  before("", async () => {
+  beforeAll(async () => {
     // That account is funded with ethers and is owner of all token contracts deployed
     [minter] = accounts;
     gnosisSafeOwner = accounts[9];
@@ -57,7 +57,7 @@ describe("GnosisSafe", () => {
     nft = new ERC721(NFT_ADDRESS);
   });
 
-  beforeEach("", async () => {
+  beforeEach(async () => {
     const { address: someoneAddress } = someone;
 
     // Expect an already-funded Gnosis Safe wallet
@@ -76,10 +76,10 @@ describe("GnosisSafe", () => {
     nft.removeAccount();
   });
 
-  afterEach("", async () => {
-    expect(erc20.subscribedEventNames()).to.be.empty;
-    expect(gnosisSafe.subscribedEventNames()).to.be.empty;
-    expect(provider._events).to.be.empty;
+  afterEach(async () => {
+    expect(erc20.subscribedEventNames()).toHaveLength(0);
+    expect(gnosisSafe.subscribedEventNames()).toHaveLength(0);
+    expect(provider._events).toHaveLength(0);
   });
 
   describe("test cases that need ETH deposit to the contract-based account", async () => {
@@ -102,10 +102,10 @@ describe("GnosisSafe", () => {
           const { address: ownerAddress } = gnosisSafeOwner;
 
           const ownersBefore = await gnosisSafe.getOwners();
-          expect(ownersBefore).deep.equal([ownerAddress]);
+          expect(ownersBefore).toEqual([ownerAddress]);
 
           const thresholdBefore = await gnosisSafe.getThreshold();
-          expect(`${thresholdBefore}`).to.equal(`1`);
+          expect(`${thresholdBefore}`).toBe(`1`);
 
           const { address: newSignerAddress } = ephemeralAccount;
           const newThreshold = `2`;
@@ -120,74 +120,82 @@ describe("GnosisSafe", () => {
           await action.waitForOneConfirmation();
 
           const ownersAfter = await gnosisSafe.getOwners();
-          expect(ownersAfter).deep.equal([newSignerAddress, ownerAddress]);
+          expect(ownersAfter).toEqual([newSignerAddress, ownerAddress]);
 
           const thresholdAfter = await gnosisSafe.getThreshold();
-          expect(`${thresholdAfter}`).to.equal(newThreshold);
+          expect(`${thresholdAfter}`).toBe(newThreshold);
         }
       );
 
-      it("shouldn't be able to execute transfer with insufficient signers", async () => {
-        const balanceBefore = await provider.getBalance(GNOSIS_SAFE_ADDRESS);
-        const { address: toAddress } = someone;
+      it(
+        "shouldn't be able to execute transfer with insufficient signers",
+        async () => {
+          const balanceBefore = await provider.getBalance(GNOSIS_SAFE_ADDRESS);
+          const { address: toAddress } = someone;
 
-        gnosisSafe.setSigners([gnosisSafeOwner]);
-        gnosisSafe.setAccount(gnosisSafeOwner);
-        const action = gnosisSafe.transferEther(toAddress, ONE);
+          gnosisSafe.setSigners([gnosisSafeOwner]);
+          gnosisSafe.setAccount(gnosisSafeOwner);
+          const action = gnosisSafe.transferEther(toAddress, ONE);
 
-        const errorListener = sinon.fake((error) => {
-          const { message } = error;
-          console.info(message);
+          const errorListener = sinon.fake((error) => {
+            const { message } = error;
+            console.info(message);
 
-          action.unsubscribe();
-        });
+            action.unsubscribe();
+          });
 
-        // Note: Some error events are being triggered only from the confirmationListener
-        // See more: https://github.com/tasitlabs/tasit-sdk/issues/253
-        const confirmationListener = () => {
-          // do nothing
-        };
+          // Note: Some error events are being triggered only from the confirmationListener
+          // See more: https://github.com/tasitlabs/tasit-sdk/issues/253
+          const confirmationListener = () => {
+            // do nothing
+          };
 
-        action.on("error", errorListener);
-        action.on("confirmation", confirmationListener);
+          action.on("error", errorListener);
+          action.on("confirmation", confirmationListener);
 
-        await action.send();
-        await action.waitForOneConfirmation();
+          await action.send();
+          await action.waitForOneConfirmation();
 
-        await mineBlocks(provider, 1);
+          await mineBlocks(provider, 1);
 
-        expect(errorListener.callCount).to.equal(1);
-        await expectExactEtherBalances(
-          provider,
-          [GNOSIS_SAFE_ADDRESS],
-          [balanceBefore]
-        );
-      });
+          expect(errorListener.callCount).toBe(1);
+          await expectExactEtherBalances(
+            provider,
+            [GNOSIS_SAFE_ADDRESS],
+            [balanceBefore]
+          );
+        }
+      );
     });
   });
 
   describe("test cases that need ERC20 deposit to the contract-based account", async () => {
-    beforeEach("faucet", async () => {
+    // faucet
+    beforeEach(async () => {
       await erc20Faucet(erc20, minter, GNOSIS_SAFE_ADDRESS, ONE);
       await expectExactTokenBalances(erc20, [GNOSIS_SAFE_ADDRESS], [ONE]);
     });
 
-    it("contract-based account should send ERC20 tokens to someone", async () => {
-      const tokenAddress = ERC20_ADDRESS;
-      const { address: toAddress } = someone;
+    it(
+      "contract-based account should send ERC20 tokens to someone",
+      async () => {
+        const tokenAddress = ERC20_ADDRESS;
+        const { address: toAddress } = someone;
 
-      gnosisSafe.setSigners([gnosisSafeOwner]);
-      gnosisSafe.setAccount(gnosisSafeOwner);
-      const action = gnosisSafe.transferERC20(tokenAddress, toAddress, ONE);
-      await action.send();
-      await action.waitForOneConfirmation();
+        gnosisSafe.setSigners([gnosisSafeOwner]);
+        gnosisSafe.setAccount(gnosisSafeOwner);
+        const action = gnosisSafe.transferERC20(tokenAddress, toAddress, ONE);
+        await action.send();
+        await action.waitForOneConfirmation();
 
-      await expectExactTokenBalances(erc20, [GNOSIS_SAFE_ADDRESS], [ZERO]);
-      await expectExactTokenBalances(erc20, [toAddress], [ONE]);
-    });
+        await expectExactTokenBalances(erc20, [GNOSIS_SAFE_ADDRESS], [ZERO]);
+        await expectExactTokenBalances(erc20, [toAddress], [ONE]);
+      }
+    );
 
     describe("spending by an ephemeral account", () => {
-      beforeEach("ethers to the ephemeral account pay for gas", async () => {
+      // ethers to the ephemeral account pay for gas
+      beforeEach(async () => {
         const { address: ephemeralAddress } = ephemeralAccount;
         await etherFaucet(provider, minter, ephemeralAddress, SMALL_AMOUNT);
         await expectExactEtherBalances(
@@ -197,44 +205,47 @@ describe("GnosisSafe", () => {
         );
       });
 
-      it("ephemeral account shouldn't be able to transfer funds from contract-based account without allowance", (done) => {
-        (async () => {
-          const balanceBefore = await erc20.balanceOf(GNOSIS_SAFE_ADDRESS);
+      it(
+        "ephemeral account shouldn't be able to transfer funds from contract-based account without allowance",
+        (done) => {
+          (async () => {
+            const balanceBefore = await erc20.balanceOf(GNOSIS_SAFE_ADDRESS);
 
-          const { address: toAddress } = someone;
+            const { address: toAddress } = someone;
 
-          gnosisSafe.setAccount(ephemeralAccount);
-          const action = erc20.transferFrom(
-            GNOSIS_SAFE_ADDRESS,
-            toAddress,
-            ONE
-          );
-
-          const errorListener = sinon.fake(async (error) => {
-            const { message } = error;
-            console.info(message);
-
-            action.unsubscribe();
-
-            await expectExactTokenBalances(
-              erc20,
-              [GNOSIS_SAFE_ADDRESS],
-              [balanceBefore]
+            gnosisSafe.setAccount(ephemeralAccount);
+            const action = erc20.transferFrom(
+              GNOSIS_SAFE_ADDRESS,
+              toAddress,
+              ONE
             );
 
-            done();
-          });
+            const errorListener = sinon.fake(async (error) => {
+              const { message } = error;
+              console.info(message);
 
-          const confirmationListener = () => {
-            done(new Error());
-          };
+              action.unsubscribe();
 
-          action.on("error", errorListener);
-          action.on("confirmation", confirmationListener);
+              await expectExactTokenBalances(
+                erc20,
+                [GNOSIS_SAFE_ADDRESS],
+                [balanceBefore]
+              );
 
-          action.send();
-        })();
-      });
+              done();
+            });
+
+            const confirmationListener = () => {
+              done(new Error());
+            };
+
+            action.on("error", errorListener);
+            action.on("confirmation", confirmationListener);
+
+            action.send();
+          })();
+        }
+      );
 
       describe("test cases that need ERC20 spending approval for ephemeral account", () => {
         // TODO: Move to @tasit/link-wallet
@@ -262,35 +273,38 @@ describe("GnosisSafe", () => {
               spenderAddress
             );
 
-            expect(`${amountAllowed}`).to.equal(`${SMALL_AMOUNT}`);
+            expect(`${amountAllowed}`).toBe(`${SMALL_AMOUNT}`);
           }
         );
 
-        it("ephemeral account should transfer allowed funds from the contract-based account", async () => {
-          const balanceBefore = await erc20.balanceOf(GNOSIS_SAFE_ADDRESS);
-          const { address: toAddress } = someone;
+        it(
+          "ephemeral account should transfer allowed funds from the contract-based account",
+          async () => {
+            const balanceBefore = await erc20.balanceOf(GNOSIS_SAFE_ADDRESS);
+            const { address: toAddress } = someone;
 
-          erc20.setAccount(ephemeralAccount);
-          const action = erc20.transferFrom(
-            GNOSIS_SAFE_ADDRESS,
-            toAddress,
-            SMALL_AMOUNT
-          );
+            erc20.setAccount(ephemeralAccount);
+            const action = erc20.transferFrom(
+              GNOSIS_SAFE_ADDRESS,
+              toAddress,
+              SMALL_AMOUNT
+            );
 
-          await action.send();
+            await action.send();
 
-          await action.waitForOneConfirmation();
+            await action.waitForOneConfirmation();
 
-          await mineBlocks(provider, 1);
+            await mineBlocks(provider, 1);
 
-          const expectedBalance = balanceBefore.sub(SMALL_AMOUNT);
-          await expectExactTokenBalances(
-            erc20,
-            [GNOSIS_SAFE_ADDRESS],
-            [expectedBalance]
-          );
-          await expectExactTokenBalances(erc20, [toAddress], [SMALL_AMOUNT]);
-        });
+            const expectedBalance = balanceBefore.sub(SMALL_AMOUNT);
+            await expectExactTokenBalances(
+              erc20,
+              [GNOSIS_SAFE_ADDRESS],
+              [expectedBalance]
+            );
+            await expectExactTokenBalances(erc20, [toAddress], [SMALL_AMOUNT]);
+          }
+        );
       });
     });
   });
@@ -298,7 +312,8 @@ describe("GnosisSafe", () => {
   describe("test cases that need NFT deposit to the contract-based account", async () => {
     const tokenId = 1;
 
-    beforeEach("faucet", async () => {
+    // faucet
+    beforeEach(async () => {
       await erc721Faucet(nft, minter, GNOSIS_SAFE_ADDRESS, tokenId);
       await expectExactTokenBalances(nft, [GNOSIS_SAFE_ADDRESS], [1]);
     });

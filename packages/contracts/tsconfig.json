@@ -1,7 +1,8 @@
 {
   "extends": "../../tsconfig.json",
-  "include": ["src", "types", "./abi/**/*.json"],
+  "include": ["src", "types", "typechain/**/*.d.ts"],
   "compilerOptions": {
+    // "typeRoots" : ["./typechain", "./node_modules/@types"],
     "outDir": "./dist",
     "rootDir": "./src",
     "composite": true,

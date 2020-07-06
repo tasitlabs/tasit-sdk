@@ -6,7 +6,7 @@ sidebar_label: (Internal docs) Publishing
 
 ### Publishing new versions
 
-**Note: This doc is mainly useful for the Tasit team to publish new versions of the Tasit SDK, not for a team using the Tasit SDK.**
+**Note: This doc is mainly useful for the Tasit team to publish new versions of Tasit, not for a team using Tasit.**
 
 1. Create a publish issue on GitHub (with the desired new version number in the name).
 
@@ -39,7 +39,7 @@ sidebar_label: (Internal docs) Publishing
      - @tasit/account: 0.0.7 => 0.0.8
      - @tasit/action: 0.0.7 => 0.0.8
      - @tasit/contracts: 0.0.7 => 0.0.8
-     - tasit-sdk: 0.0.7 => 0.0.8
+     - tasit: 0.0.7 => 0.0.8
 
     ? Are you sure you want to publish these packages? (ynH)
     ```
@@ -57,5 +57,3 @@ Sometimes during the `lerna bootstrap` process, the file `package-lock.json` can
 ---
 
 [Go back](Home.md) to the home page of the docs.
-
-See something that can be improved on this page? [Edit it here](https://github.com/tasitlabs/tasit-sdk/blob/develop/packages/docs/docs/Publishing.md).

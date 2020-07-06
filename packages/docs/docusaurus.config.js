@@ -1,5 +1,5 @@
 module.exports = {
-  title: "Tasit SDK",
+  title: "Tasit",
   tagline: "Docs",
   url: "https://docs.tasit.io",
   baseUrl: "/",
@@ -8,7 +8,7 @@ module.exports = {
   projectName: "tasit-sdk", // Usually your repo name.
   themeConfig: {
     navbar: {
-      title: "Tasit SDK",
+      title: "Tasit",
       logo: {
         alt: "Tasit Logo",
         src: "img/TasitLogoSvg.svg",
@@ -69,13 +69,12 @@ module.exports = {
           ],
         },
       ],
-      logo: {
-        alt: "Tasit Logo",
-        src:
-          "https://raw.githubusercontent.com/tasitlabs/tasit-sdk/develop/docs/images/TasitLogoBlack.png",
-      },
       copyright: `Copyright © ${new Date().getFullYear()} Tasit`,
     },
+    // algolia: {
+    //   apiKey: process.env.REACT_APP_API_KEY,
+    //   indexName: process.env.REACT_APP_INDEX_NAME
+    // }
   },
   presets: [
     [

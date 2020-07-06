@@ -16,8 +16,32 @@ const create = () => {
   }
 };
 
+// In the client app
+// import * as Random from 'expo-random';
+// const randomBytes = await Random.getRandomBytesAsync(16);
+// https://github.com/expo/expo/tree/main/packages/expo-random#getrandombytesasync
+
+const createUsingRandomness = (randomBytes: Uint8Array) => {
+  try {
+    const mnemonic = ethers.utils.HDNode.entropyToMnemonic(randomBytes);
+    const wallet = ethers.Wallet.fromMnemonic(mnemonic);
+    return wallet;
+  } catch (error) {
+    throw new Error(`Error creating account with randomness: ${error.message}`);
+  }
+}
+
+// TODO: Potentially make a method called save to persist an account
+// with the public address in Async Storage
+// https://react-native-community.github.io/async-storage/
+// and the private key in Expo SecureStore
+// https://docs.expo.io/versions/latest/sdk/securestore/
+// But that would go in a package that has hooks and React
+// as a peer dep, like @tasit/hooks
+
 export const Account = {
   create,
+  createUsingRandomness
 };
 
 export default Account;

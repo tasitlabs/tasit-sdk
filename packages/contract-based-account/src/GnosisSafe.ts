@@ -1,249 +1,261 @@
-import TasitAction from "@tasit/action";
+// import TasitAction from "@tasit/action";
 
-const { Action, Contract, Utils: ActionUtils } = TasitAction;
-import GnosisSafeUtils from "./GnosisSafeUtils";
+// // TODO: Import these non-default exports directly
+// // import { Action, Contract, Utils: ActionUtils } from "@tasit/action";
+// const { Action, Contract, Utils: ActionUtils } = TasitAction;
 
-import TasitContracts from "@tasit/contracts";
+// import TasitContracts from "@tasit/contracts";
 
-const { local } = TasitContracts;
-const { GnosisSafe: GnosisSafeInfo, MyERC20, MyERC721 } = local;
-const { abi: gnosisSafeABI } = GnosisSafeInfo;
-const { abi: erc20ABI } = MyERC20;
-const { abi: erc721ABI } = MyERC721;
+// import GnosisSafeUtils from "./GnosisSafeUtils";
 
-// Possible Gnosis Safe wallet operations
-const operations = {
-  CALL: 0,
-  DELEGATE_CALL: 1,
-  CREATE: 2,
-};
+// interface RawAction {
+//   to: any;
+//   data: any;
+// }
 
-const { CALL } = operations;
+// const { local } = TasitContracts;
+// const { GnosisSafe: GnosisSafeInfo, MyERC20, MyERC721 } = local;
+// const { abi: gnosisSafeABI } = GnosisSafeInfo;
+// const { abi: erc20ABI } = MyERC20;
+// const { abi: erc721ABI } = MyERC721;
 
-const areValidSigners = (signers: {
-  map: (
-    arg0: (signer: { _ethersType: string }) => boolean
-  ) => { includes: (arg0: boolean) => void };
-}) => {
-  const { isEthersJsSigner: isSigner } = ActionUtils;
-  const { isArray } = Array;
+// // Possible Gnosis Safe wallet operations
+// const operations = {
+//   CALL: 0,
+//   DELEGATE_CALL: 1,
+//   CREATE: 2,
+// };
 
-  if (!isArray(signers)) return false;
+// const { CALL } = operations;
 
-  const allAreValid = !signers.map(isSigner).includes(false);
+// const areValidSigners = (signers: {
+//   map: (
+//     arg0: (signer: { _ethersType: string }) => boolean
+//   ) => { includes: (arg0: boolean) => void };
+// }) => {
+//   const { isEthersJsSigner: isSigner } = ActionUtils;
+//   const { isArray } = Array;
 
-  if (!allAreValid) return false;
+//   if (!isArray(signers)) return false;
 
-  return true;
-};
+//   const allAreValid = !signers.map(isSigner).includes(false);
 
-// Extended Gnosis Safe wallet contract with higher-level functions
-export default class GnosisSafe extends Contract {
-  private utils: GnosisSafeUtils;
-  private signers: any;
+//   if (!allAreValid) return false;
 
-  // @ts-ignore semantic error TS2376
-  // A 'super' call must be the first statement in the constructor when a
-  // class contains initialized properties or has parameter properties.
-  constructor(address: string, wallet) {
-    const abi = gnosisSafeABI;
-    super(address, abi, wallet);
-    this.utils = new GnosisSafeUtils(this);
-  }
+//   return true;
+// };
 
-  setSigners = (signers: any) => {
-    if (!areValidSigners(signers))
-      throw new Error(
-        `Cannot set invalid signers for the Gnosis Safe contract.`
-      );
+// // Extended Gnosis Safe wallet contract with higher-level functions
+// export default class GnosisSafe extends Contract {
+//   private utils: GnosisSafeUtils;
+//   private signers: any;
 
-    this.signers = signers;
-  };
+//   // @ts-ignore semantic error TS2376
+//   // A 'super' call must be the first statement in the constructor when a
+//   // class contains initialized properties or has parameter properties.
+//   constructor(address: string, wallet) {
+//     const abi = gnosisSafeABI;
+//     const abiString = abi.toString();
+//     super(address, abiString, wallet);
+//     this.utils = new GnosisSafeUtils(this);
+//   }
 
-  approveERC20 = (tokenAddress: any, spender: any, value: any) => {
-    const contractAddress = tokenAddress;
-    const contractABI = erc20ABI;
-    const functionName = "approve";
-    const argsArray = [spender, value];
+//   setSigners = (signers: any) => {
+//     if (!areValidSigners(signers))
+//       throw new Error(
+//         `Cannot set invalid signers for the Gnosis Safe contract.`
+//       );
 
-    const action = this.customContractAction(
-      contractAddress,
-      contractABI,
-      functionName,
-      argsArray
-    );
-    return action;
-  };
+//     this.signers = signers;
+//   };
 
-  transferERC20 = (tokenAddress: any, toAddress: any, value: any) => {
-    const contractAddress = tokenAddress;
-    const contractABI = erc20ABI;
-    const functionName = "transfer";
-    const argsArray = [toAddress, value];
+//   approveERC20 = (tokenAddress: any, spender: any, value: any) => {
+//     const contractAddress = tokenAddress;
+//     const contractABI = erc20ABI;
+//     const functionName = "approve";
+//     const argsArray = [spender, value];
 
-    const action = this.customContractAction(
-      contractAddress,
-      contractABI,
-      functionName,
-      argsArray
-    );
-    return action;
-  };
+//     const action = this.customContractAction(
+//       contractAddress,
+//       contractABI,
+//       functionName,
+//       argsArray
+//     );
+//     return action;
+//   };
 
-  transferNFT = (tokenAddress: any, toAddress: any, tokenId: any) => {
-    const contractAddress = tokenAddress;
-    const contractABI = erc721ABI;
-    const functionName = "safeTransferFrom";
-    const fromAddress = this.getAddress();
-    const argsArray = [fromAddress, toAddress, tokenId];
+//   transferERC20 = (tokenAddress: any, toAddress: any, value: any) => {
+//     const contractAddress = tokenAddress;
+//     const contractABI = erc20ABI;
+//     const functionName = "transfer";
+//     const argsArray = [toAddress, value];
 
-    const action = this.customContractAction(
-      contractAddress,
-      contractABI,
-      functionName,
-      argsArray
-    );
-    return action;
-  };
+//     const action = this.customContractAction(
+//       contractAddress,
+//       contractABI,
+//       functionName,
+//       argsArray
+//     );
+//     return action;
+//   };
 
-  addSignerWithThreshold = (newSignerAddress: any, newThreshold: any) => {
-    const contractAddress = this.getAddress();
-    const contractABI = this.getABI();
-    const functionName = "addOwnerWithThreshold";
-    const argsArray = [newSignerAddress, newThreshold];
+//   transferNFT = (tokenAddress: any, toAddress: any, tokenId: any) => {
+//     const contractAddress = tokenAddress;
+//     const contractABI = erc721ABI;
+//     const functionName = "safeTransferFrom";
+//     const fromAddress = this.getAddress();
+//     const argsArray = [fromAddress, toAddress, tokenId];
 
-    const action = this.customContractAction(
-      contractAddress,
-      contractABI,
-      functionName,
-      argsArray
-    );
-    return action;
-  };
+//     const action = this.customContractAction(
+//       contractAddress,
+//       contractABI,
+//       functionName,
+//       argsArray
+//     );
+//     return action;
+//   };
 
-  transferEther = (toAddress: any, value: any) => {
-    const data = "0x";
-    const etherValue = value;
-    // TODO: Decide if we want to build the transaction to transfer
-    // ether here or actually execute it
-    const action = this.executeTransaction(data, toAddress, etherValue);
-    return action;
-  };
+//   addSignerWithThreshold = (newSignerAddress: any, newThreshold: any) => {
+//     const contractAddress = this.getAddress();
+//     const contractABI = this.getABI();
+//     const functionName = "addOwnerWithThreshold";
+//     const argsArray = [newSignerAddress, newThreshold];
 
-  // Note: Once the Action doesn't send the transaction immediately after building the transaction,
-  // a new function such `Action.getData()` could be created and this function
-  // could be changed to something like `customContractAction(actionData)`
-  // Related to: https://github.com/tasitlabs/tasit-sdk/issues/162
-  customContractAction = (
-    contractAddress: any,
-    contractABI: any,
-    functionName: any,
-    argsArray: any,
-    ethersAmount = 0
-  ) => {
-    const data = this.utils.encodeFunctionCall(
-      contractABI,
-      functionName,
-      argsArray
-    );
-    const action = this.executeTransaction(data, contractAddress, ethersAmount);
-    return action;
-  };
+//     const action = this.customContractAction(
+//       contractAddress,
+//       contractABI,
+//       functionName,
+//       argsArray
+//     );
+//     return action;
+//   };
 
-  private executeTransaction = (data: any, toAddress: any, etherValue: any) => {
-    const rawActionPromise = this.prepareTransaction(
-      data,
-      toAddress,
-      etherValue
-    );
-    const provider = this._getProvider();
-    const signer = this.getAccount();
+//   transferEther = (toAddress: any, value: any) => {
+//     const data = "0x";
+//     const etherValue = value;
+//     // TODO: Decide if we want to build the transaction to transfer
+//     // ether here or actually execute it
+//     const action = this.executeTransaction(data, toAddress, etherValue);
+//     return action;
+//   };
 
-    // TODO: Decide if we want to pass a promise into Action or not
-    const action = new Action(rawActionPromise, provider, signer);
-    // TODO: Decide if we want to build the transaction here or actually
-    // execute it
-    return action;
-  };
+//   // Note: Once the Action doesn't send the transaction immediately after building the transaction,
+//   // a new function such `Action.getData()` could be created and this function
+//   // could be changed to something like `customContractAction(actionData)`
+//   // Related to: https://github.com/tasitlabs/tasit-sdk/issues/162
+//   customContractAction = (
+//     contractAddress: any,
+//     contractABI: any,
+//     functionName: any,
+//     argsArray: any,
+//     ethersAmount = 0
+//   ) => {
+//     const data = this.utils.encodeFunctionCall(
+//       contractABI,
+//       functionName,
+//       argsArray
+//     );
+//     const action = this.executeTransaction(data, contractAddress, ethersAmount);
+//     return action;
+//   };
 
-  private prepareTransaction = async (
-    data: any,
-    toAddress: any,
-    etherValue: any
-  ) => {
-    const signers = this.signers;
+//   private executeTransaction = (data: any, toAddress: any, etherValue: any) => {
+//     // TODO: Start using prepareTransaction again once we fix that
+//     const rawActionPromise: Promise<RawAction> = this.prepareTransaction(
+//       data,
+//       toAddress,
+//       etherValue
+//     );
+//     const provider = this._getProvider();
+//     const signer = this.getAccount();
 
-    if (!signers)
-      throw new Error(
-        `Cannot send an action to Gnosis Safe contract without signers.`
-      );
+//     // TODO: Decide if we want to pass a promise into Action or not
+//     const action = new Action(rawActionPromise, provider, signer);
+//     // TODO: Decide if we want to build the transaction here or actually
+//     // execute it
+//     return action;
+//   };
 
-    const operation = CALL;
+//   private prepareTransaction = async (
+//     data: any,
+//     toAddress: any,
+//     etherValue: any
+//   ) => {
+//     const signers = this.signers;
 
-    // Gas that should be used for the Safe transaction.
-    const safeTxGas = await this.utils.estimateFromSafeTxGas(
-      toAddress,
-      etherValue,
-      data,
-      operation
-    );
+//     if (!signers)
+//       throw new Error(
+//         `Cannot send an action to Gnosis Safe contract without signers.`
+//       );
 
-    // Gas price that should be used for the payment calculation.
-    // Note: If no safeTxGas has been set and the gasPrice is 0 we assume that all available gas can be used (refs GnosisSafe.sol:94)
-    const gasPrice = 0;
+//     const operation = CALL;
 
-    // Token address (or 0 if ETH) that is used for the payment.
-    const gasToken = "0x0000000000000000000000000000000000000000";
+//     // Gas that should be used for the Safe transaction.
+//     const safeTxGas = await this.utils.estimateFromSafeTxGas(
+//       toAddress,
+//       etherValue,
+//       data,
+//       operation
+//     );
 
-    // Address of receiver of gas payment (or 0 if tx.origin)
-    const refundReceiver = "0x0000000000000000000000000000000000000000";
+//     // Gas price that should be used for the payment calculation.
+//     // Note: If no safeTxGas has been set and the gasPrice is 0 we assume that all available gas can be used (refs GnosisSafe.sol:94)
+//     const gasPrice = 0;
 
-    // Gas costs for data used to trigger the safe transaction and to pay for transferring a payment
-    const { length: signersCount } = signers;
-    const dataGas = this.utils.estimateDataGas(
-      this,
-      toAddress,
-      etherValue,
-      data,
-      operation,
-      safeTxGas,
-      gasToken,
-      refundReceiver,
-      signersCount
-    );
+//     // Token address (or 0 if ETH) that is used for the payment.
+//     const gasToken = "0x0000000000000000000000000000000000000000";
 
-    const nonce = await this.nonce();
+//     // Address of receiver of gas payment (or 0 if tx.origin)
+//     const refundReceiver = "0x0000000000000000000000000000000000000000";
 
-    const transactionHash = await this.getTransactionHash(
-      toAddress,
-      etherValue,
-      data,
-      operation,
-      safeTxGas,
-      dataGas,
-      gasPrice,
-      gasToken,
-      refundReceiver,
-      nonce
-    );
+//     // Gas costs for data used to trigger the safe transaction and to pay for transferring a payment
+//     const { length: signersCount } = signers;
+//     const dataGas = this.utils.estimateDataGas(
+//       this,
+//       toAddress,
+//       etherValue,
+//       data,
+//       operation,
+//       safeTxGas,
+//       gasToken,
+//       refundReceiver,
+//       signersCount
+//     );
 
-    const signatures = this.utils.multiSign(signers, transactionHash);
+//     // TODO: Decide if we expect for nonce to exist
+//     const nonce = await this.nonce();
 
-    const execTxAction = this.execTransaction(
-      toAddress,
-      etherValue,
-      data,
-      operation,
-      safeTxGas,
-      dataGas,
-      gasPrice,
-      gasToken,
-      refundReceiver,
-      signatures
-    );
+//     // TODO: Decide if we expect for getTransactionHash to exist
+//     const transactionHash = await this.getTransactionHash(
+//       toAddress,
+//       etherValue,
+//       data,
+//       operation,
+//       safeTxGas,
+//       dataGas,
+//       gasPrice,
+//       gasToken,
+//       refundReceiver,
+//       nonce
+//     );
 
-    const rawAction = await execTxAction._toRaw();
+//     const signatures = this.utils.multiSign(signers, transactionHash);
 
-    return rawAction;
-  };
-}
+//     const execTxAction = this.execTransaction(
+//       toAddress,
+//       etherValue,
+//       data,
+//       operation,
+//       safeTxGas,
+//       dataGas,
+//       gasPrice,
+//       gasToken,
+//       refundReceiver,
+//       signatures
+//     );
+
+//     const rawAction = await execTxAction._toRaw();
+
+//     return rawAction;
+//   };
+// }
