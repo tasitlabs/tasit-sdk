@@ -1,5 +1,5 @@
 {
-  "version": "0.1.0",
+  "version": "0.0.28",
   "license": "MIT",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -39,7 +39,7 @@
     "typescript": "^3.9.6"
   },
   "dependencies": {
-    "chai": "^4.2.0",
-    "ethers": "^4.0.47"
+    "ethers": "^4.0.47",
+    "@tasit/action": "^0.0.28"
   }
 }

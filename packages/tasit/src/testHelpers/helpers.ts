@@ -1,11 +1,12 @@
-import { TasitContracts } from "../TasitSdk";
+// import { Contracts } from "../TasitSdk";
 import DecentralandUtils from "../helpers/DecentralandUtils";
-import actionHelpers from "@tasit/test-helpers";
+import coreHelpers from "@tasit/test-helpers";
+
 const {
   addressesAreEqual,
   expectMinimumTokenBalances,
   ProviderFactory,
-} = actionHelpers;
+} = coreHelpers;
 
 const getNetworkName = () => {
   const provider = ProviderFactory.getProvider();
@@ -112,7 +113,7 @@ export const checkAsset = async (
 };
 
 export const helpers = {
-  ...actionHelpers,
+  ...coreHelpers,
   pickAssetsForSale,
   checkAsset,
   getContractsAddresses,

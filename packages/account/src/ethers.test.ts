@@ -1,7 +1,12 @@
 import { ethers } from "ethers";
 
-import helpers from "./testHelpers/helpers";
-const { constants, accounts } = helpers;
+import helpers from "@tasit/test-helpers";
+
+const {
+  // createFromPrivateKey,
+  constants,
+  accounts
+} = helpers;
 
 const { ZERO } = constants;
 

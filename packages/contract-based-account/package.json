@@ -32,7 +32,7 @@
     "test:tsdx": "npx tsdx test",
     "lint": "npx tsdx lint src",
     "test:mocha-tsnode": "npx mocha src/*.test.ts --require ts-node/register --file src/testHelpers/mochaSetup.ts --timeout 4000",
-    "test": "npm run test:mocha-tsnode",
+    "test": "npm run test:tsdx",
     "update": "npx ncu",
     "update:write": "npm run update -- -u"
   },
@@ -47,9 +47,7 @@
   },
   "devDependencies": {
     "@tasit/account": "^0.0.28",
-    "@types/mocha": "^7.0.2",
-    "chai": "^4.2.0",
-    "mocha": "^7.2.0",
+    "@tasit/test-helpers": "^0.0.28",
     "npm-check-updates": "^6.0.1",
     "sinon": "^9.0.2",
     "ts-node": "^8.10.2",

@@ -1,19 +1,15 @@
-// Chai
-import sinon from "sinon";
 
 // Helpers
-import actionHelpers from "@tasit/test-helpers";
-
-import Action from "@tasit/action";
-global.expect = expect;
-global.sinon = sinon;
+import helpers from "@tasit/test-helpers";
 const {
   developmentConfig,
   ProviderFactory,
   createSnapshot,
   revertFromSnapshot,
   mineBlocks,
-} = actionHelpers;
+} = helpers;
+
+import Action from "@tasit/action";
 const { ConfigLoader } = Action;
 ConfigLoader.setConfig(developmentConfig);
 
@@ -21,18 +17,18 @@ ConfigLoader.setConfig(developmentConfig);
 const provider = ProviderFactory.getProvider();
 let snapshotId;
 
-beforeEach("global beforeEach() hook", async () => {
+beforeEach(async () => {
   snapshotId = await createSnapshot(provider);
 
   while (snapshotId > 1) {
     await revertFromSnapshot(provider, snapshotId--);
   }
 
-  expect(snapshotId).toBe(1);
+  expect(snapshotId).toEqual(1);
 });
 
-afterEach("global afterEach() hook", async () => {
-  expect(snapshotId).toBe(1);
+afterEach(async () => {
+  expect(snapshotId).toEqual(1);
   await revertFromSnapshot(provider, snapshotId);
 
   // Note: Without this the test suite is breaking.

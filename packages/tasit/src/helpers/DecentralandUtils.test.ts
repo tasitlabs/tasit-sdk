@@ -2,7 +2,11 @@ import { Account, Action } from "../TasitSdk";
 import helpers from "../testHelpers/helpers";
 import DecentralandUtils from "./DecentralandUtils";
 
-const { ERC721 } = Action;
+const { standards } = Action;
+const { ERC721 } = standards;
+
+// TODO: Add an Estate class or remove tests using them
+// or rewrite the tests to use lower-level Tasit methods
 const { Estate, Land } = ERC721;
 
 const { accounts, getContractsAddresses } = helpers;
@@ -31,7 +35,7 @@ describe("DecentralandUtils", () => {
   const isAssetAnEstate = (asset) => asset.nftAddress === estate.getAddress();
   const isAssetAParcel = (asset) => asset.nftAddress === land.getAddress();
 
-  beforeEach("", async () => {
+  beforeEach(async () => {
     land = new Land(LAND_ADDRESS);
     estate = new Estate(ESTATE_ADDRESS);
 

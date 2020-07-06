@@ -8,9 +8,7 @@
     "outDir": "./dist",
     "rootDir": "./src",
     "composite": true,
-    "types": [
-      "mocha"
-    ]
+    "types": ["jest"]
   }
   // "references": [
   //   {

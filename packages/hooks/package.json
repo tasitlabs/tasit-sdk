@@ -24,7 +24,7 @@
     "update:write": "npm run update -- -u"
   },
   "peerDependencies": {
-    "react": ">=16",
+    "react": ">=16.8",
     "react-native": "~0.61"
   },
   "homepage": "https://tasit.dev",

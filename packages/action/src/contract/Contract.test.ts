@@ -1,8 +1,3 @@
-// Chai
-import chai, { expect } from "chai";
-import chaiAsPromised from "chai-as-promised";
-chai.use(chaiAsPromised);
-
 
 import sinon from "sinon";
 
@@ -49,7 +44,7 @@ describe("TasitAction.Contract", () => {
 
     sampleContract = new Contract(SAMPLE_CONTRACT_ADDRESS, contractAbiString);
     expect(sampleContract).to.exist;
-    expect(sampleContract.getAddress()).to.equal(SAMPLE_CONTRACT_ADDRESS);
+    expect(sampleContract.getAddress()).toEqual(SAMPLE_CONTRACT_ADDRESS);
     expect(sampleContract.getValue).to.exist;
     expect(sampleContract.setValue).to.exist;
     expect(sampleContract._getProvider()).to.exist;
@@ -216,8 +211,8 @@ describe("TasitAction.Contract", () => {
 
         await mineBlocks(provider, 1);
 
-        expect(contractErrorListener.callCount).to.equal(1);
-        expect(actionErrorListener.callCount).to.equal(1);
+        expect(contractErrorListener.callCount).toEqual(1);
+        expect(actionErrorListener.callCount).toEqual(1);
       });
 
       it("on contract event listener error", (done) => {
@@ -292,7 +287,7 @@ describe("TasitAction.Contract", () => {
 
         const confirmationListener = sinon.fake(async () => {
           const value = await sampleContract.getValue();
-          expect(value).to.equal(rand);
+          expect(value).toEqual(rand);
 
           action.off("confirmation");
         });
@@ -303,7 +298,7 @@ describe("TasitAction.Contract", () => {
 
         await mineBlocks(provider, 2);
 
-        expect(confirmationListener.callCount).to.equal(1);
+        expect(confirmationListener.callCount).toEqual(1);
         expect(errorListener.called).to.be.false;
 
         action.off("error");
@@ -328,7 +323,7 @@ describe("TasitAction.Contract", () => {
             action.off("confirmation");
 
             const value = await sampleContract.getValue();
-            expect(value).to.equal(rand);
+            expect(value).toEqual(rand);
           }
         });
 
@@ -339,7 +334,7 @@ describe("TasitAction.Contract", () => {
 
         await mineBlocks(provider, 7);
 
-        expect(confirmationListener.callCount).to.equal(6);
+        expect(confirmationListener.callCount).toEqual(6);
         expect(errorListener.called).to.be.false;
       }
     );
@@ -363,7 +358,7 @@ describe("TasitAction.Contract", () => {
             action.off("confirmation");
 
             const value = await sampleContract.getValue();
-            expect(value).to.equal(rand);
+            expect(value).toEqual(rand);
           }
         });
 
@@ -384,8 +379,8 @@ describe("TasitAction.Contract", () => {
 
       const errorListener = sinon.fake((error) => {
         const { eventName, message } = error;
-        expect(eventName).to.equal("confirmation");
-        expect(message).to.equal("Event confirmation reached timeout.");
+        expect(eventName).toEqual("confirmation");
+        expect(message).toEqual("Event confirmation reached timeout.");
         expect(action.subscribedEventNames()).to.deep.equal([
           "error",
           "confirmation",
@@ -472,7 +467,7 @@ describe("TasitAction.Contract", () => {
         const errorListener = (error) => {
           const { message } = error;
           // Note: This assertion will not fail the test case (UnhandledPromiseRejectionWarning)
-          expect(message).to.equal(
+          expect(message).toEqual(
             "Your action's position in the chain has changed in a surprising way."
           );
 
@@ -522,7 +517,7 @@ describe("TasitAction.Contract", () => {
           const { message } = error;
 
           // Note: This assertion will not fail the test case (UnhandledPromiseRejectionWarning)
-          expect(message).to.equal(
+          expect(message).toEqual(
             "Your action's position in the chain has changed in a surprising way."
           );
 
@@ -629,7 +624,8 @@ describe("TasitAction.Contract", () => {
   });
 
   describe("Contract Events Subscription", async () => {
-    beforeEach("assign an account to the contract", () => {
+    // assign an account to the contract
+    beforeEach(() => {
       expect(() => {
         sampleContract.setAccount(account);
       }).not.to.throw();
@@ -686,8 +682,8 @@ describe("TasitAction.Contract", () => {
 
       const errorListener = sinon.fake((error) => {
         const { eventName, message } = error;
-        expect(eventName).to.equal("ValueChanged");
-        expect(message).to.equal("Event ValueChanged reached timeout.");
+        expect(eventName).toEqual("ValueChanged");
+        expect(message).toEqual("Event ValueChanged reached timeout.");
         expect(sampleContract.subscribedEventNames()).to.deep.equal([
           "ValueChanged",
           "error",

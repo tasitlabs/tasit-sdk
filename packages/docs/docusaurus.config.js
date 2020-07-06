@@ -71,6 +71,10 @@ module.exports = {
       ],
       copyright: `Copyright © ${new Date().getFullYear()} Tasit`,
     },
+    // algolia: {
+    //   apiKey: process.env.REACT_APP_API_KEY,
+    //   indexName: process.env.REACT_APP_INDEX_NAME
+    // }
   },
   presets: [
     [

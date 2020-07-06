@@ -6,7 +6,7 @@ import GnosisSafe from "./GnosisSafe";
 import Account from "@tasit/account";
 // import Account from "../../@tasit/account/dist";
 import TasitContracts from "@tasit/contracts";
-import actionHelpers from "@tasit/test-helpers";
+import helpers from "@tasit/test-helpers";
 const { ERC20, ERC721 } = Action;
 
 const {
@@ -21,7 +21,7 @@ const {
   erc20Faucet,
   erc721Faucet,
   etherFaucet,
-} = actionHelpers;
+} = helpers;
 const { local } = TasitContracts;
 const { GnosisSafe: GnosisSafeInfo, MyERC20, MyERC721 } = local;
 const { address: GNOSIS_SAFE_ADDRESS } = GnosisSafeInfo;
@@ -57,7 +57,7 @@ describe("GnosisSafe", () => {
     nft = new ERC721(NFT_ADDRESS);
   });
 
-  beforeEach("", async () => {
+  beforeEach(async () => {
     const { address: someoneAddress } = someone;
 
     // Expect an already-funded Gnosis Safe wallet
@@ -76,7 +76,7 @@ describe("GnosisSafe", () => {
     nft.removeAccount();
   });
 
-  afterEach("", async () => {
+  afterEach(async () => {
     expect(erc20.subscribedEventNames()).toHaveLength(0);
     expect(gnosisSafe.subscribedEventNames()).toHaveLength(0);
     expect(provider._events).toHaveLength(0);
@@ -170,7 +170,8 @@ describe("GnosisSafe", () => {
   });
 
   describe("test cases that need ERC20 deposit to the contract-based account", async () => {
-    beforeEach("faucet", async () => {
+    // faucet
+    beforeEach(async () => {
       await erc20Faucet(erc20, minter, GNOSIS_SAFE_ADDRESS, ONE);
       await expectExactTokenBalances(erc20, [GNOSIS_SAFE_ADDRESS], [ONE]);
     });
@@ -193,7 +194,8 @@ describe("GnosisSafe", () => {
     );
 
     describe("spending by an ephemeral account", () => {
-      beforeEach("ethers to the ephemeral account pay for gas", async () => {
+      // ethers to the ephemeral account pay for gas
+      beforeEach(async () => {
         const { address: ephemeralAddress } = ephemeralAccount;
         await etherFaucet(provider, minter, ephemeralAddress, SMALL_AMOUNT);
         await expectExactEtherBalances(
@@ -310,7 +312,8 @@ describe("GnosisSafe", () => {
   describe("test cases that need NFT deposit to the contract-based account", async () => {
     const tokenId = 1;
 
-    beforeEach("faucet", async () => {
+    // faucet
+    beforeEach(async () => {
       await erc721Faucet(nft, minter, GNOSIS_SAFE_ADDRESS, tokenId);
       await expectExactTokenBalances(nft, [GNOSIS_SAFE_ADDRESS], [1]);
     });
