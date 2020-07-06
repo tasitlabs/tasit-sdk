@@ -1,7 +1,5 @@
 import { ethers } from "ethers";
 
-import { expect } from "chai";
-
 import helpers from "./testHelpers/helpers";
 const { constants, accounts } = helpers;
 
@@ -21,13 +19,13 @@ describe("ethers", () => {
     [wallet] = accounts;
     wallet = wallet.connect(provider);
 
-    expect(wallet.address).to.have.lengthOf(42);
-    expect(wallet.provider).to.be.not.undefined;
+    expect(wallet.address).toHaveLength(42);
+    expect(wallet.provider).toBeDefined();
   });
 
   it("should create a random wallet ", async () => {
     const randomWallet = ethers.Wallet.createRandom();
-    expect(randomWallet.address).to.have.lengthOf(42);
+    expect(randomWallet.address).toHaveLength(42);
   });
 
   it("should get balance of wallet", async () => {
@@ -41,8 +39,8 @@ describe("ethers", () => {
       await randomWallet.getBalance()
     );
 
-    expect(fundedWalletBalance).not.to.be.undefined;
-    expect(`${emptyWalletBalance}`).to.equal(`${ZERO}`);
+    expect(fundedWalletBalance).not.toBeUndefined();
+    expect(`${emptyWalletBalance}`).toBe(`${ZERO}`);
   });
 
   it("should sign a message", async () => {
@@ -51,7 +49,7 @@ describe("ethers", () => {
 
     const expectedSignedMsg = `0x1d43db04021e3ff7e122e5298b3fc18f1c1d36da7874c44f1eb8d372a037ebd21a5ceac64a29723e13893ec502ae5a1b5f15239b585bdad5801852c712e101671b`;
 
-    expect(signedMsg).to.be.equals(expectedSignedMsg);
+    expect(signedMsg).toBe(expectedSignedMsg);
   });
 
   it("should sign a binary message", async () => {
@@ -65,7 +63,7 @@ describe("ethers", () => {
 
     const signedBinData = await wallet.signMessage(binData);
 
-    expect(signedBinData).to.equal(expectedSignedBinData);
+    expect(signedBinData).toBe(expectedSignedBinData);
   });
 
   const rawTx = {
@@ -82,15 +80,15 @@ describe("ethers", () => {
 
     const expectedSignedTx = `0xf869808504a817c8008252089488a5c2d9919e46f883eb62f7b8dd9d0cc45bc29085174876e800801ba0ea1e53eb8f5510a729eea0612b9b7d9ef36a0a360305db5c5496200f3e07e8f7a0680c0ef7b4cdf854ded2bda1a205725afc3e9a240fe21466ec86426a461e0532`;
 
-    expect(signedTx).to.equal(expectedSignedTx);
+    expect(signedTx).toBe(expectedSignedTx);
   });
 
   it("should broadcast signed tx", async () => {
     rawTx.nonce = await provider.getTransactionCount(wallet.address);
     const signedTx = await wallet.sign(rawTx);
     const sentTx = await provider.sendTransaction(signedTx);
-    expect(sentTx).not.to.be.undefined;
-    expect(sentTx.hash).not.to.be.undefined;
+    expect(sentTx).not.toBeUndefined();
+    expect(sentTx.hash).not.toBeUndefined();
 
     if (!sentTx.hash) {
       throw new Error("Transaction hash undefined");
@@ -98,6 +96,6 @@ describe("ethers", () => {
 
     await provider.waitForTransaction(sentTx.hash);
     const txResponse = await provider.getTransaction(sentTx.hash);
-    expect(txResponse.blockHash).to.be.not.undefined;
+    expect(txResponse.blockHash).toBeDefined();
   });
 });
