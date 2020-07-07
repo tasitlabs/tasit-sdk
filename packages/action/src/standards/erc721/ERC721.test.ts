@@ -6,7 +6,7 @@ import {
   accounts,
   mineBlocks,
   expectExactTokenBalances,
-} from "../../testHelpers/helpers";
+} from "@tasit/test-helpers";
 
 import sinon from "sinon";
 
@@ -22,7 +22,7 @@ interface Event {
   tokenId: number;
 }
 
-describe("TasitAction.ERC721.ERC721", () => {
+describe.skip("TasitAction.ERC721.ERC721", () => {
   let owner;
   let ana;
   let bob;
@@ -120,8 +120,8 @@ describe("TasitAction.ERC721.ERC721", () => {
       action = erc721.mint(ana.address, tokenId);
       await action.send();
 
-      const event: Event = await new Promise(function (resolve, reject) {
-        erc721.on("Transfer", (message) => {
+      const event: Event = await new Promise(function(resolve, reject) {
+        erc721.on("Transfer", message => {
           const { data } = message;
           const { args } = data;
           resolve(args);
@@ -144,7 +144,7 @@ describe("TasitAction.ERC721.ERC721", () => {
     it("should transfer an owned token", async () => {
       erc721 = new ERC721(ERC721_ADDRESS, ana);
 
-      const transferListener = sinon.fake((message) => {
+      const transferListener = sinon.fake(message => {
         const { data } = message;
         const { args } = data;
 
@@ -206,88 +206,82 @@ describe("TasitAction.ERC721.ERC721", () => {
       );
     });
 
-    it(
-      "should trigger an error if the user is listening for errors from a contract and tries safeTransferFrom to a contract without onERC721Received",
-      async () => {
-        const contractErrorFakeFn = sinon.fake();
+    it("should trigger an error if the user is listening for errors from a contract and tries safeTransferFrom to a contract without onERC721Received", async () => {
+      const contractErrorFakeFn = sinon.fake();
 
-        erc721 = new ERC721(ERC721_ADDRESS, ana);
+      erc721 = new ERC721(ERC721_ADDRESS, ana);
 
-        const contractErrorListener = (error) => {
-          const { message } = error;
-          expect(message).toBe("Action failed.");
-          contractErrorFakeFn();
-        };
+      const contractErrorListener = error => {
+        const { message } = error;
+        expect(message).toBe("Action failed.");
+        contractErrorFakeFn();
+      };
 
-        erc721.on("error", contractErrorListener);
+      erc721.on("error", contractErrorListener);
 
-        action = erc721.safeTransferFrom(
-          ana.address,
-          SAMPLE_CONTRACT_ADDRESS,
-          tokenId
-        );
-        await action.send();
+      action = erc721.safeTransferFrom(
+        ana.address,
+        SAMPLE_CONTRACT_ADDRESS,
+        tokenId
+      );
+      await action.send();
 
-        // Some error (orphan block, failed tx) events are being triggered only from the confirmationListener
-        // See more: https://github.com/tasitlabs/tasit-sdk/issues/253
-        action.on("confirmation", () => {
-          // do nothing
-        });
+      // Some error (orphan block, failed tx) events are being triggered only from the confirmationListener
+      // See more: https://github.com/tasitlabs/tasit-sdk/issues/253
+      action.on("confirmation", () => {
+        // do nothing
+      });
 
-        await action.waitForOneConfirmation();
+      await action.waitForOneConfirmation();
 
-        await mineBlocks(provider, 2);
+      await mineBlocks(provider, 2);
 
-        expect(contractErrorFakeFn.called).toBe(true);
+      expect(contractErrorFakeFn.called).toBe(true);
 
-        await expectExactTokenBalances(
-          erc721,
-          [ana.address, SAMPLE_CONTRACT_ADDRESS],
-          [1, 0]
-        );
-      }
-    );
+      await expectExactTokenBalances(
+        erc721,
+        [ana.address, SAMPLE_CONTRACT_ADDRESS],
+        [1, 0]
+      );
+    });
 
-    it(
-      "should trigger an error if the user is listening for errors for an action and tries safeTransferFrom to a contract without onERC721Received",
-      async () => {
-        const actionErrorFakeFn = sinon.fake();
+    it("should trigger an error if the user is listening for errors for an action and tries safeTransferFrom to a contract without onERC721Received", async () => {
+      const actionErrorFakeFn = sinon.fake();
 
-        erc721 = new ERC721(ERC721_ADDRESS, ana);
+      erc721 = new ERC721(ERC721_ADDRESS, ana);
 
-        const actionErrorListener = (error) => {
-          const { message } = error;
-          expect(message).toBe("Action failed.");
-          actionErrorFakeFn();
-        };
+      const actionErrorListener = error => {
+        const { message } = error;
+        expect(message).toBe("Action failed.");
+        actionErrorFakeFn();
+      };
 
-        action = erc721.safeTransferFrom(
-          ana.address,
-          SAMPLE_CONTRACT_ADDRESS,
-          tokenId
-        );
-        action.on("error", actionErrorListener);
+      action = erc721.safeTransferFrom(
+        ana.address,
+        SAMPLE_CONTRACT_ADDRESS,
+        tokenId
+      );
+      action.on("error", actionErrorListener);
 
-        // Some error (orphan block, failed tx) events are being triggered only from the confirmationListener
-        // See more: https://github.com/tasitlabs/tasit-sdk/issues/253
-        action.on("confirmation", () => {
-          // do nothing
-        });
+      // Some error (orphan block, failed tx) events are being triggered only from the confirmationListener
+      // See more: https://github.com/tasitlabs/tasit-sdk/issues/253
+      action.on("confirmation", () => {
+        // do nothing
+      });
 
-        await action.send();
+      await action.send();
 
-        await action.waitForOneConfirmation();
+      await action.waitForOneConfirmation();
 
-        await mineBlocks(provider, 1);
+      await mineBlocks(provider, 1);
 
-        expect(actionErrorFakeFn.called).toBe(true);
+      expect(actionErrorFakeFn.called).toBe(true);
 
-        await expectExactTokenBalances(
-          erc721,
-          [ana.address, SAMPLE_CONTRACT_ADDRESS],
-          [1, 0]
-        );
-      }
-    );
+      await expectExactTokenBalances(
+        erc721,
+        [ana.address, SAMPLE_CONTRACT_ADDRESS],
+        [1, 0]
+      );
+    });
   });
 });

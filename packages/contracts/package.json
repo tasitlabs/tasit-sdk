@@ -23,6 +23,7 @@
   "scripts": {
     "clean": "rm -rf build/ dist/ artifacts/ typechain/",
     "compile:contracts": "npx buidler compile --config buidler.config.5.js && npx buidler compile",
+    "deploy:contracts": "npx buidler run scripts/deploy.ts",
     "build": "npm run compile:contracts && npm run typechain && npm run build:ts",
     "prepare": "npm run build",
     "populate-contracts": "NETWORK=development npx ts-node src/scripts/populateDecentralandContracts.ts",
@@ -36,9 +37,9 @@
     "test:ts": "npx tsdx test",
     "lint:ts": "npm run lint:prettier",
     "lint:contracts": "npm run lint:prettier && npm run lint:solhint",
-    "buidler-evm:start": "npx buidler node > buidler-evm.log &",
-    "buidler-evm:stop": "kill `ps ax|grep 'buidler node'|grep -v grep| awk '{print $1}'` 2> /dev/null; exit 0",
-    "buidler-evm:watch": "tail -f -n 100 buidler-evm.log",
+    "blockchain:start": "npx buidler node > buidler-evm.log &",
+    "blockchain:stop": "kill `ps ax|grep 'buidler node'|grep -v grep| awk '{print $1}'` 2> /dev/null; exit 0",
+    "blockchain:watch": "tail -f -n 100 buidler-evm.log",
     "test": "npx buidler test",
     "update": "npx ncu",
     "update:write": "npm run update -- -u",
@@ -51,12 +52,13 @@
     "url": "https://github.com/tasitlabs/tasit-sdk/issues"
   },
   "devDependencies": {
-    "@nomiclabs/buidler": "^1.3.6",
-    "@nomiclabs/buidler-ethers": "^1.3.3",
+    "@nomiclabs/buidler": "^1.3.8",
+    "@nomiclabs/buidler-ethers": "^1.3.4",
     "@nomiclabs/buidler-solhint": "^1.3.3",
     "@nomiclabs/buidler-waffle": "^1.3.4",
     "@typechain/ethers-v4": "^1.0.0",
     "@types/node": "^14.0.13",
+    "chai": "^4.2.0",
     "dotenv-flow": "^3.1.0",
     "ethereum-waffle": "^2.5.1",
     "ethers": "^4.0.47",
@@ -74,5 +76,5 @@
   "dependencies": {
     "@openzeppelin/contracts": "3.0.2"
   },
-  "gitHead": "08af46b69dccad031c3230a563650278e8688006"
+  "gitHead": "b013a22bf9953710aa35664e9762237900b19e08"
 }

@@ -71,6 +71,7 @@ describe("Decentraland", () => {
   });
 
   beforeEach(async () => {
+    await provider.ready;
     await expectExactTokenBalances(mana, [ephemeralAddress], [0]);
     await expectExactTokenBalances(land, [ephemeralAddress], [0]);
     await expectExactTokenBalances(estate, [ephemeralAddress], [0]);

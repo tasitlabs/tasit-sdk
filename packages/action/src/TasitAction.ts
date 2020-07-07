@@ -15,7 +15,7 @@ export const TasitAction = {
   Action,
   Utils,
   ProviderFactory,
-  standards
+  standards,
 };
 
 export default TasitAction;

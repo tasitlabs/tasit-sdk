@@ -1,6 +1,11 @@
 {
   "extends": "../../tsconfig.json",
   "include": ["src", "types", "typechain/**/*.d.ts"],
+  "files": [
+    "./buidler.config.js",
+    "./node_modules/@nomiclabs/buidler-ethers/src/type-extensions.d.ts",
+    "./node_modules/@nomiclabs/buidler-waffle/src/type-extensions.d.ts"
+  ],
   "compilerOptions": {
     // "typeRoots" : ["./typechain", "./node_modules/@types"],
     "outDir": "./dist",

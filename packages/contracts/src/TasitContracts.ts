@@ -25,24 +25,27 @@ import sampleContractABI from "../artifacts/SampleContract.json";
 
 // Note: Under the current `@tasit/contracts` setup the contracts always will deployed with these addresses
 // See https://github.com/tasitlabs/tasit-sdk/issues/138
+
+// TODO: Update these new addresses with the new buidler
+// setup
 const local = {
   SampleContract: {
-    address: "0x5e1cEBbbF763093e900c280dBe688363d98c660B",
+    address: "0x7c2C195CD6D34B8F845992d380aADB2730bB9C6F",
     abi: sampleContractABI.abi,
     // type: SampleContract
   },
   MyERC721: {
-    address: "0xd3A840fDfecE8C7Eb38FE900D588584D4da92785",
+    address: "0x8858eeB3DfffA017D4BCE9801D340D36Cf895CCf",
     abi: myERC721ABI.abi,
     // type: MyErc721
   },
   MyERC20: {
-    address: "0xd9D3960AbD6681c85cE3f6fE502F7C0d86343C6E",
+    address: "0x0078371BDeDE8aAc7DeBfFf451B74c5EDB385Af7",
     abi: myERC20ABI.abi,
     // type: MyErc20
   },
   GnosisSafe: {
-    address: "0x788BAFE1c0Fc303213B8a954dE9EF07C2420Bf64",
+    address: "0x788BAFE1c0Fc303213B8a954dE9EF07C2420Bf64", // TODO: Fix this address for Buidler
     abi: gnosisSafeABI.abi,
     // type: GnosisSafe
   },
