@@ -1,6 +1,7 @@
 import { ethers } from "ethers";
 import TasitContracts from "@tasit/contracts";
-import ProviderFactory from "@tasit/action/dist/ProviderFactory";
+import TasitAction from "@tasit/action";
+const { ProviderFactory } = TasitAction;
 
 // This util class is being used to fetch data from Decentraland Marketplace contract
 // Fetching data likely will be replaced with subgraph queries
