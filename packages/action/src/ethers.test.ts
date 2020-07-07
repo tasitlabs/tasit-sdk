@@ -17,7 +17,7 @@ const provider = ProviderFactory.getProvider();
 let wallet;
 let sampleContract;
 
-describe.only("ethers", () => {
+describe("ethers", () => {
   // instantiate provider, wallet and contract objects
   beforeEach(async () => {
     await provider.ready;

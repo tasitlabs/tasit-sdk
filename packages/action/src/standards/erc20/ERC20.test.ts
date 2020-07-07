@@ -14,7 +14,7 @@ describe.skip("TasitAction.ERC20.ERC20", () => {
   it.skip("should get the ERC20 name", async () => {
     // const erc20 = new ERC20(ERC20_ADDRESS);
     // const name = await erc20.name();
-    expect(name).toEqual("ERC20");
+    // expect(name).toEqual("ERC20");
   });
 
   it("should add 1 + 1", async () => {

@@ -22,7 +22,7 @@ interface Event {
   tokenId: number;
 }
 
-describe.skip("TasitAction.ERC721.ERC721", () => {
+describe("TasitAction.ERC721.ERC721", () => {
   let owner;
   let ana;
   let bob;

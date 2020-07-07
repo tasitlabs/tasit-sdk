@@ -21,7 +21,7 @@ const {
 } = SampleContract;
 const provider = ProviderFactory.getProvider();
 
-describe.skip("TasitAction.Contract", () => {
+describe("TasitAction.Contract", () => {
   let sampleContract;
   let account;
   let action;

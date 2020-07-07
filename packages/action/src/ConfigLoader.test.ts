@@ -134,7 +134,7 @@ const checkConfig = async config => {
   expect(userConfig).toEqual(loadedConfig);
 };
 
-describe.skip("TasitAction.ConfigLoader", () => {
+describe("TasitAction.ConfigLoader", () => {
   let defaultConfig;
 
   // store default config
