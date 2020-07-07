@@ -2,12 +2,11 @@ import Action from "@tasit/action";
 
 import GnosisSafe from "./GnosisSafe";
 
-// TODO: Use the @tasit scoped version of these packages
 import Account from "@tasit/account";
-// import Account from "../../@tasit/account/dist";
 import TasitContracts from "@tasit/contracts";
 import helpers from "@tasit/test-helpers";
-const { ERC20, ERC721 } = Action;
+const { standards } = Action;
+const { ERC20, ERC721 } = standards;
 
 const {
   constants,
@@ -22,6 +21,7 @@ const {
   erc721Faucet,
   etherFaucet,
 } = helpers;
+
 const { local } = TasitContracts;
 const { GnosisSafe: GnosisSafeInfo, MyERC20, MyERC721 } = local;
 const { address: GNOSIS_SAFE_ADDRESS } = GnosisSafeInfo;

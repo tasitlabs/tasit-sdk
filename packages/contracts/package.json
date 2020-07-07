@@ -52,6 +52,8 @@
     "url": "https://github.com/tasitlabs/tasit-sdk/issues"
   },
   "devDependencies": {
+    "@tasit/contracts": "^0.0.29",
+    "@tasit/test-helpers": "^0.0.29",
     "@nomiclabs/buidler": "^1.3.8",
     "@nomiclabs/buidler-ethers": "^1.3.4",
     "@nomiclabs/buidler-solhint": "^1.3.3",
