@@ -39,9 +39,9 @@ For each file in this repo - let's say it's named `file.ts` - we have a separate
 
 Some other projects keep all their tests in one big test directory, but we find that it's harder to visually confirm if all files are tested that way.
 
-If you want to test only the package that you are working on, run `npm pretest` from `tasit-sdk` folder and then run `npm test` from the package's folder.
+If you want to test only the package that you are working on, run `npm pretest` from the `tasit-sdk` folder and then run `npm test` from the package's folder.
 
-The `pretest` script will start `buidler-evm` and deploy contracts from `tasit-contract`.
+The `pretest` script will start `buidler-evm` and deploy contracts from `@tasit/contracts`.
 
 ### Making some changes
 

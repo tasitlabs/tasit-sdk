@@ -58,6 +58,7 @@ describe("GnosisSafe", () => {
   });
 
   beforeEach(async () => {
+    await provider.ready;
     const { address: someoneAddress } = someone;
 
     // Expect an already-funded Gnosis Safe wallet
@@ -82,7 +83,7 @@ describe("GnosisSafe", () => {
     expect(provider._events).toHaveLength(0);
   });
 
-  describe("test cases that need ETH deposit to the contract-based account", async () => {
+  describe("test cases that need ETH deposit to the contract-based account", () => {
     it("contract-based account should send ETHs to someone", async () => {
       const { address: toAddress } = someone;
 
@@ -96,9 +97,8 @@ describe("GnosisSafe", () => {
     });
 
     describe("test cases with more than one signer", () => {
-      beforeEach(
-        "contract-based accounts' owner should add an account as signer",
-        async () => {
+      // contract-based accounts' owner should add an account as signer
+      beforeEach(async () => {
           const { address: ownerAddress } = gnosisSafeOwner;
 
           const ownersBefore = await gnosisSafe.getOwners();
@@ -169,7 +169,7 @@ describe("GnosisSafe", () => {
     });
   });
 
-  describe("test cases that need ERC20 deposit to the contract-based account", async () => {
+  describe("test cases that need ERC20 deposit to the contract-based account", () => {
     // faucet
     beforeEach(async () => {
       await erc20Faucet(erc20, minter, GNOSIS_SAFE_ADDRESS, ONE);
@@ -249,9 +249,8 @@ describe("GnosisSafe", () => {
 
       describe("test cases that need ERC20 spending approval for ephemeral account", () => {
         // TODO: Move to @tasit/link-wallet
-        beforeEach(
-          "contract-based accounts' owner should approve an ephemeral account to spend funds",
-          async () => {
+        // contract-based accounts' owner should approve an ephemeral account to spend funds
+        beforeEach(async () => {
             const tokenAddress = ERC20_ADDRESS;
             const { address: spenderAddress } = ephemeralAccount;
 
@@ -309,7 +308,7 @@ describe("GnosisSafe", () => {
     });
   });
 
-  describe("test cases that need NFT deposit to the contract-based account", async () => {
+  describe("test cases that need NFT deposit to the contract-based account", () => {
     const tokenId = 1;
 
     // faucet

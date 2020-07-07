@@ -10,6 +10,11 @@ const {
 
 const { ZERO } = constants;
 
+// function timeout(ms) {
+//   return new Promise(resolve => setTimeout(resolve, ms));
+// }
+
+// const provider = new ethers.providers.JsonRpcProvider("http://localhost:8545", { chainId: 31337, name: "istanbul"});
 const provider = new ethers.providers.JsonRpcProvider("http://localhost:8545");
 provider.pollingInterval = 50;
 
@@ -35,17 +40,17 @@ describe("ethers", () => {
 
   it("should get balance of wallet", async () => {
     let randomWallet = ethers.Wallet.createRandom();
+    
+    const walletBalance = await wallet.getBalance();
     randomWallet = randomWallet.connect(provider);
+    const randomWalletBalance = await randomWallet.getBalance();
 
-    const fundedWalletBalance = ethers.utils.bigNumberify(
-      await wallet.getBalance()
-    );
-    const emptyWalletBalance = ethers.utils.bigNumberify(
-      await randomWallet.getBalance()
-    );
+    const fundedWalletBalance = ethers.utils.bigNumberify(walletBalance);
+    const emptyWalletBalance = ethers.utils.bigNumberify(randomWalletBalance);
 
     expect(fundedWalletBalance).not.toBeUndefined();
     expect(`${emptyWalletBalance}`).toBe(`${ZERO}`);
+
   });
 
   it("should sign a message", async () => {

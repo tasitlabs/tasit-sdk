@@ -21,6 +21,7 @@ let snapshotId;
 // TODO: Potentially move this before each function into
 // @tasit/test-helpers
 beforeEach(async () => {
+  await provider.ready;
   snapshotId = await createSnapshot(provider);
 
   while (snapshotId > 1) {

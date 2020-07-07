@@ -24,10 +24,12 @@ module.exports = {
       // TODO: Use shared constants from one spot
       // Or just add buidler as a dev dep in each child package that needs
       // a blockchain
+      // But then making sure all of the necessary contracts are compiled in
+      // each separate buidler evm doesn't seem ideal
       accounts: [
         {
           privateKey: "0x02380f59eeed7a02557aeaab089606739feb0e1db34c6b08374ad31188a3892d",
-          balance: "0x42010000000000000"
+          balance: "0x420100000000000000"
         },
         {
           privateKey: "0x2232aa52d058352511c5dd2d0ebcc0cfb6dfb5f051a9b367b7505556d2672490",

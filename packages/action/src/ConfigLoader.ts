@@ -1,4 +1,5 @@
 const MAINNET = "mainnet";
+// const OTHER = "other";
 
 // All config properties
 // const sampleConfig = {
@@ -48,7 +49,7 @@ export class ConfigLoader {
 
   static getDefaultConfig() {
     return {
-      network: MAINNET,
+      network: MAINNET, // OTHER
       provider: "fallback",
       pollingInterval: 4000,
       jsonRpc: {

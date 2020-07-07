@@ -3,7 +3,7 @@ import { ethers } from "ethers";
 import TasitContracts from "@tasit/contracts";
 
 import ProviderFactory from "./ProviderFactory";
-import { accounts } from "./testHelpers/helpers";
+import { accounts } from "@tasit/test-helpers";
 ethers.errors.setLogLevel("error");
 const { local: localContracts } = TasitContracts;
 const { SampleContract } = localContracts;
@@ -20,40 +20,45 @@ let sampleContract;
 describe("ethers", () => {
   // instantiate provider, wallet and contract objects
   beforeEach(async () => {
+    await provider.ready;
     [wallet] = accounts;
     wallet = wallet.connect(provider);
     expect(wallet.address).toHaveLength(42);
     expect(wallet.provider).toBeDefined();
 
+    // console.log({ wallet })
+
+    // TODO: Determine why we're getting "contract not deployed" error
+    // with this provider
+    // Maybe something with buidler config for root vs. @tasit/contracts?
+    // Or a subtle difference in the provider?
     sampleContract = new ethers.Contract(
       SAMPLE_CONTRACT_ADDRESS,
       sampleContractABI,
-      wallet
+      provider
     );
+
     expect(sampleContract.address).toBe(SAMPLE_CONTRACT_ADDRESS);
   });
 
-  it(
-    "should instatiate contract object using human-readable ABI",
-    async () => {
-      const humanReadableABI = [
-        "event ValueChanged(address indexed author, string oldValue, string newValue)",
-        "constructor(string memory) public",
-        "function getValue() public view returns (string memory)",
-        "function setValue(string memory) public",
-      ];
+  it("should instantiate contract object using human-readable ABI", async () => {
+    const humanReadableABI = [
+      "event ValueChanged(address indexed author, string oldValue, string newValue)",
+      "constructor(string memory) public",
+      "function getValue() public view returns (string memory)",
+      "function setValue(string memory) public",
+    ];
 
-      sampleContract = undefined;
-      sampleContract = new ethers.Contract(
-        SAMPLE_CONTRACT_ADDRESS,
-        humanReadableABI,
-        wallet
-      );
-      expect(sampleContract.interface.functions.getValue).toBeDefined();
-      expect(sampleContract.interface.functions.setValue).toBeDefined();
-      expect(sampleContract.interface.events.ValueChanged).toBeDefined();
-    }
-  );
+    sampleContract = undefined;
+    sampleContract = new ethers.Contract(
+      SAMPLE_CONTRACT_ADDRESS,
+      humanReadableABI,
+      provider
+    );
+    expect(sampleContract.interface.functions.getValue).toBeDefined();
+    expect(sampleContract.interface.functions.setValue).toBeDefined();
+    expect(sampleContract.interface.events.ValueChanged).toBeDefined();
+  });
 
   it("should get contract's value", async () => {
     const value = await sampleContract.getValue();
@@ -62,6 +67,7 @@ describe("ethers", () => {
   });
 
   it("should set contract's value", async () => {
+    sampleContract = sampleContract.connect(wallet);
     const rand = Math.floor(Math.random() * Math.floor(1000)).toString();
 
     const sentTx = await sampleContract.setValue(rand);
@@ -72,7 +78,7 @@ describe("ethers", () => {
     expect(value).toBe(rand);
   });
 
-  it("should watch contract's ValueChanged event", (done) => {
+  it("should watch contract's ValueChanged event", done => {
     (async () => {
       const oldValue = await sampleContract.getValue();
       const newValue = `I like cats`;
@@ -108,7 +114,7 @@ describe("ethers", () => {
     })();
   });
 
-  it("should remove listener using removeAllListeners function", (done) => {
+  it("should remove listener using removeAllListeners function", done => {
     (async () => {
       const timeout = setTimeout(() => {
         done(new Error("timeout"));
