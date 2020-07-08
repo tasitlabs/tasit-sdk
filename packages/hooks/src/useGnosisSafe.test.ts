@@ -34,12 +34,10 @@ const INPUT_ENTROPY_ARRAY = [
 test('does nothing without randomBytes', async () => {
   const { result } = renderHook(() =>
     // TODO: Mock the Gnosis API in a test env
-    useGnosisSafe(["0xabc123def"], 1, new Uint8Array(INPUT_ENTROPY_ARRAY))
+    useGnosisSafe(['0xabc123def'], 1, new Uint8Array(INPUT_ENTROPY_ARRAY))
   );
 
-  const { address, hasError } = await result.current
+  const { address, hasError } = await result.current;
   expect(address).toEqual('');
   expect(hasError).toEqual(false);
 });
-
-
