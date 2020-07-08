@@ -6,20 +6,20 @@ const { Deploy } = ContractBasedAccount;
 const { create } = Deploy;
 
 type GnosisSafeCreationData = {
-  gnosisSafeAddress: string;
-  gnosisSafeCreationError: boolean;
+  address: string;
+  hasError: boolean;
+  isLoading: boolean;
 };
 
 // Note: In the case where from local state you know
 // Gnosis Safe has already been created for the user,
 // don't bother rendering a component which uses this hook
-// TODO: Pass in saltNonce so the user can use this again with the same settings
-// TODO: Think about whether we want a hook to be async
-export async function useGnosisSafe(
+
+export function useGnosisSafe(
   owners: string[],
   threshold: number,
   randomBytes: Uint8Array
-): Promise<GnosisSafeCreationData> {
+): GnosisSafeCreationData {
   console.log("useGnosisSafe called");
   // For this hook, it "wants" to let the component using the hook decide
   // how to manage state (local state, redux, Apollo's internal redux, etc.)
@@ -29,7 +29,11 @@ export async function useGnosisSafe(
   // let gnosisSafeCreationError = false;
   // const [gnosisSafeCreated, setGnosisSafeCreated] = useState(false);
   const [gnosisSafeAddress, setGnosisSafeAddress] = useState("");
-  const [gnosisSafeCreationError, setGnosisSafeCreationError] = useState(false);
+  const [hasError, setHasError] = useState(false);
+  // TODO: Decide whether the error should be a boolean
+  // or contain the error, or if we want both
+  const [isLoading, setIsLoading] = useState(false);
+
 
   useEffect(() => {
     console.log("useEffect called");
@@ -37,15 +41,17 @@ export async function useGnosisSafe(
 
     function createSync(owners: string[], threshold: number, randomBytes: Uint8Array): void {
       (async () => {
+        setIsLoading(true);
         try {
           const address = await create(owners, threshold, randomBytes);
           // gnosisSafeCreated = true;
           // setGnosisSafeCreated(true);
           // gnosisSafeAddress = address;
           setGnosisSafeAddress(address);
+          setIsLoading(false);
         } catch (error) {
           // gnosisSafeCreationError = true;
-          setGnosisSafeCreationError(true);
+          setHasError(true);
         }
       })();
     }
@@ -59,5 +65,5 @@ export async function useGnosisSafe(
     };
   }, [owners, threshold, randomBytes]); // Only deploy Gnosis Safe with new params;
 
-  return { gnosisSafeAddress, gnosisSafeCreationError };
+  return { address: gnosisSafeAddress, hasError, isLoading };
 }
