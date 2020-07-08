@@ -65,6 +65,20 @@ When a PR is opened from your feature branch, CircleCI will automatically run th
 
 Note: When you want to use the local version of `tasit` or a child package from the lerna monorepo like `@tasit/[package_name]` in a local Expo app while developing, refer to the metro config file used in the `account-example` app in the [`tasit-apps` repo](https://github.com/tasitlabs/tasit-apps) and enable some settigs there that are disabled.
 
+You'll have to use npm link in the package from tasit and then npm link `@tasit/[PACKAGE_NAME]` in the app dir. You might also want to link `tasit` itself and link the child package to the main `tasit` package to be safe.
+
+To get type resolution working, you'll need a `baseUrl` and `paths` config in the `tsconfig.json` like this under `compilerOptions`:
+
+```
+    "baseUrl": "./",
+    "paths": {
+      "tasit": ["node_modules/tasit"],
+      "tasit/*": ["node_modules/tasit/*"],
+      "@tasit/hooks": ["node_modules/@tasit/hooks"],
+      "@tasit/hooks/*": ["node_modules/@tasit/hooks/*"]
+    }
+```
+
 To make sure two versions of React aren't found, follow these instructions:
 
 Your bundler might “see” two Reacts — one in the application folder and one in your library folder. One possible fix is to run `npm link ../../../tasit-apps/apps/in-dapp-account/node_modules/react` from this dir, `tasit-sdk/packages/[package_name]`. This should make the library use the application’s React copy.
