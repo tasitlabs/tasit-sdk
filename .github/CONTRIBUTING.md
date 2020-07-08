@@ -67,7 +67,7 @@ Note: When you want to use the local version of `tasit` or a child package from 
 
 To make sure two versions of React aren't found, follow these instructions:
 
-Your bundler might “see” two Reacts — one in the application folder and one in your library folder. One possible fix is to run `npm link ../../../tasit-apps/apps/account-example/node_modules/react` from this dir, `tasit-sdk/packages/[package_name]`. This should make the library use the application’s React copy.
+Your bundler might “see” two Reacts — one in the application folder and one in your library folder. One possible fix is to run `npm link ../../../tasit-apps/apps/in-dapp-account/node_modules/react` from this dir, `tasit-sdk/packages/[package_name]`. This should make the library use the application’s React copy.
 
 Note that depending on what dir your local app and this library are in, the number of `..`'s is likely to change.
 
