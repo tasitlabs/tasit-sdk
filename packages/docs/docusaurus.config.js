@@ -1,6 +1,6 @@
 module.exports = {
-  title: "Tasit",
-  tagline: "Docs",
+  title: "Tasit docs",
+  tagline: "A JavaScript / TypeScript SDK for building native mobile Ethereum dapps with React Native",
   url: "https://docs.tasit.io",
   baseUrl: "/",
   favicon: "img/favicon-32x32.png",
@@ -10,7 +10,7 @@ module.exports = {
     navbar: {
       title: "Tasit",
       logo: {
-        alt: "Tasit Logo",
+        alt: "Tasit logo",
         src: "img/TasitLogoSvg.svg",
       },
       links: [
@@ -69,7 +69,7 @@ module.exports = {
           ],
         },
       ],
-      copyright: `Copyright © ${new Date().getFullYear()} Tasit`,
+      copyright: `Copyright © ${new Date().getFullYear()} Tasit Labs`,
     },
     // algolia: {
     //   apiKey: process.env.REACT_APP_API_KEY,
