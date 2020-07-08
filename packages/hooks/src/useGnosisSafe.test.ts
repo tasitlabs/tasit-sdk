@@ -3,7 +3,7 @@ import {
   // act
 } from '@testing-library/react-hooks';
 
-import useGnosisSafe from './useGnosisSafe';
+import { useGnosisSafe } from './useGnosisSafe';
 
 const INPUT_ENTROPY_ARRAY = [
   21,
@@ -34,12 +34,10 @@ const INPUT_ENTROPY_ARRAY = [
 test('does nothing without randomBytes', async () => {
   const { result } = renderHook(() =>
     // TODO: Mock the Gnosis API in a test env
-    useGnosisSafe(["0xabc123def"], 1, new Uint8Array(INPUT_ENTROPY_ARRAY))
+    useGnosisSafe(['0xabc123def'], 1, new Uint8Array(INPUT_ENTROPY_ARRAY))
   );
 
-  const { gnosisSafeAddress, gnosisSafeCreationError } = await result.current
-  expect(gnosisSafeAddress).toEqual('');
-  expect(gnosisSafeCreationError).toEqual(false);
+  const { address, hasError } = await result.current;
+  expect(address).toEqual('');
+  expect(hasError).toEqual(false);
 });
-
-

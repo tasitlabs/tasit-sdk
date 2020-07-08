@@ -64,8 +64,8 @@
   },
   "homepage": "https://tasit.dev",
   "engines": {
-    "node": ">=10.15.0",
-    "npm": ">=6.4.1"
+    "node": ">=12.18.0",
+    "npm": ">=6.14.5"
   },
   "dependencies": {}
 }

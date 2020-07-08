@@ -1,12 +1,7 @@
 import axios from "axios";
 
-// TODO: Move base URL into an env var
 // const BASE_URL = "https://safe-relay.rinkeby.gnosis.io/"; // Rinkeby
 const BASE_URL = "https://safe-relay.staging.gnosisdev.com/api"; // Mainnet staging
-
-const api = axios.create({
-  baseURL: BASE_URL,
-});
 
 const API_VERSION = "v3";
 
@@ -24,7 +19,7 @@ async function generateRandomBytes(randomBytes: Uint8Array): Promise<number> {
 }
 
 // Using relay service:
-export async function create(owners: string[], threshold: number, randomBytes: Uint8Array): Promise<string> {
+export async function create(owners: string[], threshold: number, randomBytes: Uint8Array, baseURL: string = BASE_URL): Promise<string> {
   try {
     // API parameters:
     // saltNonce*	integer
@@ -44,13 +39,17 @@ export async function create(owners: string[], threshold: number, randomBytes: U
     const randomInt = await generateRandomBytes(randomBytes);
     console.log({ randomInt });
 
+    const api = axios.create({
+      baseURL: baseURL,
+    });
+
     const response = await api.post(`/${API_VERSION}/safes/`, {
       threshold: threshold,
       owners: owners,
       saltNonce: randomInt,
     });
 
-    console.log({ response });
+    // console.log({ response });
 
     const { data, status } = response;
     console.log({ data });
