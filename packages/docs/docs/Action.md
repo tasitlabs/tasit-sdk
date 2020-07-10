@@ -34,7 +34,7 @@ Why `@tasit/action`? **action:** [ak-shən], noun. "a thing done". It's also nic
 - [Low-level Tasit middleware](#getting-data---low-level-tasit-middleware)
 - [Contract API from ethers](#getting-data---contract-api-from-ethers)
 
-#### Getting data - Decentraland
+### Getting data - Decentraland
 
 Let's start at the highest level of abstraction possible, where we can construct our ideal API for the end user assuming we know `tasit` is being used specifically for the Decentraland contracts.
 
@@ -80,7 +80,7 @@ Open questions:
 - Whether the address should be configurable at this level of abstraction. For instance, the developer using `tasit` might know sooner than Tasit project core devs do that a non-upgradeable contract project (that is, a standard smart contract project - not a delegatecall + proxy project) is deploying new contracts and will be using a new interface address from now on.
 - Whether the ABI should be in version control in this package or whether we want to add functionality for getting it from the web, using Etherscan's API or hopefully a decentralized npm where teams publish generated files like ABIs down the road.
 
-#### Getting data - ERC721
+### Getting data - ERC721
 
 Let's now consider a slightly lower level of abstraction, where we can construct our ideal API for the end user assuming we know `tasit` is being used specifically for an ERC721 (NFT) contract, but not which one until the user instantiates the contract using `tasit`.
 
@@ -121,7 +121,7 @@ Fetching additional metadata from the tokenURI is obviously something we need to
 
 Fetching images from additional URIs linked to in the JSON blob available at the main tokenURI will also be a common use case in the app.
 
-#### Getting data - Low-level Tasit middleware
+### Getting data - Low-level Tasit middleware
 
 A low-level library for calling all of the functions on a given smart contract and listening to events from the smart contract.
 
@@ -178,7 +178,7 @@ Find all `view` (`external` or `public`) functions. Assume they're the interesti
 
 Possibly even infer from param types what they might do, but that's a lot harder.
 
-#### Getting data - Contract API from ethers
+### Getting data - Contract API from ethers
 
 Let's re-read the `@tasit/action` section above when it is finalized and see how much it differs from the [ethers abstraction for connecting to contracts](https://docs.ethers.io/ethers.js/html/api-contract.html#connecting-to-existing-contracts).
 
@@ -196,7 +196,7 @@ Setting data could possibly be non-async if it's like publishing in pubsub. Ther
 
 - [ERC721](#setting-data---erc721)
 
-#### Setting data - Low-level Tasit middleware
+### Setting data - Low-level Tasit middleware
 
 When using the contract abstraction from ethers, the functions for setting data return a transaction hash.
 
@@ -230,13 +230,13 @@ Since remembering to remove the listener is a little clunky, we could also inclu
 
 For more customization of how this works, during or before sending the transaction the user of `tasit` could pick which types of events they want to be subscribed to.
 
-#### Setting data - Contract API from ethers
+### Setting data - Contract API from ethers
 
 Setting data on a contract returns a tx hash. In the example in the ethers docs, the next step is to `await` to see that the transaction has been confirmed.
 
 `@tasit/action` has more of a "optimistic updates" but "be sure to handle error cases" philosophy. Of course that could be achieved with the lower-level ethers API too, but the `@tasit/action` abstraction gently guides the user towards that approach in a more opinionated fashion.
 
-#### Setting data - Decentraland
+### Setting data - Decentraland
 
 ```javascript
 // TODO: Add me
@@ -244,7 +244,7 @@ Setting data on a contract returns a tx hash. In the example in the ethers docs,
 // extrapolate how this would work from the rest
 ```
 
-#### Setting data - ERC721
+### Setting data - ERC721
 
 ```javascript
 // TODO: Add me
@@ -262,7 +262,7 @@ Setting data on a contract returns a tx hash. In the example in the ethers docs,
 
 - [Contract API from ethers](#listening-for-events---contract-api-from-ethers)
 
-#### Listening for events - Low-level Tasit middleware
+### Listening for events - Low-level Tasit middleware
 
 Listening for events has a similar subcriptions API to the one you use after creating a transaction (see above).
 
@@ -274,7 +274,7 @@ Here, it is initiated explicitly with a subscribe function.
 contract.on("ExampleEvent", handlerFunction);
 ```
 
-#### Listening for events - ERC721
+### Listening for events - ERC721
 
 Note: The ERC721 level of abstraction for listening for events would already know what events to listen for and let you subscribe to them like so:
 
@@ -286,7 +286,7 @@ contract.off("Transfer");
 
 In this example there's an event `Transfer` as one of the events supported by ERC721. After unsubscribing from transfer events, you're still be subscribed to other events emitted by the contract.
 
-#### Listening for events - Decentraland
+### Listening for events - Decentraland
 
 ```javascript
 // TODO: Add me
@@ -294,7 +294,7 @@ In this example there's an event `Transfer` as one of the events supported by ER
 // extrapolate how this would work from the rest
 ```
 
-#### Listening for events - Contract API from ethers
+### Listening for events - Contract API from ethers
 
 ```javascript
 // TODO: Add me

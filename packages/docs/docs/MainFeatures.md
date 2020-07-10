@@ -5,8 +5,8 @@ sidebar_label: Main features
 ---
 
 - [in-dapp wallets (burner and contract-based)](#in-dapp-wallets-burner-and-contract-based)
-    - [in-dapp accounts](#in-dapp-accounts)
-    - [in-dapp contract-based accounts](#in-dapp-contract-based-accounts)
+  - [in-dapp accounts](#in-dapp-accounts)
+  - [in-dapp contract-based accounts](#in-dapp-contract-based-accounts)
 - [Optimistic UI](#optimistic-ui)
 - [Start in read-only mode](#start-in-read-only-mode)
 
@@ -20,7 +20,7 @@ This SDK takes an opinionated approach to onboarding (although since it's a modu
 
 _This means a flow that users will be used to which decreases the friction for onboarding people who have used other Ethereum dapps._
 
-#### in-dapp accounts
+### in-dapp accounts
 
 Using Tasit, you can generate a new Ethereum account and private key for the user.
 
@@ -34,7 +34,7 @@ For more info, see [`@tasit/account`](/packages/account/).
 
 _This means fewer steps that need to be taken to onboard a new user._
 
-#### in-dapp contract-based accounts
+### in-dapp contract-based accounts
 
 Give them a contract-based account so that the UX around securing keys and recovering funds is simpler.
 

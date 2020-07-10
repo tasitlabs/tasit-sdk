@@ -5,10 +5,10 @@ sidebar_label: Why
 ---
 
 - [Why (from the user's perspective)?](#why-from-the-users-perspective)
-    - [Right to exit for users](#right-to-exit-for-users)
+  - [Right to exit for users](#right-to-exit-for-users)
 - [Why (from a developer's / Ethereum enthusiast's perspective)?](#why-from-a-developers--ethereum-enthusiasts-perspective)
-    - [Proof of decentralization](#proof-of-decentralization)
-    - [No platform risk](#no-platform-risk)
+  - [Proof of decentralization](#proof-of-decentralization)
+  - [No platform risk](#no-platform-risk)
 - [Why React Native?](#why-react-native)
 
 ## Why (from the user's perspective)?
@@ -17,7 +17,7 @@ Today, using a dapp from a phone is painful. Almost no dapps have standalone mob
 
 The idea is that Tasit would be used by many different mobile apps on a user's device. Once Tasit is around, more dapps will have dedicated mobile apps. This will remove a key barrier to mainstream adoption of Ethereum dapps.
 
-#### Right to exit for users
+### Right to exit for users
 
 A single company's financial incentives determining how a software product works is a bummer for users. See Facebook's newsfeed changing to clickbait, or see Twitter users clamoring for simple changes to the product like spambot or harassment detection to no avail.
 
@@ -33,11 +33,11 @@ There's no reason building an Ethereum dapp should feel much different for the f
 
 If you want to see the Ethereum ecosystem grow, mobile is critical for making that happen, because that's where all the users are.
 
-#### Proof of decentralization
+### Proof of decentralization
 
 Tasit will serve as "proof of decentralization" for the dapps we support. Vitalik Buterin once tweeted 'One simple litmus test for whether or not a blockchain project is truly decentralized: can a third party independently make a client for it, and do everything that the "official" client can?'. We agree. It's time for major decoupling of "back end" and front end.
 
-#### No platform risk
+### No platform risk
 
 What's unique about the Ethereum ecosystem is that making a 3rd-party client is fully permissionless and interoperable, which means there's no risk that the developers of a smart contract can suddenly "throttle" users of their "API" in the way that would have been possible in web 2.0.
 
