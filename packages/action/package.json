@@ -1,5 +1,5 @@
 {
-	"name": "@tasit/action",
+  "name": "@tasit/action",
 	"version": "0.0.30",
 	"description": "A library for using Ethereum smart contracts that abstracts away the low-level blockchain-related details so that developers can focus on the core business logic for their app",
 	"main": "dist/index",
