@@ -48,8 +48,7 @@
     "@tasit/hooks": "^0.0.32"
   },
   "peerDependencies": {
-    "react": ">=16.8",
-    "react-native": "~0.61"
+    "react": ">=16.8"
   },
   "devDependencies": {
     "@tasit/test-helpers": "^0.0.32",
@@ -61,5 +60,5 @@
     "tslib": "^2.0.0",
     "typescript": "^3.9.6"
   },
-  "gitHead": "30cec71740126b47ca2171cc12b6a2f60637a823"
+  "gitHead": "41dbf759be32bad0d5f45282218ab0e4df40cb36"
 }
