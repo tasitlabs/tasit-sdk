@@ -1,6 +1,6 @@
 {
   "name": "tasit",
-  "version": "0.0.31",
+  "version": "0.0.32",
   "description": "A JavaScript / TypeScript SDK for making mobile Ethereum dapps using React Native",
   "main": "dist/index",
   "module": "dist/tasit.esm.js",
@@ -41,18 +41,18 @@
     "url": "https://github.com/tasitlabs/tasit-sdk/issues"
   },
   "dependencies": {
-    "@tasit/account": "^0.0.31",
-    "@tasit/action": "^0.0.31",
-    "@tasit/contract-based-account": "^0.0.31",
-    "@tasit/contracts": "^0.0.31",
-    "@tasit/hooks": "^0.0.31"
+    "@tasit/account": "^0.0.32",
+    "@tasit/action": "^0.0.32",
+    "@tasit/contract-based-account": "^0.0.32",
+    "@tasit/contracts": "^0.0.32",
+    "@tasit/hooks": "^0.0.32"
   },
   "peerDependencies": {
     "react": ">=16.8",
     "react-native": "~0.61"
   },
   "devDependencies": {
-    "@tasit/test-helpers": "^0.0.31",
+    "@tasit/test-helpers": "^0.0.32",
     "ethers": "^4.0.47",
     "node-fetch": "^2.6.0",
     "npm-check-updates": "^6.0.1",
