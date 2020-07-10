@@ -5,10 +5,10 @@ sidebar_label: Main features
 ---
 
 - [in-dapp wallets (burner and contract-based)](#in-dapp-wallets-burner-and-contract-based)
-  - [Start in read-only mode](#start-in-read-only-mode)
-  - [in-dapp accounts](#in-dapp-accounts)
-  - [in-dapp contract-based accounts](#in-dapp-contract-based-accounts)
+    - [in-dapp accounts](#in-dapp-accounts)
+    - [in-dapp contract-based accounts](#in-dapp-contract-based-accounts)
 - [Optimistic UI](#optimistic-ui)
+- [Start in read-only mode](#start-in-read-only-mode)
 
 ## in-dapp wallets (burner and contract-based)
 
@@ -19,14 +19,6 @@ Once the user has enough value that they shouldn't hold it with that account, it
 This SDK takes an opinionated approach to onboarding (although since it's a modular repo, you still retain the ability to use other child packages and not the onboarding-related ones if you prefer). The SDK supports read-only mode, meta-transactions, contract-based accounts, and connecting with their preferred primary mobile Ethereum wallet.
 
 _This means a flow that users will be used to which decreases the friction for onboarding people who have used other Ethereum dapps._
-
-#### Start in read-only mode
-
-A native mobile dapp should be read-only for as long as possible. The user shouldn't know there's a blockchain involved or see anything about an account, and an Ethereum account shouldn't even be created until it becomes necessary. Why go through an onboarding flow at all right away?
-
-The flow for reading data from The Graph or directly from contracts without onboarding first just works with no special configuration.
-
-For more info, see [`@tasit/action`](/packages/action/).
 
 #### in-dapp accounts
 
@@ -99,6 +91,14 @@ This middleware wraps the core ethers.js contract API for making JSON-RPC reques
 Fore more info, see [`@tasit/action`](/packages/action/).
 
 _This makes the experience for new developers working on a mobile app with Tasit simpler, which means more mobile dapps for end users._
+
+## Start in read-only mode
+
+A native mobile dapp should be read-only for as long as possible. The user shouldn't know there's a blockchain involved or see anything about an account, and an Ethereum account shouldn't even be created until it becomes necessary. Why go through an onboarding flow at all right away?
+
+The flow for reading data from The Graph or directly from contracts without onboarding first just works with no special configuration.
+
+For more info, see [`@tasit/action`](/packages/action/).
 
 ---
 
