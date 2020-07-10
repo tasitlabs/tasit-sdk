@@ -1,5 +1,5 @@
 {
-  "version": "0.0.30",
+  "version": "0.0.31",
   "license": "MIT",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -38,7 +38,7 @@
     "typescript": "^3.9.6"
   },
   "dependencies": {
-    "@tasit/provider-helpers": "^0.0.30",
+    "@tasit/provider-helpers": "^0.0.31",
     "ethers": "^4.0.47"
   },
   "gitHead": "a7ecd59c99e09f0b6a61aa3c277c2a3e9aab13bf"
