@@ -1,6 +1,7 @@
 import { ethers } from 'ethers';
 
-import ProviderFactory from '@tasit/action';
+import TasitProviderHelpers from '@tasit/provider-helpers';
+const { ProviderFactory } = TasitProviderHelpers;
 import developmentConfig from './config/default';
 
 const { utils: ethersUtils, constants: ethersConstants } = ethers;

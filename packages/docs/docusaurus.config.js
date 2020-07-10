@@ -1,11 +1,11 @@
 module.exports = {
-  title: "Tasit docs",
+  title: "Tasit",
   tagline: "A JavaScript / TypeScript SDK for building native mobile Ethereum dapps with React Native",
   url: "https://docs.tasit.io",
   baseUrl: "/",
   favicon: "img/favicon-32x32.png",
   organizationName: "tasitlabs", // Usually your GitHub org/user name.
-  projectName: "tasit-sdk", // Usually your repo name.
+  projectName: "tasit", // Usually your repo name.
   themeConfig: {
     navbar: {
       title: "Tasit",
@@ -14,7 +14,7 @@ module.exports = {
         src: "img/TasitLogoSvg.svg",
       },
       links: [
-        { to: "docs/home", label: "Docs", position: "left" },
+        { to: "docs/introduction", label: "Docs", position: "left" },
         {
           href: "https://github.com/tasitlabs/tasit-sdk",
           label: "GitHub",
@@ -30,7 +30,7 @@ module.exports = {
           items: [
             {
               label: "Docs",
-              to: "docs/home",
+              to: "docs/introduction",
             },
             {
               label: "Roadmap",

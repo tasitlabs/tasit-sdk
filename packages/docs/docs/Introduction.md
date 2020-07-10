@@ -1,7 +1,7 @@
 ---
-id: home
-title: Tasit
-sidebar_label: Home
+id: introduction
+title: Introduction
+sidebar_label: Introduction
 ---
 
 <div align="left">
@@ -20,7 +20,7 @@ style={{
 </span>
 );
 
-### Introduction
+## Introduction
 
 <Highlight color="rgb(0, 154, 115)">Tasit</Highlight> is a JavaScript/TypeScript SDK for making mobile Ethereum dapps using React Native.
 

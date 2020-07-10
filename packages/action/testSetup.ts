@@ -1,7 +1,8 @@
 // Helpers
 // import { createSnapshot, revertFromSnapshot, mineBlocks } from "@tasit/test-helpers";
 // import ProviderFactory from "./src/ProviderFactory";
-import ConfigLoader from "./src/ConfigLoader";
+import TasitProviderHelpers from "@tasit/provider-helpers";
+const { ConfigLoader } = TasitProviderHelpers;
 import config from "./src/config/default";
 ConfigLoader.setConfig(config);
 

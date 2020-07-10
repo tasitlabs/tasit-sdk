@@ -3,24 +3,17 @@ import "ethers/dist/shims.js";
 // shims aren't injected with package import
 import { ethers } from "ethers";
 import Utils from "./Utils";
-import ProviderFactory from "../ProviderFactory";
+import TasitProviderHelpers from "@tasit/provider-helpers";
 import Subscription from "../subscription";
 import Action from "../action";
+
+const { ProviderFactory } = TasitProviderHelpers;
 
 // Log levels: debug, default, info, warn, error, off
 // See more: https://github.com/ethers-io/ethers.js/blob/527de7ba5e1d31bd7c166a78d0fa62b58bf50a54/src.ts/errors.ts
 ethers.errors.setLogLevel("error");
 
-interface Wallet {
-  connect: (arg0: any) => any;
-  _ethersType: string;
-}
-
-interface ContractFunction {
-  constant: boolean | undefined;
-  stateMutability: string;
-  name: string | number;
-}
+import { Wallet, ContractFunction } from "./types"
 
 export class Contract extends Subscription {
   private provider: any;
