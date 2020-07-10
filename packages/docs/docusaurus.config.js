@@ -5,7 +5,7 @@ module.exports = {
   baseUrl: "/",
   favicon: "img/favicon-32x32.png",
   organizationName: "tasitlabs", // Usually your GitHub org/user name.
-  projectName: "tasit", // Usually your repo name.
+  projectName: "tasit-sdk", // Usually your repo name.
   themeConfig: {
     navbar: {
       title: "Tasit",
