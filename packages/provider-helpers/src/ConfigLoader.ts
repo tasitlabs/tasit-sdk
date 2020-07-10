@@ -39,7 +39,7 @@ const MAINNET = "mainnet";
 export class ConfigLoader {
   static config: any;
 
-  static setConfig(config) {
+  static setConfig(config: any) {
     this.config = config;
   }
 

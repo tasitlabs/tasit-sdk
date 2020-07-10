@@ -1,32 +1,31 @@
 ---
-id: getting-started
-title: Getting started
-sidebar_label: Getting started
+id: get-started
+title: Get started
+sidebar_label: Get started
 ---
-
-### Getting started
 
 You can use Tasit to create user-friendly mobile iOS and Android apps for a dapp using React Native.
 
 Looking for the entry point for the `tasit` package? [That's here](https://github.com/tasitlabs/tasit-sdk/tree/develop/packages/sdk). Tasit is a collection of smaller packages exported as one using [lerna](https://lerna.js.org/).
 
-#### Installation
+## Installation
 
 Getting started is as simple as running
 
 `npm install --save tasit`
 
-#### Usage
+## Usage
 
 Are you looking to add Ethereum-related functionality to a pre-existing app using Tasit?
 
 Using Tasit from within your app is simple.
 In `App.js` or the appropriate React Native component, import whichever APIs you need from Tasit.
 
-```javascript
+```js
 import { Account } from "tasit";
-const ephemeralWallet = Account.create();
-console.log(ephemeralWallet.address); // '0x...'
+const burnerWallet = await Account.create();
+const { address } = burnerWallet;
+console.log(address); // '0x...'
 // ...
 ```
 
@@ -52,7 +51,7 @@ action.sendForFree(); // meta-tx broadcast
 // ...
 ```
 
-#### Modular
+## Modular
 
 Tasit is designed with modularity in mind. Are you only planning on using Tasit for generating an ephemeral Ethereum acccount in your app? That works too!
 

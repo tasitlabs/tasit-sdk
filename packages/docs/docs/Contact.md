@@ -17,5 +17,5 @@ sidebar_label: Contact
 
 ---
 
-[Go back](Home.md) to the home page of the docs.
+[Go back](Introduction.md) to the home page of the docs.
 

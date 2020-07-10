@@ -4,6 +4,8 @@ import "ethers/dist/shims.js";
 import { ethers } from "ethers";
 import { ConfigLoader } from "./ConfigLoader";
 
+import { JsonRpc, Infura, Etherscan } from "./types";
+
 export class ProviderFactory {
   static getProvider = () => {
     const { provider: providerConfig } = ConfigLoader.getConfig();
@@ -17,6 +19,13 @@ export class ProviderFactory {
     jsonRpc,
     infura,
     etherscan,
+  }: {
+    network: string,
+    provider: string,
+    pollingInterval: number,
+    jsonRpc: JsonRpc,
+    infura: Infura,
+    etherscan: Etherscan,
   }) => {
     const networks = [
       "mainnet",
@@ -28,6 +37,8 @@ export class ProviderFactory {
     ];
     const providers = ["fallback", "infura", "etherscan", "jsonrpc"];
 
+    let networkToUse: string | undefined;
+
     if (!networks.includes(network)) {
       throw new Error(`Invalid network, use: [${networks}].`);
     }
@@ -37,8 +48,9 @@ export class ProviderFactory {
     }
 
     if (provider === "fallback") provider = "default";
-    if (network === "mainnet") network = "homestead";
-    else if (network === "other") network = undefined;
+    if (network === "mainnet") networkToUse = "homestead";
+
+    else if (network === "other") networkToUse = undefined;
 
     const defaultConfig = ConfigLoader.getDefaultConfig();
 
@@ -46,23 +58,27 @@ export class ProviderFactory {
 
     switch (provider) {
       case "default": {
-        ethersProvider = ethers.getDefaultProvider(network);
+        ethersProvider = ethers.getDefaultProvider(networkToUse);
         break;
       }
       case "infura": {
         const infuraApiKey = !infura ? null : infura.apiKey;
-        ethersProvider = new ethers.providers.InfuraProvider(
-          network,
-          infuraApiKey
-        );
+        if (infuraApiKey) {
+          ethersProvider = new ethers.providers.InfuraProvider(
+            networkToUse,
+            infuraApiKey
+          );
+        }
         break;
       }
       case "etherscan": {
         const etherscanApiKey = !etherscan ? null : etherscan.apiKey;
-        ethersProvider = new ethers.providers.EtherscanProvider(
-          network,
-          etherscanApiKey
-        );
+        if (etherscanApiKey) {
+          ethersProvider = new ethers.providers.EtherscanProvider(
+            networkToUse,
+            etherscanApiKey
+          );
+        }
         break;
       }
       case "jsonrpc": {
@@ -75,13 +91,13 @@ export class ProviderFactory {
 
         ethersProvider = new ethers.providers.JsonRpcProvider(
           { url: `${url}:${port}`, user, password, allowInsecure },
-          network
+          networkToUse
         );
         break;
       }
     }
 
-    if (pollingInterval) ethersProvider.pollingInterval = pollingInterval;
+    if (ethersProvider && pollingInterval) ethersProvider.pollingInterval = pollingInterval;
     return ethersProvider;
   };
 }

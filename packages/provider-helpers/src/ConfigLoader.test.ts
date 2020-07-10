@@ -9,34 +9,17 @@ const {
   EtherscanProvider,
 } = providers;
 
-const parseNetworkNameFromEthers = networkName => {
+
+const parseNetworkNameFromEthers = (networkName: string) => {
   if (networkName === "unknown") return "other";
   if (networkName === "homestead") return "mainnet";
   return networkName;
 };
 
-interface Api {
-  apiKey: string;
-}
+import { Config } from "./types";
 
-interface JsonRpc {
-  url: string;
-  port: number;
-  user: any;
-  password: any;
-  allowInsecure: any;
-}
 
-interface Config {
-  pollingInterval: any;
-  provider?: string;
-  network: string;
-  etherscan?: Api;
-  infura?: Api;
-  jsonRpc?: JsonRpc;
-}
-
-const extractProviderConfig = async provider => {
+const extractProviderConfig = async (provider: any) => {
   await provider.ready;
   const network = await provider.getNetwork();
   const { name: networkName } = network;
@@ -85,7 +68,7 @@ const extractProviderConfig = async provider => {
   return config;
 };
 
-const fulfillConfigWithDefaults = config => {
+const fulfillConfigWithDefaults = (config: any) => {
   let { provider } = config;
   let { jsonRpc, provider: providerType, infura, etherscan } = provider;
 
@@ -119,7 +102,7 @@ const fulfillConfigWithDefaults = config => {
   return config;
 };
 
-const checkConfig = async config => {
+const checkConfig = async (config: any) => {
   const userConfig = fulfillConfigWithDefaults(config);
 
   ConfigLoader.setConfig(config);
@@ -134,8 +117,8 @@ const checkConfig = async config => {
   expect(userConfig).toEqual(loadedConfig);
 };
 
-describe("TasitAction.ConfigLoader", () => {
-  let defaultConfig;
+describe("TasitProviderHelpers.ConfigLoader", () => {
+  let defaultConfig: any;
 
   // store default config
   beforeEach(() => {

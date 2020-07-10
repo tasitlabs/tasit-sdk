@@ -1,60 +1,57 @@
 {
   "name": "@tasit/action",
-  "version": "0.0.30",
-  "description": "A library for using Ethereum smart contracts that abstracts away the low-level blockchain-related details so that developers can focus on the core business logic for their app",
-  "main": "dist/index",
-  "module": "dist/action.esm.js",
-  "typings": "dist/index.d.ts",
-  "keywords": [
-    "ethereum",
-    "dapp",
-    "react",
-    "native"
-  ],
-  "author": "Tasit Labs",
-  "homepage": "https://tasit.dev",
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/tasitlabs/tasit-sdk.git"
-  },
-  "files": [
-    "dist"
-  ],
-  "scripts": {
+	"version": "0.0.30",
+	"description": "A library for using Ethereum smart contracts that abstracts away the low-level blockchain-related details so that developers can focus on the core business logic for their app",
+	"main": "dist/index",
+	"module": "dist/action.esm.js",
+	"typings": "dist/index.d.ts",
+	"keywords": [
+		"ethereum",
+		"dapp",
+		"react",
+		"native"
+	],
+	"scripts": {
     "prepare": "npm run build",
     "start": "npx tsdx watch",
     "build": "npx tsdx build",
-    "test:tsdx": "npx tsdx test",
     "lint": "npx tsdx lint src",
-    "test:mocha-tsnode": "env TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\" }' npx mocha \"src/**/*.test.ts\" --recursive --require ts-node/register --file src/testHelpers/mochaSetup.ts --timeout 8000",
-    "test": "npm run test:tsdx",
+    "test": "npx tsdx test",
     "update": "npx ncu",
     "update:write": "npm run update -- -u"
   },
-  "bugs": {
-    "url": "https://github.com/tasitlabs/tasit-sdk/issues"
-  },
-  "publishConfig": {
-    "access": "public"
-  },
-  "dependencies": {
-    "ethers": "^4.0.47"
-  },
-  "devDependencies": {
-    "@tasit/account": "^0.0.30",
-    "@tasit/contracts": "^0.0.30",
-    "@tasit/test-helpers": "^0.0.30",
-    "@types/node": "^14.0.10",
-    "@typescript-eslint/eslint-plugin": "^3.1.0",
-    "@typescript-eslint/parser": "^3.1.0",
-    "node-fetch": "^2.6.0",
-    "npm-check-updates": "^6.0.1",
-    "sinon": "^9.0.2",
-    "ts-node": "^8.10.2",
-    "tsdx": "^0.13.2",
-    "tslib": "^2.0.0",
-    "typescript": "^3.9.3"
-  },
-  "gitHead": "a7ecd59c99e09f0b6a61aa3c277c2a3e9aab13bf"
+	"author": "Tasit Labs",
+	"homepage": "https://tasit.dev",
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/tasitlabs/tasit-sdk.git"
+	},
+	"files": [
+		"dist"
+	],
+	"bugs": {
+		"url": "https://github.com/tasitlabs/tasit-sdk/issues"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"dependencies": {
+		"ethers": "^4.0.47",
+		"@tasit/provider-helpers": "^0.0.30",
+		"@tasit/contracts": "^0.0.30"
+	},
+	"devDependencies": {
+		"@types/node": "^14.0.10",
+		"@typescript-eslint/eslint-plugin": "^3.1.0",
+		"@typescript-eslint/parser": "^3.1.0",
+		"node-fetch": "^2.6.0",
+		"npm-check-updates": "^6.0.1",
+		"sinon": "^9.0.2",
+		"ts-node": "^8.10.2",
+		"tsdx": "^0.13.2",
+		"tslib": "^2.0.0",
+		"typescript": "^3.9.3"
+	},
+	"gitHead": "a7ecd59c99e09f0b6a61aa3c277c2a3e9aab13bf"
 }

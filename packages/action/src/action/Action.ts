@@ -1,28 +1,17 @@
 import Subscription from "../subscription";
-import ProviderFactory from "../ProviderFactory";
+import TasitProviderHelpers from "@tasit/provider-helpers";
+const { ProviderFactory } = TasitProviderHelpers;
 
-interface Network {
-  chainId: any;
-}
-
-interface Receipt {
-  confirmations: any;
-  status: any;
-}
-
-interface RawAction {
-  to: any;
-  data: any;
-}
+import { Network, Receipt, RawAction } from "./types"
 
 // If necessary, we can create TransactionAction
 // and/or MetaTxAction subclasses
 class Action extends Subscription {
   private provider: {
     getTransactionCount: (arg0: any) => void;
-    getNetwork: () => Network;
+    getNetwork: () => Promise<Network>;
     sendTransaction: (arg0: any) => void;
-    getTransactionReceipt: (arg0: any) => Receipt;
+    getTransactionReceipt: (arg0: any) => Promise<Receipt>;
     waitForTransaction: (arg0: any) => void;
   };
 
@@ -56,7 +45,7 @@ class Action extends Subscription {
   private fillRawAction = async (rawTx: { value: any }) => {
     const nonce = this.provider.getTransactionCount(this.signer.address);
 
-    const network = this.provider.getNetwork();
+    const network = await this.provider.getNetwork();
     const { chainId } = network;
 
     let { value } = rawTx;
@@ -147,9 +136,11 @@ class Action extends Subscription {
 
         const receipt = this.provider.getTransactionReceipt(tx.hash);
 
+        const { confirmations, status } = await receipt;
+
         const blockReorgOccurred =
           (receipt === null && this.txConfirmations > 0) ||
-          (receipt !== null && receipt.confirmations <= this.txConfirmations);
+          (receipt !== null && confirmations <= this.txConfirmations);
 
         if (blockReorgOccurred) {
           this._emitErrorEventFromEventListener(
@@ -162,7 +153,6 @@ class Action extends Subscription {
 
         if (!receipt) return;
 
-        const { confirmations, status } = receipt;
         const txFailed = status === 0;
 
         if (txFailed) {
@@ -217,7 +207,10 @@ class Action extends Subscription {
 
   // For testing purposes
   _refreshProvider = () => {
-    this.provider = ProviderFactory.getProvider();
+    const provider = ProviderFactory.getProvider();
+    if (provider) {
+      this.provider = provider;
+    }
   };
 }
 

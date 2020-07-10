@@ -7,14 +7,17 @@
 
 module.exports = {
   docs: {
-    "Tasit Docs": [
-      "home",
-      "getting-started",
+    "Docs": [
+      "introduction",
+      "get-started",
       "main-features",
       "why",
+      "config",
       "project-layout",
       "other-features",
       "contact",
+    ],
+    "Internal docs for Tasit devs": [
       "publishing",
     ],
   },

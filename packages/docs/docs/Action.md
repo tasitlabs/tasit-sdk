@@ -1,6 +1,12 @@
 <!-- Note: Not linked to in the docs right now on purpose. -->
 <!-- TODO: Make use of this info after updating it. -->
 
+<!-- ---
+id: action
+title: Action
+sidebar_label: Action
+--- -->
+
 # Reading and writing data and reacting to events
 
 This explains how one can use Tasit to interact with smart contracts at different levels of abstraction.
@@ -11,33 +17,26 @@ _Note:_ This functionality all "lives" in `@tasit/action`, a child package of [`
 
 Why `@tasit/action`? **action:** [ak-shən], noun. "a thing done". It's also nice that "act" (the verb form) is part of the words _contract_ and _abstraction_ and _transaction_. Finally, directors say “action” before starting to film a scene in a movie. Also, since this package supports meta-transactions, it's not quite correct to call them transactions. "action" is our catch-all word for transactions and meta-transactions.
 
-### Table of Contents
+## Table of Contents
 
 - [Getting data](#getting-data)
-
 - [Setting data](#setting-data)
-
 - [Listening for events](#listening-for-events)
-
 - [Topics for the future](#topics-for-the-future)
-
 - [Notes](#notes)
 
 # Docs
 
-### Getting data
+## Getting data
 
 - [Decentraland](#getting-data---decentraland)
-
 - [ERC721](#getting-data---erc721)
-
-- [Low-level Tasit middleware](#getting-data---low-level-tasit-sdk-middleware)
-
+- [Low-level Tasit middleware](#getting-data---low-level-tasit-middleware)
 - [Contract API from ethers](#getting-data---contract-api-from-ethers)
 
-##### Getting data - Decentraland
+### Getting data - Decentraland
 
-Let's start at the highest level of abstraction possible, where we can construct our ideal API for the end user assuming we know the SDK is being used specifically for the Decentraland contracts.
+Let's start at the highest level of abstraction possible, where we can construct our ideal API for the end user assuming we know `tasit` is being used specifically for the Decentraland contracts.
 
 I think at this level of abstraction, we don't use ERC165 interface detection like we do at lower levels (see below). But actually, using it at all warrants more thought, depending on whether we're assuming the user knows the full contract ABI or not (and depending on whether ethers assumes that.)
 
@@ -78,12 +77,12 @@ All of this could be done with a little more work using just the ERC721 abstract
 
 Open questions:
 
-- Whether the address should be configurable at this level of abstraction. For instance, the developer using this SDK might know sooner than Tasit project core devs do that a non-upgradeable contract project (that is, a standard smart contract project - not a delegatecall + proxy project) is deploying new contracts and will be using a new interface address from now on.
+- Whether the address should be configurable at this level of abstraction. For instance, the developer using `tasit` might know sooner than Tasit project core devs do that a non-upgradeable contract project (that is, a standard smart contract project - not a delegatecall + proxy project) is deploying new contracts and will be using a new interface address from now on.
 - Whether the ABI should be in version control in this package or whether we want to add functionality for getting it from the web, using Etherscan's API or hopefully a decentralized npm where teams publish generated files like ABIs down the road.
 
-##### Getting data - ERC721
+### Getting data - ERC721
 
-Let's now consider a slightly lower level of abstraction, where we can construct our ideal API for the end user assuming we know the SDK is being used specifically for an ERC721 (NFT) contract, but not which one until the user instantiates the contract using the SDK.
+Let's now consider a slightly lower level of abstraction, where we can construct our ideal API for the end user assuming we know `tasit` is being used specifically for an ERC721 (NFT) contract, but not which one until the user instantiates the contract using `tasit`.
 
 There's functionality for determining what ERC721 features it supports beyond the basic, required ones using ERC165 interface detection.
 
@@ -122,7 +121,7 @@ Fetching additional metadata from the tokenURI is obviously something we need to
 
 Fetching images from additional URIs linked to in the JSON blob available at the main tokenURI will also be a common use case in the app.
 
-##### Getting data - Low-level Tasit middleware
+### Getting data - Low-level Tasit middleware
 
 A low-level library for calling all of the functions on a given smart contract and listening to events from the smart contract.
 
@@ -146,7 +145,7 @@ const supportsInterface = await contract.usesSupportsInterface();
 
 Let's use ERC165 to see if this contract uses the ERC721Metadata extension. Remember, this will be a longer shot because we're just using `@tasit/action`, not the ERC721 abstraction that already "knows" ERC165 is popular for ERC721s. Unlike above where we did `nft.detectInterfaces()`, we don't know the hashes of the interfaces to check for without the prior knowledge of what type of contract this is. So we'll need to check for ERC721Metadata using its hash as an argument.
 
-If we decide the user of the SDK has to have the full ABI at this point, maybe this feature is less useful.
+If we decide the user of `tasit` has to have the full ABI at this point, maybe this feature is less useful.
 
 ```javascript
 // TODO: Add the proper type conversion, etc.
@@ -179,17 +178,17 @@ Find all `view` (`external` or `public`) functions. Assume they're the interesti
 
 Possibly even infer from param types what they might do, but that's a lot harder.
 
-##### Getting data - Contract API from ethers
+### Getting data - Contract API from ethers
 
 Let's re-read the `@tasit/action` section above when it is finalized and see how much it differs from the [ethers abstraction for connecting to contracts](https://docs.ethers.io/ethers.js/html/api-contract.html#connecting-to-existing-contracts).
 
 We'll want to do the same for setting data and listening for events too. As long as there's any abstraction we want on top of the ethers contract functions, `@tasit/action` support for contracts of unknown type seems justified. Setting data / creating transactions is very likely to diverge from the ethers library.
 
-### Setting data
+## Setting data
 
 Setting data could possibly be non-async if it's like publishing in pubsub. There's additional info on this in the [notes](#notes) section at the beginning.
 
-- [Low-level Tasit middleware](#setting-data---low-level-tasit-sdk-middleware)
+- [Low-level Tasit middleware](#setting-data---low-level-tasit-middleware)
 
 - [Contract API from ethers](#setting-data---contract-api-from-ethers)
 
@@ -197,7 +196,7 @@ Setting data could possibly be non-async if it's like publishing in pubsub. Ther
 
 - [ERC721](#setting-data---erc721)
 
-##### Setting data - Low-level Tasit middleware
+### Setting data - Low-level Tasit middleware
 
 When using the contract abstraction from ethers, the functions for setting data return a transaction hash.
 
@@ -223,21 +222,21 @@ const handlerFunction = message => {
 action.on("confirmation", handlerFunction);
 ```
 
-You could even imagine pre-attaching a listener with a handlerFunction by default for a few pubsub topics that the user of the SDK is likely to want.
+You could even imagine pre-attaching a listener with a handlerFunction by default for a few pubsub topics that the user of `tasit` is likely to want.
 
 Since remembering to remove the listener is a little clunky, we could also include a variant that unsubscribes after the first message for that topic. This is a pretty common pattern.
 
 `contract.once("enoughConfirmations", handlerFunction)`
 
-For more customization of how this works, during or before sending the transaction the user of the SDK could pick which types of events they want to be subscribed to.
+For more customization of how this works, during or before sending the transaction the user of `tasit` could pick which types of events they want to be subscribed to.
 
-##### Setting data - Contract API from ethers
+### Setting data - Contract API from ethers
 
 Setting data on a contract returns a tx hash. In the example in the ethers docs, the next step is to `await` to see that the transaction has been confirmed.
 
 `@tasit/action` has more of a "optimistic updates" but "be sure to handle error cases" philosophy. Of course that could be achieved with the lower-level ethers API too, but the `@tasit/action` abstraction gently guides the user towards that approach in a more opinionated fashion.
 
-##### Setting data - Decentraland
+### Setting data - Decentraland
 
 ```javascript
 // TODO: Add me
@@ -245,7 +244,7 @@ Setting data on a contract returns a tx hash. In the example in the ethers docs,
 // extrapolate how this would work from the rest
 ```
 
-##### Setting data - ERC721
+### Setting data - ERC721
 
 ```javascript
 // TODO: Add me
@@ -253,9 +252,9 @@ Setting data on a contract returns a tx hash. In the example in the ethers docs,
 // extrapolate how this would work from the rest
 ```
 
-### Listening for events
+## Listening for events
 
-- [Low-level Tasit middleware](#listening-for-events---low-level-tasit-sdk-middleware)
+- [Low-level Tasit middleware](#listening-for-events---low-level-tasit-middleware)
 
 - [ERC721](#listening-for-events---erc721)
 
@@ -263,7 +262,7 @@ Setting data on a contract returns a tx hash. In the example in the ethers docs,
 
 - [Contract API from ethers](#listening-for-events---contract-api-from-ethers)
 
-##### Listening for events - Low-level Tasit middleware
+### Listening for events - Low-level Tasit middleware
 
 Listening for events has a similar subcriptions API to the one you use after creating a transaction (see above).
 
@@ -275,7 +274,7 @@ Here, it is initiated explicitly with a subscribe function.
 contract.on("ExampleEvent", handlerFunction);
 ```
 
-##### Listening for events - ERC721
+### Listening for events - ERC721
 
 Note: The ERC721 level of abstraction for listening for events would already know what events to listen for and let you subscribe to them like so:
 
@@ -287,7 +286,7 @@ contract.off("Transfer");
 
 In this example there's an event `Transfer` as one of the events supported by ERC721. After unsubscribing from transfer events, you're still be subscribed to other events emitted by the contract.
 
-##### Listening for events - Decentraland
+### Listening for events - Decentraland
 
 ```javascript
 // TODO: Add me
@@ -295,7 +294,7 @@ In this example there's an event `Transfer` as one of the events supported by ER
 // extrapolate how this would work from the rest
 ```
 
-##### Listening for events - Contract API from ethers
+### Listening for events - Contract API from ethers
 
 ```javascript
 // TODO: Add me
@@ -303,11 +302,11 @@ In this example there's an event `Transfer` as one of the events supported by ER
 // extrapolate how this would work from the rest
 ```
 
-### Topics for the future
+## Topics for the future
 
 Is it worth considering having upgradeable smart contracts being a first-class feature of this package? That would mean not assuming the ABI you have right now will always work. But, it could still assume that there will be a backwards compatibility guarantee and that the existing ABI functions would continue to be supported.
 
-### Notes
+## Notes
 
 Getting data is like an HTTP(S) request, so it should be async. Because doing the JSON-RPC request to Infura and getting data back has network lag.
 

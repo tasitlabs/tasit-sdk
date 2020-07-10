@@ -1,18 +1,16 @@
 ---
 id: publishing
 title: (Internal docs) Publishing
-sidebar_label: (Internal docs) Publishing
+sidebar_label: Publishing
 ---
-
-### Publishing new versions
 
 **Note: This doc is mainly useful for the Tasit team to publish new versions of Tasit, not for a team using Tasit.**
 
 1. Create a publish issue on GitHub (with the desired new version number in the name).
 
-1. Create a new branch (e.g. `feature/publish-1-2-3`) from an updated `develop` branch.
+2. Create a new branch (e.g. `feature/publish-1-2-3`) from an updated `develop` branch.
 
-1. Run `npm run publish` script
+3. Run `npm run publish` script
 
    This script will clean packages, install dependencies, compile and test all packages. If all these steps run without error, the `lerna publish` routine will be called and a prompt will be shown:
 
@@ -29,7 +27,7 @@ sidebar_label: (Internal docs) Publishing
       Custom Version
     ```
 
-1. After the selection of the correct option, the packages that are about to have new versions published are listed:
+4. After the selection of the correct option, the packages that are about to have new versions published are listed:
 
 
     ```
@@ -44,16 +42,16 @@ sidebar_label: (Internal docs) Publishing
     ? Are you sure you want to publish these packages? (ynH)
     ```
 
-1. If that's correct, press `y` to publish the packages.
+5. If that's correct, press `y` to publish the packages.
 
-1. During the publishing process, Lerna will update the `package.json` files with the new version and push changes to the GitHub repository (and to npm, of course).
+6. During the publishing process, Lerna will update the `package.json` files with the new version and push changes to the GitHub repository (and to npm, of course).
 
-1. If that was successful, create a new PR that auto-closes the issue created in step 1.
+7. If that was successful, create a new PR that auto-closes the issue created in step 1.
 
-**Troubleshooting**
+### Troubleshooting
 
 Sometimes during the `lerna bootstrap` process, the file `package-lock.json` can be changed, and that will make `lerna publish` abort. Publishing will only be done if there are no unstaged files in the `git` repo. To solve that, commit the file and run the `publish` script again.
 
 ---
 
-[Go back](Home.md) to the home page of the docs.
+[Go back](Introduction.md) to the home page of the docs.

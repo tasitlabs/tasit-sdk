@@ -1,4 +1,5 @@
-import ConfigLoader from "../ConfigLoader";
+import TasitProviderHelpers from "@tasit/provider-helpers";
+const { ConfigLoader } = TasitProviderHelpers;
 
 interface CustomError extends Error {
   eventName?: any;

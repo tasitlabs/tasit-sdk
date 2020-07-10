@@ -17,6 +17,7 @@
     "lint": "tsdx lint",
     "prepare": "tsdx build"
   },
+  "peerDependencies": {},
   "husky": {
     "hooks": {
       "pre-commit": "tsdx lint"
@@ -28,9 +29,9 @@
     "singleQuote": true,
     "trailingComma": "es5"
   },
-  "name": "@tasit/test-helpers",
+  "name": "@tasit/provider-helpers",
   "author": "Tasit Labs",
-  "module": "dist/test-helpers.esm.js",
+  "module": "dist/provider-helpers.esm.js",
   "devDependencies": {
     "husky": "^4.2.5",
     "tsdx": "^0.13.2",
@@ -38,8 +39,6 @@
     "typescript": "^3.9.6"
   },
   "dependencies": {
-    "@tasit/provider-helpers": "^0.0.30",
     "ethers": "^4.0.47"
-  },
-  "gitHead": "a7ecd59c99e09f0b6a61aa3c277c2a3e9aab13bf"
+  }
 }
