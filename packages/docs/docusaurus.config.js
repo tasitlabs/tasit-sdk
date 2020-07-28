@@ -1,3 +1,5 @@
+require('dotenv').config()
+
 module.exports = {
   title: "Tasit",
   tagline: "A JavaScript / TypeScript SDK for building native mobile Ethereum dapps with React Native",
@@ -13,7 +15,7 @@ module.exports = {
         alt: "Tasit logo",
         src: "img/TasitLogoSvg.svg",
       },
-      links: [
+      items: [
         { to: "docs/introduction", label: "Docs", position: "left" },
         {
           href: "https://github.com/tasitlabs/tasit-sdk",
@@ -71,10 +73,10 @@ module.exports = {
       ],
       copyright: `Copyright © ${new Date().getFullYear()} Tasit Labs`,
     },
-    // algolia: {
-    //   apiKey: process.env.REACT_APP_API_KEY,
-    //   indexName: process.env.REACT_APP_INDEX_NAME
-    // }
+    algolia: {
+      apiKey: process.env.API_KEY,
+      indexName: process.env.INDEX_NAME
+    }
   },
   presets: [
     [
@@ -91,4 +93,7 @@ module.exports = {
       },
     ],
   ],
+  plugins: [
+    'docusaurus2-dotenv'
+  ]
 };

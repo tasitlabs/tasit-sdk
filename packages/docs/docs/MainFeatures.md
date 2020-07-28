@@ -30,7 +30,7 @@ The intended UX is that this account should NOT have any significant amount of E
 
 For users without any ETH or tokens, any costs the user incurs at first should be subsidized.
 
-For more info, see [`@tasit/account`](/packages/account/).
+For more info, see [`@tasit/account`](https://github.com/tasitlabs/tasit-sdk/tree/develop/packages/account/).
 
 _This means fewer steps that need to be taken to onboard a new user._
 
@@ -57,7 +57,7 @@ const contractBasedAccount = await create2ContractBasedAccount.deploy();
 console.log(contractBasedAccount.ensName); // paul.{NAMEOFTHISDAPP}.eth
 ```
 
-For more info, see [`@tasit/contract-based-account`](/packages/contract-based-account/).
+For more info, see [`@tasit/contract-based-account`](https://github.com/tasitlabs/tasit-sdk/tree/develop/packages/contract-based-account/).
 
 ## Optimistic UI
 
@@ -88,7 +88,7 @@ As a mobile developer, using Tasit to interact with the backend should be as sim
 
 This middleware wraps the core ethers.js contract API for making JSON-RPC requests.
 
-Fore more info, see [`@tasit/action`](/packages/action/).
+Fore more info, see [`@tasit/action`](https://github.com/tasitlabs/tasit-sdk/tree/develop/packages/action/).
 
 _This makes the experience for new developers working on a mobile app with Tasit simpler, which means more mobile dapps for end users._
 
@@ -98,7 +98,7 @@ A native mobile dapp should be read-only for as long as possible. The user shoul
 
 The flow for reading data from The Graph or directly from contracts without onboarding first just works with no special configuration.
 
-For more info, see [`@tasit/action`](/packages/action/).
+For more info, see [`@tasit/action`](https://github.com/tasitlabs/tasit-sdk/tree/develop/packages/action/).
 
 ---
 
