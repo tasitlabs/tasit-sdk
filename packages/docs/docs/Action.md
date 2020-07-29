@@ -42,7 +42,7 @@ I think at this level of abstraction, we don't use ERC165 interface detection li
 
 We just know the ABI for the open source contracts for that exact project and assume the presence of these functions. The developer can still use the lower-level APIs to confirm, though.
 
-```javascript
+```ts
 import { Decentraland } from @tasit/action
 // We already know what would have normally been the params here
 // (contractABI, address, etc.)
@@ -51,19 +51,19 @@ const decentraland = new Decentraland()
 
 Low-level functions still work
 
-```javascript
+```ts
 const balance = await decentraland.balanceOf(owner);
 ```
 
 Optional: Expose higher-level functions that are specific to this dapp
 
-```javascript
+```ts
 // This is not necessarily the name of the function in the contracts
 // but whatever we think would be simplest for the developer using this
 const [x, y] = await decentraland.getLandCoordinates(landId);
 ```
 
-```javascript
+```ts
 // Decentraland has some land owned by estates which are owned by users
 // and some land owned directly by users
 // You might want to get all the land a user owns even if they have it
@@ -92,7 +92,7 @@ But maybe there doesn't need to be if we decide the contract ABI will be present
 
 Anyway, here's how to instantiate the contract:
 
-```javascript
+```ts
 // TODO: Decide if we can instantiate this with more or less params
 const nft = new NFT(address, contractABI);
 // or
@@ -103,7 +103,7 @@ const nft = new NFT(address); // with an assumed ABI
 
 Internally it calls the lower level `contract.usesSupportsInterface()` first to see if checking for specific interfaces is even worthwhile.
 
-```javascript
+```ts
 const { supportsMetadata } = await nft.detectInterfaces();
 if (supportsMetadata) {
   const metadata = await nft.getMetadata();
@@ -113,7 +113,7 @@ if (supportsMetadata) {
 
 Alternatively, because tokenURI is just an `external` or `public` `view` function you can get it directly using the underlying "call a contract method" approach you'll see used exclusively below in the lower-level `@tasit/action` library with no prior knowledge about contract type.
 
-```javascript
+```ts
 const tokenURI = await nft.tokenURI(tokenId);
 ```
 
@@ -127,7 +127,7 @@ A low-level library for calling all of the functions on a given smart contract a
 
 To make this example comparable with the ERC721 example above, let's say the contract happens to be of the same type, ERC721.
 
-```javascript
+```ts
 // TODO: Finalize way to instantiate contract.
 // Maybe just the same as ethers?
 const contract = new contract(address, contractABI);
@@ -138,7 +138,7 @@ const owner = await contract.ownerOf(tokenId);
 
 Checks whether the contract will let you look up other interfaces it implements using ERC165
 
-```javascript
+```ts
 // supportsInterface is a bool
 const supportsInterface = await contract.usesSupportsInterface();
 ```
@@ -147,7 +147,7 @@ Let's use ERC165 to see if this contract uses the ERC721Metadata extension. Reme
 
 If we decide the user of `tasit` has to have the full ABI at this point, maybe this feature is less useful.
 
-```javascript
+```ts
 // TODO: Add the proper type conversion, etc.
 // Note: This is straight from Solidity - the string as it is probably isn't right.
 const INTERFACE_ID_ERC721_METADATA = "0x5b5e139f";
@@ -206,7 +206,7 @@ So the "set" should return something that lets the user subscribe for the 1st or
 
 Here's one option for how it could work:
 
-```javascript
+```ts
 const action = contract.transferFrom(from, to, tokenId);
 
 const handlerFunction = message => {
@@ -238,7 +238,7 @@ Setting data on a contract returns a tx hash. In the example in the ethers docs,
 
 ### Setting data - Decentraland
 
-```javascript
+```ts
 // TODO: Add me
 // But this far down in in the docs, you can probably
 // extrapolate how this would work from the rest
@@ -246,7 +246,7 @@ Setting data on a contract returns a tx hash. In the example in the ethers docs,
 
 ### Setting data - ERC721
 
-```javascript
+```ts
 // TODO: Add me
 // But this far down in in the docs, you can probably
 // extrapolate how this would work from the rest
@@ -270,7 +270,7 @@ But unlike for "set" operations, the subscription isn't created implicitly.
 
 Here, it is initiated explicitly with a subscribe function.
 
-```javascript
+```ts
 contract.on("ExampleEvent", handlerFunction);
 ```
 
@@ -278,7 +278,7 @@ contract.on("ExampleEvent", handlerFunction);
 
 Note: The ERC721 level of abstraction for listening for events would already know what events to listen for and let you subscribe to them like so:
 
-```javascript
+```ts
 // Subscriptions is an object where the keys are the event names from ERC721
 contract.onAll(handlerFunction);
 contract.off("Transfer");
@@ -288,7 +288,7 @@ In this example there's an event `Transfer` as one of the events supported by ER
 
 ### Listening for events - Decentraland
 
-```javascript
+```ts
 // TODO: Add me
 // But this far down in in the docs, you can probably
 // extrapolate how this would work from the rest
@@ -296,7 +296,7 @@ In this example there's an event `Transfer` as one of the events supported by ER
 
 ### Listening for events - Contract API from ethers
 
-```javascript
+```ts
 // TODO: Add me
 // But this far down in in the docs, you can probably
 // extrapolate how this would work from the rest
