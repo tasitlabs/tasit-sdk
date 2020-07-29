@@ -34,7 +34,7 @@ Simple integration of fiat onramps that let users use Apple Pay and Google pay
 
 ### The Graph
 
-```js
+```ts
 const action = contract.safeTransferfrom(/*...*/);
 action.on("error", errorListener);
 action.on("presentInTheGraph", successListener);
@@ -60,7 +60,7 @@ paul.tasit.eth
 
 ### Meta-transactions
 
-```js
+```ts
 const action = contract.myFavoriteMethod(/*...*/);
 action.on("error", errorListener);
 action.on("enoughConfirmations", successListener);

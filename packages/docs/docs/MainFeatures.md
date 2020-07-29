@@ -40,6 +40,8 @@ Give them a contract-based account so that the UX around securing keys and recov
 
 For example, set up a [Gnosis Safe](https://safe.gnosis.io/) for the user.
 
+<!-- TODO: Update this example to use hooks -->
+
 ```ts
 const { address: burnerWalletAddress } = burnerWallet;
 const username = "paul";
@@ -59,11 +61,13 @@ console.log(contractBasedAccount.ensName); // paul.{NAMEOFTHISDAPP}.eth
 
 For more info, see [`@tasit/contract-based-account`](https://github.com/tasitlabs/tasit-sdk/tree/develop/packages/contract-based-account/).
 
+Here's an [example app](https://github.com/tasitlabs/tasit-apps/tree/develop/apps/account-recovery) using the account and contract-based account functionality from `tasit`.
+
 ## Optimistic UI
 
 Tasit provides JavaScript/TypeScript middleware for reading from and writing to smart contracts (and listening to events) through an expressive pub/sub API.
 
-```js
+```ts
 import { Contract } from "tasit";
 const { NFT } = Contract;
 
