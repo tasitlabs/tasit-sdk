@@ -75,7 +75,7 @@
     "typescript": "^3.9.5"
   },
   "dependencies": {
-    "@openzeppelin/contracts": "3.0.2"
+    "@openzeppelin/contracts": "4.4.2"
   },
   "gitHead": "41dbf759be32bad0d5f45282218ab0e4df40cb36"
 }
