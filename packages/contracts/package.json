@@ -61,7 +61,7 @@
     "@types/node": "^14.0.13",
     "chai": "^4.2.0",
     "dotenv-flow": "^3.1.0",
-    "ethereum-waffle": "^2.5.1",
+    "ethereum-waffle": "^4.0.7",
     "ethers": "^4.0.47",
     "node-fetch": "^2.6.0",
     "npm-check-updates": "^7.0.1",
